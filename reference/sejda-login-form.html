@@ -1,0 +1,49 @@
+id="content">
+            <div class="container centered">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row login">
+                            <div><img src="/images/icon.svg" class="center-logo"></div>
+                            <h1>Sign in to your account</h1>
+
+                            <form autocomplete="off" id="login-form" class="form">
+                                <div class="alert-wrap"><div style="display: none" class="alert alert-danger"></div></div>
+                                <input required="required" name="email" type="text" class="form-control input-lg" placeholder="Email" value="">
+
+                                <input style="margin-top: 20px;" required="required" name="password" type="password" class="form-control input-lg pwd-login-elem" placeholder="Password" value="">
+
+                                <div style="display: none" class="form-group verification-code-group">
+                                    <br>
+                                    <label style="color: #999;">Email verification code</label>
+                                    <input type="text" class="form-control" name="emailVerificationCode" placeholder="123456">
+
+                                    <p class="help-block">
+                                        Please confirm it's really you.<br>
+                                        <span class="check_inbox_link">Check your inbox</span>.
+                                        We've sent a verification code to your email address.
+                                        <br><br>
+                                        No email? Check your "Spam" folder or use the previously received verification code.
+                                    </p>
+                                </div>
+                                
+                                <input value="5P2FSZAB1JOKAO2V1ETO" name="csrf" id="csrf" type="hidden">
+
+                                <div class="cf-turnstile" id="cf-turnstile"><div><div></div><input type="hidden" name="cf-turnstile-response" id="cf-chl-widget-bpb1x_response"></div></div>
+
+                                <button class="btn btn-medium form-submit btn-login pwd-login-elem" type="submit"><i class="fal fa-lock"></i> Sign in</button>
+                                
+                                <button class="btn btn-medium btn-login-sso sso-login-elem" type="button" style="display:none">Continue with SSO <i style="margin-left: 5px; margin-right: 0;" class="fal fa-chevron-right"></i> </button>
+
+                                <div class="switch-use-pwd sso-login-elem"><a href="javascript://">Use password to login</a></div>
+                                <div class="forgot pwd-login-elem"><a target="_blank" href="./reset-password">Reset password</a></div>
+                            </form>
+
+                            <section id="alternativeSigninOpts">
+                                <div style="margin-bottom: 40px" class="divider-line-with-text">
+                                    <p>or alternatively</p>
+                                </div>
+                                <section id="google-signin-preload">
+                                    <div class="btn-login-google-preload">
+                                        <img src="/images/icons/google.svg" class="icon"> Sign in with Google 
+                                    </div>
+                                </section>
