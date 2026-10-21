@@ -196,5 +196,30 @@ describe('StateStore Engine Tests', () => {
     store.clearCropSettings();
     assert.strictEqual(store.getState().cropSettings, null);
   });
+
+  test('bates numbering configuration and clear', () => {
+    const bates = { prefix: 'CASE-', startNumber: 1, digits: 6, suffix: '-A', position: 'bottom-right', color: '#1e293b' };
+    store.setBatesNumbering(bates);
+
+    assert.deepStrictEqual(store.getState().batesNumbering, bates);
+
+    store.undo();
+    assert.strictEqual(store.getState().batesNumbering, null);
+
+    store.redo();
+    assert.deepStrictEqual(store.getState().batesNumbering, bates);
+
+    store.clearBatesNumbering();
+    assert.strictEqual(store.getState().batesNumbering, null);
+  });
+
+  test('flatten forms toggle', () => {
+    assert.strictEqual(store.getState().flattenForms, false);
+    store.setFlattenForms(true);
+    assert.strictEqual(store.getState().flattenForms, true);
+    store.setFlattenForms(false);
+    assert.strictEqual(store.getState().flattenForms, false);
+  });
 });
+
 

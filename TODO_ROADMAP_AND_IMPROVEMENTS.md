@@ -142,30 +142,30 @@ gantt
 Below is the roadmap for extending our PDF Studio suite to match every single tool on Sejda's platform. Complete technical recipes and reverse-engineering findings are documented in [`SEJDA_FULL_SUITE_REVERSE_ENGINEERING.md`](file:///home/codxbrexx/Pdf-Editor/SEJDA_FULL_SUITE_REVERSE_ENGINEERING.md).
 
 ### Category 1: Merge, Split & Page Organization
-- [ ] **Merge PDF (`/merge-pdf`):** Combine multiple PDF uploads into one document using `PDFDocument.create()` and `copyPages()`.
-- [ ] **Alternate & Mix (`/alternate-mix-pdf`):** Interleave odd pages from Doc A and even pages from Doc B (duplex scanner flow).
-- [ ] **Organize & Reorder (`/organize-pdf`):** Visual full-grid page drag-and-drop sequencing.
-- [ ] **Split by Pages (`/split-pdf`):** Subdivide document by custom ranges (e.g. `1-3, 4-7, 8-12`).
+- [x] **Merge PDF (`/merge-pdf`):** Combine multiple PDF uploads into one document using `PDFDocument.create()` and `copyPages()` via sidebar.
+- [x] **Alternate & Mix (`/alternate-mix-pdf`):** Interleave odd pages from Doc A and even pages from Doc B (duplex scanner flow) via [`src/components/alternate-mix-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/alternate-mix-modal.js).
+- [x] **Organize & Reorder (`/organize-pdf`):** Visual full-grid page drag-and-drop sequencing with live thumbnail preview.
+- [x] **Split by Pages (`/split-pdf`):** Subdivide document by custom ranges (e.g. `1-2, 3-4`) or extract all pages via [`src/components/split-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/split-modal.js).
 - [ ] **Split in Half (`/split-pdf-down-the-middle`):** Bisect A3 or two-page book scans down the center into separate A4 pages.
-- [ ] **Delete & Extract Pages (`/delete-pdf-pages` & `/extract-pdf-pages`):** Extract selected pages to new file.
+- [x] **Delete & Extract Pages (`/delete-pdf-pages` & `/extract-pdf-pages`):** Extract selected pages or delete individual pages via sidebar thumbnail controls.
 
 ### Category 2: Security & Watermarking
-- [ ] **Protect / Encrypt (`/encrypt-pdf`):** User & owner passwords with AES-256 and print/copy restriction flags.
+- [x] **Protect / Encrypt (`/encrypt-pdf`):** User & owner passwords with AES-256 and print/copy restriction flags via [`src/components/security-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/security-modal.js).
 - [ ] **Unlock (`/unlock-pdf`):** Decrypt and strip password restrictions.
-- [ ] **Watermark (`/watermark-pdf`):** Diagonal text or logo watermark with configurable opacity (0.1 - 1.0) and rotation angle.
-- [ ] **Flatten (`/flatten-pdf`):** Bake all form fields and annotations permanently into the page stream.
+- [x] **Watermark (`/watermark-pdf`):** Diagonal text or logo watermark with configurable opacity (0.1 - 1.0) and rotation angle via [`src/components/watermark-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/watermark-modal.js).
+- [x] **Flatten (`/flatten-pdf`):** Bake all interactive AcroForm fields and annotations permanently into static vector page streams via `form.flatten()`.
 
 ### Category 3: Page Geometry & Dimensions
-- [ ] **Crop PDF (`/crop-pdf`):** Interactive marquee crop setting `setCropBox()`.
+- [x] **Crop PDF (`/crop-pdf`):** Interactive margin crop setting `setCropBox()` with presets and live margin preview via [`src/components/crop-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/crop-modal.js).
 - [ ] **Resize Margins (`/resize-pdf`):** Adjust page bounds (A4, Letter) and add margin padding for binding.
-- [ ] **Bates Numbering (`/bates-numbering-pdf`):** Legal numbering sequences with custom prefix and zero-padding.
-- [ ] **Header & Footer / Page Numbers (`/header-footer-pdf`):** Apply `Page {n} of {total}` across all pages with 6 alignment positions.
-- [ ] **N-Up Printing (`/n-up-pdf`):** Place 2 or 4 pages per sheet onto an enlarged page.
+- [x] **Bates Numbering (`/bates-numbering-pdf`):** Legal numbering sequences with custom prefix, start index, zero-padding, and 6 positions via [`src/components/bates-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/bates-modal.js).
+- [x] **Header & Footer / Page Numbers (`/header-footer-pdf`):** Apply `Page {n} of {total}` across all pages with 6 alignment positions via [`src/components/pagenumbers-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/pagenumbers-modal.js).
+- [x] **N-Up Printing (`/n-up-pdf`):** Place 2 or 4 pages per sheet onto an enlarged page via [`src/components/nup-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/nup-modal.js).
 
 ### Category 4: Conversions & OCR
 - [ ] **PDF to JPG / PNG (`/pdf-to-jpg`):** Render pages at 72, 150, or 300 DPI and download individual images or a ZIP.
-- [ ] **JPG / Images to PDF (`/jpg-to-pdf`):** Pack multiple image files into a single multi-page PDF document.
-- [ ] **PDF to Text (`/extract-text-from-pdf`):** Extract all searchable document text using `page.getTextContent()`.
-- [ ] **Edit Metadata (`/edit-pdf-metadata`):** Update Title, Author, Subject, Keywords, and Creator tags.
+- [x] **JPG / Images to PDF (`/jpg-to-pdf`):** Pack multiple image files into a single multi-page PDF document via `pdfEngine.imagesToPdf()`.
+- [x] **PDF to Text (`/extract-text-from-pdf`):** Extract all searchable document text using decompressed binary content stream parsing via `pdfEngine.extractDocumentText()`.
+- [x] **Edit Metadata (`/edit-pdf-metadata`):** Update Title, Author, Subject, Keywords, Creator, and Producer tags via [`src/components/metadata-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/metadata-modal.js).
 - [ ] **OCR PDF (`/ocr-pdf`):** Run Tesseract.js (WebAssembly) on image pages to inject an invisible searchable text layer.
 

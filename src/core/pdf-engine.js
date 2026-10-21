@@ -3,14 +3,18 @@
  */
 
 import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, degrees, StandardFonts, PDFName, PDFArray } from 'pdf-lib';
 import { hexToRgb } from '../utils/helpers.js';
 import { applyPdfEncryption } from './pdf-crypto.js';
-import { redactPageContentStreams } from './pdf-redactor.js';
+import { redactPageContentStreams, pdfHexToString, decompressStreamBytes } from './pdf-redactor.js';
 
 // Setup PDF.js worker
-const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+const workerSrc = typeof window !== 'undefined'
+  ? new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+  : '';
+if (workerSrc) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+}
 
 export class PdfEngine {
   constructor() {
@@ -211,6 +215,346 @@ export class PdfEngine {
     this.rawBytes = newBytes.buffer;
     const info = await this.loadPdf(this.rawBytes);
     return info.numPages;
+  }
+
+  /**
+   * Splits or extracts pages from the active PDF based on a range expression.
+   * e.g. "1-2, 3" -> generates separate documents.
+   * @param {string} rangeExpression - e.g. "1-2, 3" or "all"
+   * @returns {Promise<Array<{ name: string, bytes: Uint8Array, pageCount: number }>>}
+   */
+  async splitPdf(rangeExpression) {
+    if (!this.rawBytes) throw new Error('No PDF loaded to split');
+    const sourceDoc = await PDFDocument.load(this.rawBytes);
+    const totalPages = sourceDoc.getPageCount();
+
+    if (!rangeExpression || rangeExpression.trim().toLowerCase() === 'all') {
+      // Split each page into individual documents
+      const results = [];
+      for (let i = 0; i < totalPages; i++) {
+        const subDoc = await PDFDocument.create();
+        const [page] = await subDoc.copyPages(sourceDoc, [i]);
+        subDoc.addPage(page);
+        const bytes = await subDoc.save();
+        results.push({
+          name: `page_${i + 1}.pdf`,
+          bytes,
+          pageCount: 1
+        });
+      }
+      return results;
+    }
+
+    // Parse comma-separated ranges: e.g. "1-2, 3-5"
+    const groups = rangeExpression.split(',').map(s => s.trim()).filter(Boolean);
+    const results = [];
+
+    for (let gIdx = 0; gIdx < groups.length; gIdx++) {
+      const g = groups[gIdx];
+      let pageIndices = [];
+      if (g.includes('-')) {
+        const [startStr, endStr] = g.split('-').map(s => s.trim());
+        const start = Math.max(1, parseInt(startStr, 10));
+        const end = Math.min(totalPages, parseInt(endStr, 10));
+        for (let p = start; p <= end; p++) {
+          pageIndices.push(p - 1);
+        }
+      } else {
+        const p = parseInt(g, 10);
+        if (p >= 1 && p <= totalPages) {
+          pageIndices.push(p - 1);
+        }
+      }
+
+      if (pageIndices.length > 0) {
+        const subDoc = await PDFDocument.create();
+        const pages = await subDoc.copyPages(sourceDoc, pageIndices);
+        pages.forEach(pg => subDoc.addPage(pg));
+        const bytes = await subDoc.save();
+        results.push({
+          name: `split_range_${g.replace(/\s+/g, '')}.pdf`,
+          bytes,
+          pageCount: pageIndices.length
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Interleaves pages from two documents (Sejda Alternate & Mix tool).
+   * Commonly used for duplex feeder scanning (Doc A = odd pages, Doc B = even pages).
+   * @param {ArrayBuffer|Uint8Array} docABytes
+   * @param {ArrayBuffer|Uint8Array} docBBytes
+   * @param {{ reverseB?: boolean }} options
+   * @returns {Promise<Uint8Array>}
+   */
+  async alternateMix(docABytes, docBBytes, options = {}) {
+    const docA = await PDFDocument.load(docABytes);
+    const docB = await PDFDocument.load(docBBytes);
+    const finalDoc = await PDFDocument.create();
+
+    const countA = docA.getPageCount();
+    const countB = docB.getPageCount();
+    const reverseB = options.reverseB !== false; // Default true for scanner flows
+
+    const indicesB = Array.from({ length: countB }, (_, i) => i);
+    if (reverseB) indicesB.reverse();
+
+    const maxCount = Math.max(countA, countB);
+
+    for (let i = 0; i < maxCount; i++) {
+      if (i < countA) {
+        const [copiedA] = await finalDoc.copyPages(docA, [i]);
+        finalDoc.addPage(copiedA);
+      }
+      if (i < countB) {
+        const bIdx = indicesB[i];
+        const [copiedB] = await finalDoc.copyPages(docB, [bIdx]);
+        finalDoc.addPage(copiedB);
+      }
+    }
+
+    return await finalDoc.save();
+  }
+
+  /**
+   * Generates N-Up imposition (2 or 4 pages per sheet onto A4).
+   * @param {number} nUpCount - 2 or 4
+   * @returns {Promise<Uint8Array>}
+   */
+  async nUpPdf(nUpCount = 2) {
+    if (!this.rawBytes) throw new Error('No PDF loaded');
+    const sourceDoc = await PDFDocument.load(this.rawBytes);
+    const finalDoc = await PDFDocument.create();
+    const numPages = sourceDoc.getPageCount();
+
+    if (nUpCount === 2) {
+      // 2-Up: Landscape A4 (841.89 x 595.28 pt)
+      const sheetW = 841.89;
+      const sheetH = 595.28;
+
+      for (let i = 0; i < numPages; i += 2) {
+        const sheet = finalDoc.addPage([sheetW, sheetH]);
+
+        const page1 = sourceDoc.getPage(i);
+        if (!page1.node.get(PDFName.of('Contents'))) {
+          page1.node.set(PDFName.of('Contents'), sourceDoc.context.register(sourceDoc.context.stream('')));
+        }
+        const ep1 = await finalDoc.embedPage(page1);
+        const sz1 = ep1.size();
+        const scale1 = Math.min((sheetW / 2 - 40) / sz1.width, (sheetH - 40) / sz1.height);
+        sheet.drawPage(ep1, {
+          x: 30 + ((sheetW / 2 - 40) - sz1.width * scale1) / 2,
+          y: (sheetH - sz1.height * scale1) / 2,
+          xScale: scale1,
+          yScale: scale1
+        });
+
+        if (i + 1 < numPages) {
+          const page2 = sourceDoc.getPage(i + 1);
+          if (!page2.node.get(PDFName.of('Contents'))) {
+            page2.node.set(PDFName.of('Contents'), sourceDoc.context.register(sourceDoc.context.stream('')));
+          }
+          const ep2 = await finalDoc.embedPage(page2);
+          const sz2 = ep2.size();
+          const scale2 = Math.min((sheetW / 2 - 40) / sz2.width, (sheetH - 40) / sz2.height);
+          sheet.drawPage(ep2, {
+            x: sheetW / 2 + 10 + ((sheetW / 2 - 40) - sz2.width * scale2) / 2,
+            y: (sheetH - sz2.height * scale2) / 2,
+            xScale: scale2,
+            yScale: scale2
+          });
+        }
+      }
+    } else {
+      // 4-Up: Portrait A4 (595.28 x 841.89 pt) in 2x2 grid
+      const sheetW = 595.28;
+      const sheetH = 841.89;
+      const cellW = sheetW / 2;
+      const cellH = sheetH / 2;
+
+      for (let i = 0; i < numPages; i += 4) {
+        const sheet = finalDoc.addPage([sheetW, sheetH]);
+        const positions = [
+          { x: 10, y: cellH + 10 },               // Top-left
+          { x: cellW + 10, y: cellH + 10 },       // Top-right
+          { x: 10, y: 10 },                       // Bottom-left
+          { x: cellW + 10, y: 10 }                // Bottom-right
+        ];
+
+        for (let sub = 0; sub < 4; sub++) {
+          const pIdx = i + sub;
+          if (pIdx < numPages) {
+            const page = sourceDoc.getPage(pIdx);
+            if (!page.node.get(PDFName.of('Contents'))) {
+              page.node.set(PDFName.of('Contents'), sourceDoc.context.register(sourceDoc.context.stream('')));
+            }
+            const ep = await finalDoc.embedPage(page);
+            const sz = ep.size();
+            const scale = Math.min((cellW - 20) / sz.width, (cellH - 20) / sz.height);
+            sheet.drawPage(ep, {
+              x: positions[sub].x + ((cellW - 20) - sz.width * scale) / 2,
+              y: positions[sub].y + ((cellH - 20) - sz.height * scale) / 2,
+              xScale: scale,
+              yScale: scale
+            });
+          }
+        }
+      }
+    }
+
+    return await finalDoc.save();
+  }
+
+  /**
+   * Converts an array of images (data URL or Uint8Array/ArrayBuffer) into a clean A4 PDF.
+   * @param {Array<{ bytes?: Uint8Array|ArrayBuffer, dataUrl?: string, isJpg?: boolean }>} imagesList
+   * @returns {Promise<Uint8Array>}
+   */
+  async imagesToPdf(imagesList) {
+    const finalDoc = await PDFDocument.create();
+    const pageW = 595.28;
+    const pageH = 841.89;
+
+    for (const item of imagesList) {
+      let imgBytes = item.bytes;
+      if (!imgBytes && item.dataUrl) {
+        if (typeof fetch !== 'undefined') {
+          imgBytes = await fetch(item.dataUrl).then(r => r.arrayBuffer());
+        }
+      }
+      if (!imgBytes) continue;
+
+      let embeddedImg;
+      const isJpg = item.isJpg || (item.dataUrl && (item.dataUrl.includes('image/jpeg') || item.dataUrl.includes('image/jpg')));
+      if (isJpg) {
+        embeddedImg = await finalDoc.embedJpg(imgBytes);
+      } else {
+        embeddedImg = await finalDoc.embedPng(imgBytes);
+      }
+
+      const imgDims = embeddedImg.scale(1.0);
+      const scale = Math.min((pageW - 40) / imgDims.width, (pageH - 40) / imgDims.height);
+      const scaledW = imgDims.width * scale;
+      const scaledH = imgDims.height * scale;
+
+      const page = finalDoc.addPage([pageW, pageH]);
+      page.drawImage(embeddedImg, {
+        x: (pageW - scaledW) / 2,
+        y: (pageH - scaledH) / 2,
+        width: scaledW,
+        height: scaledH
+      });
+    }
+
+    return await finalDoc.save();
+  }
+
+  /**
+   * Extracts all plain text across all document pages.
+   * @returns {Promise<string>}
+   */
+  async extractDocumentText() {
+    if (!this.rawBytes && !this.pdfDoc) throw new Error('No PDF loaded');
+
+    // Browser path via PDF.js if available
+    if (this.pdfDoc) {
+      const fullText = [];
+      for (let p = 1; p <= this.pdfDoc.numPages; p++) {
+        const page = await this.pdfDoc.getPage(p);
+        const content = await page.getTextContent();
+        const pageStrings = content.items.map(item => item.str).join(' ');
+        fullText.push(`--- Page ${p} ---\n${pageStrings}\n`);
+      }
+      return fullText.join('\n');
+    }
+
+    // Direct content stream parsing path (headless/Node.js safe)
+    const doc = await PDFDocument.load(this.rawBytes);
+    const numPages = doc.getPageCount();
+    const fullText = [];
+
+    for (let i = 0; i < numPages; i++) {
+      const page = doc.getPage(i);
+      const pageNum = i + 1;
+      const contentsRef = page.node.get(PDFName.of('Contents'));
+      const streamTexts = [];
+
+      if (contentsRef) {
+        const streamObjects = contentsRef instanceof PDFArray
+          ? contentsRef.asArray()
+          : (Array.isArray(contentsRef) ? contentsRef : [contentsRef]);
+        for (const ref of streamObjects) {
+          const stream = doc.context.lookup(ref);
+          if (stream && stream.getContents) {
+            let bytes = stream.getContents();
+            try {
+              const filter = stream.dict.get(PDFName.of('Filter'));
+              if (filter && (filter.encodedName === '/FlateDecode' || filter === PDFName.of('FlateDecode'))) {
+                bytes = await decompressStreamBytes(bytes);
+              }
+            } catch (e) {
+              // Proceed with uncompressed bytes
+            }
+
+            const textStr = new TextDecoder('latin1').decode(bytes);
+
+            // Match literal strings: (text) Tj
+            const literalMatches = textStr.match(/\(([^)]+)\)\s*(?:Tj|'|")/g) || [];
+            for (const lm of literalMatches) {
+              const cleaned = lm.replace(/^[('"]|[)'"]\s*(?:Tj)?$/g, '').trim();
+              if (cleaned) streamTexts.push(cleaned);
+            }
+
+            // Match hex strings: <hex> Tj
+            const hexMatches = textStr.match(/<([0-9a-fA-F]+)>\s*Tj/g) || [];
+            for (const hm of hexMatches) {
+              const hexVal = hm.replace(/[<>\sTj]/g, '');
+              const decoded = pdfHexToString(hexVal);
+              if (decoded && decoded.trim()) streamTexts.push(decoded.trim());
+            }
+
+            // Match array TJ: [(text) 10 (text2)] TJ
+            const arrayMatches = textStr.match(/\[([^\]]+)\]\s*TJ/g) || [];
+            for (const am of arrayMatches) {
+              const inArr = am.match(/\(([^)]+)\)/g) || [];
+              for (const item of inArr) {
+                const s = item.replace(/[()]/g, '').trim();
+                if (s) streamTexts.push(s);
+              }
+            }
+          }
+        }
+      }
+
+      fullText.push(`--- Page ${pageNum} ---\n${streamTexts.join(' ')}\n`);
+    }
+
+    return fullText.join('\n');
+  }
+
+  /**
+   * Renders a given page to a high-resolution Image Blob (PNG / JPEG).
+   * @param {number} pageNum
+   * @param {number} dpiScale - 1.0 (72 DPI), 2.0 (150 DPI), 4.16 (300 DPI)
+   * @param {string} format - 'image/png' or 'image/jpeg'
+   * @returns {Promise<Blob>}
+   */
+  async renderPageToImageBlob(pageNum, dpiScale = 2.0, format = 'image/png') {
+    if (!this.pdfDoc) throw new Error('No PDF loaded');
+    const page = await this.pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: dpiScale });
+    if (typeof document === 'undefined') {
+      return new Uint8Array(0);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    return new Promise(resolve => canvas.toBlob(resolve, format, 0.95));
   }
 
   /**
@@ -486,6 +830,47 @@ export class PdfEngine {
           font: helvetica,
           color: rgb(0.35, 0.35, 0.35)
         });
+      }
+
+      // Add Legal Bates Numbering if configured
+      if (state.batesNumbering) {
+        const bn = state.batesNumbering;
+        const start = Number(bn.startNumber) || 1;
+        const currentNum = start + outIdx;
+        const digits = Number(bn.digits) || 6;
+        const padded = String(currentNum).padStart(digits, '0');
+        const batesText = `${bn.prefix || ''}${padded}${bn.suffix || ''}`;
+        const batesSize = Number(bn.fontSize) || 10;
+        const batesWidth = helveticaBold.widthOfTextAtSize(batesText, batesSize);
+        const { r, g, b } = hexToRgb(bn.color || '#1e293b');
+
+        let bnX = pWidth - batesWidth - 36;
+        let bnY = 24;
+
+        if (bn.position === 'bottom-left') { bnX = 36; bnY = 24; }
+        else if (bn.position === 'bottom-center') { bnX = (pWidth - batesWidth) / 2; bnY = 24; }
+        else if (bn.position === 'bottom-right') { bnX = pWidth - batesWidth - 36; bnY = 24; }
+        else if (bn.position === 'top-left') { bnX = 36; bnY = pHeight - 34; }
+        else if (bn.position === 'top-center') { bnX = (pWidth - batesWidth) / 2; bnY = pHeight - 34; }
+        else if (bn.position === 'top-right') { bnX = pWidth - batesWidth - 36; bnY = pHeight - 34; }
+
+        copiedPage.drawText(batesText, {
+          x: bnX,
+          y: bnY,
+          size: batesSize,
+          font: helveticaBold,
+          color: rgb(r / 255, g / 255, b / 255)
+        });
+      }
+    }
+
+    // Flatten interactive forms into read-only vector page content if configured
+    if (state.flattenForms || state.flatten) {
+      try {
+        const form = finalDoc.getForm();
+        form.flatten();
+      } catch (flattenErr) {
+        // Form may have no fields or is already flat
       }
     }
 

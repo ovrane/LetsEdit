@@ -256,5 +256,143 @@ describe('PDF Vector Export & Feature Tests', () => {
     assert(Math.abs(cropBox.width - (595.28 - 50)) < 0.1);
     assert(Math.abs(cropBox.height - (841.89 - 90)) < 0.1);
   });
+
+  test('splitPdf extracts custom ranges and individual pages', async () => {
+    // Split into 2 individual ranges (1-1 and 2-2)
+    const ranges = await pdfEngine.splitPdf('1-1, 2-2');
+    assert.strictEqual(ranges.length, 2);
+    assert.strictEqual(ranges[0].pageCount, 1);
+    assert.strictEqual(ranges[1].pageCount, 1);
+
+    const doc1 = await PDFDocument.load(ranges[0].bytes);
+    assert.strictEqual(doc1.getPageCount(), 1);
+
+    // Split 'all' mode
+    const allSplits = await pdfEngine.splitPdf('all');
+    assert.strictEqual(allSplits.length, 2);
+  });
+
+  test('exportPdf compiles legal Bates numbering across pages', async () => {
+    const state = {
+      pageCount: 2,
+      pageOrder: [1, 2],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0, 2: 0 },
+      annotations: { 1: [], 2: [] },
+      watermark: null,
+      pageNumbers: null,
+      exportPassword: null,
+      batesNumbering: {
+        prefix: 'LEGAL-',
+        startNumber: 100,
+        digits: 6,
+        suffix: '-CONF',
+        position: 'bottom-right',
+        fontSize: 10,
+        color: '#0f172a'
+      }
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    const doc = await PDFDocument.load(exportedBytes);
+    assert.strictEqual(doc.getPageCount(), 2);
+  });
+
+  test('exportPdf flattens interactive form fields into static vectors', async () => {
+    const state = {
+      pageCount: 1,
+      pageOrder: [1],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0 },
+      annotations: {
+        1: [
+          {
+            id: 'field-1',
+            type: 'form',
+            formType: 'input',
+            value: 'Permanent Value',
+            x: 0.1,
+            y: 0.2,
+            width: 0.3,
+            height: 0.05
+          }
+        ]
+      },
+      watermark: null,
+      pageNumbers: null,
+      exportPassword: null,
+      flattenForms: true
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    const doc = await PDFDocument.load(exportedBytes);
+    // After flattening, form fields should be baked and no longer in getFields()
+    const form = doc.getForm();
+    assert.strictEqual(form.getFields().length, 0);
+  });
+
+  test('extractDocumentText extracts searchable plain text across all pages', async () => {
+    const text = await pdfEngine.extractDocumentText();
+    assert(typeof text === 'string');
+    assert(text.includes('Sample PDF Contract & Document'));
+    assert(text.includes('Terms & Conditions Exhibit'));
+    assert(text.includes('--- Page 1 ---'));
+    assert(text.includes('--- Page 2 ---'));
+  });
+
+  test('alternateMix interleaves pages from two documents', async () => {
+    const docA = await pdfEngine.createSamplePdf();
+    const docB = await pdfEngine.createSamplePdf();
+
+    // Alternate mix forward
+    const mixed = await pdfEngine.alternateMix(docA, docB, { reverseB: false });
+    const doc = await PDFDocument.load(mixed);
+    assert.strictEqual(doc.getPageCount(), 4);
+
+    // Alternate mix with reverse B (duplex scanner mode)
+    const duplexMixed = await pdfEngine.alternateMix(docA, docB, { reverseB: true });
+    const duplexDoc = await PDFDocument.load(duplexMixed);
+    assert.strictEqual(duplexDoc.getPageCount(), 4);
+  });
+
+  test('nUpPdf creates 2-Up and 4-Up imposition sheets', async () => {
+    // 2-Up on 2-page sample produces 1 landscape sheet
+    const nup2Bytes = await pdfEngine.nUpPdf(2);
+    const nup2Doc = await PDFDocument.load(nup2Bytes);
+    assert.strictEqual(nup2Doc.getPageCount(), 1);
+    const sz2 = nup2Doc.getPage(0).getSize();
+    assert.strictEqual(sz2.width, 841.89);
+    assert.strictEqual(sz2.height, 595.28);
+
+    // 4-Up on 2-page sample produces 1 portrait sheet
+    const nup4Bytes = await pdfEngine.nUpPdf(4);
+    const nup4Doc = await PDFDocument.load(nup4Bytes);
+    assert.strictEqual(nup4Doc.getPageCount(), 1);
+    const sz4 = nup4Doc.getPage(0).getSize();
+    assert.strictEqual(sz4.width, 595.28);
+    assert.strictEqual(sz4.height, 841.89);
+  });
+
+  test('imagesToPdf converts multiple images into a multi-page A4 PDF', async () => {
+    const pngBytes = Uint8Array.from([
+      137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0,
+      31, 21, 196, 137, 0, 0, 0, 13, 73, 68, 65, 84, 120, 156, 99, 248, 207, 192, 240, 31, 0, 5, 0, 1,
+      255, 137, 145, 125, 163, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130
+    ]);
+
+    const images = [
+      { bytes: pngBytes, isJpg: false },
+      { bytes: pngBytes, isJpg: false }
+    ];
+
+    const pdfBytes = await pdfEngine.imagesToPdf(images);
+    assert(pdfBytes.byteLength > 200);
+
+    const doc = await PDFDocument.load(pdfBytes);
+    assert.strictEqual(doc.getPageCount(), 2);
+  });
 });
+
+
+
 

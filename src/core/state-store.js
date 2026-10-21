@@ -39,6 +39,8 @@ export class StateStore {
         producer: 'PDF Studio Vector Engine'
       },
       cropSettings: null,      // { top: 0, right: 0, bottom: 0, left: 0, applyToAll: true, pageNum: 1 }
+      batesNumbering: null,    // { prefix, startNumber, digits, suffix, position, fontSize, color }
+      flattenForms: false,     // whether to flatten interactive AcroForm fields
       history: [],             // Undo stack
       future: [],              // Redo stack
       user: typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('pdf_user') || 'null') : null,
@@ -155,6 +157,23 @@ export class StateStore {
     this.notify('crop-cleared', {});
   }
 
+  setBatesNumbering(bates) {
+    this.saveSnapshot('Set Bates Numbering');
+    this.state.batesNumbering = bates;
+    this.notify('bates-updated', { batesNumbering: bates });
+  }
+
+  clearBatesNumbering() {
+    this.saveSnapshot('Clear Bates Numbering');
+    this.state.batesNumbering = null;
+    this.notify('bates-cleared', {});
+  }
+
+  setFlattenForms(flatten) {
+    this.state.flattenForms = !!flatten;
+    this.notify('flatten-updated', { flattenForms: this.state.flattenForms });
+  }
+
   getAnnotations(pageNum) {
     if (!this.state.annotations[pageNum]) {
       this.state.annotations[pageNum] = [];
@@ -213,7 +232,9 @@ export class StateStore {
       pageOrder: [...this.state.pageOrder],
       deletedPages: new Set(this.state.deletedPages),
       metadata: { ...this.state.metadata },
-      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null
+      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null,
+      batesNumbering: this.state.batesNumbering ? { ...this.state.batesNumbering } : null,
+      flattenForms: this.state.flattenForms
     };
     this.state.history.push(snapshot);
     if (this.state.history.length > 30) {
@@ -231,7 +252,9 @@ export class StateStore {
       pageOrder: [...this.state.pageOrder],
       deletedPages: new Set(this.state.deletedPages),
       metadata: { ...this.state.metadata },
-      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null
+      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null,
+      batesNumbering: this.state.batesNumbering ? { ...this.state.batesNumbering } : null,
+      flattenForms: this.state.flattenForms
     };
     this.state.future.push(currentSnapshot);
 
@@ -242,6 +265,8 @@ export class StateStore {
     this.state.deletedPages = prev.deletedPages;
     if (prev.metadata) this.state.metadata = { ...prev.metadata };
     this.state.cropSettings = prev.cropSettings ? { ...prev.cropSettings } : null;
+    this.state.batesNumbering = prev.batesNumbering ? { ...prev.batesNumbering } : null;
+    this.state.flattenForms = !!prev.flattenForms;
 
     this.notify('undo-performed', {
       canUndo: this.state.history.length > 0,
@@ -257,7 +282,9 @@ export class StateStore {
       pageOrder: [...this.state.pageOrder],
       deletedPages: new Set(this.state.deletedPages),
       metadata: { ...this.state.metadata },
-      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null
+      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null,
+      batesNumbering: this.state.batesNumbering ? { ...this.state.batesNumbering } : null,
+      flattenForms: this.state.flattenForms
     };
     this.state.history.push(currentSnapshot);
 
@@ -268,6 +295,8 @@ export class StateStore {
     this.state.deletedPages = next.deletedPages;
     if (next.metadata) this.state.metadata = { ...next.metadata };
     this.state.cropSettings = next.cropSettings ? { ...next.cropSettings } : null;
+    this.state.batesNumbering = next.batesNumbering ? { ...next.batesNumbering } : null;
+    this.state.flattenForms = !!next.flattenForms;
 
     this.notify('redo-performed', {
       canUndo: true,

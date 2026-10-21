@@ -16,6 +16,10 @@ import { PageNumbersModal } from './components/pagenumbers-modal.js';
 import { SecurityModal } from './components/security-modal.js';
 import { cropModal } from './components/crop-modal.js';
 import { metadataModal } from './components/metadata-modal.js';
+import { batesModal } from './components/bates-modal.js';
+import { splitModal } from './components/split-modal.js';
+import { nUpModal } from './components/nup-modal.js';
+import { alternateMixModal } from './components/alternate-mix-modal.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 
@@ -193,6 +197,18 @@ class App {
 
     const metaBtn = document.getElementById('btn-open-metadata');
     if (metaBtn) metaBtn.onclick = () => metadataModal.show();
+
+    const batesBtn = document.getElementById('btn-open-bates');
+    if (batesBtn) batesBtn.onclick = () => batesModal.show();
+
+    const splitBtn = document.getElementById('btn-open-split');
+    if (splitBtn) splitBtn.onclick = () => splitModal.show();
+
+    const nupBtn = document.getElementById('btn-open-nup');
+    if (nupBtn) nupBtn.onclick = () => nUpModal.show();
+
+    const mixBtn = document.getElementById('btn-open-mix');
+    if (mixBtn) mixBtn.onclick = () => alternateMixModal.show();
 
     toolBtns.forEach(btn => {
       btn.onclick = () => {
