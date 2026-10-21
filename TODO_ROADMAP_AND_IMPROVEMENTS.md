@@ -10,10 +10,10 @@
 | :--- | :--- | :---: | :---: |
 | **PDF Rendering Engine** | Renders via PDF.js on high-DPI `<canvas>` | **90%** | Add virtualized lazy-loading for 50+ page docs |
 | **Inline Text Editing** | Click-to-edit with automatic whiteout underlay | **85%** | Add multi-font embedding & ligature handling |
-| **Freehand & Annotations** | Smooth pen & translucent highlighter | **90%** | Add path smoothing (Catmull-Rom) & eraser tool |
+| **Freehand & Annotations** | Smooth pen, highlighter & dedicated Eraser tool | **100%** | Completed with fluid rub-to-erase stroke detection & Lucide cursor |
 | **Shapes & Lines** | Rectangle, Ellipse, Line, Arrow | **85%** | Add polygon, star, and border dash styling |
 | **Signatures** | Draw, Type (calligraphy fonts), Upload & Webcam Extraction | **100%** | Live webcam streaming with paper ink binarization completed |
-| **Images & Stamps** | Upload, place, resize, and delete | **85%** | Add opacity slider & standard stamps (Approved, Draft) |
+| **Images & Stamps** | Upload, opacity slider, standard & custom business stamps | **100%** | Pre-designed stamps suite (Approved, Draft, Void, Sign Here, etc.) |
 | **Form Builder** | Interactive inputs, checkboxes, and radio | **100%** | True AcroForms export with interactive text/checkbox/radio fields |
 | **Page Management** | 90° rotation, deletion, thumbnails, blank page, merge | **100%** | HTML5 drag-and-drop reordering, blank pages, and merge external PDF |
 | **Watermark Tool** | Document-wide angle, opacity, presets, and vector export | **100%** | Completed with live canvas preview and pure vector export |
@@ -44,15 +44,21 @@
 - [x] **Webcam Signature Capture:**
   - *Implemented:* Added 4th `Camera` tab to `SignatureTool` with `getUserMedia` video feed and threshold binarization to extract dark pen ink and make background paper transparent.
 
-### Phase 2: Next Implementation Priorities
+### Phase 2: Core Editing & Creative Capabilities (IN PROGRESS 🚀)
+- [x] **Official Business Stamps Suite & Custom Stamp Generator:**
+  - *Implemented:* Standard stamps (`APPROVED`, `REJECTED`, `CONFIDENTIAL`, `DRAFT`, `RECEIVED`, `SIGN HERE`, `VOID`, `FINAL`) with double border styling, live date badge, custom stamp generator with custom angles and colors, and opacity slider in [`src/tools/image-tool.js`](file:///home/codxbrexx/Pdf-Editor/src/tools/image-tool.js).
+- [x] **Dedicated Eraser Tool:**
+  - *Implemented:* Toolbar eraser button with custom Lucide SVG cursor, real-time stroke/annotation collision detection, and instant history undo support in [`src/core/canvas-manager.js`](file:///home/codxbrexx/Pdf-Editor/src/core/canvas-manager.js).
+- [x] **ISO 32000-1 Standard PDF Encryption Module:**
+  - *Implemented:* Pure JavaScript implementation of MD5, RC4 stream cipher, and Algorithms 2, 3, and 4 in [`src/core/pdf-crypto.js`](file:///home/codxbrexx/Pdf-Editor/src/core/pdf-crypto.js). Correctly computes `/O`, `/U`, and `/P` security dictionaries and registers `/Encrypt` trailers in exported PDFs without external dependencies.
+- [x] **Automated Regression & Functional Test Suite:**
+  - *Implemented:* Node native test suite (`npm test`) covering StateStore immutability, undo/redo stacks, page reordering, blank page insertion, AcroForm fields generation, watermarks, page numbering tokens, and encryption rejection.
 - [ ] **True Text Redaction (Security):**
   - *Current state:* Whiteout places an opaque white rectangle over the text and exports clean white vector rectangles.
   - *Task:* For high-security compliance, strip the underlying character text streams from the exported PDF content stream so text cannot be extracted by selecting/copying underneath the whiteout box.
 - [ ] **Font Catalog Expansion:**
   - *Current state:* Text tool exports Helvetica, Times Roman, and Courier.
   - *Task:* Integrate Google Web Fonts (Roboto, Open Sans, Lato, Montserrat, Poppins) and embed their `.ttf`/`.woff` font bytes into `pdf-lib` using `pdfDoc.embedFont(fontBytes)`.
-- [ ] **Eraser Tool:**
-  - *Task:* A dedicated eraser tool that clears freehand pen and highlighter strokes under the cursor without removing the entire annotation object.
 
 ---
 

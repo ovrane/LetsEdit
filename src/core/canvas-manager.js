@@ -12,6 +12,7 @@ export class CanvasManager {
     this.pageElements = new Map(); // pageNum -> { wrap, canvas, textLayer, annotCanvas }
     this.activeAnnotation = null;
     this.isDrawing = false;
+    this.isErasing = false;
     this.currentPoints = [];
     this.dragTarget = null;
     this.dragStartPos = null;
@@ -474,7 +475,11 @@ export class CanvasManager {
       const state = store.getState();
       const pos = getPos(e);
 
-      if (state.activeTool === 'draw' || state.activeTool === 'highlight') {
+      if (state.activeTool === 'eraser') {
+        this.isErasing = true;
+        this.eraseAtPosition(pageNum, pos, wrap);
+        return;
+      } else if (state.activeTool === 'draw' || state.activeTool === 'highlight') {
         this.isDrawing = true;
         drawingPoints = [{ x: pos.normX, y: pos.normY }];
       } else if (state.activeTool === 'whiteout') {
@@ -488,8 +493,12 @@ export class CanvasManager {
     });
 
     wrap.addEventListener('mousemove', (e) => {
-      if (!this.isDrawing) return;
       const pos = getPos(e);
+      if (this.isErasing) {
+        this.eraseAtPosition(pageNum, pos, wrap);
+        return;
+      }
+      if (!this.isDrawing) return;
       drawingPoints.push({ x: pos.normX, y: pos.normY });
 
       // Live sketch on annotCanvas
@@ -513,7 +522,8 @@ export class CanvasManager {
       ctx.restore();
     });
 
-    const stopDrawing = () => {
+    const stopAction = () => {
+      this.isErasing = false;
       if (!this.isDrawing) return;
       this.isDrawing = false;
       const state = store.getState();
@@ -530,8 +540,46 @@ export class CanvasManager {
       drawingPoints = [];
     };
 
-    wrap.addEventListener('mouseup', stopDrawing);
-    wrap.addEventListener('mouseleave', stopDrawing);
+    wrap.addEventListener('mouseup', stopAction);
+    wrap.addEventListener('mouseleave', stopAction);
+  }
+
+  eraseAtPosition(pageNum, pos, wrap) {
+    const annotations = store.getAnnotations(pageNum);
+    if (!annotations || annotations.length === 0) return;
+
+    const eraseRadius = 22; // Pixel radius
+    const toRemove = [];
+
+    for (const ann of annotations) {
+      if (ann.type === 'drawing') {
+        if (!ann.points) continue;
+        for (const pt of ann.points) {
+          const dx = (pt.x - pos.normX) * wrap.clientWidth;
+          const dy = (pt.y - pos.normY) * wrap.clientHeight;
+          if (dx * dx + dy * dy <= eraseRadius * eraseRadius) {
+            toRemove.push(ann.id);
+            break;
+          }
+        }
+      } else if (['shape', 'whiteout', 'image', 'text', 'signature'].includes(ann.type)) {
+        const annLeft = ann.x * wrap.clientWidth;
+        const annTop = ann.y * wrap.clientHeight;
+        const annRight = annLeft + (ann.width * wrap.clientWidth);
+        const annBottom = annTop + (ann.height * wrap.clientHeight);
+
+        if (pos.px >= annLeft - eraseRadius &&
+            pos.px <= annRight + eraseRadius &&
+            pos.py >= annTop - eraseRadius &&
+            pos.py <= annBottom + eraseRadius) {
+          toRemove.push(ann.id);
+        }
+      }
+    }
+
+    if (toRemove.length > 0) {
+      toRemove.forEach(id => store.removeAnnotation(pageNum, id));
+    }
   }
 
   promptNewText(pageNum, pos, wrap) {

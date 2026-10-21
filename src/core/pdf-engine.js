@@ -5,6 +5,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
 import { hexToRgb } from '../utils/helpers.js';
+import { applyPdfEncryption } from './pdf-crypto.js';
 
 // Setup PDF.js worker
 const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
@@ -430,12 +431,14 @@ export class PdfEngine {
       }
     }
 
-    // Save with password encryption if configured
+    // Apply standard PDF encryption if configured
     if (state.exportPassword && state.exportPassword.userPassword) {
-      return await finalDoc.save({
-        userPassword: state.exportPassword.userPassword,
-        ownerPassword: state.exportPassword.ownerPassword || state.exportPassword.userPassword
-      });
+      applyPdfEncryption(
+        finalDoc,
+        state.exportPassword.userPassword,
+        state.exportPassword.ownerPassword,
+        state.exportPassword.permissions
+      );
     }
 
     return await finalDoc.save();

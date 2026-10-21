@@ -32,7 +32,7 @@ export class StateStore {
       exportPassword: null,    // { userPassword, ownerPassword }
       history: [],             // Undo stack
       future: [],              // Redo stack
-      user: JSON.parse(localStorage.getItem('pdf_user') || 'null'),
+      user: typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('pdf_user') || 'null') : null,
       isSearching: false,
       searchQuery: '',
       replaceQuery: '',
@@ -63,6 +63,9 @@ export class StateStore {
   setTool(tool, subTool = null) {
     this.state.activeTool = tool;
     this.state.subTool = subTool;
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.dataset.activeTool = tool;
+    }
     this.notify('tool-changed', { tool, subTool });
   }
 
@@ -171,7 +174,8 @@ export class StateStore {
   deletePage(pageNum) {
     this.saveSnapshot('Delete Page');
     this.state.deletedPages.add(pageNum);
-    this.notify('page-deleted', { pageNum });
+    this.state.pageOrder = this.state.pageOrder.filter(p => p !== pageNum);
+    this.notify('page-deleted', { pageNum, pageOrder: this.state.pageOrder });
   }
 
   saveSnapshot(actionName = 'Edit') {
@@ -179,6 +183,7 @@ export class StateStore {
       actionName,
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
+      pageOrder: [...this.state.pageOrder],
       deletedPages: new Set(this.state.deletedPages)
     };
     this.state.history.push(snapshot);
@@ -194,6 +199,7 @@ export class StateStore {
     const currentSnapshot = {
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
+      pageOrder: [...this.state.pageOrder],
       deletedPages: new Set(this.state.deletedPages)
     };
     this.state.future.push(currentSnapshot);
@@ -201,6 +207,7 @@ export class StateStore {
     const prev = this.state.history.pop();
     this.state.annotations = prev.annotations;
     this.state.pageRotations = prev.pageRotations;
+    if (prev.pageOrder) this.state.pageOrder = [...prev.pageOrder];
     this.state.deletedPages = prev.deletedPages;
     this.notify('undo-performed', {
       canUndo: this.state.history.length > 0,
@@ -213,6 +220,7 @@ export class StateStore {
     const currentSnapshot = {
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
+      pageOrder: [...this.state.pageOrder],
       deletedPages: new Set(this.state.deletedPages)
     };
     this.state.history.push(currentSnapshot);
@@ -220,6 +228,7 @@ export class StateStore {
     const next = this.state.future.pop();
     this.state.annotations = next.annotations;
     this.state.pageRotations = next.pageRotations;
+    if (next.pageOrder) this.state.pageOrder = [...next.pageOrder];
     this.state.deletedPages = next.deletedPages;
     this.notify('redo-performed', {
       canUndo: true,
@@ -246,10 +255,12 @@ export class StateStore {
 
   setUser(user) {
     this.state.user = user;
-    if (user) {
-      localStorage.setItem('pdf_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('pdf_user');
+    if (typeof localStorage !== 'undefined') {
+      if (user) {
+        localStorage.setItem('pdf_user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('pdf_user');
+      }
     }
     this.notify('user-changed', { user });
   }
