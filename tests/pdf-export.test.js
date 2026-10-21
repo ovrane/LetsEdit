@@ -193,4 +193,68 @@ describe('PDF Vector Export & Feature Tests', () => {
     assert.strictEqual(docWithIgnore.isEncrypted, true);
     assert.strictEqual(docWithIgnore.getPageCount(), 1);
   });
+
+  test('exportPdf embeds document metadata properties', async () => {
+    const state = {
+      pageCount: 1,
+      pageOrder: [1],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0 },
+      annotations: { 1: [] },
+      watermark: null,
+      pageNumbers: null,
+      exportPassword: null,
+      metadata: {
+        title: 'Confidential Executive Summary',
+        author: 'Chief Executive Officer',
+        subject: 'Q4 2026 Strategy',
+        keywords: 'strategy, confidential, executive',
+        creator: 'PDF Studio Pro Test',
+        producer: 'PDF Studio Vector Engine'
+      }
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    const doc = await PDFDocument.load(exportedBytes, { updateMetadata: false });
+
+    assert.strictEqual(doc.getTitle(), 'Confidential Executive Summary');
+    assert.strictEqual(doc.getAuthor(), 'Chief Executive Officer');
+    assert.strictEqual(doc.getSubject(), 'Q4 2026 Strategy');
+    assert.strictEqual(doc.getCreator(), 'PDF Studio Pro Test');
+    assert.strictEqual(doc.getProducer(), 'PDF Studio Vector Engine');
+  });
+
+  test('exportPdf applies crop box trimming to pages', async () => {
+    const state = {
+      pageCount: 1,
+      pageOrder: [1],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0 },
+      annotations: { 1: [] },
+      watermark: null,
+      pageNumbers: null,
+      exportPassword: null,
+      cropSettings: {
+        top: 40,
+        right: 30,
+        bottom: 50,
+        left: 20,
+        applyToAll: true,
+        pageNum: 1
+      }
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    const doc = await PDFDocument.load(exportedBytes);
+    const page = doc.getPage(0);
+    const cropBox = page.getCropBox();
+
+    // Original page is A4: [595.28, 841.89]
+    // Left: 20, Bottom: 50, Width: 595.28 - 20 - 30 = 545.28, Height: 841.89 - 40 - 50 = 751.89
+    assert.strictEqual(cropBox.x, 20);
+    assert.strictEqual(cropBox.y, 50);
+    assert(Math.abs(cropBox.width - (595.28 - 50)) < 0.1);
+    assert(Math.abs(cropBox.height - (841.89 - 90)) < 0.1);
+  });
 });
+

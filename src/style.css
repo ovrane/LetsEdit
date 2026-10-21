@@ -445,6 +445,42 @@ body:not(.sidebar-open) .app-sidebar {
   border-color: var(--primary);
 }
 
+.annot-item.selected {
+  border: 1.5px solid var(--primary) !important;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+  z-index: 15;
+}
+
+.annot-item.selected .annot-delete-btn {
+  display: flex;
+}
+
+/* 8-Point Transform Handles */
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border: 1.5px solid var(--primary);
+  border-radius: 2px;
+  z-index: 20;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.annot-item.selected .resize-handle {
+  display: block;
+}
+
+.handle-nw { top: -4px; left: -4px; cursor: nwse-resize; }
+.handle-n  { top: -4px; left: calc(50% - 4px); cursor: ns-resize; }
+.handle-ne { top: -4px; right: -4px; cursor: nesw-resize; }
+.handle-e  { top: calc(50% - 4px); right: -4px; cursor: ew-resize; }
+.handle-se { bottom: -4px; right: -4px; cursor: nwse-resize; }
+.handle-s  { bottom: -4px; left: calc(50% - 4px); cursor: ns-resize; }
+.handle-sw { bottom: -4px; left: -4px; cursor: nesw-resize; }
+.handle-w  { top: calc(50% - 4px); left: -4px; cursor: ew-resize; }
+
 .annot-text {
   background: transparent;
   padding: 2px 4px;
@@ -521,9 +557,18 @@ body:not(.sidebar-open) .app-sidebar {
   position: absolute;
   background: rgba(250, 204, 21, 0.45);
   border-bottom: 2px solid #ca8a04;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   border-radius: 2px;
   z-index: 3;
+  transition: all 0.15s ease;
+}
+
+.search-match-highlight.active-match {
+  background: rgba(249, 115, 22, 0.65) !important;
+  border: 1.5px solid #ea580c !important;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.6);
+  z-index: 6;
 }
 
 /* ==========================================================================

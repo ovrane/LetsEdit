@@ -14,6 +14,8 @@ import { AuthModal } from './components/auth-modal.js';
 import { WatermarkModal } from './components/watermark-modal.js';
 import { PageNumbersModal } from './components/pagenumbers-modal.js';
 import { SecurityModal } from './components/security-modal.js';
+import { cropModal } from './components/crop-modal.js';
+import { metadataModal } from './components/metadata-modal.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 
@@ -186,6 +188,12 @@ class App {
     const secBtn = document.getElementById('btn-open-security');
     if (secBtn) secBtn.onclick = () => this.securityModal.open();
 
+    const cropBtn = document.getElementById('btn-open-crop');
+    if (cropBtn) cropBtn.onclick = () => cropModal.show();
+
+    const metaBtn = document.getElementById('btn-open-metadata');
+    if (metaBtn) metaBtn.onclick = () => metadataModal.show();
+
     toolBtns.forEach(btn => {
       btn.onclick = () => {
         const tool = btn.dataset.tool;
@@ -251,14 +259,52 @@ class App {
     const findInp = document.getElementById('find-query-input');
     const repInp = document.getElementById('replace-query-input');
     const searchCountBadge = document.getElementById('search-count-badge');
+    const chkCase = document.getElementById('chk-search-case');
+    const chkRegex = document.getElementById('chk-search-regex');
+
+    const updateBadge = (res) => {
+      if (!res || res.total === 0) {
+        searchCountBadge.textContent = '0/0';
+      } else {
+        searchCountBadge.textContent = `${res.current}/${res.total}`;
+      }
+    };
 
     document.getElementById('btn-do-search').onclick = async () => {
       const q = findInp.value.trim();
-      const res = await searchReplace.search(q);
-      searchCountBadge.textContent = `${res.total} found`;
+      const res = await searchReplace.search(q, {
+        isRegex: chkRegex ? chkRegex.checked : false,
+        matchCase: chkCase ? chkCase.checked : false
+      });
+      updateBadge(res);
       if (res.total > 0) Toast.info(`Found ${res.total} matches`);
       else Toast.info('No matches found');
     };
+
+    const prevBtn = document.getElementById('btn-prev-match');
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        const res = searchReplace.prevMatch();
+        updateBadge(res);
+      };
+    }
+
+    const nextBtn = document.getElementById('btn-next-match');
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        const res = searchReplace.nextMatch();
+        updateBadge(res);
+      };
+    }
+
+    const repOneBtn = document.getElementById('btn-do-replace-one');
+    if (repOneBtn) {
+      repOneBtn.onclick = () => {
+        const rep = repInp.value;
+        const res = searchReplace.replaceCurrent(rep);
+        updateBadge(res);
+      };
+    }
 
     document.getElementById('btn-do-replace').onclick = () => {
       const q = findInp.value.trim();
@@ -267,8 +313,11 @@ class App {
         Toast.warning('Enter search text first');
         return;
       }
-      const count = searchReplace.replaceAll(q, rep);
-      searchCountBadge.textContent = '0 found';
+      const count = searchReplace.replaceAll(q, rep, {
+        isRegex: chkRegex ? chkRegex.checked : false,
+        matchCase: chkCase ? chkCase.checked : false
+      });
+      searchCountBadge.textContent = '0/0';
     };
   }
 

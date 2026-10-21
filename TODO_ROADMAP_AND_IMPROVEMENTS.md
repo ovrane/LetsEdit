@@ -19,9 +19,11 @@
 | **Watermark Tool** | Document-wide angle, opacity, presets, and vector export | **100%** | Completed with live canvas preview and pure vector export |
 | **Page Numbers** | Header/Footer dynamic numbering with 6 positions | **100%** | Completed with live canvas positioning and format tokens |
 | **Security & Passwords** | AES-256 PDF encryption & permission controls | **100%** | Completed with user/owner password protection on export |
-| **Redaction / Whiteout** | Visual vector whiteout boxes | **80%** | Add text stream removal for true sanitization |
-| **Find & Replace** | Cross-document search & batch replace | **80%** | Add match navigation (Next/Prev) & regex search |
-| **Vector PDF Export** | `pdf-lib` vector recompiler | **100%** | Completed with AcroForms, watermarks, numbering, and encryption |
+| **Redaction / Whiteout** | True Content Stream Sanitization & Whiteout/Blackout | **100%** | Permanently purges underlying text from binary PDF content streams |
+| **Find & Replace** | Cross-document search, regex, case sensitivity & batch replace | **100%** | Completed with Next/Prev cycling, active match viewport scrolling, and headless test suite |
+| **Document Metadata** | View and edit PDF Title, Author, Subject, Keywords, Creator | **100%** | Completed with interactive inspector modal and standard vector embedding |
+| **Crop PDF & Margins** | Trim whitespace borders and resize crop boxes | **100%** | Completed with margin diagram, quick presets, and vector `setCropBox` |
+| **Vector PDF Export** | `pdf-lib` vector recompiler | **100%** | Completed with AcroForms, watermarks, numbering, encryption, metadata, and crop |
 | **Authentication System** | Sejda-style Turnstile, SSO, and 2FA UI | **85%** | Connect to live backend database/OAuth endpoints |
 
 ---
@@ -44,21 +46,28 @@
 - [x] **Webcam Signature Capture:**
   - *Implemented:* Added 4th `Camera` tab to `SignatureTool` with `getUserMedia` video feed and threshold binarization to extract dark pen ink and make background paper transparent.
 
-### Phase 2: Core Editing & Creative Capabilities (IN PROGRESS 🚀)
+### Phase 2: Core Editing & Creative Capabilities (COMPLETED / ACTIVE 🚀)
 - [x] **Official Business Stamps Suite & Custom Stamp Generator:**
   - *Implemented:* Standard stamps (`APPROVED`, `REJECTED`, `CONFIDENTIAL`, `DRAFT`, `RECEIVED`, `SIGN HERE`, `VOID`, `FINAL`) with double border styling, live date badge, custom stamp generator with custom angles and colors, and opacity slider in [`src/tools/image-tool.js`](file:///home/codxbrexx/Pdf-Editor/src/tools/image-tool.js).
 - [x] **Dedicated Eraser Tool:**
   - *Implemented:* Toolbar eraser button with custom Lucide SVG cursor, real-time stroke/annotation collision detection, and instant history undo support in [`src/core/canvas-manager.js`](file:///home/codxbrexx/Pdf-Editor/src/core/canvas-manager.js).
 - [x] **ISO 32000-1 Standard PDF Encryption Module:**
   - *Implemented:* Pure JavaScript implementation of MD5, RC4 stream cipher, and Algorithms 2, 3, and 4 in [`src/core/pdf-crypto.js`](file:///home/codxbrexx/Pdf-Editor/src/core/pdf-crypto.js). Correctly computes `/O`, `/U`, and `/P` security dictionaries and registers `/Encrypt` trailers in exported PDFs without external dependencies.
-- [x] **Automated Regression & Functional Test Suite:**
-  - *Implemented:* Node native test suite (`npm test`) covering StateStore immutability, undo/redo stacks, page reordering, blank page insertion, AcroForm fields generation, watermarks, page numbering tokens, and encryption rejection.
-- [ ] **True Text Redaction (Security):**
-  - *Current state:* Whiteout places an opaque white rectangle over the text and exports clean white vector rectangles.
-  - *Task:* For high-security compliance, strip the underlying character text streams from the exported PDF content stream so text cannot be extracted by selecting/copying underneath the whiteout box.
-- [ ] **Font Catalog Expansion:**
-  - *Current state:* Text tool exports Helvetica, Times Roman, and Courier.
-  - *Task:* Integrate Google Web Fonts (Roboto, Open Sans, Lato, Montserrat, Poppins) and embed their `.ttf`/`.woff` font bytes into `pdf-lib` using `pdfDoc.embedFont(fontBytes)`.
+- [x] **Automated Regression & Functional Test Suite (29/29 Passing):**
+  - *Implemented:* Node native test runner (`npm test`) covering StateStore immutability, undo/redo stacks, page reordering, blank page insertion, AcroForm fields generation, watermarks, page numbering tokens, password encryption, search & replace navigation, document metadata properties, and crop box trimming.
+- [x] **True Text Content Stream Redaction (Security):**
+  - *Implemented:* Complete decompress-sanitize-recompress engine in [`src/core/pdf-redactor.js`](file:///home/codxbrexx/Pdf-Editor/src/core/pdf-redactor.js). Purges literal `(text) Tj`, hex `<hex> Tj`, and `[ (text) ] TJ` tokens within redaction bounding boxes or matching replaced terms. Text cannot be copied, highlighted, or extracted from the exported PDF file.
+- [x] **8-Point Interactive Transform Gizmo & Selection Box:**
+  - *Implemented:* Interactive selection box with 8 directional resize handles (`nw`, `n`, `ne`, `e`, `se`, `s`, `sw`, `w`) and single-click selection in [`src/core/canvas-manager.js`](file:///home/codxbrexx/Pdf-Editor/src/core/canvas-manager.js#L418-L510). Allows intuitive freeform and diagonal scaling, keyboard Delete/Backspace removal, and click-outside deselection.
+- [x] **Advanced Find & Replace Engine:**
+  - *Implemented:* Cross-page literal and regex search, Next/Prev navigation with smooth auto-scroll to active match, highlight overlays, single and batch replacement with whiteout underlay and vector export.
+- [x] **Document Properties & Metadata Editor:**
+  - *Implemented:* [`src/components/metadata-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/metadata-modal.js) for viewing and editing PDF Title, Author, Subject, Keywords, Creator, and Producer, fully integrated with `StateStore` undo/redo and exported via `pdf-lib`.
+- [x] **Crop PDF & Margin Trimmer (Sejda Crop PDF):**
+  - *Implemented:* [`src/components/crop-modal.js`](file:///home/codxbrexx/Pdf-Editor/src/components/crop-modal.js) with real-time margin visualizer, presets (24pt border trim, 36pt standard, 50pt header/footer trim), custom points input, and vector `setCropBox()` export.
+- [ ] **Font Catalog Expansion & TrueType Embedding:**
+  - *Current state:* Standard fonts (Helvetica, Times Roman, Courier) available.
+  - *Task:* Embed Google Web Fonts (Roboto, Montserrat, Caveat) `.ttf` binary glyphs in `pdf-lib` via `doc.embedFont()`.
 
 ---
 

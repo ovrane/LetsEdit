@@ -118,8 +118,16 @@
         <span>Page Numbers</span>
       </button>
 
+      <button class="tool-btn" id="btn-open-crop" title="Crop & Trim PDF Margins">
+        <span>Crop</span>
+      </button>
+
       <button class="tool-btn" id="btn-open-security" title="Protect & Encrypt PDF">
         <span>Security</span>
+      </button>
+
+      <button class="tool-btn" id="btn-open-metadata" title="Document Properties & Metadata">
+        <span>Properties</span>
       </button>
     </div>
   </nav>
@@ -150,6 +158,9 @@
         <option value="Helvetica" selected>Helvetica / Arial</option>
         <option value="TimesRoman">Times New Roman</option>
         <option value="Courier">Courier Monospace</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Caveat">Caveat (Signature / Script)</option>
       </select>
     </div>
 
@@ -180,12 +191,23 @@
     </div>
 
     <!-- Find and replace inputs -->
-    <div class="prop-item" id="prop-replace-wrap" style="display:none;">
+    <div class="prop-item" id="prop-replace-wrap" style="display:none; align-items:center; gap:8px;">
       <input type="text" id="find-query-input" class="input-sm" placeholder="Find text..." />
       <input type="text" id="replace-query-input" class="input-sm" placeholder="Replace with..." />
       <button class="btn btn-sm btn-outline" id="btn-do-search">Search</button>
+      <div style="display:flex; align-items:center; gap:3px;">
+        <button class="btn btn-sm btn-outline" id="btn-prev-match" title="Previous Match" style="padding:4px 8px;">◀</button>
+        <span id="search-count-badge" style="font-size:12px; color:var(--text-muted); min-width:44px; text-align:center;">0/0</span>
+        <button class="btn btn-sm btn-outline" id="btn-next-match" title="Next Match" style="padding:4px 8px;">▶</button>
+      </div>
+      <button class="btn btn-sm btn-outline" id="btn-do-replace-one">Replace</button>
       <button class="btn btn-sm btn-primary" id="btn-do-replace">Replace All</button>
-      <span id="search-count-badge" style="font-size:12px; color:var(--text-muted);">0 found</span>
+      <label style="display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); cursor:pointer;">
+        <input type="checkbox" id="chk-search-case" /> Case
+      </label>
+      <label style="display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); cursor:pointer;">
+        <input type="checkbox" id="chk-search-regex" /> Regex
+      </label>
     </div>
   </div>
 

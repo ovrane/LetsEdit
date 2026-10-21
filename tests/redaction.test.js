@@ -102,12 +102,21 @@ describe('True PDF Redaction & Content Stream Sanitization Tests', () => {
 
     await redactPageContentStreams(doc, page, redactionBoxes, ['99482']);
 
-    // 3. Save PDF and verify text is physically purged from the output binary
+    // 3. Save PDF and verify text is physically purged from the output stream
     const savedBytes = await doc.save();
-    const binaryString = new TextDecoder('latin1').decode(savedBytes);
 
-    assert(!binaryString.includes('CONFIDENTIAL PATIENT RECORD 99482'), 'Confidential string must not appear in saved PDF');
-    assert(!binaryString.includes('99482'), 'Patient ID token must not appear in saved PDF');
-    assert(binaryString.includes('Hospital General Notice'), 'Unredacted text must be preserved');
+    // Verify by reloading the saved PDF and checking the page content stream
+    const reloadedDoc = await PDFDocument.load(savedBytes);
+    const reloadedPage = reloadedDoc.getPage(0);
+    const stream = reloadedDoc.context.lookup(reloadedPage.node.Contents().get(0));
+    const reloadedDecomp = await decompressStreamBytes(stream.getContents());
+    const streamString = new TextDecoder('latin1').decode(reloadedDecomp);
+
+    const secretHex = stringToPdfHex('CONFIDENTIAL PATIENT RECORD 99482');
+    const noticeHex = stringToPdfHex('Hospital General Notice');
+
+    assert(!streamString.includes(secretHex), 'Confidential hex string must not appear in saved stream');
+    assert(!streamString.includes('99482'), 'Patient ID token must not appear in saved stream');
+    assert(streamString.includes(noticeHex), 'Unredacted text hex must be preserved in saved stream');
   });
 });

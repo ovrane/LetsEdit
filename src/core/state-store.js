@@ -30,6 +30,15 @@ export class StateStore {
       watermark: null,         // { text, opacity, rotation, color, fontSize }
       pageNumbers: null,       // { format, position }
       exportPassword: null,    // { userPassword, ownerPassword }
+      metadata: {              // PDF document properties
+        title: '',
+        author: '',
+        subject: '',
+        keywords: '',
+        creator: 'PDF Studio Pro',
+        producer: 'PDF Studio Vector Engine'
+      },
+      cropSettings: null,      // { top: 0, right: 0, bottom: 0, left: 0, applyToAll: true, pageNum: 1 }
       history: [],             // Undo stack
       future: [],              // Redo stack
       user: typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('pdf_user') || 'null') : null,
@@ -128,6 +137,24 @@ export class StateStore {
     this.notify('password-updated', { exportPassword: pwdConfig });
   }
 
+  setMetadata(meta) {
+    this.saveSnapshot('Update Metadata');
+    this.state.metadata = { ...this.state.metadata, ...meta };
+    this.notify('metadata-updated', { metadata: this.state.metadata });
+  }
+
+  setCropSettings(crop) {
+    this.saveSnapshot('Crop Margins');
+    this.state.cropSettings = crop;
+    this.notify('crop-updated', { cropSettings: crop });
+  }
+
+  clearCropSettings() {
+    this.saveSnapshot('Reset Crop');
+    this.state.cropSettings = null;
+    this.notify('crop-cleared', {});
+  }
+
   getAnnotations(pageNum) {
     if (!this.state.annotations[pageNum]) {
       this.state.annotations[pageNum] = [];
@@ -184,7 +211,9 @@ export class StateStore {
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
       pageOrder: [...this.state.pageOrder],
-      deletedPages: new Set(this.state.deletedPages)
+      deletedPages: new Set(this.state.deletedPages),
+      metadata: { ...this.state.metadata },
+      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null
     };
     this.state.history.push(snapshot);
     if (this.state.history.length > 30) {
@@ -200,7 +229,9 @@ export class StateStore {
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
       pageOrder: [...this.state.pageOrder],
-      deletedPages: new Set(this.state.deletedPages)
+      deletedPages: new Set(this.state.deletedPages),
+      metadata: { ...this.state.metadata },
+      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null
     };
     this.state.future.push(currentSnapshot);
 
@@ -209,6 +240,9 @@ export class StateStore {
     this.state.pageRotations = prev.pageRotations;
     if (prev.pageOrder) this.state.pageOrder = [...prev.pageOrder];
     this.state.deletedPages = prev.deletedPages;
+    if (prev.metadata) this.state.metadata = { ...prev.metadata };
+    this.state.cropSettings = prev.cropSettings ? { ...prev.cropSettings } : null;
+
     this.notify('undo-performed', {
       canUndo: this.state.history.length > 0,
       canRedo: true
@@ -221,7 +255,9 @@ export class StateStore {
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
       pageOrder: [...this.state.pageOrder],
-      deletedPages: new Set(this.state.deletedPages)
+      deletedPages: new Set(this.state.deletedPages),
+      metadata: { ...this.state.metadata },
+      cropSettings: this.state.cropSettings ? { ...this.state.cropSettings } : null
     };
     this.state.history.push(currentSnapshot);
 
@@ -230,6 +266,9 @@ export class StateStore {
     this.state.pageRotations = next.pageRotations;
     if (next.pageOrder) this.state.pageOrder = [...next.pageOrder];
     this.state.deletedPages = next.deletedPages;
+    if (next.metadata) this.state.metadata = { ...next.metadata };
+    this.state.cropSettings = next.cropSettings ? { ...next.cropSettings } : null;
+
     this.notify('redo-performed', {
       canUndo: true,
       canRedo: this.state.future.length > 0

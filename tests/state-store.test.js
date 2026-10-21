@@ -167,4 +167,34 @@ describe('StateStore Engine Tests', () => {
     assert.strictEqual(undone.deletedPages.has(2), false);
     assert.deepStrictEqual(undone.pageOrder, [1, 2, 3]);
   });
+
+  test('document metadata updates and persists correctly', () => {
+    store.setMetadata({
+      title: 'Commercial Lease Agreement',
+      author: 'Acme Properties LLC',
+      subject: 'Real Estate Contract',
+      keywords: 'lease, commercial, rent, 2026'
+    });
+
+    const meta = store.getState().metadata;
+    assert.strictEqual(meta.title, 'Commercial Lease Agreement');
+    assert.strictEqual(meta.author, 'Acme Properties LLC');
+    assert.strictEqual(meta.subject, 'Real Estate Contract');
+    assert.strictEqual(meta.keywords, 'lease, commercial, rent, 2026');
+
+    // Undo metadata update
+    store.undo();
+    assert.strictEqual(store.getState().metadata.title, '');
+  });
+
+  test('crop settings configuration and reset', () => {
+    const crop = { top: 24, right: 30, bottom: 24, left: 30, applyToAll: true, pageNum: 1 };
+    store.setCropSettings(crop);
+
+    assert.deepStrictEqual(store.getState().cropSettings, crop);
+
+    store.clearCropSettings();
+    assert.strictEqual(store.getState().cropSettings, null);
+  });
 });
+

@@ -6,6 +6,7 @@ export class Toast {
   static container = null;
 
   static init() {
+    if (typeof document === 'undefined') return;
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.className = 'toast-container';
@@ -14,6 +15,7 @@ export class Toast {
   }
 
   static show(message, type = 'info', duration = 3500) {
+    if (typeof document === 'undefined') return;
     this.init();
     const item = document.createElement('div');
     item.className = `toast-item toast-${type}`;

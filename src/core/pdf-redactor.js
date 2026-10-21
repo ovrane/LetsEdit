@@ -144,8 +144,7 @@ export async function redactPageContentStreams(doc, page, redactionBoxes, textTa
     const sanitizedText = sanitizeContentStream(textContent, redactionBoxes, textTargets);
 
     if (sanitizedText !== textContent) {
-      const recompressed = await compressStreamBytes(new TextEncoder().encode(sanitizedText));
-      const newFlateStream = doc.context.flateStream(recompressed);
+      const newFlateStream = doc.context.flateStream(new TextEncoder().encode(sanitizedText));
       doc.context.assign(ref, newFlateStream);
     }
   }

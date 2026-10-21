@@ -11,6 +11,7 @@ export class CanvasManager {
     this.container = container;
     this.pageElements = new Map(); // pageNum -> { wrap, canvas, textLayer, annotCanvas }
     this.activeAnnotation = null;
+    this.selectedAnnotation = null;
     this.isDrawing = false;
     this.isErasing = false;
     this.currentPoints = [];
@@ -410,8 +411,108 @@ export class CanvasManager {
     };
     el.appendChild(delBtn);
 
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.selectAnnotation(pageNum, ann, el);
+    });
+
+    this.attachResizeHandles(el, pageNum, ann);
     this.makeDraggable(el, pageNum, ann);
     container.appendChild(el);
+  }
+
+  selectAnnotation(pageNum, ann, el) {
+    this.deselectAnnotation();
+    this.selectedAnnotation = { pageNum, ann, el };
+    el.classList.add('selected');
+  }
+
+  deselectAnnotation() {
+    if (this.selectedAnnotation) {
+      if (this.selectedAnnotation.el) {
+        this.selectedAnnotation.el.classList.remove('selected');
+      }
+      this.selectedAnnotation = null;
+    }
+  }
+
+  attachResizeHandles(el, pageNum, ann) {
+    const directions = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+    for (const dir of directions) {
+      const handle = document.createElement('div');
+      handle.className = `resize-handle handle-${dir}`;
+      handle.dataset.dir = dir;
+
+      handle.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const origX = ann.x;
+        const origY = ann.y;
+        const origW = ann.width;
+        const origH = ann.height;
+
+        const refs = this.pageElements.get(pageNum);
+        if (!refs) return;
+        const w = refs.wrap.clientWidth;
+        const h = refs.wrap.clientHeight;
+
+        const onMouseMove = (moveEv) => {
+          const dx = (moveEv.clientX - startX) / w;
+          const dy = (moveEv.clientY - startY) / h;
+
+          let newX = origX;
+          let newY = origY;
+          let newW = origW;
+          let newH = origH;
+
+          if (dir.includes('e')) {
+            newW = Math.max(0.02, origW + dx);
+          }
+          if (dir.includes('w')) {
+            const possibleW = Math.max(0.02, origW - dx);
+            newX = origX + (origW - possibleW);
+            newW = possibleW;
+          }
+          if (dir.includes('s')) {
+            newH = Math.max(0.015, origH + dy);
+          }
+          if (dir.includes('n')) {
+            const possibleH = Math.max(0.015, origH - dy);
+            newY = origY + (origH - possibleH);
+            newH = possibleH;
+          }
+
+          ann.x = newX;
+          ann.y = newY;
+          ann.width = newW;
+          ann.height = newH;
+
+          el.style.left = `${ann.x * w}px`;
+          el.style.top = `${ann.y * h}px`;
+          el.style.width = `${ann.width * w}px`;
+          el.style.height = `${ann.height * h}px`;
+        };
+
+        const onMouseUp = () => {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          store.updateAnnotation(pageNum, ann.id, {
+            x: ann.x,
+            y: ann.y,
+            width: ann.width,
+            height: ann.height
+          });
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
+
+      el.appendChild(handle);
+    }
   }
 
   makeDraggable(el, pageNum, ann) {
@@ -723,5 +824,24 @@ export class CanvasManager {
         }
       }
     });
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('click', (e) => {
+        if (!e.target.closest('.annot-item') && !e.target.closest('.tool-btn')) {
+          this.deselectAnnotation();
+        }
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedAnnotation) {
+          if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
+            e.preventDefault();
+            const { pageNum, ann } = this.selectedAnnotation;
+            store.removeAnnotation(pageNum, ann.id);
+            this.deselectAnnotation();
+          }
+        }
+      });
+    }
   }
 }

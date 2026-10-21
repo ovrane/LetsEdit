@@ -6,6 +6,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
 import { hexToRgb } from '../utils/helpers.js';
 import { applyPdfEncryption } from './pdf-crypto.js';
+import { redactPageContentStreams } from './pdf-redactor.js';
 
 // Setup PDF.js worker
 const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
@@ -233,6 +234,20 @@ export class PdfEngine {
       Courier: courier
     };
 
+    if (state.metadata) {
+      if (state.metadata.title) finalDoc.setTitle(state.metadata.title);
+      if (state.metadata.author) finalDoc.setAuthor(state.metadata.author);
+      if (state.metadata.subject) finalDoc.setSubject(state.metadata.subject);
+      if (state.metadata.keywords) {
+        const kwList = Array.isArray(state.metadata.keywords)
+          ? state.metadata.keywords
+          : String(state.metadata.keywords).split(',').map(s => s.trim()).filter(Boolean);
+        finalDoc.setKeywords(kwList);
+      }
+      if (state.metadata.creator) finalDoc.setCreator(state.metadata.creator);
+      if (state.metadata.producer) finalDoc.setProducer(state.metadata.producer);
+    }
+
     const numSourcePages = sourceDoc.getPageCount();
 
     // Determine target page sequence from pageOrder
@@ -249,6 +264,24 @@ export class PdfEngine {
 
       const { width: pWidth, height: pHeight } = copiedPage.getSize();
 
+      // Apply crop margins if configured
+      if (state.cropSettings) {
+        const cs = state.cropSettings;
+        if (cs.applyToAll || cs.pageNum === origPage) {
+          const top = Number(cs.top) || 0;
+          const right = Number(cs.right) || 0;
+          const bottom = Number(cs.bottom) || 0;
+          const left = Number(cs.left) || 0;
+
+          const cropX = left;
+          const cropY = bottom;
+          const cropW = Math.max(20, pWidth - left - right);
+          const cropH = Math.max(20, pHeight - top - bottom);
+
+          copiedPage.setCropBox(cropX, cropY, cropW, cropH);
+        }
+      }
+
       // Apply rotation if any
       const addRotation = state.pageRotations[origPage] || 0;
       if (addRotation !== 0) {
@@ -259,6 +292,30 @@ export class PdfEngine {
       // Get annotations for this page
       const annotations = state.annotations[origPage] || [];
 
+      // Pass 1: True Redaction - Purge underlying text content streams
+      const redactionBoxes = [];
+      const textTargets = [];
+
+      for (const ann of annotations) {
+        if (ann.type === 'whiteout' || (ann.type === 'text' && ann.hasUnderlay)) {
+          const pdfX = ann.x * pWidth;
+          const pdfY = pHeight - (ann.y * pHeight) - (ann.height * pHeight);
+          const pdfW = ann.width * pWidth;
+          const pdfH = ann.height * pHeight;
+          redactionBoxes.push({ x: pdfX, y: pdfY, width: pdfW, height: pdfH });
+          if (ann.replacedText) textTargets.push(ann.replacedText);
+        }
+      }
+
+      if (redactionBoxes.length > 0 || textTargets.length > 0) {
+        try {
+          await redactPageContentStreams(finalDoc, copiedPage, redactionBoxes, textTargets);
+        } catch (redactErr) {
+          console.warn('Content stream redaction skipped for page:', redactErr);
+        }
+      }
+
+      // Pass 2: Draw visual annotations
       for (const ann of annotations) {
         const pdfX = ann.x * pWidth;
         const pdfY = pHeight - (ann.y * pHeight) - (ann.height * pHeight);
@@ -266,12 +323,13 @@ export class PdfEngine {
         const pdfH = ann.height * pHeight;
 
         if (ann.type === 'whiteout') {
+          const isBlackout = ann.color === '#000000' || ann.isBlackout;
           copiedPage.drawRectangle({
             x: pdfX,
             y: pdfY,
             width: pdfW,
             height: pdfH,
-            color: rgb(1, 1, 1),
+            color: isBlackout ? rgb(0, 0, 0) : rgb(1, 1, 1),
             borderWidth: 0
           });
         } else if (ann.type === 'text') {
@@ -441,7 +499,7 @@ export class PdfEngine {
       );
     }
 
-    return await finalDoc.save();
+    return await finalDoc.save({ updateMetadata: false });
   }
 }
 
