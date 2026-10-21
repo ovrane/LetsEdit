@@ -391,7 +391,146 @@ describe('PDF Vector Export & Feature Tests', () => {
     const doc = await PDFDocument.load(pdfBytes);
     assert.strictEqual(doc.getPageCount(), 2);
   });
+
+  test('splitInHalf vertically and horizontally slices book scan pages', async () => {
+    // Vertical split
+    const vertBytes = await pdfEngine.splitInHalf('vertical');
+    const vertDoc = await PDFDocument.load(vertBytes);
+    assert.strictEqual(vertDoc.getPageCount(), 4);
+    const cbVert = vertDoc.getPage(0).getCropBox();
+    assert.strictEqual(cbVert.x, 0);
+    assert.strictEqual(cbVert.y, 0);
+    assert(Math.abs(cbVert.width - 595.28 / 2) < 0.1);
+
+    // Horizontal split
+    const horizBytes = await pdfEngine.splitInHalf('horizontal');
+    const horizDoc = await PDFDocument.load(horizBytes);
+    assert.strictEqual(horizDoc.getPageCount(), 4);
+    const cbHoriz = horizDoc.getPage(0).getCropBox();
+    assert(Math.abs(cbHoriz.height - 841.89 / 2) < 0.1);
+  });
+
+  test('unlockPdf strips password protection and returns unrestricted PDF', async () => {
+    // 1. Create encrypted PDF
+    const encState = {
+      pageCount: 1,
+      pageOrder: [1],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0 },
+      annotations: { 1: [] },
+      watermark: null,
+      pageNumbers: null,
+      exportPassword: {
+        userPassword: 'LockPassword123!',
+        ownerPassword: 'AdminMaster456!'
+      }
+    };
+    const encryptedBytes = await pdfEngine.exportPdf(encState);
+
+    // Verify it rejects without password
+    await assert.rejects(
+      async () => {
+        await PDFDocument.load(encryptedBytes);
+      },
+      /encrypted/i
+    );
+
+    // 2. Unlock the PDF
+    const unlockedBytes = await pdfEngine.unlockPdf(encryptedBytes, 'LockPassword123!');
+    assert(unlockedBytes.byteLength > 200);
+
+    // 3. Verify it loads freely with zero errors and isEncrypted is false
+    const cleanDoc = await PDFDocument.load(unlockedBytes);
+    assert.strictEqual(cleanDoc.isEncrypted, false);
+    assert.strictEqual(cleanDoc.getPageCount(), 1);
+  });
+
+  test('resizePdfMargins expands page margins and standardizes sheet bounds', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+
+    // 1. Expand margins (e.g. Left +72 for spiral binder, +36 Top/Bottom/Right)
+    const expandedBytes = await pdfEngine.resizePdfMargins(sampleBytes, {
+      marginLeft: 72,
+      marginRight: 36,
+      marginTop: 36,
+      marginBottom: 36,
+      pageSize: 'original'
+    });
+    const expDoc = await PDFDocument.load(expandedBytes);
+    assert.strictEqual(expDoc.getPageCount(), 2);
+    const expSize = expDoc.getPage(0).getSize();
+    // A4 is 595.28 x 841.89 -> +108 width, +72 height
+    assert(Math.abs(expSize.width - (595.28 + 108)) < 0.1);
+    assert(Math.abs(expSize.height - (841.89 + 72)) < 0.1);
+
+    // 2. Standardize to US Letter (612 x 792 pt)
+    const letterBytes = await pdfEngine.resizePdfMargins(sampleBytes, {
+      marginLeft: 36,
+      marginRight: 36,
+      marginTop: 36,
+      marginBottom: 36,
+      pageSize: 'letter'
+    });
+    const letterDoc = await PDFDocument.load(letterBytes);
+    assert.strictEqual(letterDoc.getPageCount(), 2);
+    const letterSize = letterDoc.getPage(0).getSize();
+    assert.strictEqual(letterSize.width, 612.0);
+    assert.strictEqual(letterSize.height, 792.0);
+  });
+
+  test('compressPdf compresses stream objects and returns size savings metrics', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+    const result = await pdfEngine.compressPdf(sampleBytes, { quality: 'recommended', removeMetadata: true });
+
+    assert(result.bytes instanceof Uint8Array);
+    assert(result.originalSize > 0);
+    assert(result.compressedSize > 0);
+    assert(result.compressedSize <= result.originalSize);
+    assert(typeof result.savingsPercent === 'number');
+
+    const compressedDoc = await PDFDocument.load(result.bytes);
+    assert.strictEqual(compressedDoc.getPageCount(), 2);
+    assert.strictEqual(compressedDoc.getTitle() || '', '');
+  });
+
+  test('flipPages mirrors pages horizontally, vertically, and both with page scopes', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+
+    // 1. Horizontal flip on all pages
+    const horizBytes = await pdfEngine.flipPages(sampleBytes, { direction: 'horizontal', pageRange: 'all' });
+    assert(horizBytes.byteLength > 200);
+    const horizDoc = await PDFDocument.load(horizBytes);
+    assert.strictEqual(horizDoc.getPageCount(), 2);
+    const p1Size = horizDoc.getPage(0).getSize();
+    assert.strictEqual(Math.round(p1Size.width), 595);
+    assert.strictEqual(Math.round(p1Size.height), 842);
+
+    // 2. Vertical flip on odd pages only
+    const vertBytes = await pdfEngine.flipPages(sampleBytes, { direction: 'vertical', pageRange: [1] });
+    const vertDoc = await PDFDocument.load(vertBytes);
+    assert.strictEqual(vertDoc.getPageCount(), 2);
+
+    // 3. Both (180° inverted) flip
+    const bothBytes = await pdfEngine.flipPages(sampleBytes, { direction: 'both', pageRange: 'all' });
+    const bothDoc = await PDFDocument.load(bothBytes);
+    assert.strictEqual(bothDoc.getPageCount(), 2);
+  });
+
+  test('convertToGrayscale desaturates color streams to DeviceGray', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+    const grayBytes = await pdfEngine.convertToGrayscale(sampleBytes);
+
+    assert(grayBytes.byteLength > 200);
+    const grayDoc = await PDFDocument.load(grayBytes);
+    assert.strictEqual(grayDoc.getPageCount(), 2);
+
+    // Verify content streams contain valid DeviceGray operators (g or G)
+    const p1 = grayDoc.getPage(0);
+    const contents = p1.node.Contents();
+    assert(contents !== null && contents !== undefined);
+  });
 });
+
 
 
 

@@ -47,8 +47,23 @@
       </div>
     </div>
 
-    <!-- Right Actions: Save / Download, Account -->
+    <!-- Right Actions: All Tools, Theme, Save / Download, Account -->
     <div class="navbar-right">
+      <div class="autosave-badge" title="Changes auto-saved in browser session">
+        <span class="autosave-dot"></span>
+        <span>Saved</span>
+      </div>
+
+      <button class="btn btn-sm btn-outline" id="btn-open-all-tools" title="Open 30+ PDF Tools Hub (/)">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+        <span>All Tools</span>
+      </button>
+
+      <button class="icon-btn" id="btn-toggle-theme" title="Toggle Light / Dark Studio Mode">
+        <svg id="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+        <svg id="theme-icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+      </button>
+
       <button class="btn btn-primary btn-sm" id="btn-save-pdf">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         <span>Apply & Export PDF</span>
@@ -63,87 +78,220 @@
     </div>
   </header>
 
-  <!-- Secondary Tools Bar (The 9 Core Tools) -->
+  <!-- Canva-Style Studio Toolbar -->
   <nav class="app-toolbar">
+    <!-- Group 1: Creation & Annotations -->
     <div class="toolbar-group">
-      <button class="tool-btn active" data-tool="select" title="Selection & Move Tool">
-        <span>Cursor</span>
+      <button class="tool-btn active" data-tool="select" title="Cursor / Select Tool (V)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"></path></svg>
+        <span>Select</span>
       </button>
 
-      <button class="tool-btn" data-tool="text" title="Add text or click existing text to edit">
+      <button class="tool-btn" data-tool="text" title="Text Tool (T)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
         <span>Text</span>
       </button>
 
-      <button class="tool-btn" data-tool="draw" title="Freehand Pen">
+      <button class="tool-btn" data-tool="draw" title="Pen (P)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
         <span>Draw</span>
       </button>
 
-      <button class="tool-btn" data-tool="highlight" title="Highlighter Pen">
+      <button class="tool-btn" data-tool="highlight" title="Highlighter (H)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2l4 4L7 17H3v-4L14 2z"></path><path d="M3 22h18"></path></svg>
         <span>Highlight</span>
       </button>
 
-      <button class="tool-btn" data-tool="whiteout" title="Redaction / Whiteout box">
-        <span>Whiteout</span>
-      </button>
-
-      <button class="tool-btn" data-tool="eraser" title="Eraser (Erase pen, highlighter, and drawings)">
+      <button class="tool-btn" data-tool="eraser" title="Eraser (E)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13l-7-7L3 14l7 7 8-8z"></path><line x1="14" y1="22" x2="22" y2="22"></line></svg>
         <span>Eraser</span>
       </button>
 
-      <button class="tool-btn" data-tool="shape" title="Shapes (Rectangle, Circle, Line, Arrow)">
-        <span>Shape</span>
+      <button class="tool-btn" data-tool="whiteout" title="Redaction / Whiteout">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+        <span>Redact</span>
+      </button>
+
+      <button class="tool-btn" data-tool="shape" title="Shapes (Rectangle, Ellipse, Arrow)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 16 16 16"></polygon></svg>
+        <span>Shapes</span>
       </button>
 
       <button class="tool-btn" data-tool="sign" title="Electronic Signature">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
         <span>Sign</span>
       </button>
 
       <button class="tool-btn" data-tool="image" title="Insert Images & Stamps">
-        <span>Image</span>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        <span>Stamps</span>
       </button>
 
-      <button class="tool-btn" data-tool="form" title="Form Fields (Input, Checkbox, Radio)">
-        <span>Form</span>
+      <button class="tool-btn" data-tool="form" title="Form Fields">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>Forms</span>
       </button>
+    </div>
 
-      <button class="tool-btn" data-tool="replace" title="Find and Replace text">
-        <span>Find & Replace</span>
-      </button>
+    <!-- Group 2: Canva Dropdown Category Menus -->
+    <div class="toolbar-group">
+      <!-- Pages Dropdown -->
+      <div class="canva-dropdown">
+        <button class="tool-btn dropdown-trigger" id="dropdown-pages-btn" title="Organize, Split, Crop & Resize Pages">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <span>Pages</span>
+          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" id="btn-open-split">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 3h5v5M8 3H3v5M12 22V2"></path></svg>
+            <div>
+              <div class="dropdown-title">Split Pages</div>
+              <div class="dropdown-desc">Extract custom page ranges</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-split-half">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <div>
+              <div class="dropdown-title">Split in Half</div>
+              <div class="dropdown-desc">Bisect two-page book scans</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-mix">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line></svg>
+            <div>
+              <div class="dropdown-title">Alternate & Mix</div>
+              <div class="dropdown-desc">Interleave duplex scanner pages</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-nup">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line></svg>
+            <div>
+              <div class="dropdown-title">N-Up Imposition</div>
+              <div class="dropdown-desc">Print 2 or 4 pages per sheet</div>
+            </div>
+          </button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" id="btn-open-crop">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
+            <div>
+              <div class="dropdown-title">Crop Margins</div>
+              <div class="dropdown-desc">Trim whitespace and borders</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-resize">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+            <div>
+              <div class="dropdown-title">Resize & Bounds</div>
+              <div class="dropdown-desc">Spiral binder margin & A4/Letter fit</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-flip">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path></svg>
+            <div>
+              <div class="dropdown-title">Flip / Mirror</div>
+              <div class="dropdown-desc">Horizontal or vertical flip</div>
+            </div>
+          </button>
+        </div>
+      </div>
 
-      <button class="tool-btn" id="btn-open-watermark" title="Add Document Watermark">
-        <span>Watermark</span>
-      </button>
+      <!-- Document Tools Dropdown -->
+      <div class="canva-dropdown">
+        <button class="tool-btn dropdown-trigger" id="dropdown-tools-btn" title="Compress, Watermark, Numbers, Security">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Tools</span>
+          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" id="btn-open-compress">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"></path></svg>
+            <div>
+              <div class="dropdown-title">Compress PDF</div>
+              <div class="dropdown-desc">Reduce document file size</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-watermark">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            <div>
+              <div class="dropdown-title">Watermark</div>
+              <div class="dropdown-desc">Diagonal text or stamp overlay</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-pagenumbers">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+            <div>
+              <div class="dropdown-title">Page Numbers</div>
+              <div class="dropdown-desc">Header & Footer numbering</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-bates">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <div>
+              <div class="dropdown-title">Bates Numbering</div>
+              <div class="dropdown-desc">Legal indexing sequences</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-security">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <div>
+              <div class="dropdown-title">Protect & Encrypt</div>
+              <div class="dropdown-desc">AES password security</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-metadata">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <div>
+              <div class="dropdown-title">Metadata & Properties</div>
+              <div class="dropdown-desc">Title, Author, Keywords</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-open-grayscale">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path></svg>
+            <div>
+              <div class="dropdown-title">Grayscale PDF</div>
+              <div class="dropdown-desc">Desaturate colors & save ink</div>
+            </div>
+          </button>
+        </div>
+      </div>
 
-      <button class="tool-btn" id="btn-open-pagenumbers" title="Add Page Numbers">
-        <span>Page Numbers</span>
-      </button>
+      <!-- Convert Dropdown -->
+      <div class="canva-dropdown">
+        <button class="tool-btn dropdown-trigger" id="dropdown-convert-btn" title="Convert to and from PDF">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <span>Convert</span>
+          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" id="btn-open-to-image">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <div>
+              <div class="dropdown-title">PDF to JPG / PNG</div>
+              <div class="dropdown-desc">High-res 72, 150, or 300 DPI</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-quick-images-to-pdf">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg>
+            <div>
+              <div class="dropdown-title">Images to PDF</div>
+              <div class="dropdown-desc">Combine photos into A4 PDF</div>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-quick-extract-text">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+            <div>
+              <div class="dropdown-title">Extract Plain Text</div>
+              <div class="dropdown-desc">Save text to .txt document</div>
+            </div>
+          </button>
+        </div>
+      </div>
 
-      <button class="tool-btn" id="btn-open-crop" title="Crop & Trim PDF Margins">
-        <span>Crop</span>
-      </button>
-
-      <button class="tool-btn" id="btn-open-security" title="Protect & Encrypt PDF">
-        <span>Security</span>
-      </button>
-
-      <button class="tool-btn" id="btn-open-metadata" title="Document Properties & Metadata">
-        <span>Properties</span>
-      </button>
-
-      <button class="tool-btn" id="btn-open-bates" title="Legal Bates Numbering">
-        <span>Bates</span>
-      </button>
-
-      <button class="tool-btn" id="btn-open-split" title="Split & Extract Pages">
-        <span>Split</span>
-      </button>
-
-      <button class="tool-btn" id="btn-open-nup" title="N-Up Imposition (2 or 4 Pages per Sheet)">
-        <span>N-Up</span>
-      </button>
-
-      <button class="tool-btn" id="btn-open-mix" title="Alternate & Mix (Duplex Scanner Flow)">
-        <span>Alternate & Mix</span>
+      <!-- Find & Replace Trigger -->
+      <button class="tool-btn" data-tool="replace" id="btn-toggle-find" title="Find & Replace text in document (Ctrl+F)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Find</span>
       </button>
     </div>
   </nav>

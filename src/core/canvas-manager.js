@@ -16,7 +16,8 @@ export class CanvasManager {
     this.isErasing = false;
     this.currentPoints = [];
     this.dragTarget = null;
-    this.dragStartPos = null;
+    this.renderedPages = new Set();
+    this.pageObserver = null;
 
     this.bindGlobalEvents();
   }
@@ -24,6 +25,7 @@ export class CanvasManager {
   async renderDocument() {
     this.container.innerHTML = '';
     this.pageElements.clear();
+    this.renderedPages.clear();
 
     const state = store.getState();
     if (!state.pdfBytes || state.pageCount === 0) return;
@@ -32,11 +34,40 @@ export class CanvasManager {
       ? state.pageOrder
       : Array.from({ length: state.pageCount }, (_, i) => i + 1);
 
+    // Virtualized IntersectionObserver for large documents (50+ pages)
+    if (typeof IntersectionObserver !== 'undefined') {
+      if (this.pageObserver) {
+        this.pageObserver.disconnect();
+      }
+      this.pageObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const pageNum = Number(entry.target.dataset.page);
+            if (pageNum && !this.renderedPages.has(pageNum)) {
+              this.renderedPages.add(pageNum);
+              this.renderPage(pageNum);
+            }
+          }
+        }
+      }, {
+        root: null,
+        rootMargin: '600px 0px 600px 0px',
+        threshold: 0.01
+      });
+    }
+
     for (const p of pageOrder) {
       if (state.deletedPages.has(p)) continue;
       const pageWrapper = this.createPageElement(p);
       this.container.appendChild(pageWrapper);
-      await this.renderPage(p);
+
+      // Render first page immediately; lazy-render remaining pages on viewport proximity
+      if (p === pageOrder[0] || !this.pageObserver) {
+        this.renderedPages.add(p);
+        await this.renderPage(p);
+      } else {
+        this.pageObserver.observe(pageWrapper);
+      }
     }
   }
 
@@ -45,6 +76,12 @@ export class CanvasManager {
     wrap.className = 'pdf-page-wrap';
     wrap.dataset.page = pageNum;
     wrap.id = `page-wrap-${pageNum}`;
+
+    const state = store.getState();
+    const approxW = Math.round(595 * (state.scale || 1.0));
+    const approxH = Math.round(842 * (state.scale || 1.0));
+    wrap.style.minWidth = `${approxW}px`;
+    wrap.style.minHeight = `${approxH}px`;
 
     // 1. Background Canvas Layer
     const canvas = document.createElement('canvas');
@@ -82,6 +119,8 @@ export class CanvasManager {
   async renderPage(pageNum) {
     const refs = this.pageElements.get(pageNum);
     if (!refs) return;
+
+    this.renderedPages.add(pageNum);
 
     const state = store.getState();
     const page = await pdfEngine.getPage(pageNum);

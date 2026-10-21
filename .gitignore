@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-
+reference/
 # Environment variables and secrets
 .env
 .env.*
@@ -11,7 +11,7 @@ dist/
 build/
 coverage/
 referance
-
+AGENTS.md
 # Logs
 *.log
 npm-debug.log*

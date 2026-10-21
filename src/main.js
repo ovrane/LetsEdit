@@ -20,6 +20,13 @@ import { batesModal } from './components/bates-modal.js';
 import { splitModal } from './components/split-modal.js';
 import { nUpModal } from './components/nup-modal.js';
 import { alternateMixModal } from './components/alternate-mix-modal.js';
+import { splitHalfModal } from './components/split-half-modal.js';
+import { pdfToImageModal } from './components/pdf-to-image-modal.js';
+import { resizeModal } from './components/resize-modal.js';
+import { compressModal } from './components/compress-modal.js';
+import { flipModal } from './components/flip-modal.js';
+import { grayscaleModal } from './components/grayscale-modal.js';
+import { allToolsModal } from './components/all-tools-modal.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 
@@ -170,6 +177,59 @@ class App {
         Toast.error('Failed to export PDF: ' + err.message);
       }
     };
+
+    // Dark / Light Theme Toggle
+    const themeBtn = document.getElementById('btn-toggle-theme');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+
+    const updateThemeUI = (theme) => {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (sunIcon) sunIcon.style.display = 'block';
+        if (moonIcon) moonIcon.style.display = 'none';
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.documentElement.removeAttribute('data-theme');
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = 'block';
+      }
+    };
+
+    const savedTheme = localStorage.getItem('pdf_editor_theme') ||
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    updateThemeUI(savedTheme);
+
+    if (themeBtn) {
+      themeBtn.onclick = () => {
+        const isDark = document.body.classList.contains('dark-mode');
+        const nextTheme = isDark ? 'light' : 'dark';
+        localStorage.setItem('pdf_editor_theme', nextTheme);
+        updateThemeUI(nextTheme);
+        Toast.info(`Switched to ${nextTheme === 'dark' ? 'Dark' : 'Light'} theme`);
+      };
+    }
+
+    // All Tools Hub modal
+    const allToolsBtn = document.getElementById('btn-open-all-tools');
+    if (allToolsBtn) allToolsBtn.onclick = () => allToolsModal.show();
+
+    // Inline rename document title
+    const filenameEl = document.getElementById('current-filename');
+    if (filenameEl) {
+      filenameEl.onclick = () => {
+        const current = store.getState().filename || 'Sample_Document.pdf';
+        const newName = prompt('Rename document:', current);
+        if (newName && newName.trim() !== '') {
+          const finalName = newName.trim().endsWith('.pdf') ? newName.trim() : `${newName.trim()}.pdf`;
+          store.getState().filename = finalName;
+          store.getState().documentName = finalName;
+          filenameEl.textContent = finalName;
+          Toast.success(`Renamed document to ${finalName}`);
+        }
+      };
+    }
   }
 
   bindToolbarEvents() {
@@ -209,6 +269,61 @@ class App {
 
     const mixBtn = document.getElementById('btn-open-mix');
     if (mixBtn) mixBtn.onclick = () => alternateMixModal.show();
+
+    const splitHalfBtn = document.getElementById('btn-open-split-half');
+    if (splitHalfBtn) splitHalfBtn.onclick = () => splitHalfModal.show();
+
+    const toImageBtn = document.getElementById('btn-open-to-image');
+    if (toImageBtn) toImageBtn.onclick = () => pdfToImageModal.show();
+
+    const resizeBtn = document.getElementById('btn-open-resize');
+    if (resizeBtn) resizeBtn.onclick = () => resizeModal.show();
+
+    const flipBtn = document.getElementById('btn-open-flip');
+    if (flipBtn) flipBtn.onclick = () => flipModal.show();
+
+    const compressBtn = document.getElementById('btn-open-compress');
+    if (compressBtn) compressBtn.onclick = () => compressModal.show();
+
+    const grayscaleBtn = document.getElementById('btn-open-grayscale');
+    if (grayscaleBtn) grayscaleBtn.onclick = () => grayscaleModal.show();
+
+    // Convert dropdown quick actions
+    const quickImgToPdf = document.getElementById('btn-quick-images-to-pdf');
+    if (quickImgToPdf) {
+      quickImgToPdf.onclick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+          const files = Array.from(e.target.files);
+          if (files.length > 0) {
+            Toast.info(`Converting ${files.length} images to PDF...`);
+            const buffers = await Promise.all(files.map(f => f.arrayBuffer()));
+            const newPdf = await pdfEngine.imagesToPdf(buffers);
+            const info = await pdfEngine.loadPdf(newPdf);
+            store.setDocument(newPdf, 'Images_Combined.pdf', info.numPages);
+            Toast.success(`Created PDF from ${files.length} images!`);
+          }
+        };
+        input.click();
+      };
+    }
+
+    const quickExtractText = document.getElementById('btn-quick-extract-text');
+    if (quickExtractText) {
+      quickExtractText.onclick = async () => {
+        const state = store.getState();
+        if (!state.pdfBytes) return Toast.error('No document loaded');
+        Toast.info('Extracting searchable text...');
+        const text = await pdfEngine.extractDocumentText(state.pdfBytes);
+        const blob = new Blob([text], { type: 'text/plain' });
+        const name = (state.documentName || 'Document').replace(/\.pdf$/i, '') + '_text.txt';
+        downloadBlob(blob, name);
+        Toast.success('Extracted plain text downloaded!');
+      };
+    }
 
     toolBtns.forEach(btn => {
       btn.onclick = () => {
@@ -358,6 +473,11 @@ class App {
       if (e.key === 'Escape') {
         const selectBtn = document.querySelector('.tool-btn[data-tool="select"]');
         if (selectBtn) selectBtn.click();
+      }
+      // Slash (/) to open All Tools Hub (Canva style)
+      if (e.key === '/' && !e.target.matches('input, textarea')) {
+        e.preventDefault();
+        allToolsModal.show();
       }
     });
   }
