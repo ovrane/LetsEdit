@@ -1043,3 +1043,18 @@ body:not(.sidebar-open) .app-sidebar {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Page Numbers alignment button active state */
+.pn-pos-btn.active {
+  background: #eff6ff;
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.wm-preset:hover, .pn-preset:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+

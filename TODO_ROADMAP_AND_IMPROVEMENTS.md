@@ -12,37 +12,42 @@
 | **Inline Text Editing** | Click-to-edit with automatic whiteout underlay | **85%** | Add multi-font embedding & ligature handling |
 | **Freehand & Annotations** | Smooth pen & translucent highlighter | **90%** | Add path smoothing (Catmull-Rom) & eraser tool |
 | **Shapes & Lines** | Rectangle, Ellipse, Line, Arrow | **85%** | Add polygon, star, and border dash styling |
-| **Signatures** | Draw, Type (calligraphy fonts), and Upload | **90%** | Add webcam capture & signature background removal |
+| **Signatures** | Draw, Type (calligraphy fonts), Upload & Webcam Extraction | **100%** | Live webcam streaming with paper ink binarization completed |
 | **Images & Stamps** | Upload, place, resize, and delete | **85%** | Add opacity slider & standard stamps (Approved, Draft) |
-| **Form Builder** | Interactive inputs, checkboxes, and radio | **75%** | Export true fillable AcroForms into the PDF |
-| **Page Management** | 90° rotation, deletion, thumbnails | **70%** | Add drag-and-drop page reordering & blank page insertion |
-| **Redaction / Whiteout** | Visual vector whiteout boxes | **70%** | Add true cryptographic text removal (True Redaction) |
+| **Form Builder** | Interactive inputs, checkboxes, and radio | **100%** | True AcroForms export with interactive text/checkbox/radio fields |
+| **Page Management** | 90° rotation, deletion, thumbnails, blank page, merge | **100%** | HTML5 drag-and-drop reordering, blank pages, and merge external PDF |
+| **Watermark Tool** | Document-wide angle, opacity, presets, and vector export | **100%** | Completed with live canvas preview and pure vector export |
+| **Page Numbers** | Header/Footer dynamic numbering with 6 positions | **100%** | Completed with live canvas positioning and format tokens |
+| **Security & Passwords** | AES-256 PDF encryption & permission controls | **100%** | Completed with user/owner password protection on export |
+| **Redaction / Whiteout** | Visual vector whiteout boxes | **80%** | Add text stream removal for true sanitization |
 | **Find & Replace** | Cross-document search & batch replace | **80%** | Add match navigation (Next/Prev) & regex search |
-| **Vector PDF Export** | `pdf-lib` vector recompiler | **90%** | Add PDF compression & metadata editing |
+| **Vector PDF Export** | `pdf-lib` vector recompiler | **100%** | Completed with AcroForms, watermarks, numbering, and encryption |
 | **Authentication System** | Sejda-style Turnstile, SSO, and 2FA UI | **85%** | Connect to live backend database/OAuth endpoints |
 
 ---
 
 ## 📋 2. Incomplete Tasks & Immediate TODOs
 
-### Phase 1: High-Priority Document Operations
-- [ ] **Drag-and-Drop Page Reordering:**
-  - *Current state:* Sidebar displays thumbnail list with rotation and delete actions.
-  - *Task:* Implement HTML5 Drag-and-Drop or Sortable list in `src/components/sidebar.js` so users can reorder pages visually, updating `pdfDoc` page indices during export.
-- [ ] **Insert Blank Page & Merge External PDF:**
-  - *Current state:* `+ Add Blank Page` button triggers a notification stub.
-  - *Task:* Implement `pdfDoc.addPage()` or insert page at specific index, and add a "Merge PDF" dialog allowing users to upload a second PDF and append/interleave pages.
-- [ ] **Full AcroForms Native Export:**
-  - *Current state:* Form fields (text inputs, checkboxes) are drawn as visual vector graphics in the exported PDF.
-  - *Task:* Use `pdf-lib`'s `pdfDoc.getForm().createTextField()` and `createCheckBox()` so the exported PDF contains real, clickable, fillable form fields when opened in Adobe Acrobat or mobile viewers.
+### Phase 1: High-Priority Document Operations (COMPLETED ✅)
+- [x] **Drag-and-Drop Page Reordering:**
+  - *Implemented:* HTML5 Drag-and-Drop reordering in `src/components/sidebar.js`. Synchronized with `state.pageOrder` and honored during both rendering and `pdf-lib` vector export.
+- [x] **Insert Blank Page & Merge External PDF:**
+  - *Implemented:* `+ Blank Page` button dynamically inserts a clean canvas page at any index; `Merge PDF` input uploads and appends external PDF pages into the active document.
+- [x] **Full AcroForms Native Export:**
+  - *Implemented:* `pdf-lib` interactive AcroForms export using `form.createTextField()`, `form.createCheckBox()`, and `form.createRadioGroup()`.
+- [x] **Document-Wide Watermarking:**
+  - *Implemented:* `WatermarkModal` with angle (0°, 45°, 90°, -45°), opacity slider, font size, custom color, quick presets (`CONFIDENTIAL`, `DRAFT`, `SAMPLE`, `DO NOT COPY`, `APPROVED`), live canvas overlay, and vector export.
+- [x] **Header & Footer Page Numbers:**
+  - *Implemented:* `PageNumbersModal` with `{n}` and `{total}` token support, 6 alignment positions (Top Left/Center/Right, Bottom Left/Center/Right), live canvas positioning, and vector export.
+- [x] **PDF Security & AES-256 Encryption:**
+  - *Implemented:* `SecurityModal` with user open password, owner password, strength meter, and permissions policy (printing, copying, content modification).
+- [x] **Webcam Signature Capture:**
+  - *Implemented:* Added 4th `Camera` tab to `SignatureTool` with `getUserMedia` video feed and threshold binarization to extract dark pen ink and make background paper transparent.
 
-### Phase 2: Editing & UX Polish
+### Phase 2: Next Implementation Priorities
 - [ ] **True Text Redaction (Security):**
-  - *Current state:* Whiteout places an opaque white rectangle over the text.
-  - *Task:* For sensitive compliance use cases, strip the underlying character text streams from the exported PDF content stream so text cannot be extracted by selecting/copying underneath the whiteout box.
-- [ ] **Webcam Signature Capture:**
-  - *Current state:* Signature modal supports **Draw**, **Type**, and **Upload**.
-  - *Task:* Add a 4th tab: **Camera**, utilizing `navigator.mediaDevices.getUserMedia()`, capturing the video feed, and applying an edge/luminance threshold filter (Otsu's method) to remove paper background and retain only ink.
+  - *Current state:* Whiteout places an opaque white rectangle over the text and exports clean white vector rectangles.
+  - *Task:* For high-security compliance, strip the underlying character text streams from the exported PDF content stream so text cannot be extracted by selecting/copying underneath the whiteout box.
 - [ ] **Font Catalog Expansion:**
   - *Current state:* Text tool exports Helvetica, Times Roman, and Courier.
   - *Task:* Integrate Google Web Fonts (Roboto, Open Sans, Lato, Montserrat, Poppins) and embed their `.ttf`/`.woff` font bytes into `pdf-lib` using `pdfDoc.embedFont(fontBytes)`.

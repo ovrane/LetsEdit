@@ -11,6 +11,9 @@ import { ImageTool } from './tools/image-tool.js';
 import { FormTool } from './tools/form-tool.js';
 import { searchReplace } from './tools/search-replace.js';
 import { AuthModal } from './components/auth-modal.js';
+import { WatermarkModal } from './components/watermark-modal.js';
+import { PageNumbersModal } from './components/pagenumbers-modal.js';
+import { SecurityModal } from './components/security-modal.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 
@@ -21,6 +24,9 @@ class App {
     this.signatureTool = null;
     this.imageTool = null;
     this.authModal = null;
+    this.watermarkModal = null;
+    this.pageNumbersModal = null;
+    this.securityModal = null;
   }
 
   async init() {
@@ -33,6 +39,9 @@ class App {
     this.signatureTool = new SignatureTool();
     this.imageTool = new ImageTool();
     this.authModal = new AuthModal();
+    this.watermarkModal = new WatermarkModal();
+    this.pageNumbersModal = new PageNumbersModal();
+    this.securityModal = new SecurityModal();
 
     this.bindNavbarEvents();
     this.bindToolbarEvents();
@@ -167,9 +176,20 @@ class App {
     const formTypeWrap = document.getElementById('prop-form-type-wrap');
     const replaceWrap = document.getElementById('prop-replace-wrap');
 
+    // Standalone action buttons on toolbar
+    const wmBtn = document.getElementById('btn-open-watermark');
+    if (wmBtn) wmBtn.onclick = () => this.watermarkModal.open();
+
+    const pnBtn = document.getElementById('btn-open-pagenumbers');
+    if (pnBtn) pnBtn.onclick = () => this.pageNumbersModal.open();
+
+    const secBtn = document.getElementById('btn-open-security');
+    if (secBtn) secBtn.onclick = () => this.securityModal.open();
+
     toolBtns.forEach(btn => {
       btn.onclick = () => {
         const tool = btn.dataset.tool;
+        if (!tool) return;
 
         if (tool === 'sign') {
           this.signatureTool.open();

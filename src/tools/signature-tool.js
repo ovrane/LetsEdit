@@ -1,5 +1,6 @@
 /**
- * Signature Tool: Modal supporting Draw, Type, and Upload
+ * Signature Tool: Modal supporting Draw, Type, Upload, and Webcam Camera Extraction
+ * Matches Sejda's 4-way electronic signature creation suite.
  */
 
 import { store } from '../core/state-store.js';
@@ -11,6 +12,7 @@ export class SignatureTool {
     this.modal = null;
     this.activeTab = 'draw';
     this.inkColor = '#0f172a';
+    this.cameraStream = null;
     this.initModal();
   }
 
@@ -21,7 +23,7 @@ export class SignatureTool {
     this.modal.style.display = 'none';
 
     this.modal.innerHTML = `
-      <div class="modal-dialog">
+      <div class="modal-dialog" style="max-width: 540px;">
         <div class="modal-header">
           <h3>Create Your Signature</h3>
           <button class="modal-close-btn">&times;</button>
@@ -30,6 +32,7 @@ export class SignatureTool {
           <button class="tab-btn active" data-tab="draw">Draw</button>
           <button class="tab-btn" data-tab="type">Type</button>
           <button class="tab-btn" data-tab="upload">Upload</button>
+          <button class="tab-btn" data-tab="camera">Camera</button>
         </div>
 
         <div class="modal-body">
@@ -76,6 +79,31 @@ export class SignatureTool {
               <img id="sig-uploaded-img" style="max-height:120px; border:1px solid #e2e8f0; border-radius:8px;" />
             </div>
           </div>
+
+          <!-- Tab 4: Camera (Webcam Signature Extractor) -->
+          <div class="tab-content" id="tab-camera" style="display:none;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; text-align:center;">
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
+                Hold a white piece of paper with your signature up to your webcam.
+              </p>
+              
+              <div style="position:relative; width:100%; height:200px; background:#000; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                <video id="sig-camera-video" autoplay playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
+                <canvas id="sig-camera-canvas" width="600" height="200" style="display:none;"></canvas>
+                <div id="sig-camera-placeholder" style="color:#94a3b8; font-size:13px;">Camera not active</div>
+              </div>
+
+              <div style="display:flex; justify-content:center; gap:10px; margin-top:12px;">
+                <button class="btn btn-outline btn-sm" id="btn-start-camera">Turn On Camera</button>
+                <button class="btn btn-primary btn-sm" id="btn-capture-camera" style="display:none;">Snap & Extract Ink</button>
+              </div>
+
+              <div id="sig-extracted-wrap" style="display:none; margin-top:14px; padding:10px; background:white; border:1px dashed #cbd5e1; border-radius:6px;">
+                <p style="font-size:11px; color:#64748b; margin-bottom:4px;">Extracted Transparent Signature:</p>
+                <img id="sig-extracted-img" style="max-height:80px;" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -87,6 +115,22 @@ export class SignatureTool {
 
     document.body.appendChild(this.modal);
     this.bindEvents();
+  }
+
+  stopCamera() {
+    if (this.cameraStream) {
+      this.cameraStream.getTracks().forEach(track => track.stop());
+      this.cameraStream = null;
+    }
+    const video = this.modal.querySelector('#sig-camera-video');
+    const placeholder = this.modal.querySelector('#sig-camera-placeholder');
+    const snapBtn = this.modal.querySelector('#btn-capture-camera');
+    const startBtn = this.modal.querySelector('#btn-start-camera');
+
+    if (video) video.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    if (snapBtn) snapBtn.style.display = 'none';
+    if (startBtn) startBtn.style.display = 'inline-block';
   }
 
   bindEvents() {
@@ -145,6 +189,10 @@ export class SignatureTool {
         this.activeTab = btn.dataset.tab;
         this.modal.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
         this.modal.querySelector(`#tab-${this.activeTab}`).style.display = 'block';
+
+        if (this.activeTab !== 'camera') {
+          this.stopCamera();
+        }
       };
     });
 
@@ -185,8 +233,85 @@ export class SignatureTool {
       }
     };
 
+    // Camera tab logic
+    const video = this.modal.querySelector('#sig-camera-video');
+    const placeholder = this.modal.querySelector('#sig-camera-placeholder');
+    const snapBtn = this.modal.querySelector('#btn-capture-camera');
+    const startBtn = this.modal.querySelector('#btn-start-camera');
+    const extractedWrap = this.modal.querySelector('#sig-extracted-wrap');
+    const extractedImg = this.modal.querySelector('#sig-extracted-img');
+    let cameraExtractedUrl = null;
+
+    startBtn.onclick = async () => {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          Toast.error('Webcam is not supported in this browser');
+          return;
+        }
+        this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+        video.srcObject = this.cameraStream;
+        video.style.display = 'block';
+        placeholder.style.display = 'none';
+        startBtn.style.display = 'none';
+        snapBtn.style.display = 'inline-block';
+      } catch (err) {
+        console.error('Camera access error:', err);
+        Toast.error('Could not access webcam: ' + err.message);
+      }
+    };
+
+    snapBtn.onclick = () => {
+      if (!video || video.videoWidth === 0) return;
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 600;
+      offscreen.height = 200;
+      const octx = offscreen.getContext('2d');
+
+      // Draw middle center crop of the video feed
+      const srcW = video.videoWidth;
+      const srcH = video.videoHeight;
+      const cropW = srcW * 0.8;
+      const cropH = cropW * (200 / 600);
+      const cropX = (srcW - cropW) / 2;
+      const cropY = (srcH - cropH) / 2;
+
+      octx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, 600, 200);
+
+      // Extract ink by adaptive paper binarization
+      const imgData = octx.getImageData(0, 0, 600, 200);
+      const data = imgData.data;
+
+      // Threshold: darker pixels stay ink, lighter background paper becomes fully transparent
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        if (brightness < 140) {
+          // Keep as dark ink (using selected ink color #0f172a)
+          data[i] = 15;
+          data[i + 1] = 23;
+          data[i + 2] = 42;
+          data[i + 3] = 255;
+        } else {
+          // Transparent paper
+          data[i + 3] = 0;
+        }
+      }
+
+      octx.putImageData(imgData, 0, 0);
+      cameraExtractedUrl = offscreen.toDataURL('image/png');
+      extractedImg.src = cameraExtractedUrl;
+      extractedWrap.style.display = 'block';
+      Toast.success('Signature isolated from paper background!');
+    };
+
     // Close / Cancel
-    const close = () => { this.modal.style.display = 'none'; };
+    const close = () => {
+      this.stopCamera();
+      this.modal.style.display = 'none';
+    };
     this.modal.querySelector('.modal-close-btn').onclick = close;
     this.modal.querySelector('.modal-cancel-btn').onclick = close;
 
@@ -218,6 +343,12 @@ export class SignatureTool {
           return;
         }
         finalDataUrl = uploadedDataUrl;
+      } else if (this.activeTab === 'camera') {
+        if (!cameraExtractedUrl) {
+          Toast.warning('Please capture a signature using the camera first');
+          return;
+        }
+        finalDataUrl = cameraExtractedUrl;
       }
 
       if (finalDataUrl) {
@@ -233,7 +364,6 @@ export class SignatureTool {
 
   placeSignatureOnActivePage(dataUrl) {
     const state = store.getState();
-    // Default to first active non-deleted page
     let targetPage = 1;
     for (let i = 1; i <= state.pageCount; i++) {
       if (!state.deletedPages.has(i)) {
@@ -252,6 +382,6 @@ export class SignatureTool {
       height: 0.1
     });
 
-    Toast.success('Signature placed! You can drag it into position.');
+    Toast.success('Signature placed! Drag to reposition or resize.');
   }
 }

@@ -284,6 +284,48 @@ export class CanvasManager {
         this.renderDomElement(pageNum, ann, px, py, pw, ph, domLayer);
       }
     }
+
+    // Document-wide Watermark overlay in canvas viewport
+    const wm = store.getState().watermark;
+    if (wm && wm.text) {
+      ctx.save();
+      ctx.font = `bold ${(wm.fontSize || 42) * (w / 600)}px Helvetica, Arial, sans-serif`;
+      ctx.fillStyle = wm.color || '#94a3b8';
+      ctx.globalAlpha = wm.opacity || 0.25;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(((wm.rotation || 45) * Math.PI) / 180);
+      ctx.fillText(wm.text, 0, 0);
+      ctx.restore();
+    }
+
+    // Live Page Numbers overlay
+    const pn = store.getState().pageNumbers;
+    if (pn) {
+      const pageOrder = store.getState().pageOrder || [];
+      const outIdx = pageOrder.indexOf(pageNum);
+      const totalPages = pageOrder.length;
+      if (outIdx !== -1) {
+        const pnFormat = pn.format || 'Page {n} of {total}';
+        const pnText = pnFormat.replace('{n}', (outIdx + 1).toString()).replace('{total}', totalPages.toString());
+        ctx.save();
+        ctx.font = '12px Helvetica, Arial, sans-serif';
+        ctx.fillStyle = '#64748b';
+        let px = w / 2;
+        let py = h - 20;
+        ctx.textAlign = 'center';
+
+        if (pn.position === 'bottom-left') { px = 30; ctx.textAlign = 'left'; }
+        else if (pn.position === 'bottom-right') { px = w - 30; ctx.textAlign = 'right'; }
+        else if (pn.position === 'top-center') { py = 25; }
+        else if (pn.position === 'top-left') { px = 30; py = 25; ctx.textAlign = 'left'; }
+        else if (pn.position === 'top-right') { px = w - 30; py = 25; ctx.textAlign = 'right'; }
+
+        ctx.fillText(pnText, px, py);
+        ctx.restore();
+      }
+    }
   }
 
   drawArrow(ctx, fromX, fromY, toX, toY, width) {
@@ -625,7 +667,7 @@ export class CanvasManager {
           const el = this.pageElements.get(payload.pageNum);
           if (el) el.wrap.remove();
         }
-      } else if (event === 'undo-performed' || event === 'redo-performed') {
+      } else if (event === 'undo-performed' || event === 'redo-performed' || event === 'watermark-updated' || event === 'pagenumbers-updated') {
         for (let p = 1; p <= state.pageCount; p++) {
           if (!state.deletedPages.has(p)) {
             this.renderAnnotations(p);
