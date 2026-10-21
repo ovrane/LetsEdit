@@ -27,6 +27,8 @@ import { compressModal } from './components/compress-modal.js';
 import { flipModal } from './components/flip-modal.js';
 import { grayscaleModal } from './components/grayscale-modal.js';
 import { allToolsModal } from './components/all-tools-modal.js';
+import { landingPage } from './components/landing-page.js';
+import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 
@@ -94,6 +96,14 @@ class App {
   }
 
   bindNavbarEvents() {
+    // Back to Landing / Home
+    const homeBtn = document.getElementById('btn-studio-home');
+    if (homeBtn) {
+      homeBtn.onclick = () => {
+        landingPage.switchToLanding();
+      };
+    }
+
     // Toggle sidebar
     document.getElementById('toggle-sidebar-btn').onclick = () => {
       document.body.classList.toggle('sidebar-open');
@@ -180,34 +190,12 @@ class App {
 
     // Dark / Light Theme Toggle
     const themeBtn = document.getElementById('btn-toggle-theme');
-    const sunIcon = document.getElementById('theme-icon-sun');
-    const moonIcon = document.getElementById('theme-icon-moon');
-
-    const updateThemeUI = (theme) => {
-      if (theme === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.documentElement.setAttribute('data-theme', 'dark');
-        if (sunIcon) sunIcon.style.display = 'block';
-        if (moonIcon) moonIcon.style.display = 'none';
-      } else {
-        document.body.classList.remove('dark-mode');
-        document.documentElement.removeAttribute('data-theme');
-        if (sunIcon) sunIcon.style.display = 'none';
-        if (moonIcon) moonIcon.style.display = 'block';
-      }
-    };
-
-    const savedTheme = localStorage.getItem('pdf_editor_theme') ||
-      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    updateThemeUI(savedTheme);
+    applyTheme(getPreferredTheme());
 
     if (themeBtn) {
       themeBtn.onclick = () => {
-        const isDark = document.body.classList.contains('dark-mode');
-        const nextTheme = isDark ? 'light' : 'dark';
-        localStorage.setItem('pdf_editor_theme', nextTheme);
-        updateThemeUI(nextTheme);
-        Toast.info(`Switched to ${nextTheme === 'dark' ? 'Dark' : 'Light'} theme`);
+        const next = toggleTheme();
+        Toast.info(`Switched to ${next === 'dark' ? 'Dark' : 'Light'} theme`);
       };
     }
 

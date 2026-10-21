@@ -4,19 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Studio & Editor | Professional Online PDF Suite</title>
+  <meta name="description" content="Free online PDF editor and tools suite. Edit text, merge, split, compress, fill and sign, watermark, rotate, and protect PDF files 100% in your browser with zero cloud uploads.">
+  <meta name="keywords" content="pdf editor, edit pdf, free pdf editor, merge pdf, split pdf, compress pdf, sign pdf, watermark pdf, rotate pdf, sejda pdf editor, ilovepdf">
+  <meta property="og:title" content="PDF Studio & Editor | All-in-One Online PDF Suite">
+  <meta property="og:description" content="Every tool you need to work with PDFs in one place. 100% free, private, client-side WebAssembly execution with zero server uploads.">
+  <meta property="og:type" content="website">
   <link rel="stylesheet" href="/src/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v2h2c.55 0 1-.45 1-1s-.45-1-1-1zm5 2h-1.5v-1h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5H13v3h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5z'/></svg>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PDF Studio",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Every tool you need to edit, convert, merge, split, compress, sign, and protect PDFs right in your browser with zero cloud uploads."
+  }
+  </script>
 </head>
-<body class="sidebar-open">
+<body class="show-landing sidebar-open">
 
   <!-- Main Top Navbar -->
   <header class="app-navbar">
     <div class="navbar-brand">
+      <button class="btn btn-sm btn-outline" id="btn-studio-home" title="Back to All Tools Home" style="margin-right:4px;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>All Tools</span>
+      </button>
       <button id="toggle-sidebar-btn" class="icon-btn" title="Toggle Pages Drawer">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
-      <div class="brand-badge">PDF</div>
-      <h1 class="brand-title">Studio</h1>
+      <div class="brand-badge">LETS</div>
+      <h1 class="brand-title">Edit</h1>
       <span class="file-name-tag" id="current-filename">Sample_Document.pdf</span>
       <input type="file" id="upload-pdf-input" accept="application/pdf" style="display:none;" />
       <button class="btn btn-sm btn-outline" id="btn-open-pdf">
