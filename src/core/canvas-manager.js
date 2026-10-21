@@ -176,13 +176,67 @@ export class CanvasManager {
       span.dataset.originalText = item.str;
       span.dataset.fontName = item.fontName;
 
-      // Click to edit existing text inline
-      span.addEventListener('click', (e) => {
+      // Click or drag to move/edit existing text
+      let dragStartX, dragStartY;
+      let hasDragged = false;
+
+      span.addEventListener('mousedown', (e) => {
         const state = store.getState();
-        if (state.activeTool === 'text' || state.activeTool === 'select') {
-          e.stopPropagation();
-          this.makeExistingTextEditable(span, pageNum, vx, vy - fontHeight, item.width * scale, fontHeight, item.str);
-        }
+        if (state.activeTool !== 'text' && state.activeTool !== 'select') return;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        hasDragged = false;
+
+        const onTextMove = (moveEv) => {
+          if (Math.hypot(moveEv.clientX - dragStartX, moveEv.clientY - dragStartY) > 4) {
+            hasDragged = true;
+            window.removeEventListener('mousemove', onTextMove);
+            window.removeEventListener('mouseup', onTextUp);
+            // Convert to movable annotation immediately
+            const refs = this.pageElements.get(pageNum);
+            if (!refs) return;
+            span.style.visibility = 'hidden';
+            const wrapW = refs.wrap.clientWidth || 1;
+            const wrapH = refs.wrap.clientHeight || 1;
+            const textAnn = {
+              id: uid('text'),
+              type: 'text',
+              text: item.str,
+              x: vx / wrapW,
+              y: (vy - fontHeight) / wrapH,
+              width: ((item.width * scale) + 8) / wrapW,
+              height: (fontHeight + 4) / wrapH,
+              fontSize: fontHeight,
+              fontFamily: 'Helvetica',
+              color: '#000000',
+              hasUnderlay: true
+            };
+            store.addAnnotation(pageNum, textAnn);
+            // Immediately simulate mousedown on new annotation element to continue dragging
+            setTimeout(() => {
+              const newEl = refs.domLayer.querySelector(`#annot-${textAnn.id}`);
+              if (newEl) {
+                const simulatedEvent = new MouseEvent('mousedown', {
+                  clientX: moveEv.clientX,
+                  clientY: moveEv.clientY,
+                  bubbles: true
+                });
+                newEl.dispatchEvent(simulatedEvent);
+              }
+            }, 10);
+          }
+        };
+
+        const onTextUp = () => {
+          window.removeEventListener('mousemove', onTextMove);
+          window.removeEventListener('mouseup', onTextUp);
+          if (!hasDragged) {
+            this.makeExistingTextEditable(span, pageNum, vx, vy - fontHeight, item.width * scale, fontHeight, item.str);
+          }
+        };
+
+        window.addEventListener('mousemove', onTextMove);
+        window.addEventListener('mouseup', onTextUp);
       });
 
       textLayerEl.appendChild(span);
@@ -559,24 +613,38 @@ export class CanvasManager {
 
     const onMouseDown = (e) => {
       const state = store.getState();
-      if (state.activeTool !== 'select' && state.activeTool !== ann.type) return;
+      // Allow dragging in select mode, text mode, or when interacting with an annotation
       if (e.target.closest('.annot-delete-btn') || e.target.tagName === 'INPUT') return;
 
       e.stopPropagation();
+      this.selectAnnotation(pageNum, ann, el);
+
       startX = e.clientX;
       startY = e.clientY;
-      origX = ann.x;
-      origY = ann.y;
+      origX = Number.isFinite(ann.x) ? ann.x : 0;
+      origY = Number.isFinite(ann.y) ? ann.y : 0;
 
       const refs = this.pageElements.get(pageNum);
-      const w = refs.wrap.clientWidth;
-      const h = refs.wrap.clientHeight;
+      if (!refs) return;
+      const w = refs.wrap.clientWidth || 1;
+      const h = refs.wrap.clientHeight || 1;
+
+      // Ensure width/height fallback to element rendered bounding box
+      const annW = (Number.isFinite(ann.width) && ann.width > 0) ? ann.width : Math.max(0.04, el.offsetWidth / w);
+      const annH = (Number.isFinite(ann.height) && ann.height > 0) ? ann.height : Math.max(0.02, el.offsetHeight / h);
+
+      let hasMoved = false;
 
       const onMouseMove = (moveEv) => {
         const dx = (moveEv.clientX - startX) / w;
         const dy = (moveEv.clientY - startY) / h;
-        ann.x = Math.max(0, Math.min(1 - ann.width, origX + dx));
-        ann.y = Math.max(0, Math.min(1 - ann.height, origY + dy));
+        if (Math.abs(moveEv.clientX - startX) > 2 || Math.abs(moveEv.clientY - startY) > 2) {
+          hasMoved = true;
+        }
+        ann.x = Math.max(0, Math.min(Math.max(0, 1 - annW), origX + dx));
+        ann.y = Math.max(0, Math.min(Math.max(0, 1 - annH), origY + dy));
+        ann.width = annW;
+        ann.height = annH;
         el.style.left = `${ann.x * w}px`;
         el.style.top = `${ann.y * h}px`;
       };
@@ -584,7 +652,14 @@ export class CanvasManager {
       const onMouseUp = () => {
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
-        store.updateAnnotation(pageNum, ann.id, { x: ann.x, y: ann.y });
+        if (hasMoved) {
+          store.updateAnnotation(pageNum, ann.id, {
+            x: ann.x,
+            y: ann.y,
+            width: ann.width || annW,
+            height: ann.height || annH
+          });
+        }
       };
 
       window.addEventListener('mousemove', onMouseMove);

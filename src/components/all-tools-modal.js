@@ -22,47 +22,47 @@ import { Toast } from './toast.js';
 
 export const TOOLS_CATALOG = [
   // Most Popular
-  { id: 'edit', category: 'edit', title: 'PDF Editor', desc: 'Edit text, annotate, add shapes, signatures, and stamps', icon: 'edit', color: '#2563eb', popular: true, action: 'tool:select' },
-  { id: 'compress', category: 'tools', title: 'Compress PDF', desc: 'Reduce file size while preserving high visual quality', icon: 'compress', color: '#059669', popular: true, action: 'modal:compress' },
-  { id: 'sign', category: 'edit', title: 'Fill & Sign', desc: 'Add signatures, type handwriting, or scan paper ink via webcam', icon: 'sign', color: '#7c3aed', popular: true, action: 'tool:sign' },
-  { id: 'delete', category: 'pages', title: 'Delete Pages', desc: 'Remove unwanted pages permanently from the document', icon: 'trash', color: '#ef4444', popular: true, action: 'sidebar:delete' },
-  { id: 'split', category: 'pages', title: 'Split Pages', desc: 'Extract custom page ranges or save every page as separate file', icon: 'split', color: '#ea580c', popular: true, action: 'modal:split' },
-  { id: 'merge', category: 'pages', title: 'Merge PDF', desc: 'Combine multiple PDFs and external files into one document', icon: 'merge', color: '#0284c7', popular: true, action: 'sidebar:merge' },
-  { id: 'crop', category: 'pages', title: 'Crop PDF', desc: 'Trim margins, whitespace borders, or resize crop boxes', icon: 'crop', color: '#0d9488', popular: true, action: 'modal:crop' },
-  { id: 'to-image', category: 'convert', title: 'PDF to JPG / PNG', desc: 'Convert and download pages as high-resolution images', icon: 'image', color: '#d97706', popular: true, action: 'modal:to-image' },
+  { id: 'edit', category: 'edit', title: "Let's Edit PDF", desc: 'Edit text, annotate, add shapes, signatures, and stamps', icon: 'edit', color: '#2563eb', popular: true, action: 'tool:select' },
+  { id: 'compress', category: 'tools', title: "Let's Compress", desc: 'Reduce file size while preserving high visual quality', icon: 'compress', color: '#059669', popular: true, action: 'modal:compress' },
+  { id: 'sign', category: 'edit', title: "Let's Sign PDF", desc: 'Add signatures, type handwriting, or scan paper ink via webcam', icon: 'sign', color: '#7c3aed', popular: true, action: 'tool:sign' },
+  { id: 'delete', category: 'pages', title: "Let's Delete Pages", desc: 'Remove unwanted pages permanently from the document', icon: 'trash', color: '#ef4444', popular: true, action: 'sidebar:delete' },
+  { id: 'split', category: 'pages', title: "Let's Split PDF", desc: 'Extract custom page ranges or save every page as separate file', icon: 'split', color: '#ea580c', popular: true, action: 'modal:split' },
+  { id: 'merge', category: 'pages', title: "Let's Merge PDF", desc: 'Combine multiple PDFs and external files into one document', icon: 'merge', color: '#0284c7', popular: true, action: 'sidebar:merge' },
+  { id: 'crop', category: 'pages', title: "Let's Crop PDF", desc: 'Trim margins, whitespace borders, or resize crop boxes', icon: 'crop', color: '#0d9488', popular: true, action: 'modal:crop' },
+  { id: 'to-image', category: 'convert', title: "Let's Convert to JPG", desc: 'Convert and download pages as high-resolution images', icon: 'image', color: '#d97706', popular: true, action: 'modal:to-image' },
 
   // Organize & Pages
-  { id: 'organize', category: 'pages', title: 'Organize Pages', desc: 'Drag-and-drop page sequence reordering with thumbnail grid', icon: 'grid', color: '#2563eb', action: 'sidebar:open' },
-  { id: 'split-half', category: 'pages', title: 'Split in Half', desc: 'Bisect two-page book scans (A3 to double A4 or A4 to double A5)', icon: 'book', color: '#4f46e5', action: 'modal:split-half' },
-  { id: 'alternate-mix', category: 'pages', title: 'Alternate & Mix', desc: 'Interleave odd and even pages from duplex scanner feeder runs', icon: 'shuffle', color: '#0891b2', action: 'modal:alternate-mix' },
-  { id: 'nup', category: 'pages', title: 'N-Up Imposition', desc: 'Print 2 or 4 pages per sheet side-by-side or in 2x2 grid', icon: 'layout', color: '#475569', action: 'modal:nup' },
-  { id: 'flip', category: 'pages', title: 'Flip / Mirror Pages', desc: 'Mirror PDF coordinates horizontally or vertically for transfers or scans', icon: 'flip', color: '#8b5cf6', action: 'modal:flip' },
-  { id: 'resize', category: 'pages', title: 'Resize Margins', desc: 'Add binding margins (spiral/binder) or fit to A4/Letter bounds', icon: 'maximize', color: '#6366f1', action: 'modal:resize' },
-  { id: 'rotate', category: 'pages', title: 'Rotate Pages', desc: 'Permanently rotate pages 90°, 180°, or 270° clockwise', icon: 'rotate', color: '#f59e0b', action: 'sidebar:open' },
+  { id: 'organize', category: 'pages', title: "Let's Organize Pages", desc: 'Drag-and-drop page sequence reordering with thumbnail grid', icon: 'grid', color: '#2563eb', action: 'sidebar:open' },
+  { id: 'split-half', category: 'pages', title: "Let's Split in Half", desc: 'Bisect two-page book scans (A3 to double A4 or A4 to double A5)', icon: 'book', color: '#4f46e5', action: 'modal:split-half' },
+  { id: 'alternate-mix', category: 'pages', title: "Let's Alternate & Mix", desc: 'Interleave odd and even pages from duplex scanner feeder runs', icon: 'shuffle', color: '#0891b2', action: 'modal:alternate-mix' },
+  { id: 'nup', category: 'pages', title: "Let's N-Up Print", desc: 'Print 2 or 4 pages per sheet side-by-side or in 2x2 grid', icon: 'layout', color: '#475569', action: 'modal:nup' },
+  { id: 'flip', category: 'pages', title: "Let's Flip / Mirror", desc: 'Mirror PDF coordinates horizontally or vertically for transfers or scans', icon: 'flip', color: '#8b5cf6', action: 'modal:flip' },
+  { id: 'resize', category: 'pages', title: "Let's Resize Margins", desc: 'Add binding margins (spiral/binder) or fit to A4/Letter bounds', icon: 'maximize', color: '#6366f1', action: 'modal:resize' },
+  { id: 'rotate', category: 'pages', title: "Let's Rotate Pages", desc: 'Permanently rotate pages 90°, 180°, or 270° clockwise', icon: 'rotate', color: '#f59e0b', action: 'sidebar:open' },
 
   // Edit & Annotate
-  { id: 'text', category: 'edit', title: 'Add & Edit Text', desc: 'Insert new text or click existing text on the PDF to edit inline', icon: 'type', color: '#2563eb', action: 'tool:text' },
-  { id: 'draw', category: 'edit', title: 'Freehand Draw', desc: 'Draw, sketch, and write with smooth cubic Bezier pen paths', icon: 'pen', color: '#059669', action: 'tool:draw' },
-  { id: 'highlight', category: 'edit', title: 'Highlighter', desc: 'Semi-transparent highlighter pen for reviewing and proofreading', icon: 'marker', color: '#eab308', action: 'tool:highlight' },
-  { id: 'eraser', category: 'edit', title: 'Stroke Eraser', desc: 'Continuously erase pen strokes, drawings, and highlighter paths', icon: 'eraser', color: '#dc2626', action: 'tool:eraser' },
-  { id: 'whiteout', category: 'edit', title: 'Whiteout / Redact', desc: 'Place whiteout redaction boxes to permanently purge sensitive data', icon: 'square', color: '#1e293b', action: 'tool:whiteout' },
-  { id: 'shapes', category: 'edit', title: 'Shapes & Arrows', desc: 'Add rectangles, circles, ellipses, lines, and callout arrows', icon: 'shapes', color: '#8b5cf6', action: 'tool:shape' },
-  { id: 'forms', category: 'edit', title: 'Interactive Forms', desc: 'Create fillable text fields, checkboxes, and radio button groups', icon: 'check-square', color: '#10b981', action: 'tool:form' },
-  { id: 'stamps', category: 'edit', title: 'Business Stamps', desc: 'Approved, Confidential, Draft, Void, and custom date badges', icon: 'stamp', color: '#b91c1c', action: 'tool:image' },
-  { id: 'search-replace', category: 'edit', title: 'Find & Replace', desc: 'Cross-document literal or regex search with batch replacement', icon: 'search', color: '#0284c7', action: 'tool:replace' },
+  { id: 'text', category: 'edit', title: "Let's Add & Edit Text", desc: 'Insert new text or click existing text on the PDF to edit inline', icon: 'type', color: '#2563eb', action: 'tool:text' },
+  { id: 'draw', category: 'edit', title: "Let's Freehand Draw", desc: 'Draw, sketch, and write with smooth cubic Bezier pen paths', icon: 'pen', color: '#059669', action: 'tool:draw' },
+  { id: 'highlight', category: 'edit', title: "Let's Highlight", desc: 'Semi-transparent highlighter pen for reviewing and proofreading', icon: 'marker', color: '#eab308', action: 'tool:highlight' },
+  { id: 'eraser', category: 'edit', title: "Let's Erase Strokes", desc: 'Continuously erase pen strokes, drawings, and highlighter paths', icon: 'eraser', color: '#dc2626', action: 'tool:eraser' },
+  { id: 'whiteout', category: 'edit', title: "Let's Redact & Whiteout", desc: 'Place whiteout redaction boxes to permanently purge sensitive data', icon: 'square', color: '#1e293b', action: 'tool:whiteout' },
+  { id: 'shapes', category: 'edit', title: "Let's Add Shapes", desc: 'Add rectangles, circles, ellipses, lines, and callout arrows', icon: 'shapes', color: '#8b5cf6', action: 'tool:shape' },
+  { id: 'forms', category: 'edit', title: "Let's Build Forms", desc: 'Create fillable text fields, checkboxes, and radio button groups', icon: 'check-square', color: '#10b981', action: 'tool:form' },
+  { id: 'stamps', category: 'edit', title: "Let's Add Stamps", desc: 'Approved, Confidential, Draft, Void, and custom date badges', icon: 'stamp', color: '#b91c1c', action: 'tool:image' },
+  { id: 'search-replace', category: 'edit', title: "Let's Find & Replace", desc: 'Cross-document literal or regex search with batch replacement', icon: 'search', color: '#0284c7', action: 'tool:replace' },
 
   // Document Security & Tools
-  { id: 'security', category: 'security', title: 'Protect & Encrypt', desc: 'Standard ISO 32000-1 AES-256 encryption with password policy', icon: 'lock', color: '#dc2626', action: 'modal:security' },
-  { id: 'watermark', category: 'tools', title: 'Watermark PDF', desc: 'Apply diagonal text or logo watermarks across all document pages', icon: 'droplet', color: '#0284c7', action: 'modal:watermark' },
-  { id: 'pagenumbers', category: 'tools', title: 'Page Numbers', desc: 'Add Header or Footer page numbers with dynamic {n} and {total}', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
-  { id: 'bates', category: 'tools', title: 'Legal Bates Numbering', desc: 'Sequential legal indexing with prefix, digits pad, and suffix', icon: 'shield', color: '#1e293b', action: 'modal:bates' },
-  { id: 'metadata', category: 'tools', title: 'Document Metadata', desc: 'Edit PDF Title, Author, Subject, Keywords, Creator, and Producer', icon: 'file-text', color: '#64748b', action: 'modal:metadata' },
-  { id: 'grayscale', category: 'tools', title: 'Grayscale PDF', desc: 'Desaturate vector fills, strokes, and shapes to save ink and print costs', icon: 'circle-half', color: '#475569', action: 'modal:grayscale' },
-  { id: 'flatten', category: 'tools', title: 'Flatten Forms', desc: 'Bake interactive fillable AcroForm fields permanently into vectors', icon: 'layers', color: '#0d9488', action: 'action:flatten' },
+  { id: 'security', category: 'security', title: "Let's Protect PDF", desc: 'Standard ISO 32000-1 AES-256 encryption with password policy', icon: 'lock', color: '#dc2626', action: 'modal:security' },
+  { id: 'watermark', category: 'tools', title: "Let's Watermark", desc: 'Apply diagonal text or logo watermarks across all document pages', icon: 'droplet', color: '#0284c7', action: 'modal:watermark' },
+  { id: 'pagenumbers', category: 'tools', title: "Let's Number Pages", desc: 'Add Header or Footer page numbers with dynamic {n} and {total}', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
+  { id: 'bates', category: 'tools', title: "Let's Bates Number", desc: 'Sequential legal indexing with prefix, digits pad, and suffix', icon: 'shield', color: '#1e293b', action: 'modal:bates' },
+  { id: 'metadata', category: 'tools', title: "Let's Edit Metadata", desc: 'Edit PDF Title, Author, Subject, Keywords, Creator, and Producer', icon: 'file-text', color: '#64748b', action: 'modal:metadata' },
+  { id: 'grayscale', category: 'tools', title: "Let's Grayscale", desc: 'Desaturate vector fills, strokes, and shapes to save ink and print costs', icon: 'circle-half', color: '#475569', action: 'modal:grayscale' },
+  { id: 'flatten', category: 'tools', title: "Let's Flatten Forms", desc: 'Bake interactive fillable AcroForm fields permanently into vectors', icon: 'layers', color: '#0d9488', action: 'action:flatten' },
 
   // Conversions
-  { id: 'images-to-pdf', category: 'convert', title: 'Images to PDF', desc: 'Pack multiple JPG, PNG, and WebP images into a multi-page A4 PDF', icon: 'images', color: '#d97706', action: 'action:images-to-pdf' },
-  { id: 'pdf-to-text', category: 'convert', title: 'Extract Plain Text', desc: 'Decompress binary content streams and extract plain searchable text', icon: 'align-left', color: '#334155', action: 'action:extract-text' }
+  { id: 'images-to-pdf', category: 'convert', title: "Let's Images to PDF", desc: 'Pack multiple JPG, PNG, and WebP images into a multi-page A4 PDF', icon: 'images', color: '#d97706', action: 'action:images-to-pdf' },
+  { id: 'pdf-to-text', category: 'convert', title: "Let's Extract Text", desc: 'Decompress binary content streams and extract plain searchable text', icon: 'align-left', color: '#334155', action: 'action:extract-text' }
 ];
 
 export class AllToolsModal {

@@ -23,7 +23,7 @@ npm-debug.log*
 # Operating system
 .DS_Store
 Thumbs.db
-
+todo.md
 # Temporary files
 *.tmp
 *.swp
