@@ -659,7 +659,49 @@ describe('PDF Vector Export & Feature Tests', () => {
     const mergedDoc = await PDFDocument.load(merged);
     assert.strictEqual(mergedDoc.getPageCount(), 3);
   });
+
+  test('deskewPdf rotates pages about center point by custom angle', async () => {
+    // Deskew sample PDF by +1.5 degrees
+    const deskewedBytes = await pdfEngine.deskewPdf(sampleBytes, 1.5);
+    assert(deskewedBytes.byteLength > 500, 'Deskewed PDF should have valid content');
+    const doc = await PDFDocument.load(deskewedBytes);
+    assert.strictEqual(doc.getPageCount(), 2, 'Should preserve page count');
+
+    // Passing 0 degrees returns unchanged document
+    const unchangedBytes = await pdfEngine.deskewPdf(sampleBytes, 0);
+    const unchangedDoc = await PDFDocument.load(unchangedBytes);
+    assert.strictEqual(unchangedDoc.getPageCount(), 2);
+  });
+
+  test('organizePages reorders, deletes, and rotates specific pages', async () => {
+    // Sample document has 2 pages (index 0, 1).
+    // Let's create a 3-page document first:
+    const doc3 = await PDFDocument.create();
+    doc3.addPage([400, 600]); // Page 0
+    doc3.addPage([450, 650]); // Page 1
+    doc3.addPage([500, 700]); // Page 2
+    const raw3 = await doc3.save();
+
+    // Reorder: Page 2 first, Page 0 with 90 deg rotation, discard Page 1
+    const organizedBytes = await pdfEngine.organizePages(raw3, [
+      { index: 2, rotation: 0 },
+      { index: 0, rotation: 90 }
+    ]);
+    assert(organizedBytes.byteLength > 300);
+
+    const resultDoc = await PDFDocument.load(organizedBytes);
+    assert.strictEqual(resultDoc.getPageCount(), 2, 'Should have exactly 2 pages after deleting 1');
+
+    const p0 = resultDoc.getPage(0);
+    assert.strictEqual(p0.getWidth(), 500); // Originally page 2
+    assert.strictEqual(p0.getRotation().angle, 0);
+
+    const p1 = resultDoc.getPage(1);
+    assert.strictEqual(p1.getWidth(), 400); // Originally page 0
+    assert.strictEqual(p1.getRotation().angle, 90, 'Page should have 90 degree rotation applied');
+  });
 });
+
 
 
 

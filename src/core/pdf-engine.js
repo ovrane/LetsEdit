@@ -112,6 +112,16 @@ export class PdfEngine {
     return await PageOperations.imagesToPdf(imagesList, options);
   }
 
+  async deskewPdf(pdfBytes = null, angle = 0) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.deskewPdf(bytes, angle);
+  }
+
+  async organizePages(pdfBytes = null, pageList = []) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.organizePages(bytes, pageList);
+  }
+
   // --- Transform Operations (Margins, Compression, Grayscale) ---
 
   async resizePdfMargins(pdfBytes = null, options = {}) {

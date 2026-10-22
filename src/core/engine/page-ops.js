@@ -4,7 +4,7 @@
  * duplex alternate & mix, N-up imposition, page flipping/mirroring, and image compilation.
  */
 
-import { PDFDocument, PDFName } from 'pdf-lib';
+import { PDFDocument, PDFName, degrees } from 'pdf-lib';
 
 export class PageOperations {
   /**
@@ -391,6 +391,187 @@ export class PageOperations {
         width: scaledW,
         height: scaledH
       });
+    }
+
+    return await finalDoc.save();
+  }
+
+  /**
+   * Straightens/deskews PDF pages by rotating them about their center point
+   * by the specified angle in degrees (e.g. -2.5° or +1.5°).
+   */
+  static async deskewPdf(rawBytes, angleDegrees = 0) {
+    if (!rawBytes) throw new Error('No PDF loaded to deskew');
+    let angle = 0;
+    if (typeof angleDegrees === 'number') {
+      angle = angleDegrees;
+    } else if (typeof angleDegrees === 'string') {
+      angle = parseFloat(angleDegrees) || 0;
+    } else if (angleDegrees && typeof angleDegrees.angle !== 'undefined') {
+      angle = parseFloat(angleDegrees.angle) || 0;
+    }
+
+    const srcDoc = await PDFDocument.load(rawBytes);
+    const totalPages = srcDoc.getPageCount();
+
+    if (Math.abs(angle) < 0.0001) {
+      return await srcDoc.save();
+    }
+
+    const finalDoc = await PDFDocument.create();
+
+    for (let i = 0; i < totalPages; i++) {
+      const srcPage = srcDoc.getPage(i);
+      // Ensure Contents stream exists so embedPdf doesn't fail on blank/sparse pages
+      if (!srcPage.node.get(PDFName.of('Contents'))) {
+        srcPage.node.set(PDFName.of('Contents'), srcDoc.context.register(srcDoc.context.stream('')));
+      }
+
+      const [embedded] = await finalDoc.embedPdf(srcDoc, [i]);
+      const width = srcPage.getWidth();
+      const height = srcPage.getHeight();
+
+      const newPage = finalDoc.addPage([width, height]);
+
+      // Center-point rotation matrix
+      const cx = width / 2;
+      const cy = height / 2;
+      const rad = (angle * Math.PI) / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      const x = cx - (cx * cos - cy * sin);
+      const y = cy - (cx * sin + cy * cos);
+
+      newPage.drawPage(embedded, {
+        x,
+        y,
+        rotate: degrees(angle)
+      });
+    }
+
+    return await finalDoc.save();
+  }
+
+  /**
+   * Fast client-side tilt detection using horizontal projection profile variance.
+   * Analyzes text rows across candidate angles [-5.0°, +5.0°] in 0.25° increments.
+   * Returns the angle with maximum contrast between text rows and whitespace.
+   */
+  static detectDeskewAngle(canvas) {
+    if (!canvas || !canvas.width || !canvas.height) return 0;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    const targetW = 200;
+    const scale = Math.min(1.0, targetW / w);
+    const sw = Math.round(w * scale);
+    const sh = Math.round(h * scale);
+    if (sw <= 0 || sh <= 0) return 0;
+
+    let sctx;
+    if (typeof document !== 'undefined') {
+      const sampleCanvas = document.createElement('canvas');
+      sampleCanvas.width = sw;
+      sampleCanvas.height = sh;
+      sctx = sampleCanvas.getContext('2d');
+      sctx.drawImage(canvas, 0, 0, sw, sh);
+    } else {
+      return 0;
+    }
+
+    const imgData = sctx.getImageData(0, 0, sw, sh);
+    const data = imgData.data;
+
+    // Convert to binary 1 (dark ink) / 0 (background)
+    const binary = new Uint8Array(sw * sh);
+    for (let i = 0; i < sw * sh; i++) {
+      const idx = i * 4;
+      const lum = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+      binary[i] = lum < 185 ? 1 : 0;
+    }
+
+    let bestAngle = 0;
+    let maxVariance = -1;
+
+    // Search between -5.0° and +5.0° in 0.25° increments
+    for (let a = -5.0; a <= 5.001; a += 0.25) {
+      const rad = (a * Math.PI) / 180;
+      const tan = Math.tan(rad);
+      const rowBins = new Float32Array(sh);
+
+      for (let y = 0; y < sh; y++) {
+        const rowOffset = y * sw;
+        for (let x = 0; x < sw; x += 2) {
+          if (binary[rowOffset + x]) {
+            const projectedY = Math.round(y + (x - sw / 2) * tan);
+            if (projectedY >= 0 && projectedY < sh) {
+              rowBins[projectedY]++;
+            }
+          }
+        }
+      }
+
+      // Compute variance
+      let sum = 0;
+      for (let y = 0; y < sh; y++) sum += rowBins[y];
+      const mean = sum / sh;
+      let variance = 0;
+      for (let y = 0; y < sh; y++) {
+        const d = rowBins[y] - mean;
+        variance += d * d;
+      }
+
+      if (variance > maxVariance) {
+        maxVariance = variance;
+        bestAngle = a;
+      }
+    }
+
+    // Returns angle needed to straighten (negative of detected tilt)
+    return Math.round(-bestAngle * 10) / 10;
+  }
+
+  /**
+   * Reorders, deletes, and rotates pages in a PDF document according to pageList.
+   * pageList: Array of page descriptors:
+   *   - number (0-indexed page index from original document)
+   *   - object: { index: number, rotation?: number }
+   */
+  static async organizePages(rawBytes, pageList) {
+    if (!rawBytes) throw new Error('No PDF loaded to organize');
+    if (!Array.isArray(pageList) || pageList.length === 0) {
+      throw new Error('No pages specified to organize');
+    }
+
+    const srcDoc = await PDFDocument.load(rawBytes);
+    const totalPages = srcDoc.getPageCount();
+    const finalDoc = await PDFDocument.create();
+
+    const items = pageList.map(item => {
+      if (typeof item === 'number') {
+        return { index: item, rotation: 0 };
+      }
+      return {
+        index: typeof item.index === 'number' ? item.index : 0,
+        rotation: parseInt(item.rotation, 10) || 0
+      };
+    }).filter(item => item.index >= 0 && item.index < totalPages);
+
+    if (items.length === 0) {
+      throw new Error('All pages in organize list were out of bounds');
+    }
+
+    const indicesToCopy = items.map(it => it.index);
+    const copiedPages = await finalDoc.copyPages(srcDoc, indicesToCopy);
+
+    for (let i = 0; i < copiedPages.length; i++) {
+      const page = copiedPages[i];
+      const rot = items[i].rotation;
+      if (rot !== 0) {
+        const curRot = page.getRotation().angle;
+        page.setRotation(degrees((curRot + rot) % 360));
+      }
+      finalDoc.addPage(page);
     }
 
     return await finalDoc.save();

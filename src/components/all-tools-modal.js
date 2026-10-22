@@ -37,13 +37,14 @@ export const TOOLS_CATALOG = [
   { id: 'to-image', category: 'convert', title: "Let's Convert to JPG", desc: 'Convert and download pages as high-resolution images', icon: 'image', color: '#d97706', popular: true, action: 'modal:to-image' },
 
   // Organize & Pages
-  { id: 'organize', category: 'pages', title: "Let's Organize Pages", desc: 'Drag-and-drop page sequence reordering with thumbnail grid', icon: 'grid', color: '#2563eb', action: 'sidebar:open' },
+  { id: 'organize', category: 'pages', title: "Let's Organize Pages", desc: 'Drag-and-drop page sequence reordering with thumbnail grid', icon: 'grid', color: '#2563eb', action: 'workflow:organize' },
+  { id: 'deskew', category: 'pages', title: "Let's Deskew Scans", desc: 'Auto-detect tilt and straighten crooked scanner feeds with precision angle calibration', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
   { id: 'split-half', category: 'pages', title: "Let's Split in Half", desc: 'Bisect two-page book scans (A3 to double A4 or A4 to double A5)', icon: 'book', color: '#4f46e5', action: 'modal:split-half' },
   { id: 'alternate-mix', category: 'pages', title: "Let's Alternate & Mix", desc: 'Interleave odd and even pages from duplex scanner feeder runs', icon: 'shuffle', color: '#0891b2', action: 'modal:alternate-mix' },
   { id: 'nup', category: 'pages', title: "Let's N-Up Print", desc: 'Print 2 or 4 pages per sheet side-by-side or in 2x2 grid', icon: 'layout', color: '#475569', action: 'modal:nup' },
   { id: 'flip', category: 'pages', title: "Let's Flip / Mirror", desc: 'Mirror PDF coordinates horizontally or vertically for transfers or scans', icon: 'flip', color: '#8b5cf6', action: 'modal:flip' },
   { id: 'resize', category: 'pages', title: "Let's Resize Margins", desc: 'Add binding margins (spiral/binder) or fit to A4/Letter bounds', icon: 'maximize', color: '#6366f1', action: 'modal:resize' },
-  { id: 'rotate', category: 'pages', title: "Let's Rotate Pages", desc: 'Permanently rotate pages 90°, 180°, or 270° clockwise', icon: 'rotate', color: '#f59e0b', action: 'sidebar:open' },
+  { id: 'rotate', category: 'pages', title: "Let's Rotate Pages", desc: 'Permanently rotate pages 90°, 180°, or 270° clockwise', icon: 'rotate', color: '#f59e0b', action: 'workflow:rotate' },
 
   // Edit & Annotate
   { id: 'text', category: 'edit', title: "Let's Add & Edit Text", desc: 'Insert new text or click existing text on the PDF to edit inline', icon: 'type', color: '#2563eb', action: 'tool:text' },

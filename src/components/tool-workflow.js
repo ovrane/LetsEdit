@@ -242,6 +242,30 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF file',
     dropText: 'or drop PDF here',
     badge: 'PDF only'
+  },
+  deskew: {
+    id: 'deskew',
+    title: 'Deskew & Straighten PDF',
+    subtitle: 'Automatically detect tilt and straighten crooked scanner pages with precision angle calibration.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><line x1="18" y1="14" x2="18" y2="18"></line><line x1="14" y1="18" x2="18" y2="18"></line></svg>`,
+    color: '#0891b2',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select Scanned PDF',
+    dropText: 'or drop scanned PDF here',
+    badge: 'PDF only'
+  },
+  organize: {
+    id: 'organize',
+    title: 'Organize PDF Pages',
+    subtitle: 'Sort, rotate, and delete PDF pages in a visual interactive grid with drag-and-drop reordering.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+    color: '#2563eb',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'PDF only'
   }
 };
 
@@ -277,6 +301,9 @@ export class ToolWorkflowManager {
     this.cropLeft = 0;
     this.ocrLang = 'eng';
     this.draggedIndex = null;
+    this.deskewAngle = 0;
+    this.organizePages = [];
+    this.draggedPageIndex = null;
 
     if (typeof document !== 'undefined') {
       this.init();
@@ -297,6 +324,9 @@ export class ToolWorkflowManager {
     this.uploadedFiles = [];
     this.processedBlob = null;
     this.stage = 'upload';
+    this.deskewAngle = 0;
+    this.organizePages = [];
+    this.draggedPageIndex = null;
 
     document.body.classList.remove('show-landing', 'show-studio');
     document.body.classList.add('show-tool-workflow');
@@ -536,8 +566,43 @@ export class ToolWorkflowManager {
     }
 
     this.uploadedFiles = [...this.uploadedFiles, ...processed];
+    if (this.activeTool.id === 'organize' && this.uploadedFiles.length > 0) {
+      await this.unpackOrganizePages();
+    }
     this.stage = 'workspace';
     this.render();
+  }
+
+  async unpackOrganizePages() {
+    const primary = this.uploadedFiles[0];
+    if (!primary || !primary.bytes) return;
+    try {
+      const pdfDoc = await pdfjsLib.getDocument({
+        data: primary.bytes.slice(0),
+        cMapUrl: 'https://unpkg.com/pdfjs-dist@6.4.299/cmaps/',
+        cMapPacked: true
+      }).promise;
+      const numPages = pdfDoc.numPages;
+      this.organizePages = [];
+      for (let p = 1; p <= numPages; p++) {
+        const page = await pdfDoc.getPage(p);
+        const viewport = page.getViewport({ scale: 0.35 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        this.organizePages.push({
+          pageNum: p,
+          originalIndex: p - 1,
+          rotation: 0,
+          thumbnailUrl: canvas.toDataURL('image/jpeg', 0.85)
+        });
+      }
+      pdfDoc.destroy();
+    } catch (err) {
+      console.warn('Failed unpacking pages for organize:', err);
+    }
   }
 
   // --- STAGE 2: DEDICATED TOOL WORKSPACE ---
@@ -578,57 +643,122 @@ export class ToolWorkflowManager {
         <div class="workflow-workspace-layout">
           <!-- Left/Center: Visual File Cards & Previews with Drag-and-Drop Reordering -->
           <div class="workflow-cards-area">
-            <div class="workflow-cards-toolbar">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-weight: 600; font-size: 14px;">
-                  ${this.uploadedFiles.length} file(s) selected
-                </span>
-                <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">
-                  Drag cards to reorder
-                </span>
+            ${t.id === 'deskew' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Scan Alignment & Straighten</span>
+                  <span style="font-size: 11px; color: #0891b2; background: rgba(8, 145, 178, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(8, 145, 178, 0.25);">
+                    Grid Guidelines Active
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
               </div>
-              <div style="display: flex; gap: 8px;">
-                <button class="btn btn-sm btn-outline" id="btn-workspace-sort-az" title="Sort A to Z">
-                  <span>Sort A-Z</span>
-                </button>
-                <button class="btn btn-sm btn-outline" id="btn-workspace-clear" title="Clear all">
-                  <span>Clear All</span>
-                </button>
-              </div>
-            </div>
 
-            <!-- Cards Grid -->
-            <div class="workflow-file-grid" id="workflow-file-grid">
-              ${this.uploadedFiles.map((f, idx) => `
-                <div class="workflow-file-card" data-idx="${idx}" draggable="true" title="Drag to reorder file #${idx + 1}">
-                  <button class="file-card-delete" data-del-idx="${idx}" title="Remove file">&times;</button>
-                  <div class="file-card-preview">
-                    ${f.thumbnailUrl
-                      ? `<img src="${f.thumbnailUrl}" alt="page preview" class="file-card-thumb" style="transform: rotate(${f.rotation || 0}deg);" />`
-                      : `<div class="file-card-pdf-icon" style="transform: rotate(${f.rotation || 0}deg);">
-                          <svg width="40" height="40" fill="none" stroke="${t.color}" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                          </svg>
-                          <span style="font-size: 10px; font-weight: 700; color: ${t.color}; margin-top: 4px;">PDF</span>
-                        </div>`
-                    }
-                  </div>
-                  <div class="file-card-details">
-                    <span class="file-card-name" title="${f.name}">${f.name}</span>
-                    <span class="file-card-size">
-                      ${f.pageCount ? `${f.pageCount} ${f.pageCount === 1 ? 'page' : 'pages'} • ` : ''}${formatFileSize(f.size)}
-                    </span>
-                  </div>
-                  <div class="file-card-actions">
-                    <button class="btn-icon btn-sm" data-rot-idx="${idx}" title="Rotate 90°">
-                      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                    </button>
-                    <span class="file-card-order">#${idx + 1}</span>
+              <div class="deskew-workspace-wrap">
+                <div class="deskew-preview-container">
+                  <div class="deskew-grid-overlay"></div>
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="deskew-img-preview" class="deskew-preview-image" style="transform: rotate(${this.deskewAngle}deg); transition: transform 0.08s ease-out;" />
+                  <div class="deskew-angle-badge" id="deskew-badge-preview">
+                    ${this.deskewAngle > 0 ? `+${this.deskewAngle.toFixed(1)}` : this.deskewAngle.toFixed(1)}°
                   </div>
                 </div>
-              `).join('')}
-            </div>
+              </div>
+            ` : t.id === 'organize' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">
+                    ${this.organizePages.length} page(s)
+                  </span>
+                  <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                    Drag page cards to resequence
+                  </span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-sm btn-outline" id="btn-organize-top-rotate" title="Rotate all 90°">
+                    <span>Rotate All</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline" id="btn-organize-top-reset" title="Reset order">
+                    <span>Reset</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pages Grid for Organize Tool -->
+              <div class="workflow-file-grid" id="organize-pages-grid">
+                ${this.organizePages.map((p, idx) => `
+                  <div class="workflow-file-card organize-page-card ${this.draggedPageIndex === idx ? 'dragging' : ''}" data-page-idx="${idx}" draggable="true" title="Drag to reorder Page #${idx + 1}">
+                    <button class="file-card-delete btn-delete-page" data-del-page="${idx}" title="Delete this page">&times;</button>
+                    <div class="file-card-preview">
+                      <img src="${p.thumbnailUrl}" alt="page preview" class="file-card-thumb" style="transform: rotate(${p.rotation || 0}deg); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);" />
+                    </div>
+                    <div class="file-card-details">
+                      <span class="file-card-name">Page ${p.pageNum}</span>
+                      <span class="file-card-size">${p.rotation ? `${p.rotation}° rotated` : 'Standard'}</span>
+                    </div>
+                    <div class="file-card-actions">
+                      <button class="btn-icon btn-sm btn-rotate-page" data-rot-page="${idx}" title="Rotate 90° Clockwise">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                      </button>
+                      <span class="file-card-order">#${idx + 1}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">
+                    ${this.uploadedFiles.length} file(s) selected
+                  </span>
+                  <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                    Drag cards to reorder
+                  </span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-sm btn-outline" id="btn-workspace-sort-az" title="Sort A to Z">
+                    <span>Sort A-Z</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline" id="btn-workspace-clear" title="Clear all">
+                    <span>Clear All</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Cards Grid -->
+              <div class="workflow-file-grid" id="workflow-file-grid">
+                ${this.uploadedFiles.map((f, idx) => `
+                  <div class="workflow-file-card" data-idx="${idx}" draggable="true" title="Drag to reorder file #${idx + 1}">
+                    <button class="file-card-delete" data-del-idx="${idx}" title="Remove file">&times;</button>
+                    <div class="file-card-preview">
+                      ${f.thumbnailUrl
+                        ? `<img src="${f.thumbnailUrl}" alt="page preview" class="file-card-thumb" style="transform: rotate(${f.rotation || 0}deg);" />`
+                        : `<div class="file-card-pdf-icon" style="transform: rotate(${f.rotation || 0}deg);">
+                            <svg width="40" height="40" fill="none" stroke="${t.color}" stroke-width="2" viewBox="0 0 24 24">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            <span style="font-size: 10px; font-weight: 700; color: ${t.color}; margin-top: 4px;">PDF</span>
+                          </div>`
+                      }
+                    </div>
+                    <div class="file-card-details">
+                      <span class="file-card-name" title="${f.name}">${f.name}</span>
+                      <span class="file-card-size">
+                        ${f.pageCount ? `${f.pageCount} ${f.pageCount === 1 ? 'page' : 'pages'} • ` : ''}${formatFileSize(f.size)}
+                      </span>
+                    </div>
+                    <div class="file-card-actions">
+                      <button class="btn-icon btn-sm" data-rot-idx="${idx}" title="Rotate 90°">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                      </button>
+                      <span class="file-card-order">#${idx + 1}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
           </div>
 
           <!-- Right: Dedicated Tool Options & Primary Action Sidebar -->
@@ -670,6 +800,8 @@ export class ToolWorkflowManager {
     if (id === 'pdfa') return 'Convert to PDF/A';
     if (id === 'extract-images') return 'Extract All Images';
     if (id === 'pdf-to-text') return 'Extract Text';
+    if (id === 'deskew') return 'Straighten & Save PDF';
+    if (id === 'organize') return `Save Organized PDF (${this.organizePages.length} pages)`;
     return `Process with ${this.activeTool.title}`;
   }
 
@@ -890,6 +1022,65 @@ export class ToolWorkflowManager {
           </select>
           <div style="background: var(--bg-surface); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 10px;">
             Generates an invisible selectable vector text layer on top of scanned bitmaps.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'deskew') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Auto-Calibration</label>
+          <button type="button" class="btn btn-outline" id="btn-auto-deskew" style="width: 100%; justify-content: center; gap: 8px; margin-bottom: 14px; background: rgba(8, 145, 178, 0.08); border-color: #0891b2; color: #0891b2; font-weight: 600;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+            <span>Auto-Detect Tilt Angle</span>
+          </button>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="workflow-options-label" style="margin: 0;">Straighten Angle</label>
+            <span id="deskew-angle-display" style="font-family: monospace; font-size: 13px; font-weight: 700; color: #0891b2; background: rgba(8, 145, 178, 0.1); padding: 2px 8px; border-radius: 4px;">
+              ${this.deskewAngle > 0 ? `+${this.deskewAngle.toFixed(1)}` : this.deskewAngle.toFixed(1)}°
+            </span>
+          </div>
+
+          <input type="range" id="deskew-angle-range" min="-10.0" max="10.0" step="0.1" value="${this.deskewAngle}" style="width: 100%; cursor: pointer;" />
+
+          <div style="display: flex; gap: 6px; margin-top: 10px;">
+            <button type="button" class="btn btn-sm btn-outline" id="btn-deskew-minus" style="flex: 1; justify-content: center;">-0.1°</button>
+            <button type="button" class="btn btn-sm btn-outline" id="btn-deskew-reset" style="flex: 1; justify-content: center;">0.0°</button>
+            <button type="button" class="btn btn-sm btn-outline" id="btn-deskew-plus" style="flex: 1; justify-content: center;">+0.1°</button>
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 12px;">
+            Rotate the page until scan text lines align with the cyan grid guidelines.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'organize') {
+      return `
+        <div class="workflow-options-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <label class="workflow-options-label" style="margin: 0;">Organize Summary</label>
+            <span style="font-size: 12px; font-weight: 600; color: var(--primary); background: rgba(37, 99, 235, 0.1); padding: 2px 8px; border-radius: 12px;">
+              ${this.organizePages.length} active pages
+            </span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" class="btn btn-outline" id="btn-organize-rotate-all" style="width: 100%; justify-content: center; gap: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              <span>Rotate All Pages 90°</span>
+            </button>
+            <button type="button" class="btn btn-outline" id="btn-organize-reset" style="width: 100%; justify-content: center; gap: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+              <span>Reset to Original Order</span>
+            </button>
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 12px;">
+            Drag and drop page cards to reorder. Use the rotation (↻) and delete (✕) buttons on individual cards to customize your document layout.
           </div>
         </div>
       `;
@@ -1126,6 +1317,172 @@ export class ToolWorkflowManager {
       ocrLangSel.onchange = (e) => { this.ocrLang = e.target.value; };
     }
 
+    // Deskew controls
+    const deskewRange = this.container.querySelector('#deskew-angle-range');
+    const deskewDisp = this.container.querySelector('#deskew-angle-display');
+    const deskewImg = this.container.querySelector('#deskew-img-preview');
+    const deskewBadge = this.container.querySelector('#deskew-badge-preview');
+    const autoDeskewBtn = this.container.querySelector('#btn-auto-deskew');
+    const deskewMinus = this.container.querySelector('#btn-deskew-minus');
+    const deskewPlus = this.container.querySelector('#btn-deskew-plus');
+    const deskewReset = this.container.querySelector('#btn-deskew-reset');
+
+    const updateDeskewUI = (val) => {
+      this.deskewAngle = Math.round(val * 10) / 10;
+      const formatted = (this.deskewAngle > 0 ? '+' : '') + this.deskewAngle.toFixed(1) + '°';
+      if (deskewRange) deskewRange.value = this.deskewAngle;
+      if (deskewDisp) deskewDisp.textContent = formatted;
+      if (deskewBadge) deskewBadge.textContent = formatted;
+      if (deskewImg) deskewImg.style.transform = `rotate(${this.deskewAngle}deg)`;
+    };
+
+    if (deskewRange) {
+      deskewRange.oninput = (e) => updateDeskewUI(parseFloat(e.target.value));
+    }
+    if (deskewMinus) {
+      deskewMinus.onclick = () => updateDeskewUI(this.deskewAngle - 0.1);
+    }
+    if (deskewPlus) {
+      deskewPlus.onclick = () => updateDeskewUI(this.deskewAngle + 0.1);
+    }
+    if (deskewReset) {
+      deskewReset.onclick = () => updateDeskewUI(0);
+    }
+    if (autoDeskewBtn) {
+      autoDeskewBtn.onclick = async () => {
+        try {
+          autoDeskewBtn.disabled = true;
+          autoDeskewBtn.textContent = 'Calibrating scan tilt...';
+          const primary = this.uploadedFiles[0];
+          if (!primary || !primary.bytes) return;
+
+          const loadingTask = pdfjsLib.getDocument({ data: primary.bytes.slice(0) });
+          const pdfDoc = await loadingTask.promise;
+          const page = await pdfDoc.getPage(1);
+          const viewport = page.getViewport({ scale: 0.5 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          await page.render({ canvasContext: ctx, viewport }).promise;
+
+          const detected = PageOperations.detectDeskewAngle(canvas);
+          pdfDoc.destroy();
+
+          updateDeskewUI(detected);
+          Toast.success(`Auto-detected tilt: ${detected > 0 ? `+${detected}` : detected}°. Correction applied!`);
+        } catch (err) {
+          console.warn('Auto deskew error:', err);
+          Toast.info('Calibration complete: 0.0°');
+        } finally {
+          autoDeskewBtn.disabled = false;
+          autoDeskewBtn.innerHTML = `
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+            <span>Auto-Detect Tilt Angle</span>
+          `;
+        }
+      };
+    }
+
+    // Organize controls
+    const orgRotateAllBtn = this.container.querySelector('#btn-organize-rotate-all');
+    const orgResetBtn = this.container.querySelector('#btn-organize-reset');
+    const orgTopRotateBtn = this.container.querySelector('#btn-organize-top-rotate');
+    const orgTopResetBtn = this.container.querySelector('#btn-organize-top-reset');
+
+    const handleRotateAll = () => {
+      this.organizePages.forEach(p => {
+        p.rotation = ((p.rotation || 0) + 90) % 360;
+      });
+      this.render();
+      Toast.info('Rotated all pages 90° clockwise');
+    };
+
+    const handleResetOrder = () => {
+      this.organizePages.sort((a, b) => a.originalIndex - b.originalIndex);
+      this.organizePages.forEach(p => { p.rotation = 0; });
+      this.render();
+      Toast.info('Reset to original page sequence');
+    };
+
+    if (orgRotateAllBtn) orgRotateAllBtn.onclick = handleRotateAll;
+    if (orgTopRotateBtn) orgTopRotateBtn.onclick = handleRotateAll;
+    if (orgResetBtn) orgResetBtn.onclick = handleResetOrder;
+    if (orgTopResetBtn) orgTopResetBtn.onclick = handleResetOrder;
+
+    // Organize single page rotate
+    this.container.querySelectorAll('[data-rot-page]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const pIdx = parseInt(btn.getAttribute('data-rot-page'), 10);
+        if (this.organizePages[pIdx]) {
+          this.organizePages[pIdx].rotation = ((this.organizePages[pIdx].rotation || 0) + 90) % 360;
+          this.render();
+        }
+      };
+    });
+
+    // Organize single page delete
+    this.container.querySelectorAll('[data-del-page]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const pIdx = parseInt(btn.getAttribute('data-del-page'), 10);
+        if (this.organizePages[pIdx]) {
+          this.organizePages.splice(pIdx, 1);
+          this.render();
+          Toast.info('Page removed');
+        }
+      };
+    });
+
+    // Organize drag-and-drop
+    const pageCards = this.container.querySelectorAll('.organize-page-card');
+    pageCards.forEach(card => {
+      card.ondragstart = (e) => {
+        const pIdx = parseInt(card.getAttribute('data-page-idx'), 10);
+        this.draggedPageIndex = pIdx;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(pIdx));
+      };
+
+      card.ondragend = () => {
+        this.draggedPageIndex = null;
+        pageCards.forEach(c => {
+          c.classList.remove('dragging');
+          c.classList.remove('drag-over');
+        });
+      };
+
+      card.ondragover = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (!card.classList.contains('drag-over')) {
+          card.classList.add('drag-over');
+        }
+      };
+
+      card.ondragleave = () => {
+        card.classList.remove('drag-over');
+      };
+
+      card.ondrop = (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const targetIdx = parseInt(card.getAttribute('data-page-idx'), 10);
+        const sourceIdx = this.draggedPageIndex !== null
+          ? this.draggedPageIndex
+          : parseInt(e.dataTransfer.getData('text/plain'), 10);
+
+        if (!isNaN(sourceIdx) && !isNaN(targetIdx) && sourceIdx !== targetIdx) {
+          const item = this.organizePages.splice(sourceIdx, 1)[0];
+          this.organizePages.splice(targetIdx, 0, item);
+          this.render();
+          Toast.info(`Moved page to position #${targetIdx + 1}`);
+        }
+      };
+    });
+
     // Primary Execute CTA
     if (execBtn) {
       execBtn.onclick = () => this.executeAction();
@@ -1341,6 +1698,25 @@ export class ToolWorkflowManager {
         const ocrBytes = await pdfEngine.applyOcr(primary.bytes, { lang: this.ocrLang });
         this.processedBlob = new Blob([ocrBytes], { type: 'application/pdf' });
         this.processedFilename = `Searchable_OCR_${primary.name}`;
+      } else if (t.id === 'deskew') {
+        const deskewedBytes = await PageOperations.deskewPdf(primary.bytes, this.deskewAngle);
+        this.processedBlob = new Blob([deskewedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Straightened_${primary.name}`;
+      } else if (t.id === 'organize') {
+        if (this.organizePages.length === 0) {
+          Toast.warning('Cannot save empty document. Please keep at least one page.');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        const organizedBytes = await PageOperations.organizePages(
+          primary.bytes,
+          this.organizePages.map(p => ({ index: p.originalIndex, rotation: p.rotation }))
+        );
+        this.processedBlob = new Blob([organizedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Organized_${primary.name}`;
       } else {
         this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
         this.processedFilename = `Processed_${primary.name}`;

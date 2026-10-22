@@ -3077,3 +3077,109 @@ body.show-tool-workflow .tool-workflow-container {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+/* Deskew & Straighten Styles */
+.deskew-workspace-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 480px;
+  background: var(--bg-surface);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.deskew-preview-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 460px;
+  max-height: 600px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.deskew-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background-image: 
+    linear-gradient(to right, rgba(8, 145, 178, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(8, 145, 178, 0.18) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.deskew-preview-image {
+  max-width: 100%;
+  max-height: 540px;
+  object-fit: contain;
+  display: block;
+}
+
+.deskew-angle-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  color: #38bdf8;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Organize PDF Page Grid & Actions */
+.organize-card-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px 10px;
+  border-top: 1px solid var(--border-subtle);
+  justify-content: space-between;
+  background: var(--bg-surface);
+}
+
+.organize-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.organize-action-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.organize-action-btn.btn-rotate-page:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.organize-action-btn.btn-delete-page:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+

@@ -98,7 +98,8 @@ export class LandingPage {
                     <button class="mega-item" data-action="modal:split">Let's Split Pages</button>
                     <button class="mega-item" data-action="sidebar:merge">Let's Merge PDF</button>
                     <button class="mega-item" data-action="sidebar:delete">Let's Delete Pages</button>
-                    <button class="mega-item" data-action="sidebar:open">Let's Organize Pages</button>
+                    <button class="mega-item" data-action="workflow:organize">Let's Organize Pages</button>
+                    <button class="mega-item" data-action="workflow:deskew">Let's Deskew Scans</button>
                     <button class="mega-item" data-action="modal:split-half">Let's Split in Half</button>
                     <button class="mega-item" data-action="modal:alternate-mix">Let's Alternate & Mix</button>
                     <button class="mega-item" data-action="modal:nup">Let's N-Up Imposition</button>
