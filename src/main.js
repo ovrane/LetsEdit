@@ -10,7 +10,7 @@ import { SignatureTool } from './tools/signature-tool.js';
 import { ImageTool } from './tools/image-tool.js';
 import { FormTool } from './tools/form-tool.js';
 import { searchReplace } from './tools/search-replace.js';
-import { AuthModal } from './components/auth-modal.js';
+import { AuthModal, authModal } from './components/auth-modal.js';
 import { WatermarkModal } from './components/watermark-modal.js';
 import { PageNumbersModal } from './components/pagenumbers-modal.js';
 import { SecurityModal } from './components/security-modal.js';
@@ -55,7 +55,7 @@ class App {
     this.sidebar = new Sidebar(sidebarEl);
     this.signatureTool = new SignatureTool();
     this.imageTool = new ImageTool();
-    this.authModal = new AuthModal();
+    this.authModal = authModal;
     this.watermarkModal = new WatermarkModal();
     this.pageNumbersModal = new PageNumbersModal();
     this.securityModal = new SecurityModal();
@@ -158,27 +158,21 @@ class App {
       if (event === 'scale-changed') {
         zoomText.textContent = `${Math.round(state.scale * 100)}%`;
       } else if (event === 'user-changed') {
-        const userBtn = document.getElementById('user-display-name');
-        if (state.user) {
-          userBtn.textContent = state.user.name;
-        } else {
-          userBtn.textContent = 'Log in';
-        }
+        this.authModal.updateAllUserWidgets(state.user);
       }
     });
 
-    // Auth Modal trigger
-    document.getElementById('btn-open-auth').onclick = () => {
-      const state = store.getState();
-      if (state.user) {
-        if (confirm(`Logged in as ${state.user.name}. Would you like to log out?`)) {
-          store.setUser(null);
-          Toast.info('Signed out');
-        }
-      } else {
-        this.authModal.open();
-      }
-    };
+    // Initial user status sync
+    this.authModal.updateAllUserWidgets(store.getState().user);
+
+    // Auth Modal & User Account Menu trigger
+    const authBtn = document.getElementById('btn-open-auth');
+    if (authBtn) {
+      authBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.authModal.toggleAccountMenu(authBtn);
+      };
+    }
 
     // Export & Download
     document.getElementById('btn-save-pdf').onclick = async () => {

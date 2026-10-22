@@ -220,6 +220,25 @@ describe('StateStore Engine Tests', () => {
     store.setFlattenForms(false);
     assert.strictEqual(store.getState().flattenForms, false);
   });
+
+  test('user authentication state management and dispatch', () => {
+    let notifiedUser = undefined;
+    store.subscribe((event, data) => {
+      if (event === 'user-changed') {
+        notifiedUser = data.user;
+      }
+    });
+
+    const mockUser = { email: 'alex@example.com', name: 'Alex Morgan', plan: 'Pro', token: 'token_123' };
+    store.setUser(mockUser);
+
+    assert.deepStrictEqual(store.getState().user, mockUser);
+    assert.deepStrictEqual(notifiedUser, mockUser);
+
+    store.setUser(null);
+    assert.strictEqual(store.getState().user, null);
+    assert.strictEqual(notifiedUser, null);
+  });
 });
 
 

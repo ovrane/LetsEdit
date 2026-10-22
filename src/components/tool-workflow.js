@@ -16,6 +16,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { downloadBlob, readFileAsArrayBuffer, formatFileSize, hexToRgb } from '../utils/helpers.js';
 import { toggleTheme } from '../utils/theme.js';
+import { authModal } from './auth-modal.js';
 
 // Setup PDF.js worker safely across browser and test runtimes
 const workerSrc = typeof window !== 'undefined'
@@ -364,6 +365,12 @@ export class ToolWorkflowManager {
             <button class="icon-btn" id="btn-workflow-theme" title="Toggle Theme">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
             </button>
+            <div class="user-account-wrapper">
+              <button class="btn btn-outline btn-sm user-account-btn" id="btn-workflow-auth">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span>${store.getState().user ? store.getState().user.name : 'Log in'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -415,6 +422,14 @@ export class ToolWorkflowManager {
     if (backBtn) backBtn.onclick = () => this.closeWorkflow();
     if (brandLogo) brandLogo.onclick = () => this.closeWorkflow();
     if (chooseBtn && fileInput) chooseBtn.onclick = () => fileInput.click();
+
+    const authBtn = this.container.querySelector('#btn-workflow-auth');
+    if (authBtn) {
+      authBtn.onclick = (e) => {
+        e.stopPropagation();
+        authModal.toggleAccountMenu(authBtn);
+      };
+    }
 
     if (themeBtn) {
       themeBtn.onclick = () => {

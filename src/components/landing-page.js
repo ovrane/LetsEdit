@@ -11,6 +11,7 @@ import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from '../utils/theme.js';
 import { toolWorkflow, WORKFLOW_TOOLS_CONFIG } from './tool-workflow.js';
+import { authModal } from './auth-modal.js';
 
 export class LandingPage {
   constructor() {
@@ -154,6 +155,12 @@ export class LandingPage {
               <svg id="landing-theme-sun" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
               <svg id="landing-theme-moon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
             </button>
+            <div class="user-account-wrapper" id="landing-account-wrapper">
+              <button class="btn btn-outline btn-sm user-account-btn" id="btn-landing-auth">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span class="user-name-label">Log in</span>
+              </button>
+            </div>
             <button class="btn btn-primary" id="btn-enter-studio">Open Editor Studio</button>
           </div>
         </div>
@@ -598,6 +605,16 @@ export class LandingPage {
         Toast.info(`Switched to ${nextTheme === 'dark' ? 'Dark' : 'Light'} theme`);
       };
     }
+
+    // User auth button & popover on landing header
+    const landingAuthBtn = this.container.querySelector('#btn-landing-auth');
+    if (landingAuthBtn) {
+      landingAuthBtn.onclick = (e) => {
+        e.stopPropagation();
+        authModal.toggleAccountMenu(landingAuthBtn);
+      };
+    }
+    authModal.updateAllUserWidgets(store.getState().user);
 
     // Navbar quick links
     this.container.querySelectorAll('.landing-nav-link[data-tool]').forEach(btn => {
