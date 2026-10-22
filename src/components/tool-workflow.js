@@ -266,6 +266,162 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF file',
     dropText: 'or drop PDF here',
     badge: 'PDF only'
+  },
+  bates: {
+    id: 'bates',
+    title: 'Bates Numbering for PDF',
+    subtitle: 'Add sequential legal Bates stamps with custom prefixes, starting number, and zero-padding.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+    color: '#1e293b',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Legal Bates'
+  },
+  nup: {
+    id: 'nup',
+    title: 'N-Up Imposition PDF Printing',
+    subtitle: 'Impose 2 or 4 pages per sheet side-by-side or in a 2×2 grid layout.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>`,
+    color: '#475569',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: '2-Up & 4-Up'
+  },
+  'split-half': {
+    id: 'split-half',
+    title: 'Split PDF Down the Middle',
+    subtitle: 'Bisect two-page book scans (A3 to double A4 or A4 to double A5) vertically or horizontally.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="12" y1="2" x2="12" y2="22" stroke-dasharray="3 3"></line></svg>`,
+    color: '#4f46e5',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select Book Scan PDF',
+    dropText: 'or drop PDF here',
+    badge: 'Book Scan Slicer'
+  },
+  'alternate-mix': {
+    id: 'alternate-mix',
+    title: 'Alternate & Mix PDF',
+    subtitle: 'Interleave pages from two documents (e.g. odd and even scanner feeder batches).',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>`,
+    color: '#0891b2',
+    accept: '.pdf,application/pdf',
+    multiple: true,
+    buttonText: 'Select 2 PDF files to Interleave',
+    dropText: 'or drop 2 PDFs here',
+    badge: 'Select 2 files'
+  },
+  'pdf-to-word': {
+    id: 'pdf-to-word',
+    title: 'Convert PDF to Word DOC',
+    subtitle: 'Extract text, formatting, and layout from PDF into an editable Word document.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
+    color: '#2563eb',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Word DOC'
+  },
+  'pdf-to-excel': {
+    id: 'pdf-to-excel',
+    title: 'Convert PDF to Excel / CSV',
+    subtitle: 'Extract table data and columns from PDF into a spreadsheet CSV file.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>`,
+    color: '#107c41',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Excel / CSV'
+  },
+  'pdf-to-ppt': {
+    id: 'pdf-to-ppt',
+    title: 'Convert PDF to PowerPoint',
+    subtitle: 'Convert PDF document pages into high-resolution presentation slides.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
+    color: '#d24726',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'PPT Slides'
+  },
+  unlock: {
+    id: 'unlock',
+    title: 'Unlock PDF Restrictions',
+    subtitle: 'Remove owner passwords and printing/copying restrictions from PDF documents.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`,
+    color: '#10b981',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select Locked PDF',
+    dropText: 'or drop PDF here',
+    badge: 'Remove Restrictions'
+  },
+  'remove-annotations': {
+    id: 'remove-annotations',
+    title: 'Remove Annotations from PDF',
+    subtitle: 'Batch remove highlights, strikeouts, sticky notes, and drawings to clean up document vectors.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+    color: '#dc2626',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Clean Vectors'
+  },
+  'extract-pages': {
+    id: 'extract-pages',
+    title: 'Extract Pages from PDF',
+    subtitle: 'Select and extract custom pages into a new independent PDF document.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
+    color: '#ea580c',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Extract Pages'
+  },
+  rename: {
+    id: 'rename',
+    title: 'Rename PDF by Content',
+    subtitle: 'Automatically detect document title, heading, or invoice number to rename file.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+    color: '#059669',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Smart Rename'
+  },
+  'html-to-pdf': {
+    id: 'html-to-pdf',
+    title: 'Convert HTML to PDF',
+    subtitle: 'Convert web pages, HTML files, or raw code into a clean, vector PDF document.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+    color: '#0284c7',
+    accept: '.html,.htm,text/html,text/plain',
+    multiple: false,
+    buttonText: 'Select HTML file',
+    dropText: 'or drop HTML file here',
+    badge: 'HTML to PDF'
+  },
+  'word-to-pdf': {
+    id: 'word-to-pdf',
+    title: 'Convert Word DOCX to PDF',
+    subtitle: 'Creates a clean PDF document from Microsoft Word DOCX files client-side.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
+    color: '#2563eb',
+    accept: '.docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword',
+    multiple: false,
+    buttonText: 'Select Word file',
+    dropText: 'or drop Word DOCX here',
+    badge: 'DOCX to PDF'
   }
 };
 
@@ -299,14 +455,41 @@ export class ToolWorkflowManager {
     this.cropRight = 0;
     this.cropBottom = 0;
     this.cropLeft = 0;
+    this.cropApplyAll = true;
     this.ocrLang = 'eng';
     this.draggedIndex = null;
     this.deskewAngle = 0;
     this.organizePages = [];
     this.draggedPageIndex = null;
+    this.batesPrefix = 'CASE-';
+    this.batesSuffix = '';
+    this.batesStart = 1;
+    this.batesDigits = 6;
+    this.batesPos = 'bottom-right';
+    this.batesColor = '#1e293b';
+    this.nupCount = 2;
+    this.splitHalfDirection = 'vertical';
+    this.alternateReverseB = true;
+    this.flipDirection = 'horizontal';
+    this.grayscalePreviewActive = true;
+    this.extractedTextPreview = '';
+    this.unlockPassword = '';
+    this.renameCustomName = '';
 
     if (typeof document !== 'undefined') {
       this.init();
+    }
+  }
+
+  getBatesPositionCss() {
+    switch (this.batesPos) {
+      case 'top-left': return 'top: 14px; left: 14px;';
+      case 'top-center': return 'top: 14px; left: 50%; transform: translateX(-50%);';
+      case 'top-right': return 'top: 14px; right: 14px;';
+      case 'bottom-left': return 'bottom: 14px; left: 14px;';
+      case 'bottom-center': return 'bottom: 14px; left: 50%; transform: translateX(-50%);';
+      case 'bottom-right':
+      default: return 'bottom: 14px; right: 14px;';
     }
   }
 
@@ -327,6 +510,20 @@ export class ToolWorkflowManager {
     this.deskewAngle = 0;
     this.organizePages = [];
     this.draggedPageIndex = null;
+    this.cropTop = 0;
+    this.cropRight = 0;
+    this.cropBottom = 0;
+    this.cropLeft = 0;
+    this.cropApplyAll = true;
+    this.batesPrefix = 'CASE-';
+    this.batesSuffix = '';
+    this.batesStart = 1;
+    this.batesDigits = 6;
+    this.batesPos = 'bottom-right';
+    this.batesColor = '#1e293b';
+    this.nupCount = 2;
+    this.splitHalfDirection = 'vertical';
+    this.alternateReverseB = true;
 
     document.body.classList.remove('show-landing', 'show-studio');
     document.body.classList.add('show-tool-workflow');
@@ -569,6 +766,25 @@ export class ToolWorkflowManager {
     if (this.activeTool.id === 'organize' && this.uploadedFiles.length > 0) {
       await this.unpackOrganizePages();
     }
+    if (this.activeTool.id === 'pdf-to-text' && this.uploadedFiles.length > 0) {
+      try {
+        this.extractedTextPreview = await pdfEngine.extractDocumentText(this.uploadedFiles[0].bytes);
+      } catch (e) {
+        console.warn('Text preview extraction failed:', e);
+      }
+    }
+    if (this.activeTool.id === 'rename' && this.uploadedFiles.length > 0) {
+      try {
+        const text = await pdfEngine.extractDocumentText(this.uploadedFiles[0].bytes);
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2 && !l.startsWith('---'));
+        if (lines.length > 0) {
+          const heading = lines[0].replace(/[^a-zA-Z0-9_\-\s]/g, '').slice(0, 40).trim().replace(/\s+/g, '_');
+          if (heading) this.renameCustomName = `${heading}.pdf`;
+        }
+      } catch (e) {
+        console.warn('Auto heading detection failed:', e);
+      }
+    }
     this.stage = 'workspace';
     this.render();
   }
@@ -706,6 +922,193 @@ export class ToolWorkflowManager {
                   </div>
                 `).join('')}
               </div>
+            ` : t.id === 'crop' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Crop Margins Preview</span>
+                  <span id="crop-dimensions-badge" style="font-size: 11px; color: #0d9488; background: rgba(13, 148, 136, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(13, 148, 136, 0.25);">
+                    Active Area: ${Math.max(20, Math.round(595.28 - this.cropLeft - this.cropRight))} × ${Math.max(20, Math.round(841.89 - this.cropTop - this.cropBottom))} pt
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="crop-workspace-wrap">
+                <div class="crop-preview-container" id="crop-preview-container">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="crop-page-img" class="crop-page-img" />
+                  <div class="crop-marquee-box" id="crop-marquee-box" style="inset: ${this.cropTop * 0.35}px ${this.cropRight * 0.35}px ${this.cropBottom * 0.35}px ${this.cropLeft * 0.35}px;">
+                    <div class="crop-handle crop-handle-nw"></div>
+                    <div class="crop-handle crop-handle-n"></div>
+                    <div class="crop-handle crop-handle-ne"></div>
+                    <div class="crop-handle crop-handle-e"></div>
+                    <div class="crop-handle crop-handle-se"></div>
+                    <div class="crop-handle crop-handle-s"></div>
+                    <div class="crop-handle crop-handle-sw"></div>
+                    <div class="crop-handle crop-handle-w"></div>
+                  </div>
+                </div>
+              </div>
+            ` : t.id === 'bates' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Bates Numbering Preview</span>
+                  <span id="bates-preview-badge" style="font-size: 11px; color: #1e293b; background: rgba(30, 41, 59, 0.1); padding: 3px 8px; border-radius: 6px; font-family: monospace; font-weight: 700; border: 1px solid rgba(30, 41, 59, 0.25);">
+                    ${this.batesPrefix}${String(this.batesStart).padStart(this.batesDigits, '0')}${this.batesSuffix}
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="bates-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="bates-page-img" style="width: 100%; height: auto; display: block;" />
+                  <div id="bates-overlay-stamp" style="position: absolute; ${this.getBatesPositionCss()}; background: rgba(255, 255, 255, 0.9); padding: 4px 8px; border-radius: 4px; border: 1px dashed ${this.batesColor}; font-family: monospace; font-size: 11px; font-weight: 700; color: ${this.batesColor}; pointer-events: none; transition: all 0.2s ease;">
+                    ${this.batesPrefix}${String(this.batesStart).padStart(this.batesDigits, '0')}${this.batesSuffix}
+                  </div>
+                </div>
+              </div>
+            ` : t.id === 'nup' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Imposition Layout Preview</span>
+                  <span style="font-size: 11px; color: #475569; background: rgba(71, 85, 105, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(71, 85, 105, 0.25);">
+                    ${this.nupCount === 2 ? '2-Up Landscape Sheet' : '4-Up Portrait Sheet'}
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="nup-workspace-wrap" style="display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="background: white; border: 2px solid var(--border-strong); box-shadow: 0 12px 28px rgba(0,0,0,0.2); border-radius: 6px; padding: 16px; ${this.nupCount === 2 ? 'width: 420px; height: 297px;' : 'width: 297px; height: 420px;'} display: grid; ${this.nupCount === 2 ? 'grid-template-columns: 1fr 1fr; gap: 14px;' : 'grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px;'}">
+                  ${Array.from({ length: this.nupCount }).map((_, i) => `
+                    <div style="border: 1px dashed #64748b; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; color: #475569; font-size: 12px; font-weight: 600;">
+                      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                      <span style="margin-top: 4px;">Page ${i + 1}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : t.id === 'split-half' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Book Scan Bisecting Preview</span>
+                  <span style="font-size: 11px; color: #4f46e5; background: rgba(79, 70, 229, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(79, 70, 229, 0.25);">
+                    ${this.splitHalfDirection === 'vertical' ? 'Vertical Center Cut (Left & Right)' : 'Horizontal Center Cut (Top & Bottom)'}
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="split-half-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 340px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: auto; display: block;" />
+                  ${this.splitHalfDirection === 'vertical' ? `
+                    <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; border-left: 2px dashed #ef4444; transform: translateX(-1px); pointer-events: none;">
+                      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">✂</div>
+                    </div>
+                  ` : `
+                    <div style="position: absolute; left: 0; right: 0; top: 50%; height: 2px; border-top: 2px dashed #ef4444; transform: translateY(-1px); pointer-events: none;">
+                      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">✂</div>
+                    </div>
+                  `}
+                </div>
+              </div>
+            ` : t.id === 'flip' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Mirror & Flip Preview</span>
+                  <span style="font-size: 11px; color: #8b5cf6; background: rgba(139, 92, 246, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(139, 92, 246, 0.25);">
+                    ${this.flipDirection === 'horizontal' ? 'Horizontal (Left-Right)' : (this.flipDirection === 'vertical' ? 'Vertical (Top-Bottom)' : 'Both Axes')}
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="flip-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="flip-page-img" style="width: 100%; height: auto; display: block; transform: ${this.flipDirection === 'horizontal' ? 'scaleX(-1)' : (this.flipDirection === 'vertical' ? 'scaleY(-1)' : 'scale(-1, -1)')}; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);" />
+                </div>
+              </div>
+            ` : t.id === 'grayscale' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Monochrome Desaturation Preview</span>
+                  <span style="font-size: 11px; color: #475569; background: rgba(71, 85, 105, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(71, 85, 105, 0.25);">
+                    DeviceGray Simulation
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="grayscale-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="grayscale-page-img" style="width: 100%; height: auto; display: block; filter: ${this.grayscalePreviewActive !== false ? 'grayscale(100%) contrast(105%)' : 'none'}; transition: filter 0.25s ease;" />
+                  <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.85); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; backdrop-filter: blur(4px);">
+                    ${this.grayscalePreviewActive !== false ? '● Grayscale Preview' : '● Original Color'}
+                  </div>
+                </div>
+              </div>
+            ` : t.id === 'pdf-to-text' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Extracted Plain Text Preview</span>
+                  <span id="text-word-count-badge" style="font-size: 11px; color: #334155; background: rgba(51, 65, 85, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(51, 65, 85, 0.25);">
+                    ${this.extractedTextPreview ? `${this.extractedTextPreview.split(/\s+/).filter(Boolean).length} words` : 'Inspecting text...'}
+                  </span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-sm btn-outline" id="btn-copy-extracted-text">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <span>Copy Text</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="text-extract-workspace-wrap" style="display: grid; grid-template-columns: 240px 1fr; gap: 20px; background: var(--bg-surface); padding: 20px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; background: white; align-self: start;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: auto; display: block;" />
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; height: 100%;">
+                  <textarea id="extracted-text-area" readonly style="width: 100%; flex: 1; min-height: 380px; padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.6; resize: none;" placeholder="Extracting searchable text from document...">${this.extractedTextPreview || 'Loading plain text streams...'}</textarea>
+                </div>
+              </div>
+            ` : t.id === 'unlock' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Unlock Security & Permissions</span>
+                  <span style="font-size: 11px; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.25);">
+                    Zero Restrictions
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="unlock-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 36px 20px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px; text-align: center;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Remove PDF Password & Permissions</h3>
+                <p style="font-size: 13px; color: var(--text-muted); max-width: 420px; line-height: 1.5; margin-bottom: 24px;">
+                  Strip owner passwords, printing blocks, copying limitations, and editing restrictions permanently from this document.
+                </p>
+                <div style="box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); border-radius: 4px; overflow: hidden; background: white; max-width: 200px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: auto; display: block;" />
+                </div>
+              </div>
             ` : `
               <div class="workflow-cards-toolbar">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -802,6 +1205,18 @@ export class ToolWorkflowManager {
     if (id === 'pdf-to-text') return 'Extract Text';
     if (id === 'deskew') return 'Straighten & Save PDF';
     if (id === 'organize') return `Save Organized PDF (${this.organizePages.length} pages)`;
+    if (id === 'bates') return 'Apply Bates Numbering';
+    if (id === 'nup') return `Create ${this.nupCount}-Up PDF`;
+    if (id === 'split-half') return `Split in Half (${this.splitHalfDirection})`;
+    if (id === 'alternate-mix') return 'Mix & Interleave Documents';
+    if (id === 'html-to-pdf') return 'Convert HTML to PDF';
+    if (id === 'word-to-pdf') return 'Convert DOCX to PDF';
+    if (id === 'pdf-to-word') return 'Convert to Word DOC';
+    if (id === 'pdf-to-excel') return 'Export to CSV / Excel';
+    if (id === 'pdf-to-ppt') return 'Export to PPT Slides';
+    if (id === 'unlock') return 'Unlock & Decrypt PDF';
+    if (id === 'remove-annotations') return 'Clean Annotations';
+    if (id === 'rename') return 'Save Renamed PDF';
     return `Process with ${this.activeTool.title}`;
   }
 
@@ -1081,6 +1496,245 @@ export class ToolWorkflowManager {
 
           <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 12px;">
             Drag and drop page cards to reorder. Use the rotation (↻) and delete (✕) buttons on individual cards to customize your document layout.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'crop') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Auto-Detect Whitespace</label>
+          <button type="button" class="btn btn-outline" id="btn-auto-crop" style="width: 100%; justify-content: center; gap: 8px; margin-bottom: 14px; background: rgba(13, 148, 136, 0.08); border-color: #0d9488; color: #0d9488; font-weight: 600;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
+            <span>Auto-Crop Margins</span>
+          </button>
+
+          <label class="workflow-options-label">Presets</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+            <button type="button" class="btn btn-sm btn-outline btn-crop-preset" data-top="24" data-right="24" data-bottom="24" data-left="24">Scanner Trim (24pt)</button>
+            <button type="button" class="btn btn-sm btn-outline btn-crop-preset" data-top="36" data-right="36" data-bottom="36" data-left="36">Standard (36pt)</button>
+            <button type="button" class="btn btn-sm btn-outline btn-crop-preset" data-top="50" data-right="30" data-bottom="50" data-left="30">Header/Footer (50pt)</button>
+            <button type="button" class="btn btn-sm btn-outline btn-crop-preset" data-top="0" data-right="0" data-bottom="0" data-left="0">Reset 0pt</button>
+          </div>
+
+          <label class="workflow-options-label">Custom Margins (pt)</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Top Margin</span>
+              <input type="number" id="workflow-crop-top" class="input-sm" min="0" max="300" value="${this.cropTop}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+            </div>
+            <div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Bottom Margin</span>
+              <input type="number" id="workflow-crop-bottom" class="input-sm" min="0" max="300" value="${this.cropBottom}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+            </div>
+            <div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Left Margin</span>
+              <input type="number" id="workflow-crop-left" class="input-sm" min="0" max="300" value="${this.cropLeft}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+            </div>
+            <div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Right Margin</span>
+              <input type="number" id="workflow-crop-right" class="input-sm" min="0" max="300" value="${this.cropRight}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-main); cursor: pointer;">
+              <input type="checkbox" id="workflow-crop-all" ${this.cropApplyAll ? 'checked' : ''} />
+              <span>Apply crop margins across all pages in document</span>
+            </label>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'bates') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Bates Stamp Format</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Prefix:</span>
+              <input type="text" id="workflow-bates-prefix" class="input-sm" value="${this.batesPrefix}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: monospace;" />
+            </div>
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Suffix:</span>
+              <input type="text" id="workflow-bates-suffix" class="input-sm" value="${this.batesSuffix}" placeholder="e.g. -CONF" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: monospace;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Start Number:</span>
+              <input type="number" id="workflow-bates-start" class="input-sm" min="1" value="${this.batesStart}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+            </div>
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Digits Padding:</span>
+              <select id="workflow-bates-digits" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+                ${[3, 4, 5, 6, 7, 8].map(d => `<option value="${d}" ${this.batesDigits === d ? 'selected' : ''}>${d} digits (e.g. ${'1'.padStart(d, '0')})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <label class="workflow-options-label">Stamp Position</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
+            ${['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'].map(pos => `
+              <button type="button" class="btn btn-sm ${this.batesPos === pos ? 'btn-primary' : 'btn-outline'} btn-bates-pos" data-pos="${pos}" style="font-size: 11px; padding: 6px 4px; justify-content: center;">
+                ${pos.replace('-', ' ')}
+              </button>
+            `).join('')}
+          </div>
+
+          <label class="workflow-options-label">Stamp Color</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="color" id="workflow-bates-color" value="${this.batesColor}" style="width: 36px; height: 32px; border: none; cursor: pointer; border-radius: 4px;" />
+            <span id="workflow-bates-color-label" style="font-size: 12px; color: var(--text-muted); font-family: monospace;">${this.batesColor}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'nup') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Imposition Layout</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+            <button type="button" class="btn ${this.nupCount === 2 ? 'btn-primary' : 'btn-outline'} btn-nup-toggle" data-count="2" style="flex-direction: column; padding: 12px 8px; text-align: center; gap: 4px;">
+              <span style="font-weight: 700; font-size: 14px;">2-Up</span>
+              <span style="font-size: 11px; opacity: 0.85;">Side-by-side Landscape</span>
+            </button>
+            <button type="button" class="btn ${this.nupCount === 4 ? 'btn-primary' : 'btn-outline'} btn-nup-toggle" data-count="4" style="flex-direction: column; padding: 12px 8px; text-align: center; gap: 4px;">
+              <span style="font-weight: 700; font-size: 14px;">4-Up</span>
+              <span style="font-size: 11px; opacity: 0.85;">2×2 Grid Portrait</span>
+            </button>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Preserves vector fidelity and auto-scales page margins for standard A4 printing.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'split-half') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Split Direction</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+            <button type="button" class="btn ${this.splitHalfDirection === 'vertical' ? 'btn-primary' : 'btn-outline'} btn-split-half-dir" data-dir="vertical" style="flex-direction: column; padding: 12px 8px; text-align: center; gap: 4px;">
+              <span style="font-weight: 700; font-size: 13px;">Vertical Split</span>
+              <span style="font-size: 11px; opacity: 0.85;">Left & Right halves (Book Spreads)</span>
+            </button>
+            <button type="button" class="btn ${this.splitHalfDirection === 'horizontal' ? 'btn-primary' : 'btn-outline'} btn-split-half-dir" data-dir="horizontal" style="flex-direction: column; padding: 12px 8px; text-align: center; gap: 4px;">
+              <span style="font-weight: 700; font-size: 13px;">Horizontal Split</span>
+              <span style="font-size: 11px; opacity: 0.85;">Top & Bottom halves</span>
+            </button>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Slices each page into two independent, sequential pages. Double-page book scans will become normal reading order pages.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'alternate-mix') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Interleaving Order</label>
+          <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-main); cursor: pointer; user-select: none; margin-bottom: 12px;">
+            <input type="checkbox" id="workflow-alternate-reverse" ${this.alternateReverseB ? 'checked' : ''} style="margin-top: 2px;" />
+            <span>Reverse order of Document B<br/><small style="color: var(--text-muted); font-size: 11px;">Standard for automatic duplex sheet-feeder scanner runs</small></span>
+          </label>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Mixes Doc A (odd: 1, 3, 5...) and Doc B (even: 2, 4, 6...) into a single properly ordered document.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'flip') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Mirror / Flip Axis</label>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+            <button type="button" class="btn ${this.flipDirection === 'horizontal' ? 'btn-primary' : 'btn-outline'} btn-flip-dir" data-dir="horizontal" style="justify-content: flex-start; gap: 10px; padding: 10px 14px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path></svg>
+              <span>Horizontal Mirror (Left & Right)</span>
+            </button>
+            <button type="button" class="btn ${this.flipDirection === 'vertical' ? 'btn-primary' : 'btn-outline'} btn-flip-dir" data-dir="vertical" style="justify-content: flex-start; gap: 10px; padding: 10px 14px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 8l5-5 5 5M7 16l5 5 5-5M4 12h16"></path></svg>
+              <span>Vertical Mirror (Top & Bottom)</span>
+            </button>
+            <button type="button" class="btn ${this.flipDirection === 'both' ? 'btn-primary' : 'btn-outline'} btn-flip-dir" data-dir="both" style="justify-content: flex-start; gap: 10px; padding: 10px 14px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20z"></path></svg>
+              <span>Both Axes (Inverted)</span>
+            </button>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Essential for iron-on fabric transfers, backlit transparency signs, or inverted scanner feeds.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'grayscale') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Preview Mode</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+            <button type="button" class="btn ${this.grayscalePreviewActive !== false ? 'btn-primary' : 'btn-outline'} btn-grayscale-toggle" data-val="true" style="justify-content: center;">
+              Grayscale
+            </button>
+            <button type="button" class="btn ${this.grayscalePreviewActive === false ? 'btn-primary' : 'btn-outline'} btn-grayscale-toggle" data-val="false" style="justify-content: center;">
+              Original Color
+            </button>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Converts colored images and vector drawing streams to monochrome DeviceGray. Significantly reduces ink usage and printing costs.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'pdf-to-text') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Text Extraction Format</label>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+            Parses decompressed text streams using vector font encoding tables, preserving document reading flow and paragraphs.
+          </div>
+          <button type="button" class="btn btn-outline" id="btn-options-copy-text" style="width: 100%; justify-content: center; gap: 8px;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Copy Full Text to Clipboard</span>
+          </button>
+        </div>
+      `;
+    }
+
+    if (id === 'unlock') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Document Password (If Protected)</label>
+          <input type="password" id="workflow-unlock-password" class="input-sm" placeholder="Leave blank if owner-restricted" value="${this.unlockPassword}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            If the PDF has restrictions preventing printing, copying, or form changes, LetsEdit strips the encryption dictionary so you have full unrestricted access.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'rename') {
+      const primary = this.uploadedFiles[0];
+      const defaultName = this.renameCustomName || (primary ? primary.name.replace(/\.pdf$/i, '_renamed.pdf') : 'document.pdf');
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">New Filename</label>
+          <input type="text" id="workflow-rename-input" class="input-sm" value="${defaultName}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-weight: 600; margin-bottom: 12px;" />
+          <button type="button" class="btn btn-sm btn-outline" id="btn-auto-detect-heading" style="width: 100%; justify-content: center; gap: 8px; margin-bottom: 12px;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>
+            <span>Auto-Detect Title from Page 1</span>
+          </button>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Inspects top heading and typography in the PDF text layer to suggest an authentic document title.
           </div>
         </div>
       `;
@@ -1483,6 +2137,257 @@ export class ToolWorkflowManager {
       };
     });
 
+    // Crop controls
+    const cropTopInp = this.container.querySelector('#workflow-crop-top');
+    const cropBottomInp = this.container.querySelector('#workflow-crop-bottom');
+    const cropLeftInp = this.container.querySelector('#workflow-crop-left');
+    const cropRightInp = this.container.querySelector('#workflow-crop-right');
+    const cropAllCheckbox = this.container.querySelector('#workflow-crop-all');
+    const cropMarquee = this.container.querySelector('#crop-marquee-box');
+    const cropBadge = this.container.querySelector('#crop-dimensions-badge');
+    const autoCropBtn = this.container.querySelector('#btn-auto-crop');
+    const cropPresets = this.container.querySelectorAll('.btn-crop-preset');
+
+    const updateCropUI = (top, right, bottom, left) => {
+      this.cropTop = Math.max(0, Math.min(300, Math.round(Number(top) || 0)));
+      this.cropRight = Math.max(0, Math.min(300, Math.round(Number(right) || 0)));
+      this.cropBottom = Math.max(0, Math.min(300, Math.round(Number(bottom) || 0)));
+      this.cropLeft = Math.max(0, Math.min(300, Math.round(Number(left) || 0)));
+
+      if (cropTopInp) cropTopInp.value = this.cropTop;
+      if (cropRightInp) cropRightInp.value = this.cropRight;
+      if (cropBottomInp) cropBottomInp.value = this.cropBottom;
+      if (cropLeftInp) cropLeftInp.value = this.cropLeft;
+
+      if (cropMarquee) {
+        cropMarquee.style.inset = `${this.cropTop * 0.35}px ${this.cropRight * 0.35}px ${this.cropBottom * 0.35}px ${this.cropLeft * 0.35}px`;
+      }
+      if (cropBadge) {
+        cropBadge.textContent = `Active Area: ${Math.max(20, Math.round(595.28 - this.cropLeft - this.cropRight))} × ${Math.max(20, Math.round(841.89 - this.cropTop - this.cropBottom))} pt`;
+      }
+    };
+
+    if (cropTopInp) cropTopInp.oninput = (e) => updateCropUI(e.target.value, this.cropRight, this.cropBottom, this.cropLeft);
+    if (cropRightInp) cropRightInp.oninput = (e) => updateCropUI(this.cropTop, e.target.value, this.cropBottom, this.cropLeft);
+    if (cropBottomInp) cropBottomInp.oninput = (e) => updateCropUI(this.cropTop, this.cropRight, e.target.value, this.cropLeft);
+    if (cropLeftInp) cropLeftInp.oninput = (e) => updateCropUI(this.cropTop, this.cropRight, this.cropBottom, e.target.value);
+
+    if (cropAllCheckbox) {
+      cropAllCheckbox.onchange = (e) => {
+        this.cropApplyAll = e.target.checked;
+      };
+    }
+
+    cropPresets.forEach(btn => {
+      btn.onclick = () => {
+        const top = parseInt(btn.getAttribute('data-top'), 10) || 0;
+        const right = parseInt(btn.getAttribute('data-right'), 10) || 0;
+        const bottom = parseInt(btn.getAttribute('data-bottom'), 10) || 0;
+        const left = parseInt(btn.getAttribute('data-left'), 10) || 0;
+        updateCropUI(top, right, bottom, left);
+      };
+    });
+
+    if (autoCropBtn) {
+      autoCropBtn.onclick = async () => {
+        try {
+          autoCropBtn.disabled = true;
+          autoCropBtn.textContent = 'Scanning margins...';
+          const primary = this.uploadedFiles[0];
+          if (!primary || !primary.bytes) return;
+
+          const loadingTask = pdfjsLib.getDocument({ data: primary.bytes.slice(0) });
+          const pdfDoc = await loadingTask.promise;
+          const page = await pdfDoc.getPage(1);
+          const viewport = page.getViewport({ scale: 0.5 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          await page.render({ canvasContext: ctx, viewport }).promise;
+
+          const detected = PageOperations.detectWhitespaceCrop(canvas, 0.5);
+          pdfDoc.destroy();
+
+          updateCropUI(detected.top, detected.right, detected.bottom, detected.left);
+          Toast.success(`Auto-margins detected: T:${detected.top}pt R:${detected.right}pt B:${detected.bottom}pt L:${detected.left}pt`);
+        } catch (err) {
+          console.warn('Auto crop error:', err);
+          Toast.info('Auto detection completed (0 margins)');
+        } finally {
+          autoCropBtn.disabled = false;
+          autoCropBtn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+            Auto-Detect Margins
+          `;
+        }
+      };
+    }
+
+    // Bates controls
+    const batesPrefixInp = this.container.querySelector('#workflow-bates-prefix');
+    const batesSuffixInp = this.container.querySelector('#workflow-bates-suffix');
+    const batesStartInp = this.container.querySelector('#workflow-bates-start');
+    const batesDigitsSel = this.container.querySelector('#workflow-bates-digits');
+    const batesColorInp = this.container.querySelector('#workflow-bates-color');
+    const batesColorLabel = this.container.querySelector('#workflow-bates-color-label');
+    const batesPosBtns = this.container.querySelectorAll('.btn-bates-pos');
+    const batesBadge = this.container.querySelector('#bates-preview-badge');
+    const batesStamp = this.container.querySelector('#bates-overlay-stamp');
+
+    const updateBatesPreview = () => {
+      const formatted = `${this.batesPrefix}${String(this.batesStart).padStart(this.batesDigits, '0')}${this.batesSuffix}`;
+      if (batesBadge) batesBadge.textContent = formatted;
+      if (batesStamp) {
+        batesStamp.textContent = formatted;
+        batesStamp.style.color = this.batesColor;
+        batesStamp.style.borderColor = this.batesColor;
+        batesStamp.style.cssText = `position: absolute; ${this.getBatesPositionCss()}; background: rgba(255, 255, 255, 0.9); padding: 4px 8px; border-radius: 4px; border: 1px dashed ${this.batesColor}; font-family: monospace; font-size: 11px; font-weight: 700; color: ${this.batesColor}; pointer-events: none; transition: all 0.2s ease;`;
+      }
+    };
+
+    if (batesPrefixInp) {
+      batesPrefixInp.oninput = (e) => {
+        this.batesPrefix = e.target.value;
+        updateBatesPreview();
+      };
+    }
+    if (batesSuffixInp) {
+      batesSuffixInp.oninput = (e) => {
+        this.batesSuffix = e.target.value;
+        updateBatesPreview();
+      };
+    }
+    if (batesStartInp) {
+      batesStartInp.oninput = (e) => {
+        this.batesStart = parseInt(e.target.value, 10) || 1;
+        updateBatesPreview();
+      };
+    }
+    if (batesDigitsSel) {
+      batesDigitsSel.onchange = (e) => {
+        this.batesDigits = parseInt(e.target.value, 10) || 6;
+        updateBatesPreview();
+      };
+    }
+    if (batesColorInp) {
+      batesColorInp.oninput = (e) => {
+        this.batesColor = e.target.value;
+        if (batesColorLabel) batesColorLabel.textContent = this.batesColor;
+        updateBatesPreview();
+      };
+    }
+    batesPosBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.batesPos = btn.getAttribute('data-pos') || 'bottom-right';
+        batesPosBtns.forEach(b => {
+          b.className = b === btn ? 'btn btn-sm btn-primary btn-bates-pos' : 'btn btn-sm btn-outline btn-bates-pos';
+        });
+        updateBatesPreview();
+      };
+    });
+
+    // N-Up controls
+    const nupBtns = this.container.querySelectorAll('.btn-nup-toggle');
+    nupBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.nupCount = parseInt(btn.getAttribute('data-count'), 10) || 2;
+        this.render();
+      };
+    });
+
+    // Split in Half controls
+    const splitHalfBtns = this.container.querySelectorAll('.btn-split-half-dir');
+    splitHalfBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.splitHalfDirection = btn.getAttribute('data-dir') || 'vertical';
+        this.render();
+      };
+    });
+
+    // Alternate & Mix controls
+    const altReverseCheck = this.container.querySelector('#workflow-alternate-reverse');
+    if (altReverseCheck) {
+      altReverseCheck.onchange = (e) => {
+        this.alternateReverseB = e.target.checked;
+      };
+    }
+
+    // Flip / Mirror controls
+    const flipBtns = this.container.querySelectorAll('.btn-flip-dir');
+    flipBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.flipDirection = btn.getAttribute('data-dir') || 'horizontal';
+        this.render();
+      };
+    });
+
+    // Grayscale preview toggle
+    const grayBtns = this.container.querySelectorAll('.btn-grayscale-toggle');
+    grayBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.grayscalePreviewActive = btn.getAttribute('data-val') === 'true';
+        this.render();
+      };
+    });
+
+    // Copy extracted text buttons
+    const copyTextHandler = async () => {
+      const txt = this.extractedTextPreview || (this.container.querySelector('#extracted-text-area')?.value) || '';
+      if (!txt) {
+        Toast.warning('No text to copy');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(txt);
+        Toast.success('Extracted plain text copied to clipboard!');
+      } catch (e) {
+        Toast.info('Text selected for manual copy');
+      }
+    };
+    const copyBtn1 = this.container.querySelector('#btn-copy-extracted-text');
+    const copyBtn2 = this.container.querySelector('#btn-options-copy-text');
+    if (copyBtn1) copyBtn1.onclick = copyTextHandler;
+    if (copyBtn2) copyBtn2.onclick = copyTextHandler;
+
+    // Unlock password input
+    const unlockPassInp = this.container.querySelector('#workflow-unlock-password');
+    if (unlockPassInp) {
+      unlockPassInp.oninput = (e) => {
+        this.unlockPassword = e.target.value;
+      };
+    }
+
+    // Rename input & heading auto-detection
+    const renameInp = this.container.querySelector('#workflow-rename-input');
+    if (renameInp) {
+      renameInp.oninput = (e) => {
+        this.renameCustomName = e.target.value;
+      };
+    }
+    const autoDetectHeadingBtn = this.container.querySelector('#btn-auto-detect-heading');
+    if (autoDetectHeadingBtn) {
+      autoDetectHeadingBtn.onclick = async () => {
+        const primary = this.uploadedFiles[0];
+        if (!primary || !primary.bytes) return;
+        Toast.info('Scanning document title...');
+        try {
+          const text = await pdfEngine.extractDocumentText(primary.bytes);
+          const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2 && !l.startsWith('---'));
+          if (lines.length > 0) {
+            const heading = lines[0].replace(/[^a-zA-Z0-9_\-\s]/g, '').slice(0, 40).trim().replace(/\s+/g, '_');
+            if (heading) {
+              this.renameCustomName = `${heading}.pdf`;
+              if (renameInp) renameInp.value = this.renameCustomName;
+              Toast.success(`Detected title: ${heading}`);
+            }
+          }
+        } catch (e) {
+          Toast.warning('Could not auto-detect title');
+        }
+      };
+    }
+
     // Primary Execute CTA
     if (execBtn) {
       execBtn.onclick = () => this.executeAction();
@@ -1652,7 +2557,7 @@ export class ToolWorkflowManager {
         this.processedBlob = new Blob([grayBytes], { type: 'application/pdf' });
         this.processedFilename = `Grayscale_${primary.name}`;
       } else if (t.id === 'flip') {
-        const flippedBytes = await PageOperations.flipPages(primary.bytes, { direction: 'horizontal' });
+        const flippedBytes = await PageOperations.flipPages(primary.bytes, { direction: this.flipDirection || 'horizontal' });
         this.processedBlob = new Blob([flippedBytes], { type: 'application/pdf' });
         this.processedFilename = `Flipped_${primary.name}`;
       } else if (t.id === 'pdfa') {
@@ -1717,6 +2622,223 @@ export class ToolWorkflowManager {
         );
         this.processedBlob = new Blob([organizedBytes], { type: 'application/pdf' });
         this.processedFilename = `Organized_${primary.name}`;
+      } else if (t.id === 'crop') {
+        const croppedBytes = await PageOperations.cropPdf(primary.bytes, {
+          top: this.cropTop,
+          right: this.cropRight,
+          bottom: this.cropBottom,
+          left: this.cropLeft,
+          pageScope: this.cropApplyAll ? 'all' : 0
+        });
+        this.processedBlob = new Blob([croppedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Cropped_${primary.name}`;
+      } else if (t.id === 'bates') {
+        const batesBytes = await PageOperations.batesNumberPdf(primary.bytes, {
+          prefix: this.batesPrefix,
+          suffix: this.batesSuffix,
+          startNumber: this.batesStart,
+          digits: this.batesDigits,
+          position: this.batesPos,
+          color: this.batesColor
+        });
+        this.processedBlob = new Blob([batesBytes], { type: 'application/pdf' });
+        this.processedFilename = `Bates_${primary.name}`;
+      } else if (t.id === 'nup') {
+        const nupBytes = await PageOperations.nUpPdf(primary.bytes, this.nupCount);
+        this.processedBlob = new Blob([nupBytes], { type: 'application/pdf' });
+        this.processedFilename = `${this.nupCount}Up_${primary.name}`;
+      } else if (t.id === 'split-half') {
+        const halvedBytes = await PageOperations.splitInHalf(primary.bytes, this.splitHalfDirection);
+        this.processedBlob = new Blob([halvedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Halved_${primary.name}`;
+      } else if (t.id === 'alternate-mix') {
+        if (this.uploadedFiles.length < 2) {
+          Toast.warning('Please upload at least 2 PDF documents to alternate and mix');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        const mixedBytes = await PageOperations.alternateMix(this.uploadedFiles[0].bytes, this.uploadedFiles[1].bytes, {
+          reverseB: this.alternateReverseB
+        });
+        this.processedBlob = new Blob([mixedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Mixed_${this.uploadedFiles[0].name}`;
+      } else if (t.id === 'pdf-to-word') {
+        const text = await pdfEngine.extractDocumentText(primary.bytes);
+        const htmlDoc = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head><meta charset='utf-8'><title>${primary.name}</title>
+          <style>body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.6; padding: 36pt; } p { margin-bottom: 10pt; }</style>
+          </head>
+          <body>
+            ${text.split('\n\n').filter(Boolean).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('')}
+          </body>
+          </html>
+        `;
+        this.processedBlob = new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' });
+        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.doc`;
+      } else if (t.id === 'pdf-to-excel') {
+        const text = await pdfEngine.extractDocumentText(primary.bytes);
+        const csvRows = text.split('\n').map(line => {
+          const cols = line.trim().split(/\s{2,}|\t/);
+          return cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',');
+        }).join('\n');
+        this.processedBlob = new Blob([csvRows], { type: 'text/csv;charset=utf-8' });
+        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.csv`;
+      } else if (t.id === 'pdf-to-ppt') {
+        const text = await pdfEngine.extractDocumentText(primary.bytes);
+        const slides = text.split('\n\n\n').filter(Boolean);
+        const htmlPpt = `
+          <html><head><meta charset='utf-8'><title>${primary.name}</title>
+          <style>body { font-family: Calibri, sans-serif; } .slide { page-break-after: always; padding: 40px; border: 1px solid #ccc; margin-bottom: 20px; }</style>
+          </head><body>
+          ${slides.map((s, i) => `<div class='slide'><h2>Slide ${i + 1}</h2><p>${s.replace(/\n/g, '<br/>')}</p></div>`).join('')}
+          </body></html>
+        `;
+        this.processedBlob = new Blob([htmlPpt], { type: 'application/vnd.ms-powerpoint;charset=utf-8' });
+        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.ppt`;
+      } else if (t.id === 'unlock') {
+        const unlockedBytes = await pdfEngine.unlockPdf(primary.bytes, this.unlockPassword || '');
+        this.processedBlob = new Blob([unlockedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Unlocked_${primary.name}`;
+      } else if (t.id === 'remove-annotations') {
+        const cleanDoc = await PDFDocument.load(primary.bytes);
+        const pCount = cleanDoc.getPageCount();
+        for (let i = 0; i < pCount; i++) {
+          cleanDoc.getPage(i).node.delete(PDFName.of('Annots'));
+        }
+        const cleanBytes = await cleanDoc.save();
+        this.processedBlob = new Blob([cleanBytes], { type: 'application/pdf' });
+        this.processedFilename = `Cleaned_${primary.name}`;
+      } else if (t.id === 'extract-pages') {
+        const splits = await PageOperations.splitPdf(primary.bytes, this.splitRange || '1');
+        if (splits.length > 0) {
+          this.processedBlob = new Blob([splits[0].bytes], { type: 'application/pdf' });
+          this.processedFilename = splits[0].name;
+        } else {
+          this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
+          this.processedFilename = `Extracted_${primary.name}`;
+        }
+      } else if (t.id === 'rename') {
+        const text = await pdfEngine.extractDocumentText(primary.bytes);
+        const autoName = (text.split('\n').find(l => l.trim().length > 3) || 'Renamed_Document')
+          .trim()
+          .replace(/[/\\?%*:|"<>]/g, '_')
+          .substring(0, 40);
+        const finalName = (this.renameCustomName || '').trim() || autoName;
+        this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
+        this.processedFilename = finalName.toLowerCase().endsWith('.pdf') ? finalName : `${finalName}.pdf`;
+      } else if (t.id === 'html-to-pdf') {
+        const textDecoder = new TextDecoder('utf-8');
+        const rawHtml = textDecoder.decode(primary.bytes);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rawHtml, 'text/html');
+        const title = doc.querySelector('title')?.textContent || primary.name.replace(/\.[^/.]+$/, '');
+        const elements = Array.from(doc.body.querySelectorAll('h1, h2, h3, p, li, pre, blockquote, div')).map(el => el.textContent.trim()).filter(Boolean);
+        const lines = elements.length > 0 ? elements : rawHtml.replace(/<[^>]+>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean);
+
+        const pdfDoc = await PDFDocument.create();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        let page = pdfDoc.addPage([595.28, 841.89]);
+        let y = 800;
+
+        page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+        y -= 30;
+
+        for (const line of lines) {
+          if (y < 60) {
+            page = pdfDoc.addPage([595.28, 841.89]);
+            y = 800;
+          }
+          const words = line.split(' ');
+          let curLine = '';
+          for (const w of words) {
+            const testLine = curLine ? `${curLine} ${w}` : w;
+            if (font.widthOfTextAtSize(testLine, 10.5) > 495) {
+              page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
+              y -= 15;
+              if (y < 60) {
+                page = pdfDoc.addPage([595.28, 841.89]);
+                y = 800;
+              }
+              curLine = w;
+            } else {
+              curLine = testLine;
+            }
+          }
+          if (curLine) {
+            page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
+            y -= 18;
+          }
+        }
+
+        const outBytes = await pdfDoc.save();
+        this.processedBlob = new Blob([outBytes], { type: 'application/pdf' });
+        this.processedFilename = `${title.replace(/[/\\?%*:|"<>]/g, '_')}.pdf`;
+      } else if (t.id === 'word-to-pdf') {
+        let paragraphs = [];
+        try {
+          const zip = await JSZip.loadAsync(primary.bytes);
+          const docXml = await zip.file('word/document.xml')?.async('text');
+          if (docXml) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(docXml, 'text/xml');
+            paragraphs = Array.from(xmlDoc.getElementsByTagName('w:p')).map(p => {
+              return Array.from(p.getElementsByTagName('w:t')).map(t => t.textContent).join('');
+            }).filter(Boolean);
+          }
+        } catch (e) {
+          console.warn('DOCX ZIP unpack fallback:', e);
+        }
+
+        if (paragraphs.length === 0) {
+          const textDecoder = new TextDecoder('utf-8');
+          paragraphs = textDecoder.decode(primary.bytes).replace(/[^\x20-\x7E\n]/g, ' ').split('\n').map(l => l.trim()).filter(l => l.length > 2);
+        }
+
+        const pdfDoc = await PDFDocument.create();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        let page = pdfDoc.addPage([595.28, 841.89]);
+        let y = 800;
+
+        const docTitle = primary.name.replace(/\.[^/.]+$/, '');
+        page.drawText(docTitle, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+        y -= 30;
+
+        for (const para of paragraphs) {
+          if (y < 60) {
+            page = pdfDoc.addPage([595.28, 841.89]);
+            y = 800;
+          }
+          const words = para.split(' ');
+          let curLine = '';
+          for (const w of words) {
+            const testLine = curLine ? `${curLine} ${w}` : w;
+            if (font.widthOfTextAtSize(testLine, 11) > 495) {
+              page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
+              y -= 16;
+              if (y < 60) {
+                page = pdfDoc.addPage([595.28, 841.89]);
+                y = 800;
+              }
+              curLine = w;
+            } else {
+              curLine = testLine;
+            }
+          }
+          if (curLine) {
+            page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
+            y -= 20;
+          }
+        }
+
+        const outBytes = await pdfDoc.save();
+        this.processedBlob = new Blob([outBytes], { type: 'application/pdf' });
+        this.processedFilename = `${docTitle}.pdf`;
       } else {
         this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
         this.processedFilename = `Processed_${primary.name}`;

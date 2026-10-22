@@ -6,7 +6,7 @@
 
 import { store } from '../core/state-store.js';
 import { pdfEngine } from '../core/pdf-engine.js';
-import { TOOLS_CATALOG, allToolsModal } from './all-tools-modal.js';
+import { TOOLS_CATALOG, SEJDA_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from '../utils/theme.js';
@@ -243,12 +243,15 @@ export class LandingPage {
 
             <div class="landing-filter-rail" id="landing-filter-rail">
               <button class="landing-filter-chip active" data-filter="all">All Tools</button>
-              <button class="landing-filter-chip" data-filter="popular">⭐ Popular</button>
-              <button class="landing-filter-chip" data-filter="pages">Organize Pages</button>
-              <button class="landing-filter-chip" data-filter="tools">Optimize PDF</button>
-              <button class="landing-filter-chip" data-filter="edit">Edit & Sign</button>
-              <button class="landing-filter-chip" data-filter="security">Security & Protect</button>
-              <button class="landing-filter-chip" data-filter="convert">Convert PDF</button>
+              <button class="landing-filter-chip" data-filter="popular">⭐ Most Popular</button>
+              <button class="landing-filter-chip" data-filter="merge">🔗 Merge</button>
+              <button class="landing-filter-chip" data-filter="split">✂ Split</button>
+              <button class="landing-filter-chip" data-filter="edit-sign">✏ Edit & Sign</button>
+              <button class="landing-filter-chip" data-filter="compress-scans">🗜 Compress & Scans</button>
+              <button class="landing-filter-chip" data-filter="security">🔒 Security</button>
+              <button class="landing-filter-chip" data-filter="convert-from">📤 Convert from PDF</button>
+              <button class="landing-filter-chip" data-filter="convert-to">📥 Convert to PDF</button>
+              <button class="landing-filter-chip" data-filter="others">⚡ Others</button>
             </div>
 
             <!-- Responsive Cards Grid (34+ Tools) -->
@@ -426,47 +429,8 @@ export class LandingPage {
     return iconSvgs[id] || iconSvgs.edit;
   }
 
-  renderCards() {
-    const grid = this.container.querySelector('#landing-cards-grid');
-    if (!grid) return;
-
-    const q = (this.searchQuery || '').trim().toLowerCase();
-    const filtered = TOOLS_CATALOG.filter(tool => {
-      const matchesFilter = (this.activeFilter === 'all')
-        ? true
-        : (this.activeFilter === 'popular' ? tool.popular : tool.category === this.activeFilter);
-      if (!matchesFilter) return false;
-      if (!q) return true;
-      return tool.title.toLowerCase().includes(q) ||
-             tool.desc.toLowerCase().includes(q) ||
-             tool.id.toLowerCase().includes(q);
-    });
-
-    if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="landing-empty-tools">
-          <p>No tools found matching "<strong>${this.searchQuery}</strong>".</p>
-          <button class="btn btn-sm btn-outline" id="btn-reset-tool-filter">Show All Tools</button>
-        </div>
-      `;
-      const resetBtn = grid.querySelector('#btn-reset-tool-filter');
-      if (resetBtn) {
-        resetBtn.onclick = () => {
-          this.searchQuery = '';
-          const searchInput = this.container.querySelector('#landing-tool-search');
-          if (searchInput) searchInput.value = '';
-          const clearBtn = this.container.querySelector('#landing-search-clear');
-          if (clearBtn) clearBtn.style.display = 'none';
-          this.activeFilter = 'all';
-          const chips = this.container.querySelectorAll('.landing-filter-chip');
-          chips.forEach(c => c.classList.toggle('active', c.getAttribute('data-filter') === 'all'));
-          this.renderCards();
-        };
-      }
-      return;
-    }
-
-    grid.innerHTML = filtered.map(tool => `
+  renderSingleCardHtml(tool) {
+    return `
       <div class="landing-tool-card" data-action="${tool.action}" data-tool-id="${tool.id}" style="--tool-accent: ${tool.color};">
         <div class="card-icon-badge" style="background: ${tool.color}15; color: ${tool.color};">
           ${this.getTwoToneIconSvg(tool.id, tool.color)}
@@ -474,10 +438,87 @@ export class LandingPage {
         <h3 class="card-title">${tool.title}</h3>
         <p class="card-desc">${tool.desc}</p>
       </div>
+    `;
+  }
+
+  renderCards() {
+    const grid = this.container.querySelector('#landing-cards-grid');
+    if (!grid) return;
+
+    const q = (this.searchQuery || '').trim().toLowerCase();
+
+    // 1. Search Query active: render filtered cards flat
+    if (q) {
+      const filtered = TOOLS_CATALOG.filter(tool =>
+        tool.title.toLowerCase().includes(q) ||
+        tool.desc.toLowerCase().includes(q) ||
+        tool.id.toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        grid.className = 'landing-cards-grid';
+        grid.innerHTML = `
+          <div class="landing-empty-tools">
+            <p>No tools found matching "<strong>${this.searchQuery}</strong>".</p>
+            <button class="btn btn-sm btn-outline" id="btn-reset-tool-filter">Show All Tools</button>
+          </div>
+        `;
+        const resetBtn = grid.querySelector('#btn-reset-tool-filter');
+        if (resetBtn) {
+          resetBtn.onclick = () => {
+            this.searchQuery = '';
+            const searchInput = this.container.querySelector('#landing-tool-search');
+            if (searchInput) searchInput.value = '';
+            const clearBtn = this.container.querySelector('#landing-search-clear');
+            if (clearBtn) clearBtn.style.display = 'none';
+            this.activeFilter = 'all';
+            const chips = this.container.querySelectorAll('.landing-filter-chip');
+            chips.forEach(c => c.classList.toggle('active', c.getAttribute('data-filter') === 'all'));
+            this.renderCards();
+          };
+        }
+        return;
+      }
+
+      grid.className = 'landing-cards-grid';
+      grid.innerHTML = filtered.map(tool => this.renderSingleCardHtml(tool)).join('');
+      this.attachLandingCardEvents(grid);
+      return;
+    }
+
+    // 2. Specific Category selected: render cards for that category
+    if (this.activeFilter !== 'all') {
+      const cat = SEJDA_TOOL_CATEGORIES.find(c => c.id === this.activeFilter);
+      const tools = cat ? cat.tools : [];
+
+      grid.className = 'landing-cards-grid';
+      grid.innerHTML = tools.map(tool => this.renderSingleCardHtml(tool)).join('');
+      this.attachLandingCardEvents(grid);
+      return;
+    }
+
+    // 3. Default (All Tools): Render all 9 Sejda categories in structured groups!
+    grid.className = 'landing-categories-wrapper';
+    grid.innerHTML = SEJDA_TOOL_CATEGORIES.map(cat => `
+      <div class="landing-category-group" data-category="${cat.id}">
+        <div class="landing-category-header">
+          <div class="landing-category-title-wrap">
+            <h3 class="landing-category-title">${cat.name}</h3>
+            <span class="landing-category-desc">${cat.desc}</span>
+          </div>
+          <span class="landing-category-count">${cat.tools.length} tools</span>
+        </div>
+        <div class="landing-cards-grid">
+          ${cat.tools.map(tool => this.renderSingleCardHtml(tool)).join('')}
+        </div>
+      </div>
     `).join('');
 
-    // Attach card click handlers
-    grid.querySelectorAll('.landing-tool-card').forEach(card => {
+    this.attachLandingCardEvents(grid);
+  }
+
+  attachLandingCardEvents(container) {
+    container.querySelectorAll('.landing-tool-card').forEach(card => {
       card.onclick = () => {
         const action = card.getAttribute('data-action');
         const toolId = card.getAttribute('data-tool-id');
@@ -493,19 +534,26 @@ export class LandingPage {
       if (match) matchedId = match.id;
     }
 
-    // 1. If it's the core editor, open Studio Canvas directly
+    // 1. Direct workflow action prefix
+    if (action && action.startsWith('workflow:')) {
+      const toolKey = action.replace('workflow:', '');
+      toolWorkflow.openTool(toolKey);
+      return;
+    }
+
+    // 2. If it's the core editor, open Studio Canvas directly
     if (matchedId === 'edit' || action === 'tool:select') {
       this.switchToStudio();
       return;
     }
 
-    // 2. If it's a dedicated workflow tool (Merge, Compress, Split, etc.), launch the dedicated tool workflow
+    // 3. If it's a dedicated workflow tool (Merge, Compress, Split, etc.), launch the dedicated tool workflow
     if (matchedId && WORKFLOW_TOOLS_CONFIG[matchedId]) {
       toolWorkflow.openTool(matchedId);
       return;
     }
 
-    // 3. Fallback to in-studio modal if opened from within editor context
+    // 4. Fallback to in-studio modal if opened from within editor context
     this.switchToStudio();
     setTimeout(() => {
       allToolsModal.dispatchToolAction(action);

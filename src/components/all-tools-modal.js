@@ -21,61 +21,148 @@ import { ocrModal } from './ocr-modal.js';
 import { compareModal } from './compare-modal.js';
 import { repairModal } from './repair-modal.js';
 import { pdfaModal } from './pdfa-modal.js';
-import { pdfEngine } from '../core/pdf-engine.js';
+import { toolWorkflow, WORKFLOW_TOOLS_CONFIG } from './tool-workflow.js';
 import { downloadBlob } from '../utils/helpers.js';
 import { Toast } from './toast.js';
 
-export const TOOLS_CATALOG = [
-  // Most Popular
-  { id: 'edit', category: 'edit', title: "Let's Edit PDF", desc: 'Edit text, annotate, add shapes, signatures, and stamps', icon: 'edit', color: '#2563eb', popular: true, action: 'tool:select' },
-  { id: 'compress', category: 'tools', title: "Let's Compress", desc: 'Reduce file size while preserving high visual quality', icon: 'compress', color: '#059669', popular: true, action: 'modal:compress' },
-  { id: 'sign', category: 'edit', title: "Let's Sign PDF", desc: 'Add signatures, type handwriting, or scan paper ink via webcam', icon: 'sign', color: '#7c3aed', popular: true, action: 'tool:sign' },
-  { id: 'delete', category: 'pages', title: "Let's Delete Pages", desc: 'Remove unwanted pages permanently from the document', icon: 'trash', color: '#ef4444', popular: true, action: 'sidebar:delete' },
-  { id: 'split', category: 'pages', title: "Let's Split PDF", desc: 'Extract custom page ranges or save every page as separate file', icon: 'split', color: '#ea580c', popular: true, action: 'modal:split' },
-  { id: 'merge', category: 'pages', title: "Let's Merge PDF", desc: 'Combine multiple PDFs and external files into one document', icon: 'merge', color: '#0284c7', popular: true, action: 'sidebar:merge' },
-  { id: 'crop', category: 'pages', title: "Let's Crop PDF", desc: 'Trim margins, whitespace borders, or resize crop boxes', icon: 'crop', color: '#0d9488', popular: true, action: 'modal:crop' },
-  { id: 'to-image', category: 'convert', title: "Let's Convert to JPG", desc: 'Convert and download pages as high-resolution images', icon: 'image', color: '#d97706', popular: true, action: 'modal:to-image' },
-
-  // Organize & Pages
-  { id: 'organize', category: 'pages', title: "Let's Organize Pages", desc: 'Drag-and-drop page sequence reordering with thumbnail grid', icon: 'grid', color: '#2563eb', action: 'workflow:organize' },
-  { id: 'deskew', category: 'pages', title: "Let's Deskew Scans", desc: 'Auto-detect tilt and straighten crooked scanner feeds with precision angle calibration', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
-  { id: 'split-half', category: 'pages', title: "Let's Split in Half", desc: 'Bisect two-page book scans (A3 to double A4 or A4 to double A5)', icon: 'book', color: '#4f46e5', action: 'modal:split-half' },
-  { id: 'alternate-mix', category: 'pages', title: "Let's Alternate & Mix", desc: 'Interleave odd and even pages from duplex scanner feeder runs', icon: 'shuffle', color: '#0891b2', action: 'modal:alternate-mix' },
-  { id: 'nup', category: 'pages', title: "Let's N-Up Print", desc: 'Print 2 or 4 pages per sheet side-by-side or in 2x2 grid', icon: 'layout', color: '#475569', action: 'modal:nup' },
-  { id: 'flip', category: 'pages', title: "Let's Flip / Mirror", desc: 'Mirror PDF coordinates horizontally or vertically for transfers or scans', icon: 'flip', color: '#8b5cf6', action: 'modal:flip' },
-  { id: 'resize', category: 'pages', title: "Let's Resize Margins", desc: 'Add binding margins (spiral/binder) or fit to A4/Letter bounds', icon: 'maximize', color: '#6366f1', action: 'modal:resize' },
-  { id: 'rotate', category: 'pages', title: "Let's Rotate Pages", desc: 'Permanently rotate pages 90°, 180°, or 270° clockwise', icon: 'rotate', color: '#f59e0b', action: 'workflow:rotate' },
-
-  // Edit & Annotate
-  { id: 'text', category: 'edit', title: "Let's Add & Edit Text", desc: 'Insert new text or click existing text on the PDF to edit inline', icon: 'type', color: '#2563eb', action: 'tool:text' },
-  { id: 'draw', category: 'edit', title: "Let's Freehand Draw", desc: 'Draw, sketch, and write with smooth cubic Bezier pen paths', icon: 'pen', color: '#059669', action: 'tool:draw' },
-  { id: 'highlight', category: 'edit', title: "Let's Highlight", desc: 'Semi-transparent highlighter pen for reviewing and proofreading', icon: 'marker', color: '#eab308', action: 'tool:highlight' },
-  { id: 'eraser', category: 'edit', title: "Let's Erase Strokes", desc: 'Continuously erase pen strokes, drawings, and highlighter paths', icon: 'eraser', color: '#dc2626', action: 'tool:eraser' },
-  { id: 'whiteout', category: 'edit', title: "Let's Redact & Whiteout", desc: 'Place whiteout redaction boxes to permanently purge sensitive data', icon: 'square', color: '#1e293b', action: 'tool:whiteout' },
-  { id: 'shapes', category: 'edit', title: "Let's Add Shapes", desc: 'Add rectangles, circles, ellipses, lines, and callout arrows', icon: 'shapes', color: '#8b5cf6', action: 'tool:shape' },
-  { id: 'forms', category: 'edit', title: "Let's Build Forms", desc: 'Create fillable text fields, checkboxes, and radio button groups', icon: 'check-square', color: '#10b981', action: 'tool:form' },
-  { id: 'stamps', category: 'edit', title: "Let's Add Stamps", desc: 'Approved, Confidential, Draft, Void, and custom date badges', icon: 'stamp', color: '#b91c1c', action: 'tool:image' },
-  { id: 'search-replace', category: 'edit', title: "Let's Find & Replace", desc: 'Cross-document literal or regex search with batch replacement', icon: 'search', color: '#0284c7', action: 'tool:replace' },
-
-  // Document Security & Tools
-  { id: 'security', category: 'security', title: "Let's Protect PDF", desc: 'Standard ISO 32000-1 AES-256 encryption with password policy', icon: 'lock', color: '#dc2626', action: 'modal:security' },
-  { id: 'watermark', category: 'tools', title: "Let's Watermark", desc: 'Apply diagonal text or logo watermarks across all document pages', icon: 'droplet', color: '#0284c7', action: 'modal:watermark' },
-  { id: 'pagenumbers', category: 'tools', title: "Let's Number Pages", desc: 'Add Header or Footer page numbers with dynamic {n} and {total}', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
-  { id: 'bates', category: 'tools', title: "Let's Bates Number", desc: 'Sequential legal indexing with prefix, digits pad, and suffix', icon: 'shield', color: '#1e293b', action: 'modal:bates' },
-  { id: 'metadata', category: 'tools', title: "Let's Edit Metadata", desc: 'Edit PDF Title, Author, Subject, Keywords, Creator, and Producer', icon: 'file-text', color: '#64748b', action: 'modal:metadata' },
-  { id: 'grayscale', category: 'tools', title: "Let's Grayscale", desc: 'Desaturate vector fills, strokes, and shapes to save ink and print costs', icon: 'circle-half', color: '#475569', action: 'modal:grayscale' },
-  { id: 'ocr-pdf', category: 'tools', title: "Let's OCR PDF", desc: 'Turn scanned documents into searchable, selectable text with client-side OCR', icon: 'file-text', color: '#6366f1', popular: true, action: 'modal:ocr' },
-  { id: 'flatten', category: 'tools', title: "Let's Flatten Forms", desc: 'Bake interactive fillable AcroForm fields permanently into vectors', icon: 'layers', color: '#0d9488', action: 'action:flatten' },
-
-  { id: 'compare', category: 'tools', title: "Let's Compare PDF", desc: 'Side-by-side visual diff analysis, word insertion/deletion tracking & report', icon: 'shuffle', color: '#6366f1', popular: true, action: 'modal:compare' },
-  { id: 'repair', category: 'tools', title: "Let's Repair PDF", desc: 'Recover damaged and corrupted files, reconstruct broken xref tables and streams', icon: 'tool', color: '#ef4444', popular: true, action: 'modal:repair' },
-
-  // Conversions
-  { id: 'images-to-pdf', category: 'convert', title: "Let's Images to PDF", desc: 'Pack multiple JPG, PNG, and WebP images into a multi-page A4 PDF', icon: 'images', color: '#d97706', action: 'action:images-to-pdf' },
-  { id: 'extract-images', category: 'convert', title: "Let's Extract Images", desc: 'Enumerate and export all embedded high-res JPEG and PNG images to ZIP', icon: 'image', color: '#ec4899', popular: true, action: 'modal:extract-images' },
-  { id: 'pdf-to-text', category: 'convert', title: "Let's Extract Text", desc: 'Decompress binary content streams and extract plain searchable text', icon: 'align-left', color: '#334155', action: 'action:extract-text' },
-  { id: 'pdfa', category: 'convert', title: "Let's PDF to PDF/A", desc: 'Convert to ISO 19005-1 compliant PDF/A-1b archival standard with OutputIntents', icon: 'file-text', color: '#10b981', action: 'modal:pdfa' }
+export const SEJDA_TOOL_CATEGORIES = [
+  {
+    id: 'popular',
+    name: 'Most popular',
+    desc: 'The most frequently used tools for fast PDF tasks',
+    icon: 'star',
+    tools: [
+      { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#2563eb', popular: true, action: 'tool:select' },
+      { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', popular: true, action: 'workflow:compress' },
+      { id: 'delete', title: 'Delete Pages', desc: 'Remove pages from a PDF document', icon: 'trash', color: '#ef4444', popular: true, action: 'sidebar:delete' },
+      { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#0284c7', popular: true, action: 'workflow:merge' },
+      { id: 'split', title: 'Split', desc: 'Split specific page ranges or extract every page into a separate document', icon: 'split', color: '#ea580c', popular: true, action: 'workflow:split' },
+      { id: 'crop', title: 'Crop', desc: 'Trim PDF margins, change PDF page size', icon: 'crop', color: '#0d9488', popular: true, action: 'workflow:crop' },
+      { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', popular: true, action: 'tool:sign' },
+      { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#2563eb', popular: true, action: 'workflow:pdf-to-word' },
+      { id: 'extract-pages', title: 'Extract Pages', desc: 'Get a new document containing only the desired pages', icon: 'extract', color: '#ea580c', popular: true, action: 'workflow:extract-pages' }
+    ]
+  },
+  {
+    id: 'merge',
+    name: 'Merge',
+    desc: 'Combine and interleave documents in any custom order',
+    icon: 'merge',
+    tools: [
+      { id: 'alternate-mix', title: 'Alternate & Mix', desc: 'Mixes pages from 2 or more documents, alternating between them', icon: 'shuffle', color: '#0891b2', action: 'workflow:alternate-mix' },
+      { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#0284c7', action: 'workflow:merge' },
+      { id: 'organize', title: 'Organize', desc: 'Arrange and reorder PDF pages', icon: 'grid', color: '#2563eb', action: 'workflow:organize' }
+    ]
+  },
+  {
+    id: 'split',
+    name: 'Split',
+    desc: 'Extract chapters, split ranges, and book spreads',
+    icon: 'split',
+    tools: [
+      { id: 'extract-pages', title: 'Extract Pages', desc: 'Get a new document containing only the desired pages', icon: 'extract', color: '#ea580c', action: 'workflow:extract-pages' },
+      { id: 'split', title: 'Split by pages', desc: 'Split specific page ranges or extract every page into a separate document', icon: 'split', color: '#ea580c', action: 'workflow:split' },
+      { id: 'split-bookmarks', title: 'Split by bookmarks', desc: 'Extract chapters to separate documents based on the bookmarks in the table of contents', icon: 'bookmark', color: '#f59e0b', action: 'workflow:split' },
+      { id: 'split-half', title: 'Split in half', desc: 'Split two page layout scans, A3 to double A4 or A4 to double A5', icon: 'book', color: '#4f46e5', action: 'workflow:split-half' },
+      { id: 'split-size', title: 'Split by size', desc: 'Get multiple smaller documents with specific file sizes', icon: 'layers', color: '#6366f1', action: 'workflow:split' },
+      { id: 'split-text', title: 'Split by text', desc: 'Extract separate documents when specific text changes from page to page', icon: 'type', color: '#0284c7', action: 'workflow:split' }
+    ]
+  },
+  {
+    id: 'edit-sign',
+    name: 'Edit & Sign',
+    desc: 'Full editing, handwriting signatures, and interactive forms',
+    icon: 'edit',
+    tools: [
+      { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#2563eb', action: 'tool:select' },
+      { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', action: 'tool:sign' },
+      { id: 'forms', title: 'Create Forms', desc: 'Free PDF forms creator. Make existing PDF documents fillable', icon: 'check-square', color: '#10b981', action: 'tool:form' },
+      { id: 'delete', title: 'Delete Pages', desc: 'Remove pages from a PDF document', icon: 'trash', color: '#ef4444', action: 'sidebar:delete' }
+    ]
+  },
+  {
+    id: 'compress-scans',
+    name: 'Compress & Scans',
+    desc: 'File size reduction, scan deskewing, and OCR text extraction',
+    icon: 'compress',
+    tools: [
+      { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', action: 'workflow:compress' },
+      { id: 'deskew', title: 'Deskew', desc: 'Automatically straighten and deskew scanned PDF pages', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
+      { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', action: 'workflow:ocr-pdf' }
+    ]
+  },
+  {
+    id: 'security',
+    name: 'Security',
+    desc: 'Passwords, permissions, watermarks, and form flattening',
+    icon: 'lock',
+    tools: [
+      { id: 'security', title: 'Protect', desc: 'Protect file with password and permissions', icon: 'lock', color: '#dc2626', action: 'workflow:security' },
+      { id: 'unlock', title: 'Unlock', desc: 'Remove restrictions and password from PDF files', icon: 'unlock', color: '#10b981', action: 'workflow:unlock' },
+      { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#0284c7', action: 'workflow:watermark' },
+      { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'action:flatten' }
+    ]
+  },
+  {
+    id: 'convert-from',
+    name: 'Convert from PDF',
+    desc: 'Export PDF documents to DOC, Excel, PPT, JPG, or Plain Text',
+    icon: 'file-text',
+    tools: [
+      { id: 'pdf-to-excel', title: 'PDF to Excel', desc: 'Convert PDF to Excel or CSV online for free. Extract table data from PDF', icon: 'excel', color: '#107c41', action: 'workflow:pdf-to-excel' },
+      { id: 'to-image', title: 'PDF to JPG', desc: 'Get PDF pages converted to JPG, PNG or TIFF images', icon: 'image', color: '#d97706', action: 'workflow:to-image' },
+      { id: 'pdf-to-ppt', title: 'PDF to PPT', desc: 'Convert PDF to PowerPoint online', icon: 'ppt', color: '#d24726', action: 'workflow:pdf-to-ppt' },
+      { id: 'pdf-to-text', title: 'PDF to Text', desc: 'Copies all text from the PDF document and extracts it to a separate text file', icon: 'align-left', color: '#334155', action: 'workflow:pdf-to-text' },
+      { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#2563eb', action: 'workflow:pdf-to-word' }
+    ]
+  },
+  {
+    id: 'convert-to',
+    name: 'Convert to PDF',
+    desc: 'Generate PDF documents from Web, Images, and Word files',
+    icon: 'upload-cloud',
+    tools: [
+      { id: 'html-to-pdf', title: 'HTML to PDF', desc: 'Convert web pages or HTML files to PDF documents', icon: 'code', color: '#0284c7', action: 'workflow:html-to-pdf' },
+      { id: 'images-to-pdf', title: 'JPG to PDF', desc: 'Convert Images to PDF', icon: 'images', color: '#d97706', action: 'workflow:images-to-pdf' },
+      { id: 'word-to-pdf', title: 'Word to PDF', desc: 'Creates a PDF document from Microsoft Word .docx', icon: 'word', color: '#2563eb', action: 'workflow:word-to-pdf' }
+    ]
+  },
+  {
+    id: 'others',
+    name: 'Others',
+    desc: 'Bates numbering, margins, n-up imposition, metadata, and repair',
+    icon: 'more-horizontal',
+    tools: [
+      { id: 'bates', title: 'Bates Numbering', desc: 'Bates stamp multiple files at once', icon: 'shield', color: '#1e293b', action: 'workflow:bates' },
+      { id: 'create-bookmarks', title: 'Create Bookmarks', desc: 'Create PDF Bookmarks', icon: 'bookmark', color: '#7c3aed', action: 'modal:metadata' },
+      { id: 'crop', title: 'Crop', desc: 'Trim PDF margins, change PDF page size', icon: 'crop', color: '#0d9488', action: 'workflow:crop' },
+      { id: 'metadata', title: 'Edit Metadata', desc: 'Change PDF Author, Title, Keywords, Subject and other metadata fields', icon: 'file-text', color: '#64748b', action: 'modal:metadata' },
+      { id: 'extract-images', title: 'Extract Images', desc: 'Extract images from PDF', icon: 'image', color: '#ec4899', action: 'workflow:extract-images' },
+      { id: 'flip', title: 'Flip', desc: 'Mirror pages horizontally or vertically', icon: 'flip', color: '#8b5cf6', action: 'workflow:flip' },
+      { id: 'grayscale', title: 'Grayscale', desc: 'Make a PDF text and images grayscale', icon: 'circle-half', color: '#475569', action: 'workflow:grayscale' },
+      { id: 'header-footer', title: 'Header & Footer', desc: 'Apply page numbers or text labels to PDF files', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
+      { id: 'nup', title: 'N-up', desc: 'Print multiple pages per sheet per paper. A5 plan as 4-up on A3 or A4 2-up on A3', icon: 'layout', color: '#475569', action: 'workflow:nup' },
+      { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
+      { id: 'rename', title: 'Rename', desc: 'Change document filename based on text from the PDF pages', icon: 'edit', color: '#059669', action: 'workflow:rename' },
+      { id: 'repair', title: 'Repair', desc: 'Recover data from a corrupted or damaged PDF document', icon: 'tool', color: '#ef4444', action: 'workflow:repair' },
+      { id: 'resize', title: 'Resize', desc: 'Add page margins and padding, Change PDF page size', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },
+      { id: 'rotate', title: 'Rotate', desc: 'Rotate and save PDF pages permanently', icon: 'rotate', color: '#f59e0b', action: 'workflow:rotate' },
+      { id: 'remove-annotations', title: 'Remove annotations', desc: 'Batch remove highlights, strikeouts or any other annotations from a PDF document', icon: 'trash-2', color: '#dc2626', action: 'workflow:remove-annotations' }
+    ]
+  }
 ];
+
+// Deduplicated flat catalog
+const seen = new Set();
+export const TOOLS_CATALOG = [];
+SEJDA_TOOL_CATEGORIES.forEach(cat => {
+  cat.tools.forEach(t => {
+    if (!seen.has(t.id)) {
+      seen.add(t.id);
+      TOOLS_CATALOG.push({ ...t, category: cat.id });
+    }
+  });
+});
 
 export class AllToolsModal {
   constructor() {
@@ -94,7 +181,7 @@ export class AllToolsModal {
     this.modal.style.display = 'none';
 
     this.modal.innerHTML = `
-      <div class="modal-dialog" style="max-width: 860px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="modal-dialog" style="max-width: 920px; max-height: 88vh; display: flex; flex-direction: column;">
         <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle);">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; color: white;">
@@ -108,27 +195,30 @@ export class AllToolsModal {
           <button class="modal-close-btn" style="font-size: 24px;">&times;</button>
         </div>
 
-        <!-- Search & Filter Rail (Canva Style) -->
+        <!-- Search & Filter Rail (Sejda Categorized Style) -->
         <div style="padding: 14px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 10px;">
           <div style="position: relative;">
             <svg style="position: absolute; left: 12px; top: 11px; color: var(--text-muted);" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
-            <input type="text" id="all-tools-search" placeholder="Search 30+ PDF tools (e.g. compress, split, crop, sign, watermark, bates)..." style="width: 100%; padding: 9px 12px 9px 36px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-app); color: var(--text-main);" />
+            <input type="text" id="all-tools-search" placeholder="Search 35+ PDF tools (e.g. compress, split, crop, sign, word, bates)..." style="width: 100%; padding: 9px 12px 9px 36px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-app); color: var(--text-main);" />
           </div>
 
           <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;" id="all-tools-filter-chips">
-            <button class="tool-filter-chip active" data-filter="all">All Tools (${TOOLS_CATALOG.length})</button>
-            <button class="tool-filter-chip" data-filter="popular">🔥 Most Popular</button>
-            <button class="tool-filter-chip" data-filter="edit">🎨 Edit & Annotate</button>
-            <button class="tool-filter-chip" data-filter="pages">📄 Organize & Pages</button>
-            <button class="tool-filter-chip" data-filter="tools">⚡ Document Tools</button>
+            <button class="tool-filter-chip active" data-filter="all">All Tools</button>
+            <button class="tool-filter-chip" data-filter="popular">⭐ Most Popular</button>
+            <button class="tool-filter-chip" data-filter="merge">🔗 Merge</button>
+            <button class="tool-filter-chip" data-filter="split">✂ Split</button>
+            <button class="tool-filter-chip" data-filter="edit-sign">✏ Edit & Sign</button>
+            <button class="tool-filter-chip" data-filter="compress-scans">🗜 Compress & Scans</button>
             <button class="tool-filter-chip" data-filter="security">🔒 Security</button>
-            <button class="tool-filter-chip" data-filter="convert">🔄 Convert</button>
+            <button class="tool-filter-chip" data-filter="convert-from">📤 Convert from PDF</button>
+            <button class="tool-filter-chip" data-filter="convert-to">📥 Convert to PDF</button>
+            <button class="tool-filter-chip" data-filter="others">⚡ Others</button>
           </div>
         </div>
 
         <!-- Cards Grid Container -->
         <div class="modal-body" style="padding: 18px 20px; overflow-y: auto; flex: 1;">
-          <div id="all-tools-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;"></div>
+          <div id="all-tools-grid"></div>
         </div>
 
         <div class="modal-footer" style="padding: 12px 20px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
@@ -178,7 +268,16 @@ export class AllToolsModal {
       flip: '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path>',
       'circle-half': '<circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path>',
       'align-left': '<line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line>',
-      tool: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'
+      tool: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>',
+      star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+      word: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
+      excel: '<rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line>',
+      ppt: '<rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line>',
+      code: '<polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>',
+      bookmark: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>',
+      unlock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path>',
+      'trash-2': '<polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>',
+      extract: '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>'
     };
 
     return `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${icons[icon] || icons.edit}</svg>`;
@@ -210,36 +309,75 @@ export class AllToolsModal {
     const grid = this.modal.querySelector('#all-tools-grid');
     if (!grid) return;
 
-    let filtered = TOOLS_CATALOG;
-
-    // Filter by chip category
-    if (this.activeFilter === 'popular') {
-      filtered = filtered.filter(t => t.popular);
-    } else if (this.activeFilter !== 'all') {
-      filtered = filtered.filter(t => t.category === this.activeFilter);
-    }
-
-    // Filter by search query
+    // 1. If searching, flat filter across all tools
     if (this.searchQuery) {
-      filtered = filtered.filter(t =>
-        t.title.toLowerCase().includes(this.searchQuery) ||
-        t.desc.toLowerCase().includes(this.searchQuery)
+      const q = this.searchQuery;
+      const filtered = TOOLS_CATALOG.filter(t =>
+        t.title.toLowerCase().includes(q) ||
+        t.desc.toLowerCase().includes(q) ||
+        t.id.toLowerCase().includes(q)
       );
-    }
 
-    if (filtered.length === 0) {
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 8px; opacity: 0.5;"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+            <div style="font-size: 14px; font-weight: 600;">No tools found matching "${this.searchQuery}"</div>
+            <p style="font-size: 12px; margin-top: 4px;">Try searching for "compress", "split", "word", or "sign"</p>
+          </div>
+        `;
+        return;
+      }
+
       grid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted);">
-          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 8px; opacity: 0.5;"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
-          <div style="font-size: 14px; font-weight: 600;">No tools found matching "${this.searchQuery}"</div>
-          <p style="font-size: 12px; margin-top: 4px;">Try searching for "compress", "split", "watermark", or "sign"</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+          ${filtered.map(tool => this.renderToolCardHtml(tool)).join('')}
         </div>
       `;
+      this.attachCardEvents(grid);
       return;
     }
 
-    grid.innerHTML = filtered.map(tool => `
-      <div class="tool-card-item" data-action="${tool.action}" style="
+    // 2. If a specific category filter is chosen
+    if (this.activeFilter !== 'all') {
+      const cat = SEJDA_TOOL_CATEGORIES.find(c => c.id === this.activeFilter);
+      if (cat) {
+        grid.innerHTML = `
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">${cat.name}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">${cat.desc}</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+              ${cat.tools.map(tool => this.renderToolCardHtml(tool)).join('')}
+            </div>
+          </div>
+        `;
+        this.attachCardEvents(grid);
+        return;
+      }
+    }
+
+    // 3. Default: Render ALL Sejda categories as beautiful distinct sections!
+    grid.innerHTML = SEJDA_TOOL_CATEGORIES.map(cat => `
+      <div class="modal-category-section" style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 15px; font-weight: 700; color: var(--text-main);">${cat.name}</span>
+            <span style="font-size: 11px; color: var(--text-muted);">${cat.desc}</span>
+          </div>
+          <span style="font-size: 11px; color: var(--primary); background: rgba(37,99,235,0.08); padding: 2px 7px; border-radius: 10px; font-weight: 600;">${cat.tools.length} tools</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+          ${cat.tools.map(tool => this.renderToolCardHtml(tool)).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    this.attachCardEvents(grid);
+  }
+
+  renderToolCardHtml(tool) {
+    return `
+      <div class="tool-card-item" data-action="${tool.action}" data-tool-id="${tool.id}" style="
         background: var(--bg-surface);
         border: 1px solid var(--border-subtle);
         border-radius: 10px;
@@ -258,24 +396,68 @@ export class AllToolsModal {
           ${tool.popular ? '<span style="font-size: 10px; font-weight: 700; color: #059669; background: #ecfdf5; padding: 2px 6px; border-radius: 10px;">POPULAR</span>' : ''}
         </div>
         <div>
-          <div style="font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 3px;">${tool.title}</div>
-          <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">${tool.desc}</div>
+          <strong style="font-size: 13.5px; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 3px;">${tool.title}</strong>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 0;">${tool.desc}</p>
         </div>
       </div>
-    `).join('');
+    `;
+  }
 
-    // Bind card clicks
-    grid.querySelectorAll('.tool-card-item').forEach(card => {
+  attachCardEvents(container) {
+    container.querySelectorAll('.tool-card-item').forEach(card => {
       card.onclick = () => {
-        const action = card.dataset.action;
-        this.hide();
-        this.executeAction(action);
+        const action = card.getAttribute('data-action');
+        const toolId = card.getAttribute('data-tool-id');
+        this.dispatchToolAction(action, toolId);
+      };
+      card.onmouseenter = () => {
+        card.style.borderColor = 'var(--primary)';
+        card.style.transform = 'translateY(-2px)';
+        card.style.boxShadow = '0 6px 16px rgba(0,0,0,0.06)';
+      };
+      card.onmouseleave = () => {
+        card.style.borderColor = 'var(--border-subtle)';
+        card.style.transform = 'none';
+        card.style.boxShadow = 'none';
       };
     });
   }
 
+  dispatchToolAction(action, toolId = null) {
+    this.hide();
+    if (!action) return;
+
+    // 1. Dedicated tool workflow
+    if (action.startsWith('workflow:')) {
+      const toolKey = action.replace('workflow:', '');
+      toolWorkflow.openTool(toolKey);
+      return;
+    }
+
+    if (toolId && WORKFLOW_TOOLS_CONFIG[toolId]) {
+      toolWorkflow.openTool(toolId);
+      return;
+    }
+
+    // 2. Editor in-studio modals & canvas tools
+    this.executeAction(action);
+  }
+
   executeAction(action) {
     if (!action) return;
+
+    if (action.startsWith('workflow:')) {
+      const toolKey = action.replace('workflow:', '');
+      toolWorkflow.openTool(toolKey);
+      return;
+    }
+
+    // Ensure studio view is visible if navigating from landing page
+    if (document.body.classList.contains('show-landing')) {
+      document.body.classList.remove('show-landing');
+      document.body.classList.add('show-studio');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
 
     if (action.startsWith('tool:')) {
       const tool = action.replace('tool:', '');

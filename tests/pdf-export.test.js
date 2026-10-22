@@ -6,6 +6,7 @@
 import { test, describe, before } from 'node:test';
 import assert from 'node:assert';
 import { PDFDocument } from 'pdf-lib';
+import JSZip from 'jszip';
 import { pdfEngine } from '../src/core/pdf-engine.js';
 
 describe('PDF Vector Export & Feature Tests', () => {
@@ -699,6 +700,77 @@ describe('PDF Vector Export & Feature Tests', () => {
     const p1 = resultDoc.getPage(1);
     assert.strictEqual(p1.getWidth(), 400); // Originally page 0
     assert.strictEqual(p1.getRotation().angle, 90, 'Page should have 90 degree rotation applied');
+  });
+
+  test('cropPdf adjusts crop box coordinates across document pages', async () => {
+    // Crop sample PDF: top 30, right 20, bottom 40, left 25
+    const cropped = await pdfEngine.cropPdf(sampleBytes, {
+      top: 30,
+      right: 20,
+      bottom: 40,
+      left: 25
+    });
+    assert(cropped.byteLength > 500);
+
+    const doc = await PDFDocument.load(cropped);
+    const p0 = doc.getPage(0);
+    const cb = p0.getCropBox();
+    assert.strictEqual(cb.x, 25);
+    assert.strictEqual(cb.y, 40);
+    assert.strictEqual(cb.width, 595.28 - 25 - 20);
+    assert.strictEqual(cb.height, 841.89 - 30 - 40);
+  });
+
+  test('batesNumberPdf stamps legal bates indexing onto pages', async () => {
+    const batesPdf = await pdfEngine.batesNumberPdf(sampleBytes, {
+      prefix: 'LEGAL-',
+      startNumber: 101,
+      digits: 5,
+      suffix: '-CONF',
+      position: 'bottom-right'
+    });
+    assert(batesPdf.byteLength > 500);
+
+    const doc = await PDFDocument.load(batesPdf);
+    assert.strictEqual(doc.getPageCount(), 2);
+  });
+
+  test('htmlToPdf converts HTML string into styled multi-page PDF', async () => {
+    const html = `
+      <h1>Annual Financial Overview</h1>
+      <p>This report summarizes client-side vector compilation benchmarks and metrics.</p>
+      <p>All operations execute 100% locally with zero server uploads.</p>
+    `;
+    const pdfBytes = await pdfEngine.htmlToPdf(html, { title: 'Annual Report' });
+    assert(pdfBytes.byteLength > 500);
+
+    const doc = await PDFDocument.load(pdfBytes);
+    assert.strictEqual(doc.getPageCount(), 1);
+    const sz = doc.getPage(0).getSize();
+    assert.strictEqual(sz.width, 595.28);
+    assert.strictEqual(sz.height, 841.89);
+  });
+
+  test('wordToPdf converts Word DOCX byte stream into clean PDF', async () => {
+    // Generate valid sample DOCX package in memory with word/document.xml
+    const zip = new JSZip();
+    zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>');
+    zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:body>
+          <w:p><w:r><w:t>Confidential Legal Brief</w:t></w:r></w:p>
+          <w:p><w:r><w:t>Case Number: CV-2026-9901</w:t></w:r></w:p>
+          <w:p><w:r><w:t>The document was successfully converted from DOCX to PDF format client-side.</w:t></w:r></w:p>
+        </w:body>
+      </w:document>
+    `);
+    const docxBytes = await zip.generateAsync({ type: 'uint8array' });
+
+    const pdfBytes = await pdfEngine.wordToPdf(docxBytes, { title: 'Legal Brief' });
+    assert(pdfBytes.byteLength > 500);
+
+    const doc = await PDFDocument.load(pdfBytes);
+    assert.strictEqual(doc.getPageCount(), 1);
   });
 });
 

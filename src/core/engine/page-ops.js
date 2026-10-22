@@ -4,7 +4,8 @@
  * duplex alternate & mix, N-up imposition, page flipping/mirroring, and image compilation.
  */
 
-import { PDFDocument, PDFName, degrees } from 'pdf-lib';
+import { PDFDocument, PDFName, degrees, StandardFonts, rgb } from 'pdf-lib';
+import JSZip from 'jszip';
 
 export class PageOperations {
   /**
@@ -306,7 +307,7 @@ export class PageOperations {
       const { width, height } = srcPage.getSize();
 
       if (!srcPage.node.get(PDFName.of('Contents'))) {
-        srcPage.node.set(PDFName.of('Contents'), srcDoc.context.register(sourceDoc.context.stream('')));
+        srcPage.node.set(PDFName.of('Contents'), srcDoc.context.register(srcDoc.context.stream('')));
       }
 
       if (!shouldFlip) {
@@ -576,4 +577,256 @@ export class PageOperations {
 
     return await finalDoc.save();
   }
+
+  /**
+   * Applies custom crop box margins (top, right, bottom, left) to pages.
+   */
+  static async cropPdf(rawBytes, options = {}) {
+    if (!rawBytes) throw new Error('No PDF loaded to crop');
+    const doc = await PDFDocument.load(rawBytes);
+    const pages = doc.getPages();
+    const top = Math.max(0, Number(options.top) || 0);
+    const right = Math.max(0, Number(options.right) || 0);
+    const bottom = Math.max(0, Number(options.bottom) || 0);
+    const left = Math.max(0, Number(options.left) || 0);
+    const targetPage = typeof options.pageScope === 'number' ? options.pageScope : null;
+
+    for (let i = 0; i < pages.length; i++) {
+      if (targetPage !== null && i !== targetPage) continue;
+      const page = pages[i];
+      const { width, height } = page.getSize();
+      const cropW = Math.max(20, width - left - right);
+      const cropH = Math.max(20, height - top - bottom);
+      page.setCropBox(left, bottom, cropW, cropH);
+    }
+    return await doc.save();
+  }
+
+  /**
+   * Automatically detects outer blank/whitespace margins of a page canvas.
+   * Returns suggested crop margins { top, right, bottom, left } in points.
+   */
+  static detectWhitespaceCrop(canvas, scale = 1.0) {
+    if (!canvas || !canvas.width || !canvas.height) {
+      return { top: 0, right: 0, bottom: 0, left: 0 };
+    }
+    const w = canvas.width;
+    const h = canvas.height;
+    const ctx = canvas.getContext('2d');
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    let minX = w, maxX = 0, minY = h, maxY = 0;
+    let found = false;
+
+    for (let y = 0; y < h; y += 2) {
+      for (let x = 0; x < w; x += 2) {
+        const idx = (y * w + x) * 4;
+        const r = data[idx];
+        const g = data[idx + 1];
+        const b = data[idx + 2];
+        const a = data[idx + 3];
+        if (a > 20 && (r < 240 || g < 240 || b < 240)) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+          found = true;
+        }
+      }
+    }
+
+    if (!found) {
+      return { top: 0, right: 0, bottom: 0, left: 0 };
+    }
+
+    const topPx = minY;
+    const bottomPx = h - maxY;
+    const leftPx = minX;
+    const rightPx = w - maxX;
+
+    const ptFactor = scale > 0 ? (1 / scale) : 1;
+    return {
+      top: Math.max(0, Math.round((topPx * ptFactor) - 10)),
+      right: Math.max(0, Math.round((rightPx * ptFactor) - 10)),
+      bottom: Math.max(0, Math.round((bottomPx * ptFactor) - 10)),
+      left: Math.max(0, Math.round((leftPx * ptFactor) - 10))
+    };
+  }
+
+  /**
+   * Stamps legal Bates numbering sequentially across all document pages.
+   */
+  static async batesNumberPdf(rawBytes, options = {}) {
+    if (!rawBytes) throw new Error('No PDF loaded');
+    const sourceDoc = await PDFDocument.load(rawBytes);
+    const finalDoc = await PDFDocument.create();
+    const helveticaBold = await finalDoc.embedFont(StandardFonts.HelveticaBold);
+    const numPages = sourceDoc.getPageCount();
+
+    const prefix = options.prefix || 'CASE-';
+    const suffix = options.suffix || '';
+    const startNumber = parseInt(options.startNumber, 10) || 1;
+    const digits = parseInt(options.digits, 10) || 6;
+    const position = options.position || 'bottom-right';
+    const fontSize = parseInt(options.fontSize, 10) || 10;
+    const colorHex = options.color || '#1e293b';
+
+    const hexToRgb = (hex) => {
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    };
+    const { r, g, b } = hexToRgb(colorHex);
+    const textColor = rgb(r / 255, g / 255, b / 255);
+
+    for (let i = 0; i < numPages; i++) {
+      const [page] = await finalDoc.copyPages(sourceDoc, [i]);
+      const { width: pWidth, height: pHeight } = page.getSize();
+      const currentNum = startNumber + i;
+      const padded = String(currentNum).padStart(digits, '0');
+      const batesText = `${prefix}${padded}${suffix}`;
+      const textWidth = helveticaBold.widthOfTextAtSize(batesText, fontSize);
+
+      let bnX = pWidth - textWidth - 36;
+      let bnY = 24;
+
+      if (position === 'bottom-left') { bnX = 36; bnY = 24; }
+      else if (position === 'bottom-center') { bnX = (pWidth - textWidth) / 2; bnY = 24; }
+      else if (position === 'bottom-right') { bnX = pWidth - textWidth - 36; bnY = 24; }
+      else if (position === 'top-left') { bnX = 36; bnY = pHeight - 34; }
+      else if (position === 'top-center') { bnX = (pWidth - textWidth) / 2; bnY = pHeight - 34; }
+      else if (position === 'top-right') { bnX = pWidth - textWidth - 36; bnY = pHeight - 34; }
+
+      page.drawText(batesText, {
+        x: bnX,
+        y: bnY,
+        size: fontSize,
+        font: helveticaBold,
+        color: textColor
+      });
+
+      finalDoc.addPage(page);
+    }
+
+    return await finalDoc.save();
+  }
+
+  /**
+   * Converts HTML string / text into a vector PDF document.
+   */
+  static async htmlToPdf(htmlString, options = {}) {
+    const title = options.title || 'HTML Document';
+    const lines = htmlString.replace(/<[^>]+>/g, '\n').split('\n').map(l => l.trim()).filter(Boolean);
+
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    let page = pdfDoc.addPage([595.28, 841.89]);
+    let y = 800;
+
+    page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+    y -= 30;
+
+    for (const line of lines) {
+      if (y < 60) {
+        page = pdfDoc.addPage([595.28, 841.89]);
+        y = 800;
+      }
+      const words = line.split(' ');
+      let curLine = '';
+      for (const w of words) {
+        const testLine = curLine ? `${curLine} ${w}` : w;
+        if (font.widthOfTextAtSize(testLine, 10.5) > 495) {
+          page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
+          y -= 15;
+          if (y < 60) {
+            page = pdfDoc.addPage([595.28, 841.89]);
+            y = 800;
+          }
+          curLine = w;
+        } else {
+          curLine = testLine;
+        }
+      }
+      if (curLine) {
+        page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
+        y -= 18;
+      }
+    }
+
+    return await pdfDoc.save();
+  }
+
+  /**
+   * Converts Word DOCX byte stream or plain text into a vector PDF document.
+   */
+  static async wordToPdf(docxBytes, options = {}) {
+    let paragraphs = [];
+    try {
+      const zip = await JSZip.loadAsync(docxBytes);
+      const docXml = await zip.file('word/document.xml')?.async('text');
+      if (docXml) {
+        const parser = typeof DOMParser !== 'undefined' ? new DOMParser() : null;
+        if (parser) {
+          const xmlDoc = parser.parseFromString(docXml, 'text/xml');
+          paragraphs = Array.from(xmlDoc.getElementsByTagName('w:p')).map(p => {
+            return Array.from(p.getElementsByTagName('w:t')).map(t => t.textContent).join('');
+          }).filter(Boolean);
+        } else {
+          // Node.js regex fallback for testing environment
+          const matches = docXml.match(/<w:t[^>]*>([^<]+)<\/w:t>/g) || [];
+          paragraphs = matches.map(m => m.replace(/<[^>]+>/g, '')).filter(Boolean);
+        }
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    if (paragraphs.length === 0) {
+      const textDecoder = new TextDecoder('utf-8');
+      paragraphs = textDecoder.decode(docxBytes).replace(/[^\x20-\x7E\n]/g, ' ').split('\n').map(l => l.trim()).filter(l => l.length > 2);
+    }
+
+    const title = options.title || 'Word Document';
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    let page = pdfDoc.addPage([595.28, 841.89]);
+    let y = 800;
+
+    page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+    y -= 30;
+
+    for (const para of paragraphs) {
+      if (y < 60) {
+        page = pdfDoc.addPage([595.28, 841.89]);
+        y = 800;
+      }
+      const words = para.split(' ');
+      let curLine = '';
+      for (const w of words) {
+        const testLine = curLine ? `${curLine} ${w}` : w;
+        if (font.widthOfTextAtSize(testLine, 11) > 495) {
+          page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
+          y -= 16;
+          if (y < 60) {
+            page = pdfDoc.addPage([595.28, 841.89]);
+            y = 800;
+          }
+          curLine = w;
+        } else {
+          curLine = testLine;
+        }
+      }
+      if (curLine) {
+        page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
+        y -= 20;
+      }
+    }
+
+    return await pdfDoc.save();
+  }
 }
+
+

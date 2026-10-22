@@ -122,6 +122,16 @@ export class PdfEngine {
     return await PageOperations.organizePages(bytes, pageList);
   }
 
+  async cropPdf(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.cropPdf(bytes, options);
+  }
+
+  async batesNumberPdf(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.batesNumberPdf(bytes, options);
+  }
+
   // --- Transform Operations (Margins, Compression, Grayscale) ---
 
   async resizePdfMargins(pdfBytes = null, options = {}) {
@@ -182,6 +192,14 @@ export class PdfEngine {
 
   async exportPdf(state) {
     return await PdfExporter.exportPdf(this.rawBytes, state);
+  }
+
+  async htmlToPdf(htmlString, options = {}) {
+    return await PageOperations.htmlToPdf(htmlString, options);
+  }
+
+  async wordToPdf(docxBytes, options = {}) {
+    return await PageOperations.wordToPdf(docxBytes, options);
   }
 }
 
