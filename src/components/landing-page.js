@@ -115,6 +115,7 @@ export class LandingPage {
                   <div class="mega-column">
                     <div class="mega-col-title">OPTIMIZE & SECURITY</div>
                     <button class="mega-item" data-action="modal:compress">Let's Compress PDF</button>
+                    <button class="mega-item" data-action="modal:ocr">Let's OCR PDF</button>
                     <button class="mega-item" data-action="modal:security">Let's Protect & Encrypt</button>
                     <button class="mega-item" data-action="modal:watermark">Let's Watermark PDF</button>
                     <button class="mega-item" data-action="modal:grayscale">Let's Grayscale PDF</button>

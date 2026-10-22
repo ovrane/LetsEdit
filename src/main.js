@@ -27,6 +27,7 @@ import { compressModal } from './components/compress-modal.js';
 import { flipModal } from './components/flip-modal.js';
 import { grayscaleModal } from './components/grayscale-modal.js';
 import { extractImagesModal } from './components/extract-images-modal.js';
+import { ocrModal } from './components/ocr-modal.js';
 import { allToolsModal } from './components/all-tools-modal.js';
 import { landingPage } from './components/landing-page.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
@@ -279,6 +280,9 @@ class App {
 
     const grayscaleBtn = document.getElementById('btn-open-grayscale');
     if (grayscaleBtn) grayscaleBtn.onclick = () => grayscaleModal.show();
+
+    const ocrBtn = document.getElementById('btn-open-ocr');
+    if (ocrBtn) ocrBtn.onclick = () => ocrModal.show();
 
     // Convert dropdown quick actions
     const quickImgToPdf = document.getElementById('btn-quick-images-to-pdf');

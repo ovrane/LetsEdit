@@ -550,6 +550,39 @@ describe('PDF Vector Export & Feature Tests', () => {
     assert(images[0].bytes.byteLength > 0);
     assert(images[0].name.startsWith('image_'));
   });
+
+  test('applyOcr injects invisible searchable vector text layer onto PDF pages', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+    const mockWords = [
+      { text: 'Invoice', x: 50, y: 700, width: 45, height: 12 },
+      { text: 'Number', x: 100, y: 700, width: 40, height: 12 },
+      { text: 'TAX-2026', x: 145, y: 700, width: 55, height: 12 }
+    ];
+
+    let progressCalls = 0;
+    const result = await pdfEngine.applyOcr(sampleBytes, {
+      pageRange: [1],
+      language: 'eng',
+      mockOcrResults: [
+        { pageIndex: 0, text: 'Invoice Number TAX-2026', words: mockWords }
+      ],
+      onProgress: (p) => {
+        progressCalls++;
+        assert(p.page === 1);
+        assert(p.progress >= 0 && p.progress <= 100);
+      }
+    });
+
+    assert(result.pdfBytes.byteLength > 200);
+    assert(result.fullText.includes('Invoice Number TAX-2026'));
+    assert.strictEqual(result.pagesOcr.length, 1);
+    assert.strictEqual(result.pagesOcr[0].wordCount, 3);
+    assert(progressCalls > 0);
+
+    // Verify resulting PDF document can be loaded and is valid
+    const ocrDoc = await PDFDocument.load(result.pdfBytes);
+    assert.strictEqual(ocrDoc.getPageCount(), 2);
+  });
 });
 
 

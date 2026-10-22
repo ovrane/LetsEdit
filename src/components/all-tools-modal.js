@@ -17,6 +17,7 @@ import { pdfToImageModal } from './pdf-to-image-modal.js';
 import { flipModal } from './flip-modal.js';
 import { grayscaleModal } from './grayscale-modal.js';
 import { extractImagesModal } from './extract-images-modal.js';
+import { ocrModal } from './ocr-modal.js';
 import { pdfEngine } from '../core/pdf-engine.js';
 import { downloadBlob } from '../utils/helpers.js';
 import { Toast } from './toast.js';
@@ -59,6 +60,7 @@ export const TOOLS_CATALOG = [
   { id: 'bates', category: 'tools', title: "Let's Bates Number", desc: 'Sequential legal indexing with prefix, digits pad, and suffix', icon: 'shield', color: '#1e293b', action: 'modal:bates' },
   { id: 'metadata', category: 'tools', title: "Let's Edit Metadata", desc: 'Edit PDF Title, Author, Subject, Keywords, Creator, and Producer', icon: 'file-text', color: '#64748b', action: 'modal:metadata' },
   { id: 'grayscale', category: 'tools', title: "Let's Grayscale", desc: 'Desaturate vector fills, strokes, and shapes to save ink and print costs', icon: 'circle-half', color: '#475569', action: 'modal:grayscale' },
+  { id: 'ocr-pdf', category: 'tools', title: "Let's OCR PDF", desc: 'Turn scanned documents into searchable, selectable text with client-side OCR', icon: 'file-text', color: '#6366f1', popular: true, action: 'modal:ocr' },
   { id: 'flatten', category: 'tools', title: "Let's Flatten Forms", desc: 'Bake interactive fillable AcroForm fields permanently into vectors', icon: 'layers', color: '#0d9488', action: 'action:flatten' },
 
   // Conversions
@@ -292,6 +294,8 @@ export class AllToolsModal {
       pdfToImageModal.show();
     } else if (action === 'modal:extract-images') {
       extractImagesModal.open();
+    } else if (action === 'modal:ocr') {
+      ocrModal.show();
     } else if (action === 'modal:security') {
       const btn = document.getElementById('btn-open-security');
       if (btn) btn.click();

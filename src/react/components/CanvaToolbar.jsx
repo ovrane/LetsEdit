@@ -151,6 +151,10 @@ export function CanvaToolbar({ onAction }) {
                 <span className="font-semibold">Grayscale PDF</span>
                 <span className="text-[11px] text-slate-400">Desaturate vector colors & save ink</span>
               </button>
+              <button onClick={() => handleDropdownAction('modal:ocr')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
+                <span className="font-semibold">OCR PDF</span>
+                <span className="text-[11px] text-slate-400">Recognize scanned text into searchable vectors</span>
+              </button>
               <button onClick={() => handleDropdownAction('modal:security')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
                 <span className="font-semibold">Protect & Encrypt</span>
                 <span className="text-[11px] text-slate-400">ISO 32000-1 AES Password Security</span>
