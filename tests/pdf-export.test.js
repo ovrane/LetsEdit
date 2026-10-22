@@ -583,6 +583,56 @@ describe('PDF Vector Export & Feature Tests', () => {
     const ocrDoc = await PDFDocument.load(result.pdfBytes);
     assert.strictEqual(ocrDoc.getPageCount(), 2);
   });
+
+  test('repairPdf fixes corrupted PDF headers and recovers document pages', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+    const sampleArr = new Uint8Array(sampleBytes);
+    // Simulate damaged PDF with missing header and prepended corrupted bytes
+    const junkPrefix = new TextEncoder().encode('CORRUPTED_SYSTEM_LOG_DATA\n');
+    const damagedBytes = new Uint8Array(junkPrefix.length + sampleArr.length);
+    damagedBytes.set(junkPrefix, 0);
+    damagedBytes.set(sampleArr, junkPrefix.length);
+
+    const repaired = await pdfEngine.repairPdf(damagedBytes);
+    assert(repaired.pdfBytes.byteLength > 200);
+    assert.strictEqual(repaired.pageCount, 2);
+    assert(repaired.recoveredObjects > 0);
+
+    const doc = await PDFDocument.load(repaired.pdfBytes);
+    assert.strictEqual(doc.getPageCount(), 2);
+  });
+
+  test('comparePdfs detects differences and generates visual comparison report', async () => {
+    const docA = await PDFDocument.create();
+    const p1 = docA.addPage([400, 400]);
+    p1.drawText('Agreement between Party Alpha and Party Beta');
+    const bytesA = await docA.save();
+
+    const docB = await PDFDocument.create();
+    const p2 = docB.addPage([400, 400]);
+    p2.drawText('Agreement between Party Alpha and Party Gamma Modified');
+    const bytesB = await docB.save();
+
+    const comparison = await pdfEngine.comparePdfs(bytesA, bytesB);
+    assert.strictEqual(comparison.pagesA, 1);
+    assert.strictEqual(comparison.pagesB, 1);
+    assert(comparison.similarityScore > 0 && comparison.similarityScore <= 100);
+    assert(comparison.diffCount >= 1);
+    assert(comparison.reportPdfBytes.byteLength > 200);
+
+    const reportDoc = await PDFDocument.load(comparison.reportPdfBytes);
+    assert(reportDoc.getPageCount() >= 1);
+  });
+
+  test('convertToPdfA conforms to ISO 19005-1 with OutputIntents', async () => {
+    const sampleBytes = await pdfEngine.createSamplePdf();
+    const pdfaBytes = await pdfEngine.convertToPdfA(sampleBytes);
+    assert(pdfaBytes.byteLength > 200);
+
+    const pdfaDoc = await PDFDocument.load(pdfaBytes, { updateMetadata: false });
+    assert.strictEqual(pdfaDoc.getPageCount(), 2);
+    assert(pdfaDoc.getProducer().includes('PDF/A'));
+  });
 });
 
 

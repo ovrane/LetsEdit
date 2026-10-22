@@ -155,6 +155,14 @@ export function CanvaToolbar({ onAction }) {
                 <span className="font-semibold">OCR PDF</span>
                 <span className="text-[11px] text-slate-400">Recognize scanned text into searchable vectors</span>
               </button>
+              <button onClick={() => handleDropdownAction('modal:compare')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
+                <span className="font-semibold">Compare PDF</span>
+                <span className="text-[11px] text-slate-400">Side-by-side visual diff & reports</span>
+              </button>
+              <button onClick={() => handleDropdownAction('modal:repair')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
+                <span className="font-semibold">Repair PDF</span>
+                <span className="text-[11px] text-slate-400">Recover damaged & corrupted files</span>
+              </button>
               <button onClick={() => handleDropdownAction('modal:security')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
                 <span className="font-semibold">Protect & Encrypt</span>
                 <span className="text-[11px] text-slate-400">ISO 32000-1 AES Password Security</span>
@@ -191,6 +199,10 @@ export function CanvaToolbar({ onAction }) {
               <button onClick={() => handleDropdownAction('action:images-to-pdf')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
                 <span className="font-semibold">Images to PDF</span>
                 <span className="text-[11px] text-slate-400">Combine JPG/PNGs into A4 PDF</span>
+              </button>
+              <button onClick={() => handleDropdownAction('modal:pdfa')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
+                <span className="font-semibold">PDF to PDF/A</span>
+                <span className="text-[11px] text-slate-400">ISO 19005-1 Archival Standard</span>
               </button>
               <button onClick={() => handleDropdownAction('action:extract-text')} className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col">
                 <span className="font-semibold">PDF to Text</span>
