@@ -7,6 +7,7 @@ import { store } from './state-store.js';
 import { uid } from '../utils/helpers.js';
 import { ResizeGizmo } from './canvas/resize-gizmo.js';
 import { EraserHandler } from './canvas/eraser.js';
+import { TextClustering } from './canvas/text-clustering.js';
 
 export class CanvasManager {
   constructor(container) {
@@ -159,24 +160,36 @@ export class CanvasManager {
   async renderTextLayer(page, textLayerEl, scale, rotation, pageNum) {
     textLayerEl.innerHTML = '';
     const { items, viewport } = await pdfEngine.extractTextItems(page, scale, rotation);
+    const clusters = TextClustering.clusterTextItems(items, viewport, scale);
 
-    for (const item of items) {
-      if (!item.str || item.str.trim() === '') continue;
+    const currentAnnotations = store.getAnnotations(pageNum) || [];
+    const activeReplacedIds = new Set(
+      currentAnnotations.filter(a => a.replacedClusterId).map(a => a.replacedClusterId)
+    );
 
-      // Calculate approximate bounding box from transform
-      const tx = item.transform;
-      // tx: [scaleX, skewY, skewX, scaleY, transX, transY]
-      const [vx, vy] = viewport.convertToViewportPoint(tx[4], tx[5]);
-      const fontHeight = Math.hypot(tx[2], tx[3]) * scale;
+    for (const cluster of clusters) {
+      if (!cluster.str || cluster.str.trim() === '') continue;
 
       const span = document.createElement('span');
       span.className = 'text-item';
-      span.textContent = item.str;
-      span.style.left = `${vx}px`;
-      span.style.top = `${vy - fontHeight}px`;
-      span.style.fontSize = `${fontHeight}px`;
-      span.dataset.originalText = item.str;
-      span.dataset.fontName = item.fontName;
+      span.id = `text-cluster-${cluster.id}`;
+      span.textContent = cluster.str;
+      span.style.left = `${cluster.vx}px`;
+      span.style.top = `${cluster.top}px`;
+      span.style.width = `${cluster.width}px`;
+      span.style.height = `${cluster.height}px`;
+      span.style.fontSize = `${cluster.fontSize}px`;
+      span.style.fontFamily = TextClustering.getCssFontFamily(cluster.fontName);
+      if (cluster.isBold) span.style.fontWeight = 'bold';
+
+      span.dataset.clusterId = cluster.id;
+      span.dataset.originalText = cluster.str;
+      span.dataset.fontName = cluster.fontName;
+
+      // Hide if there is already an active annotation replacing this cluster
+      if (activeReplacedIds.has(cluster.id)) {
+        span.style.visibility = 'hidden';
+      }
 
       // Click or drag to move/edit existing text
       let dragStartX, dragStartY;
@@ -194,26 +207,31 @@ export class CanvasManager {
             hasDragged = true;
             window.removeEventListener('mousemove', onTextMove);
             window.removeEventListener('mouseup', onTextUp);
-            // Convert to movable annotation immediately
+
+            // Convert to movable annotation immediately with full cluster geometry
             const refs = this.pageElements.get(pageNum);
             if (!refs) return;
             span.style.visibility = 'hidden';
             const wrapW = refs.wrap.clientWidth || 1;
             const wrapH = refs.wrap.clientHeight || 1;
+
             const textAnn = {
               id: uid('text'),
+              replacedClusterId: cluster.id,
               type: 'text',
-              text: item.str,
-              x: vx / wrapW,
-              y: (vy - fontHeight) / wrapH,
-              width: ((item.width * scale) + 8) / wrapW,
-              height: (fontHeight + 4) / wrapH,
-              fontSize: fontHeight,
-              fontFamily: 'Helvetica',
+              text: cluster.str,
+              x: cluster.vx / wrapW,
+              y: cluster.top / wrapH,
+              width: (cluster.width + 12) / wrapW,
+              height: (cluster.height + 6) / wrapH,
+              fontSize: cluster.fontSize,
+              fontFamily: TextClustering.detectFontFamily(cluster.fontName),
+              bold: cluster.isBold,
               color: '#000000',
               hasUnderlay: true
             };
             store.addAnnotation(pageNum, textAnn);
+
             // Immediately simulate mousedown on new annotation element to continue dragging
             setTimeout(() => {
               const newEl = refs.domLayer.querySelector(`#annot-${textAnn.id}`);
@@ -233,7 +251,7 @@ export class CanvasManager {
           window.removeEventListener('mousemove', onTextMove);
           window.removeEventListener('mouseup', onTextUp);
           if (!hasDragged) {
-            this.makeExistingTextEditable(span, pageNum, vx, vy - fontHeight, item.width * scale, fontHeight, item.str);
+            this.makeExistingTextEditable(span, pageNum, cluster);
           }
         };
 
@@ -245,7 +263,7 @@ export class CanvasManager {
     }
   }
 
-  makeExistingTextEditable(span, pageNum, x, y, w, h, originalText) {
+  makeExistingTextEditable(span, pageNum, cluster) {
     const refs = this.pageElements.get(pageNum);
     if (!refs) return;
 
@@ -257,29 +275,47 @@ export class CanvasManager {
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'inline-text-editor';
-    input.value = originalText;
-    input.style.left = `${x}px`;
-    input.style.top = `${y}px`;
-    input.style.width = `${Math.max(w + 10, 80)}px`;
-    input.style.height = `${h + 6}px`;
-    input.style.fontSize = span.style.fontSize;
+    input.value = cluster.str;
+    input.style.left = `${cluster.vx - 3}px`;
+    input.style.top = `${cluster.top - 2}px`;
+    input.style.width = `${Math.max(cluster.width + 16, 90)}px`;
+    input.style.height = `${cluster.height + 6}px`;
+    input.style.fontSize = `${cluster.fontSize}px`;
+    input.style.fontFamily = TextClustering.getCssFontFamily(cluster.fontName);
+    if (cluster.isBold) input.style.fontWeight = 'bold';
 
+    // Auto-grow width dynamically while typing
+    const updateInputWidth = () => {
+      const charW = (cluster.fontSize || 14) * 0.62;
+      const dynamicWidth = Math.max(cluster.width + 16, (input.value.length * charW) + 28);
+      input.style.width = `${dynamicWidth}px`;
+    };
+    input.addEventListener('input', updateInputWidth);
+
+    let isCommitted = false;
     const commitChange = () => {
+      if (isCommitted) return;
+      isCommitted = true;
       const newText = input.value;
       input.remove();
-      if (newText && newText !== originalText) {
+
+      if (newText && newText !== cluster.str) {
+        const charW = (cluster.fontSize || 14) * 0.62;
+        const finalW = Math.max(cluster.width, newText.length * charW);
         store.addAnnotation(pageNum, {
           id: uid('text'),
+          replacedClusterId: cluster.id,
           type: 'text',
           text: newText,
-          x: x / wrapW,
-          y: y / wrapH,
-          width: (w + 10) / wrapW,
-          height: (h + 6) / wrapH,
-          fontSize: parseFloat(span.style.fontSize) || 14,
-          fontFamily: 'Helvetica',
+          x: (cluster.vx - 2) / wrapW,
+          y: (cluster.top - 2) / wrapH,
+          width: (finalW + 14) / wrapW,
+          height: (cluster.height + 6) / wrapH,
+          fontSize: cluster.fontSize,
+          fontFamily: TextClustering.detectFontFamily(cluster.fontName),
+          bold: cluster.isBold,
           color: '#000000',
-          hasUnderlay: true // Whiteout old text
+          hasUnderlay: true // Whiteout underlay covers full cluster
         });
       } else {
         span.style.visibility = 'visible';
@@ -291,6 +327,7 @@ export class CanvasManager {
       if (e.key === 'Enter') {
         input.blur();
       } else if (e.key === 'Escape') {
+        isCommitted = true;
         input.remove();
         span.style.visibility = 'visible';
       }
@@ -305,7 +342,7 @@ export class CanvasManager {
     const refs = this.pageElements.get(pageNum);
     if (!refs) return;
 
-    const { annotCanvas, domLayer, wrap } = refs;
+    const { annotCanvas, domLayer, wrap, textLayer } = refs;
     const ctx = annotCanvas.getContext('2d');
     ctx.clearRect(0, 0, annotCanvas.width, annotCanvas.height);
     domLayer.innerHTML = '';
@@ -313,6 +350,21 @@ export class CanvasManager {
     const annotations = store.getAnnotations(pageNum);
     const w = wrap.clientWidth;
     const h = wrap.clientHeight;
+
+    // Synchronize replaced text clusters visibility
+    if (textLayer) {
+      const activeReplacedIds = new Set(
+        annotations.filter(a => a.replacedClusterId).map(a => a.replacedClusterId)
+      );
+      textLayer.querySelectorAll('.text-item').forEach(itemEl => {
+        const cId = itemEl.dataset.clusterId;
+        if (cId && activeReplacedIds.has(cId)) {
+          itemEl.style.visibility = 'hidden';
+        } else if (itemEl.style.visibility === 'hidden' && (!cId || !activeReplacedIds.has(cId))) {
+          itemEl.style.visibility = 'visible';
+        }
+      });
+    }
 
     for (const ann of annotations) {
       const px = ann.x * w;

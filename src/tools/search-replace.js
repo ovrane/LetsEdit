@@ -8,6 +8,7 @@ import { pdfEngine } from '../core/pdf-engine.js';
 import { store } from '../core/state-store.js';
 import { uid } from '../utils/helpers.js';
 import { Toast } from '../components/toast.js';
+import { TextClustering } from '../core/canvas/text-clustering.js';
 
 export class SearchReplaceTool {
   constructor() {
@@ -47,22 +48,18 @@ export class SearchReplaceTool {
       if (state.deletedPages.has(p)) continue;
       const page = await pdfEngine.getPage(p);
       const { items, viewport } = await pdfEngine.extractTextItems(page, state.scale, state.pageRotations[p] || 0);
+      const clusters = TextClustering.clusterTextItems(items, viewport, state.scale);
 
-      for (const item of items) {
-        if (!item.str) continue;
-        const text = item.str;
+      for (const cluster of clusters) {
+        if (!cluster.str) continue;
+        const text = cluster.str;
 
         // Reset regex state for global flag
         regex.lastIndex = 0;
         let match;
         while ((match = regex.exec(text)) !== null) {
-          const tx = item.transform;
-          const [vx, vy] = viewport.convertToViewportPoint(tx[4], tx[5]);
-          const fontHeight = Math.hypot(tx[2], tx[3]) * state.scale;
-
-          // Estimate character offset inside the text item
-          const charWidth = (item.width * state.scale) / (text.length || 1);
-          const matchX = vx + (match.index * charWidth);
+          const charWidth = cluster.width / (text.length || 1);
+          const matchX = cluster.vx + (match.index * charWidth);
           const matchW = Math.max(8, match[0].length * charWidth);
 
           this.matches.push({
@@ -71,9 +68,11 @@ export class SearchReplaceTool {
             matchedText: match[0],
             fullItemText: text,
             x: matchX,
-            y: vy - fontHeight,
+            y: cluster.top,
             width: matchW,
-            height: fontHeight
+            height: cluster.height,
+            fontSize: cluster.fontSize,
+            fontFamily: cluster.fontName
           });
 
           if (!regex.global) break;

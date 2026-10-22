@@ -105,6 +105,12 @@ class App {
         landingPage.switchToLanding();
       };
     }
+    const editorLogo = document.getElementById('editor-brand-logo');
+    if (editorLogo) {
+      editorLogo.onclick = () => {
+        landingPage.switchToLanding();
+      };
+    }
 
     // Toggle sidebar
     document.getElementById('toggle-sidebar-btn').onclick = () => {

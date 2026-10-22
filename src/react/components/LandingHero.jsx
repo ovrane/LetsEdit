@@ -85,11 +85,11 @@ export function LandingHero({ onDocumentLoaded }) {
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-4 max-w-3xl">
-          Every tool you need to work with PDFs in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">one place</span>
+          The Modern PDF Suite Built for <span className="text-blue-600 dark:text-blue-400">Speed & Privacy</span>.
         </h1>
 
         <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mb-8 leading-relaxed">
-          The ultimate all-in-one PDF suite. Edit existing text, merge, split, compress, sign, annotate, convert, and protect documents with sub-second vector performance.
+          Edit existing text, merge, sign, compress, and convert documents directly in your browser. Powered by client-side WebAssembly — 100% free, unlimited, and your confidential files never leave your device.
         </p>
 
         {/* Hero Dropzone Card */}
@@ -107,8 +107,8 @@ export function LandingHero({ onDocumentLoaded }) {
               : 'border-slate-300 dark:border-slate-700 hover:border-blue-500/70'
           }`}
         >
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 mb-5">
-            <Upload className="w-8 h-8" />
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 flex items-center justify-center mb-5">
+            <Upload className="w-7 h-7" />
           </div>
 
           <label className="cursor-pointer mb-3">
@@ -118,7 +118,7 @@ export function LandingHero({ onDocumentLoaded }) {
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
             />
-            <span className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm sm:text-base font-bold shadow-md shadow-blue-500/25 transition inline-block">
+            <span className="px-7 py-3 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm sm:text-base font-bold shadow-md shadow-blue-500/25 transition inline-block">
               Select PDF file
             </span>
           </label>

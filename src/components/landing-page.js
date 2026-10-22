@@ -10,6 +10,7 @@ import { TOOLS_CATALOG, allToolsModal } from './all-tools-modal.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from '../utils/theme.js';
+import { toolWorkflow, WORKFLOW_TOOLS_CONFIG } from './tool-workflow.js';
 
 export class LandingPage {
   constructor() {
@@ -27,24 +28,27 @@ export class LandingPage {
 
   init() {
     this.container = document.createElement('div');
+    this.container = document.createElement('div');
     this.container.id = 'landing-view';
     this.container.className = 'landing-view-container';
+    this.searchQuery = '';
 
     this.container.innerHTML = `
       <!-- Landing Header / Top Navigation -->
       <header class="landing-header">
         <div class="landing-nav-inner">
-          <div class="landing-brand" id="landing-brand-logo">
-            <div class="brand-badge-square">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <div class="lets-logo" id="landing-brand-logo" title="LetsEdit — Home">
+            <div class="lets-logo-badge">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
+                <path d="M10.5 13.5l3.5-3.5 2 2-3.5 3.5-2.5.5.5-2.5z"></path>
               </svg>
             </div>
-            <span class="brand-text">Lets<span class="brand-highlight">Edit</span></span>
+            <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
           </div>
 
-          <!-- Desktop Quick Links (iLovePDF Style) -->
+          <!-- Desktop Quick Links (AMD / Linear Pill Style) -->
           <nav class="landing-desktop-nav">
             <button class="landing-nav-link" data-tool="merge">Merge PDF</button>
             <button class="landing-nav-link" data-tool="split">Split PDF</button>
@@ -157,52 +161,89 @@ export class LandingPage {
 
       <!-- Main Landing Content (Scrollable) -->
       <main class="landing-main-content">
-        <!-- Hero Section (iLovePDF Style Headline & Dropzone) -->
+        <!-- Hero Section (Elevated, High-Converting Hero) -->
         <section class="landing-hero-section">
           <div class="landing-hero-container">
-            <div class="hero-badge-pill">
-              <span class="badge-dot"></span>
-              <span>100% Free, Private & Client-Side • Zero Cloud Uploads</span>
-            </div>
 
-            <h1 class="landing-hero-title">LetsEdit: Every tool you need to work with PDFs in one place</h1>
+            <h1 class="landing-hero-title">
+              The Modern PDF Suite Built for <span class="hero-title-accent">Speed & Privacy</span>.
+            </h1>
             <p class="landing-hero-subtitle">
-              Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use! Merge, split, compress, convert, rotate, unlock, and watermark PDFs with just a few clicks.
+              Edit existing text, merge, sign, compress, and convert documents directly in your browser. Powered by client-side WebAssembly — 100% free, unlimited, and your confidential files never leave your device.
             </p>
 
             <!-- Interactive Dropzone Hero -->
             <div class="hero-dropzone-card" id="landing-dropzone">
               <input type="file" id="landing-file-input" accept="application/pdf" style="display:none;" />
               <div class="dropzone-icon-circle">
-                <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                   <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                 </svg>
               </div>
               <button class="btn btn-primary btn-lg dropzone-cta-btn" id="btn-select-file">
-                Select PDF file
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                <span>Choose PDF Document</span>
               </button>
-              <div class="dropzone-subtext">or drop PDF here</div>
+              <div class="dropzone-subtext">or drag and drop your PDF here</div>
+              <div class="dropzone-badges">
+                <span class="format-tag">.PDF</span>
+                <span class="format-tag">AcroForms</span>
+                <span class="format-tag">Images to PDF</span>
+                <span class="format-tag">Scans</span>
+              </div>
               <div class="dropzone-footer-actions">
-                <button class="dropzone-sample-btn" id="btn-sample-pdf">Or edit sample document →</button>
+                <button class="dropzone-sample-btn" id="btn-sample-pdf">
+                  <span>No PDF on hand? Test with an Interactive Sample Document</span>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Hero Value & Trust Bar -->
+            <div class="hero-trust-bar">
+              <div class="trust-pill">
+                <svg width="16" height="16" fill="none" stroke="#10b981" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span><strong>100% Private</strong> &bull; Zero Server Uploads</span>
+              </div>
+              <div class="trust-pill">
+                <svg width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                <span><strong>Sub-Second Speed</strong> &bull; Client-Side WASM</span>
+              </div>
+              <div class="trust-pill">
+                <svg width="16" height="16" fill="none" stroke="#8b5cf6" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                <span><strong>34+ Pro Tools</strong> &bull; Edit, OCR, Compare & Sign</span>
+              </div>
+              <div class="trust-pill">
+                <svg width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                <span><strong>Free Forever</strong> &bull; No Signups or Caps</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Tool Filter Rail (iLovePDF Filter Pills) -->
+        <!-- Tool Filter Rail & Search Bar -->
         <section class="landing-tools-section">
           <div class="landing-tools-container">
+            <!-- Search & Quick Navigation Header -->
+            <div class="landing-tools-header">
+              <div class="landing-search-wrapper">
+                <svg class="landing-search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="landing-tool-search" class="landing-search-input" placeholder="Quick find any tool (merge, split, OCR, sign, compress, compare, watermark)..." autocomplete="off" />
+                <button id="landing-search-clear" class="landing-search-clear" style="display:none;" title="Clear search">&times;</button>
+              </div>
+            </div>
+
             <div class="landing-filter-rail" id="landing-filter-rail">
-              <button class="landing-filter-chip active" data-filter="all">All</button>
-              <button class="landing-filter-chip" data-filter="popular">🔥 Popular</button>
-              <button class="landing-filter-chip" data-filter="pages">Organize PDF</button>
+              <button class="landing-filter-chip active" data-filter="all">All Tools</button>
+              <button class="landing-filter-chip" data-filter="popular">⭐ Popular</button>
+              <button class="landing-filter-chip" data-filter="pages">Organize Pages</button>
               <button class="landing-filter-chip" data-filter="tools">Optimize PDF</button>
-              <button class="landing-filter-chip" data-filter="edit">Edit PDF</button>
-              <button class="landing-filter-chip" data-filter="security">PDF Security</button>
+              <button class="landing-filter-chip" data-filter="edit">Edit & Sign</button>
+              <button class="landing-filter-chip" data-filter="security">Security & Protect</button>
               <button class="landing-filter-chip" data-filter="convert">Convert PDF</button>
             </div>
 
-            <!-- Responsive Cards Grid (34+ Tools matching reference images 1 & 2) -->
+            <!-- Responsive Cards Grid (34+ Tools) -->
             <div class="landing-cards-grid" id="landing-cards-grid"></div>
           </div>
         </section>
@@ -290,7 +331,16 @@ export class LandingPage {
         <footer class="landing-footer">
           <div class="footer-container">
             <div class="footer-brand">
-              <div class="brand-text">Lets<span class="brand-highlight">Edit</span></div>
+              <div class="lets-logo" style="margin-bottom: 12px;">
+                <div class="lets-logo-badge">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M10.5 13.5l3.5-3.5 2 2-3.5 3.5-2.5.5.5-2.5z"></path>
+                  </svg>
+                </div>
+                <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
+              </div>
               <p>The privacy-first, client-side PDF suite for editing, signing, and converting documents with ease.</p>
             </div>
             <div class="footer-links">
@@ -357,7 +407,12 @@ export class LandingPage {
       grayscale: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path></svg>`,
       flatten: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
       'images-to-pdf': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
-      'pdf-to-text': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>`
+      'pdf-to-text': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>`,
+      'ocr-pdf': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="16" x2="13" y2="16"></line><circle cx="16" cy="16" r="2.5"></circle><line x1="18" y1="18" x2="20" y2="20"></line></svg>`,
+      compare: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="8" height="16" rx="1.5"></rect><rect x="14" y="4" width="8" height="16" rx="1.5"></rect><line x1="10" y1="9" x2="14" y2="9"></line><line x1="10" y1="15" x2="14" y2="15"></line></svg>`,
+      repair: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`,
+      'extract-images': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="13" height="13" rx="2"></rect><circle cx="7" cy="7" r="1.5"></circle><polyline points="15 10 11 6 4 13"></polyline><polyline points="15 15 21 21"></polyline><polyline points="16 21 21 21 21 16"></polyline></svg>`,
+      pdfa: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>`
     };
 
     return iconSvgs[id] || iconSvgs.edit;
@@ -367,14 +422,44 @@ export class LandingPage {
     const grid = this.container.querySelector('#landing-cards-grid');
     if (!grid) return;
 
+    const q = (this.searchQuery || '').trim().toLowerCase();
     const filtered = TOOLS_CATALOG.filter(tool => {
-      if (this.activeFilter === 'all') return true;
-      if (this.activeFilter === 'popular') return tool.popular;
-      return tool.category === this.activeFilter;
+      const matchesFilter = (this.activeFilter === 'all')
+        ? true
+        : (this.activeFilter === 'popular' ? tool.popular : tool.category === this.activeFilter);
+      if (!matchesFilter) return false;
+      if (!q) return true;
+      return tool.title.toLowerCase().includes(q) ||
+             tool.desc.toLowerCase().includes(q) ||
+             tool.id.toLowerCase().includes(q);
     });
 
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="landing-empty-tools">
+          <p>No tools found matching "<strong>${this.searchQuery}</strong>".</p>
+          <button class="btn btn-sm btn-outline" id="btn-reset-tool-filter">Show All Tools</button>
+        </div>
+      `;
+      const resetBtn = grid.querySelector('#btn-reset-tool-filter');
+      if (resetBtn) {
+        resetBtn.onclick = () => {
+          this.searchQuery = '';
+          const searchInput = this.container.querySelector('#landing-tool-search');
+          if (searchInput) searchInput.value = '';
+          const clearBtn = this.container.querySelector('#landing-search-clear');
+          if (clearBtn) clearBtn.style.display = 'none';
+          this.activeFilter = 'all';
+          const chips = this.container.querySelectorAll('.landing-filter-chip');
+          chips.forEach(c => c.classList.toggle('active', c.getAttribute('data-filter') === 'all'));
+          this.renderCards();
+        };
+      }
+      return;
+    }
+
     grid.innerHTML = filtered.map(tool => `
-      <div class="landing-tool-card" data-action="${tool.action}" data-tool-id="${tool.id}">
+      <div class="landing-tool-card" data-action="${tool.action}" data-tool-id="${tool.id}" style="--tool-accent: ${tool.color};">
         <div class="card-icon-badge" style="background: ${tool.color}15; color: ${tool.color};">
           ${this.getTwoToneIconSvg(tool.id, tool.color)}
         </div>
@@ -387,13 +472,32 @@ export class LandingPage {
     grid.querySelectorAll('.landing-tool-card').forEach(card => {
       card.onclick = () => {
         const action = card.getAttribute('data-action');
-        this.handleToolAction(action);
+        const toolId = card.getAttribute('data-tool-id');
+        this.handleToolAction(action, toolId);
       };
     });
   }
 
-  handleToolAction(action) {
-    // Switch to studio mode and trigger target action
+  handleToolAction(action, toolId = null) {
+    let matchedId = toolId;
+    if (!matchedId && action) {
+      const match = TOOLS_CATALOG.find(t => t.action === action);
+      if (match) matchedId = match.id;
+    }
+
+    // 1. If it's the core editor, open Studio Canvas directly
+    if (matchedId === 'edit' || action === 'tool:select') {
+      this.switchToStudio();
+      return;
+    }
+
+    // 2. If it's a dedicated workflow tool (Merge, Compress, Split, etc.), launch the dedicated tool workflow
+    if (matchedId && WORKFLOW_TOOLS_CONFIG[matchedId]) {
+      toolWorkflow.openTool(matchedId);
+      return;
+    }
+
+    // 3. Fallback to in-studio modal if opened from within editor context
     this.switchToStudio();
     setTimeout(() => {
       allToolsModal.dispatchToolAction(action);
@@ -460,6 +564,30 @@ export class LandingPage {
       };
     });
 
+    // Tool Search Input
+    const searchInput = this.container.querySelector('#landing-tool-search');
+    const searchClear = this.container.querySelector('#landing-search-clear');
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        this.searchQuery = e.target.value;
+        if (searchClear) {
+          searchClear.style.display = this.searchQuery ? 'block' : 'none';
+        }
+        this.renderCards();
+      };
+    }
+    if (searchClear) {
+      searchClear.onclick = () => {
+        if (searchInput) {
+          searchInput.value = '';
+          this.searchQuery = '';
+          searchClear.style.display = 'none';
+          this.renderCards();
+          searchInput.focus();
+        }
+      };
+    }
+
     // Theme toggle on landing header
     const themeBtn = this.container.querySelector('#btn-landing-theme');
     applyTheme(getPreferredTheme());
@@ -475,12 +603,13 @@ export class LandingPage {
     this.container.querySelectorAll('.landing-nav-link[data-tool]').forEach(btn => {
       btn.onclick = () => {
         const tool = btn.getAttribute('data-tool');
-        this.switchToStudio();
-        setTimeout(() => {
-          if (tool === 'merge') allToolsModal.dispatchToolAction('sidebar:merge');
-          else if (tool === 'split') allToolsModal.dispatchToolAction('modal:split');
-          else if (tool === 'compress') allToolsModal.dispatchToolAction('modal:compress');
-        }, 150);
+        if (WORKFLOW_TOOLS_CONFIG[tool]) {
+          toolWorkflow.openTool(tool);
+        } else if (tool === 'edit') {
+          this.switchToStudio();
+        } else {
+          this.handleToolAction(`modal:${tool}`, tool);
+        }
       };
     });
 
@@ -498,9 +627,13 @@ export class LandingPage {
       link.onclick = (e) => {
         e.preventDefault();
         const tool = link.getAttribute('data-tool');
-        const match = TOOLS_CATALOG.find(t => t.id === tool);
-        if (match) this.handleToolAction(match.action);
-        else this.switchToStudio();
+        if (WORKFLOW_TOOLS_CONFIG[tool]) {
+          toolWorkflow.openTool(tool);
+        } else {
+          const match = TOOLS_CATALOG.find(t => t.id === tool);
+          if (match) this.handleToolAction(match.action, match.id);
+          else this.switchToStudio();
+        }
       };
     });
   }
