@@ -18,6 +18,9 @@ import { flipModal } from './flip-modal.js';
 import { grayscaleModal } from './grayscale-modal.js';
 import { extractImagesModal } from './extract-images-modal.js';
 import { ocrModal } from './ocr-modal.js';
+import { compareModal } from './compare-modal.js';
+import { repairModal } from './repair-modal.js';
+import { pdfaModal } from './pdfa-modal.js';
 import { pdfEngine } from '../core/pdf-engine.js';
 import { downloadBlob } from '../utils/helpers.js';
 import { Toast } from './toast.js';
@@ -63,10 +66,14 @@ export const TOOLS_CATALOG = [
   { id: 'ocr-pdf', category: 'tools', title: "Let's OCR PDF", desc: 'Turn scanned documents into searchable, selectable text with client-side OCR', icon: 'file-text', color: '#6366f1', popular: true, action: 'modal:ocr' },
   { id: 'flatten', category: 'tools', title: "Let's Flatten Forms", desc: 'Bake interactive fillable AcroForm fields permanently into vectors', icon: 'layers', color: '#0d9488', action: 'action:flatten' },
 
+  { id: 'compare', category: 'tools', title: "Let's Compare PDF", desc: 'Side-by-side visual diff analysis, word insertion/deletion tracking & report', icon: 'shuffle', color: '#6366f1', popular: true, action: 'modal:compare' },
+  { id: 'repair', category: 'tools', title: "Let's Repair PDF", desc: 'Recover damaged and corrupted files, reconstruct broken xref tables and streams', icon: 'tool', color: '#ef4444', popular: true, action: 'modal:repair' },
+
   // Conversions
   { id: 'images-to-pdf', category: 'convert', title: "Let's Images to PDF", desc: 'Pack multiple JPG, PNG, and WebP images into a multi-page A4 PDF', icon: 'images', color: '#d97706', action: 'action:images-to-pdf' },
   { id: 'extract-images', category: 'convert', title: "Let's Extract Images", desc: 'Enumerate and export all embedded high-res JPEG and PNG images to ZIP', icon: 'image', color: '#ec4899', popular: true, action: 'modal:extract-images' },
-  { id: 'pdf-to-text', category: 'convert', title: "Let's Extract Text", desc: 'Decompress binary content streams and extract plain searchable text', icon: 'align-left', color: '#334155', action: 'action:extract-text' }
+  { id: 'pdf-to-text', category: 'convert', title: "Let's Extract Text", desc: 'Decompress binary content streams and extract plain searchable text', icon: 'align-left', color: '#334155', action: 'action:extract-text' },
+  { id: 'pdfa', category: 'convert', title: "Let's PDF to PDF/A", desc: 'Convert to ISO 19005-1 compliant PDF/A-1b archival standard with OutputIntents', icon: 'file-text', color: '#10b981', action: 'modal:pdfa' }
 ];
 
 export class AllToolsModal {
@@ -169,7 +176,8 @@ export class AllToolsModal {
       images: '<rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>',
       flip: '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path>',
       'circle-half': '<circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path>',
-      'align-left': '<line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line>'
+      'align-left': '<line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line>',
+      tool: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'
     };
 
     return `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${icons[icon] || icons.edit}</svg>`;
@@ -296,6 +304,12 @@ export class AllToolsModal {
       extractImagesModal.open();
     } else if (action === 'modal:ocr') {
       ocrModal.show();
+    } else if (action === 'modal:compare') {
+      compareModal.show();
+    } else if (action === 'modal:repair') {
+      repairModal.show();
+    } else if (action === 'modal:pdfa') {
+      pdfaModal.show();
     } else if (action === 'modal:security') {
       const btn = document.getElementById('btn-open-security');
       if (btn) btn.click();

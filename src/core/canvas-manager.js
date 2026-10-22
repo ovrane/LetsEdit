@@ -5,6 +5,8 @@
 import { pdfEngine } from './pdf-engine.js';
 import { store } from './state-store.js';
 import { uid } from '../utils/helpers.js';
+import { ResizeGizmo } from './canvas/resize-gizmo.js';
+import { EraserHandler } from './canvas/eraser.js';
 
 export class CanvasManager {
   constructor(container) {
@@ -530,143 +532,11 @@ export class CanvasManager {
   }
 
   attachResizeHandles(el, pageNum, ann) {
-    const directions = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
-    for (const dir of directions) {
-      const handle = document.createElement('div');
-      handle.className = `resize-handle handle-${dir}`;
-      handle.dataset.dir = dir;
-
-      handle.addEventListener('mousedown', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const origX = ann.x;
-        const origY = ann.y;
-        const origW = ann.width;
-        const origH = ann.height;
-
-        const refs = this.pageElements.get(pageNum);
-        if (!refs) return;
-        const w = refs.wrap.clientWidth;
-        const h = refs.wrap.clientHeight;
-
-        const onMouseMove = (moveEv) => {
-          const dx = (moveEv.clientX - startX) / w;
-          const dy = (moveEv.clientY - startY) / h;
-
-          let newX = origX;
-          let newY = origY;
-          let newW = origW;
-          let newH = origH;
-
-          if (dir.includes('e')) {
-            newW = Math.max(0.02, origW + dx);
-          }
-          if (dir.includes('w')) {
-            const possibleW = Math.max(0.02, origW - dx);
-            newX = origX + (origW - possibleW);
-            newW = possibleW;
-          }
-          if (dir.includes('s')) {
-            newH = Math.max(0.015, origH + dy);
-          }
-          if (dir.includes('n')) {
-            const possibleH = Math.max(0.015, origH - dy);
-            newY = origY + (origH - possibleH);
-            newH = possibleH;
-          }
-
-          ann.x = newX;
-          ann.y = newY;
-          ann.width = newW;
-          ann.height = newH;
-
-          el.style.left = `${ann.x * w}px`;
-          el.style.top = `${ann.y * h}px`;
-          el.style.width = `${ann.width * w}px`;
-          el.style.height = `${ann.height * h}px`;
-        };
-
-        const onMouseUp = () => {
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-          store.updateAnnotation(pageNum, ann.id, {
-            x: ann.x,
-            y: ann.y,
-            width: ann.width,
-            height: ann.height
-          });
-        };
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-      });
-
-      el.appendChild(handle);
-    }
+    ResizeGizmo.attachResizeHandles(el, pageNum, ann, this.pageElements, (p, a, e) => this.selectAnnotation(p, a, e));
   }
 
   makeDraggable(el, pageNum, ann) {
-    let startX, startY, origX, origY;
-
-    const onMouseDown = (e) => {
-      const state = store.getState();
-      // Allow dragging in select mode, text mode, or when interacting with an annotation
-      if (e.target.closest('.annot-delete-btn') || e.target.tagName === 'INPUT') return;
-
-      e.stopPropagation();
-      this.selectAnnotation(pageNum, ann, el);
-
-      startX = e.clientX;
-      startY = e.clientY;
-      origX = Number.isFinite(ann.x) ? ann.x : 0;
-      origY = Number.isFinite(ann.y) ? ann.y : 0;
-
-      const refs = this.pageElements.get(pageNum);
-      if (!refs) return;
-      const w = refs.wrap.clientWidth || 1;
-      const h = refs.wrap.clientHeight || 1;
-
-      // Ensure width/height fallback to element rendered bounding box
-      const annW = (Number.isFinite(ann.width) && ann.width > 0) ? ann.width : Math.max(0.04, el.offsetWidth / w);
-      const annH = (Number.isFinite(ann.height) && ann.height > 0) ? ann.height : Math.max(0.02, el.offsetHeight / h);
-
-      let hasMoved = false;
-
-      const onMouseMove = (moveEv) => {
-        const dx = (moveEv.clientX - startX) / w;
-        const dy = (moveEv.clientY - startY) / h;
-        if (Math.abs(moveEv.clientX - startX) > 2 || Math.abs(moveEv.clientY - startY) > 2) {
-          hasMoved = true;
-        }
-        ann.x = Math.max(0, Math.min(Math.max(0, 1 - annW), origX + dx));
-        ann.y = Math.max(0, Math.min(Math.max(0, 1 - annH), origY + dy));
-        ann.width = annW;
-        ann.height = annH;
-        el.style.left = `${ann.x * w}px`;
-        el.style.top = `${ann.y * h}px`;
-      };
-
-      const onMouseUp = () => {
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-        if (hasMoved) {
-          store.updateAnnotation(pageNum, ann.id, {
-            x: ann.x,
-            y: ann.y,
-            width: ann.width || annW,
-            height: ann.height || annH
-          });
-        }
-      };
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-    };
-
-    el.addEventListener('mousedown', onMouseDown);
+    ResizeGizmo.makeDraggable(el, pageNum, ann, this.pageElements, (p, a, e) => this.selectAnnotation(p, a, e));
   }
 
   bindPageEvents(pageNum, wrap, annotCanvas, domLayer) {
@@ -760,41 +630,7 @@ export class CanvasManager {
   }
 
   eraseAtPosition(pageNum, pos, wrap) {
-    const annotations = store.getAnnotations(pageNum);
-    if (!annotations || annotations.length === 0) return;
-
-    const eraseRadius = 22; // Pixel radius
-    const toRemove = [];
-
-    for (const ann of annotations) {
-      if (ann.type === 'drawing') {
-        if (!ann.points) continue;
-        for (const pt of ann.points) {
-          const dx = (pt.x - pos.normX) * wrap.clientWidth;
-          const dy = (pt.y - pos.normY) * wrap.clientHeight;
-          if (dx * dx + dy * dy <= eraseRadius * eraseRadius) {
-            toRemove.push(ann.id);
-            break;
-          }
-        }
-      } else if (['shape', 'whiteout', 'image', 'text', 'signature'].includes(ann.type)) {
-        const annLeft = ann.x * wrap.clientWidth;
-        const annTop = ann.y * wrap.clientHeight;
-        const annRight = annLeft + (ann.width * wrap.clientWidth);
-        const annBottom = annTop + (ann.height * wrap.clientHeight);
-
-        if (pos.px >= annLeft - eraseRadius &&
-            pos.px <= annRight + eraseRadius &&
-            pos.py >= annTop - eraseRadius &&
-            pos.py <= annBottom + eraseRadius) {
-          toRemove.push(ann.id);
-        }
-      }
-    }
-
-    if (toRemove.length > 0) {
-      toRemove.forEach(id => store.removeAnnotation(pageNum, id));
-    }
+    EraserHandler.eraseAtPosition(pageNum, pos, wrap);
   }
 
   promptNewText(pageNum, pos, wrap) {

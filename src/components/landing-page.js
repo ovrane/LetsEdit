@@ -73,6 +73,10 @@ export class LandingPage {
                   <span class="dropdown-item-title">Extract Images</span>
                   <span class="dropdown-item-desc">Extract embedded JPEG/PNGs</span>
                 </button>
+                <button class="landing-dropdown-item" data-action="modal:pdfa">
+                  <span class="dropdown-item-title">PDF to PDF/A</span>
+                  <span class="dropdown-item-desc">ISO 19005-1 compliance</span>
+                </button>
               </div>
             </div>
 
@@ -116,6 +120,8 @@ export class LandingPage {
                     <div class="mega-col-title">OPTIMIZE & SECURITY</div>
                     <button class="mega-item" data-action="modal:compress">Let's Compress PDF</button>
                     <button class="mega-item" data-action="modal:ocr">Let's OCR PDF</button>
+                    <button class="mega-item" data-action="modal:compare">Let's Compare PDF</button>
+                    <button class="mega-item" data-action="modal:repair">Let's Repair PDF</button>
                     <button class="mega-item" data-action="modal:security">Let's Protect & Encrypt</button>
                     <button class="mega-item" data-action="modal:watermark">Let's Watermark PDF</button>
                     <button class="mega-item" data-action="modal:grayscale">Let's Grayscale PDF</button>
@@ -128,6 +134,8 @@ export class LandingPage {
                   <div class="mega-column">
                     <div class="mega-col-title">CONVERT</div>
                     <button class="mega-item" data-action="modal:to-image">Let's Convert to JPG</button>
+                    <button class="mega-item" data-action="modal:extract-images">Let's Extract Images</button>
+                    <button class="mega-item" data-action="modal:pdfa">Let's PDF to PDF/A</button>
                     <button class="mega-item" data-action="action:images-to-pdf">Let's Images to PDF</button>
                     <button class="mega-item" data-action="action:extract-text">Let's Extract Text</button>
                   </div>
