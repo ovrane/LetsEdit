@@ -1,0 +1,156 @@
+import React, { useState, useEffect } from 'react';
+import { Sun, Moon, Undo2, Redo2, ZoomIn, ZoomOut, FolderOpen, Grid, ArrowLeft, Download } from 'lucide-react';
+import { getPreferredTheme, toggleTheme, applyTheme } from '../../utils/theme.js';
+import { store } from '../../core/state-store.js';
+import { allToolsModal } from '../../components/all-tools-modal.js';
+import { Toast } from '../../components/toast.js';
+
+export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
+  const [theme, setTheme] = useState(getPreferredTheme());
+  const [docTitle, setDocTitle] = useState('Sample_Document.pdf');
+  const [zoomLevel, setZoomLevel] = useState(100);
+
+  useEffect(() => {
+    const unsub = store.subscribe((state) => {
+      if (state.documentTitle) setDocTitle(state.documentTitle);
+      if (state.zoom) setZoomLevel(Math.round(state.zoom * 100));
+    });
+    return () => unsub();
+  }, []);
+
+  const handleToggleTheme = () => {
+    const next = toggleTheme();
+    setTheme(next);
+    Toast.info(`Switched to ${next === 'dark' ? 'Dark' : 'Light'} theme`);
+  };
+
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setDocTitle(newTitle);
+    store.setDocumentTitle(newTitle);
+  };
+
+  return (
+    <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 flex items-center justify-between z-30 transition-colors">
+      {/* Brand & Left Actions */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleMode}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition"
+          title={isStudioMode ? "Back to All Tools Home" : "Open Studio Editor"}
+        >
+          {isStudioMode ? (
+            <>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>All Tools</span>
+            </>
+          ) : (
+            <>
+              <Grid className="w-3.5 h-3.5" />
+              <span>Open Studio</span>
+            </>
+          )}
+        </button>
+
+        <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => onToggleMode(false)}>
+          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow-sm">
+            LE
+          </div>
+          <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white">
+            Lets<span className="text-blue-600 dark:text-blue-400">Edit</span>
+          </span>
+        </div>
+
+        {isStudioMode && (
+          <div className="hidden sm:flex items-center gap-2 ml-2 pl-3 border-l border-slate-200 dark:border-slate-800">
+            <input
+              type="text"
+              value={docTitle}
+              onChange={handleTitleChange}
+              className="text-xs font-medium bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-blue-500 rounded px-1.5 py-1 text-slate-800 dark:text-slate-200 outline-none max-w-[180px] truncate"
+              title="Click to rename document"
+            />
+            <button
+              onClick={onOpenPdf}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
+            >
+              <FolderOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Open</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Center Studio Controls (Undo, Redo, Zoom) */}
+      {isStudioMode && (
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
+          <button
+            onClick={() => store.undo()}
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => store.redo()}
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+            title="Redo (Ctrl+Y)"
+          >
+            <Redo2 className="w-4 h-4" />
+          </button>
+          <div className="w-[1px] h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
+          <button
+            onClick={() => store.setZoom(Math.max(0.5, (zoomLevel - 15) / 100))}
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"
+            title="Zoom Out"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 px-1 min-w-[42px] text-center select-none">
+            {zoomLevel}%
+          </span>
+          <button
+            onClick={() => store.setZoom(Math.min(2.5, (zoomLevel + 15) / 100))}
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"
+            title="Zoom In"
+          >
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Right Quick Links & CTAs */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => allToolsModal.show()}
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
+        >
+          <Grid className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span>All 34 Tools</span>
+        </button>
+
+        <button
+          onClick={handleToggleTheme}
+          className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-600" />
+          )}
+        </button>
+
+        {isStudioMode && (
+          <button
+            onClick={onExportPdf}
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 active:scale-95 transition"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export PDF</span>
+          </button>
+        )}
+      </div>
+    </header>
+  );
+}

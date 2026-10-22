@@ -16,6 +16,7 @@ import { nUpModal } from './nup-modal.js';
 import { pdfToImageModal } from './pdf-to-image-modal.js';
 import { flipModal } from './flip-modal.js';
 import { grayscaleModal } from './grayscale-modal.js';
+import { extractImagesModal } from './extract-images-modal.js';
 import { pdfEngine } from '../core/pdf-engine.js';
 import { downloadBlob } from '../utils/helpers.js';
 import { Toast } from './toast.js';
@@ -62,6 +63,7 @@ export const TOOLS_CATALOG = [
 
   // Conversions
   { id: 'images-to-pdf', category: 'convert', title: "Let's Images to PDF", desc: 'Pack multiple JPG, PNG, and WebP images into a multi-page A4 PDF', icon: 'images', color: '#d97706', action: 'action:images-to-pdf' },
+  { id: 'extract-images', category: 'convert', title: "Let's Extract Images", desc: 'Enumerate and export all embedded high-res JPEG and PNG images to ZIP', icon: 'image', color: '#ec4899', popular: true, action: 'modal:extract-images' },
   { id: 'pdf-to-text', category: 'convert', title: "Let's Extract Text", desc: 'Decompress binary content streams and extract plain searchable text', icon: 'align-left', color: '#334155', action: 'action:extract-text' }
 ];
 
@@ -288,6 +290,8 @@ export class AllToolsModal {
       grayscaleModal.show();
     } else if (action === 'modal:to-image') {
       pdfToImageModal.show();
+    } else if (action === 'modal:extract-images') {
+      extractImagesModal.open();
     } else if (action === 'modal:security') {
       const btn = document.getElementById('btn-open-security');
       if (btn) btn.click();

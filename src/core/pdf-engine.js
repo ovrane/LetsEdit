@@ -3,8 +3,8 @@
  */
 
 import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument, rgb, degrees, StandardFonts, PDFName, PDFArray } from 'pdf-lib';
-import { hexToRgb } from '../utils/helpers.js';
+import { PDFDocument, rgb, degrees, StandardFonts, PDFName, PDFArray, PDFRawStream, PDFStream } from 'pdf-lib';
+import { hexToRgb, uint8ArrayToBase64 } from '../utils/helpers.js';
 import { applyPdfEncryption } from './pdf-crypto.js';
 import { redactPageContentStreams, pdfHexToString, decompressStreamBytes } from './pdf-redactor.js';
 
@@ -880,6 +880,109 @@ export class PdfEngine {
     const ctx = canvas.getContext('2d');
     await page.render({ canvasContext: ctx, viewport }).promise;
     return new Promise(resolve => canvas.toBlob(resolve, format, 0.95));
+  }
+
+  /**
+   * Extracts all embedded image objects (JPEG, PNG, JPX, raster) from a PDF.
+   * @param {Uint8Array|ArrayBuffer} [pdfBytes]
+   * @returns {Promise<Array<{ id: string, name: string, width: number, height: number, bytes: Uint8Array, mimeType: string, extension: string, dataUrl: string, sizeBytes: number }>>}
+   */
+  async extractImages(pdfBytes = null) {
+    const bytesToUse = pdfBytes || this.rawBytes;
+    if (!bytesToUse) throw new Error('No PDF loaded to extract images from');
+
+    const doc = await PDFDocument.load(bytesToUse, { ignoreEncryption: true });
+    const extracted = [];
+    const context = doc.context;
+    const indirectObjects = context.enumerateIndirectObjects();
+
+    let imageIndex = 1;
+    for (const [ref, obj] of indirectObjects) {
+      if (!obj || !(obj instanceof PDFRawStream || obj instanceof PDFStream)) continue;
+      const dict = obj.dict;
+      if (!dict) continue;
+
+      const subtype = dict.get(PDFName.of('Subtype'))?.toString();
+      if (subtype !== '/Image') continue;
+
+      const width = dict.get(PDFName.of('Width'))?.asNumber?.() || 0;
+      const height = dict.get(PDFName.of('Height'))?.asNumber?.() || 0;
+      const filter = dict.get(PDFName.of('Filter'))?.toString() || '';
+
+      const rawBytes = obj.contents;
+      if (!rawBytes || rawBytes.length === 0) continue;
+
+      let mimeType = 'image/jpeg';
+      let extension = 'jpg';
+      let dataUrl = null;
+
+      if (filter.includes('DCTDecode')) {
+        mimeType = 'image/jpeg';
+        extension = 'jpg';
+        dataUrl = `data:image/jpeg;base64,${uint8ArrayToBase64(rawBytes)}`;
+      } else if (filter.includes('JPXDecode')) {
+        mimeType = 'image/jp2';
+        extension = 'jp2';
+        dataUrl = `data:image/jp2;base64,${uint8ArrayToBase64(rawBytes)}`;
+      } else {
+        // FlateDecode or uncompressed raster
+        try {
+          const decompressed = await decompressStreamBytes(rawBytes);
+          if (typeof document !== 'undefined' && width > 0 && height > 0) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(width, height);
+            const data = imgData.data;
+
+            if (decompressed.length === width * height * 4) {
+              data.set(decompressed);
+            } else if (decompressed.length === width * height * 3) {
+              for (let i = 0, j = 0; i < decompressed.length; i += 3, j += 4) {
+                data[j] = decompressed[i];
+                data[j + 1] = decompressed[i + 1];
+                data[j + 2] = decompressed[i + 2];
+                data[j + 3] = 255;
+              }
+            } else if (decompressed.length >= width * height) {
+              for (let i = 0, j = 0; i < width * height; i++, j += 4) {
+                const g = decompressed[i];
+                data[j] = g;
+                data[j + 1] = g;
+                data[j + 2] = g;
+                data[j + 3] = 255;
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            dataUrl = canvas.toDataURL('image/png');
+            mimeType = 'image/png';
+            extension = 'png';
+          }
+        } catch (e) {
+          // Fallback if decompression fails
+        }
+      }
+
+      if (!dataUrl && rawBytes) {
+        dataUrl = `data:${mimeType};base64,${uint8ArrayToBase64(rawBytes)}`;
+      }
+
+      extracted.push({
+        id: `img_${imageIndex}`,
+        name: `image_${imageIndex}.${extension}`,
+        width,
+        height,
+        bytes: rawBytes,
+        mimeType,
+        extension,
+        dataUrl,
+        sizeBytes: rawBytes.length
+      });
+      imageIndex++;
+    }
+
+    return extracted;
   }
 
   /**

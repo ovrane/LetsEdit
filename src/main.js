@@ -26,6 +26,7 @@ import { resizeModal } from './components/resize-modal.js';
 import { compressModal } from './components/compress-modal.js';
 import { flipModal } from './components/flip-modal.js';
 import { grayscaleModal } from './components/grayscale-modal.js';
+import { extractImagesModal } from './components/extract-images-modal.js';
 import { allToolsModal } from './components/all-tools-modal.js';
 import { landingPage } from './components/landing-page.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
@@ -263,6 +264,9 @@ class App {
 
     const toImageBtn = document.getElementById('btn-open-to-image');
     if (toImageBtn) toImageBtn.onclick = () => pdfToImageModal.show();
+
+    const extractImagesBtn = document.getElementById('btn-open-extract-images');
+    if (extractImagesBtn) extractImagesBtn.onclick = () => extractImagesModal.open();
 
     const resizeBtn = document.getElementById('btn-open-resize');
     if (resizeBtn) resizeBtn.onclick = () => resizeModal.show();

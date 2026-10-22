@@ -529,6 +529,27 @@ describe('PDF Vector Export & Feature Tests', () => {
     const contents = p1.node.Contents();
     assert(contents !== null && contents !== undefined);
   });
+
+  test('extractImages extracts embedded image objects from PDF', async () => {
+    // 1. Create a PDF with an embedded PNG image
+    const testDoc = await PDFDocument.create();
+    const page = testDoc.addPage([400, 400]);
+    // 1x1 red PNG base64
+    const pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+    const pngBytes = Uint8Array.from(Buffer.from(pngBase64, 'base64'));
+    const embeddedImg = await testDoc.embedPng(pngBytes);
+    page.drawImage(embeddedImg, { x: 50, y: 50, width: 100, height: 100 });
+    const pdfWithImgBytes = await testDoc.save();
+
+    // 2. Extract embedded images
+    const images = await pdfEngine.extractImages(pdfWithImgBytes);
+    assert(Array.isArray(images), 'Extracted images should be an array');
+    assert(images.length >= 1, 'Should find at least 1 embedded image');
+    assert.strictEqual(images[0].width, 1);
+    assert.strictEqual(images[0].height, 1);
+    assert(images[0].bytes.byteLength > 0);
+    assert(images[0].name.startsWith('image_'));
+  });
 });
 
 

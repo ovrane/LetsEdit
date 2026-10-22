@@ -46,14 +46,14 @@ export class LandingPage {
 
           <!-- Desktop Quick Links (iLovePDF Style) -->
           <nav class="landing-desktop-nav">
-            <button class="landing-nav-link" data-tool="merge">LET'S MERGE</button>
-            <button class="landing-nav-link" data-tool="split">LET'S SPLIT</button>
-            <button class="landing-nav-link" data-tool="compress">LET'S COMPRESS</button>
+            <button class="landing-nav-link" data-tool="merge">Merge PDF</button>
+            <button class="landing-nav-link" data-tool="split">Split PDF</button>
+            <button class="landing-nav-link" data-tool="compress">Compress PDF</button>
 
             <!-- Convert Dropdown -->
             <div class="landing-dropdown">
               <button class="landing-nav-link dropdown-toggle">
-                <span>LET'S CONVERT</span>
+                <span>Convert PDF</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </button>
               <div class="landing-dropdown-menu">
@@ -69,13 +69,17 @@ export class LandingPage {
                   <span class="dropdown-item-title">PDF to Text</span>
                   <span class="dropdown-item-desc">Extract plain text</span>
                 </button>
+                <button class="landing-dropdown-item" data-action="modal:extract-images">
+                  <span class="dropdown-item-title">Extract Images</span>
+                  <span class="dropdown-item-desc">Extract embedded JPEG/PNGs</span>
+                </button>
               </div>
             </div>
 
             <!-- Sejda-Style Mega Menu Trigger -->
             <div class="landing-dropdown mega-dropdown">
               <button class="landing-nav-link dropdown-toggle" id="btn-landing-mega-menu">
-                <span>ALL PDF TOOLS</span>
+                <span>All PDF tools</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </button>
               <div class="landing-mega-menu-content" id="landing-mega-menu">
@@ -449,33 +453,14 @@ export class LandingPage {
 
     // Theme toggle on landing header
     const themeBtn = this.container.querySelector('#btn-landing-theme');
-    const sunIcon = this.container.querySelector('#landing-theme-sun');
-    const moonIcon = this.container.querySelector('#landing-theme-moon');
+    applyTheme(getPreferredTheme());
 
-    const updateLandingTheme = (theme) => {
-      if (theme === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.documentElement.setAttribute('data-theme', 'dark');
-        if (sunIcon) sunIcon.style.display = 'block';
-        if (moonIcon) moonIcon.style.display = 'none';
-      } else {
-        document.body.classList.remove('dark-mode');
-        document.documentElement.removeAttribute('data-theme');
-        if (sunIcon) sunIcon.style.display = 'none';
-        if (moonIcon) moonIcon.style.display = 'block';
-      }
-    };
-
-    const savedTheme = localStorage.getItem('pdf_editor_theme') || 'light';
-    updateLandingTheme(savedTheme);
-
-    themeBtn.onclick = () => {
-      const isDark = document.body.classList.contains('dark-mode');
-      const nextTheme = isDark ? 'light' : 'dark';
-      localStorage.setItem('pdf_editor_theme', nextTheme);
-      updateLandingTheme(nextTheme);
-      Toast.info(`Switched to ${nextTheme === 'dark' ? 'Dark' : 'Light'} theme`);
-    };
+    if (themeBtn) {
+      themeBtn.onclick = () => {
+        const nextTheme = toggleTheme();
+        Toast.info(`Switched to ${nextTheme === 'dark' ? 'Dark' : 'Light'} theme`);
+      };
+    }
 
     // Navbar quick links
     this.container.querySelectorAll('.landing-nav-link[data-tool]').forEach(btn => {
