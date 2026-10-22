@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Undo2, Redo2, ZoomIn, ZoomOut, FolderOpen, Grid, ArrowLeft, Download } from 'lucide-react';
-import { getPreferredTheme, toggleTheme, applyTheme } from '../../utils/theme.js';
+import { Undo2, Redo2, ZoomIn, ZoomOut, FolderOpen, Grid, ArrowLeft, Download } from 'lucide-react';
 import { store } from '../../core/state-store.js';
 import { allToolsModal } from '../../components/all-tools-modal.js';
 import { Toast } from '../../components/toast.js';
 
 export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
-  const [theme, setTheme] = useState(getPreferredTheme());
   const [docTitle, setDocTitle] = useState('Sample_Document.pdf');
   const [zoomLevel, setZoomLevel] = useState(100);
 
@@ -17,12 +15,6 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
     });
     return () => unsub();
   }, []);
-
-  const handleToggleTheme = () => {
-    const next = toggleTheme();
-    setTheme(next);
-    Toast.info(`Switched to ${next === 'dark' ? 'Dark' : 'Light'} theme`);
-  };
 
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
@@ -124,17 +116,6 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
           <span>All 34 Tools</span>
         </button>
 
-        <button
-          onClick={handleToggleTheme}
-          className="p-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
-          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-        >
-          {theme === 'dark' ? (
-            <Sun className="w-4 h-4 text-amber-400" />
-          ) : (
-            <Moon className="w-4 h-4 text-slate-600" />
-          )}
-        </button>
 
         {isStudioMode && (
           <button

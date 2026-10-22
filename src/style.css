@@ -898,6 +898,61 @@ body:not(.sidebar-open) .app-sidebar {
   border: 1px dashed #cbd5e1;
 }
 
+/* Link Hotspot Annotation */
+.annot-link-hotspot {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1.5px dashed #2563eb !important;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  overflow: visible;
+}
+
+.annot-link-hotspot:hover {
+  background: rgba(37, 99, 235, 0.18);
+  border-color: #1d4ed8 !important;
+}
+
+.annot-link-badge {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 12;
+}
+
+.annot-link-badge:hover {
+  background: #2563eb;
+}
+
+.form-field-select {
+  width: 100%;
+  height: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  font-size: 12px;
+  color: var(--text-color);
+  outline: none;
+  cursor: pointer;
+}
+
 .annot-delete-btn {
   position: absolute;
   top: -10px;
@@ -1849,7 +1904,8 @@ body.show-tool-workflow .tool-workflow-container {
   z-index: 1050;
 }
 
-.landing-dropdown:hover .landing-dropdown-menu {
+.landing-dropdown:hover .landing-dropdown-menu,
+.landing-dropdown.open .landing-dropdown-menu {
   display: flex;
 }
 
@@ -1896,7 +1952,8 @@ body.show-tool-workflow .tool-workflow-container {
   z-index: 1050;
 }
 
-.mega-dropdown:hover .landing-mega-menu-content {
+.mega-dropdown:hover .landing-mega-menu-content,
+.mega-dropdown.open .landing-mega-menu-content {
   display: block;
 }
 
@@ -2007,16 +2064,16 @@ body.show-tool-workflow .tool-workflow-container {
   margin: 0 auto 36px;
 }
 
-/* Hero Dropzone Card */
+/* Hero Dropzone Card - Compact & Professional */
 .hero-dropzone-card {
-  max-width: 620px;
-  margin: 0 auto 36px;
+  max-width: 500px;
+  margin: 0 auto 24px;
   background-color: var(--bg-surface);
-  border: 2px dashed var(--border-strong);
-  border-radius: 24px;
-  padding: 38px 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2026,33 +2083,33 @@ body.show-tool-workflow .tool-workflow-container {
 .hero-dropzone-card.drag-over {
   border-color: var(--primary);
   background-color: var(--primary-light);
-  transform: translateY(-3px);
-  box-shadow: 0 16px 36px -8px rgba(37, 99, 235, 0.18), 0 4px 14px rgba(15, 23, 42, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.14), 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .dropzone-icon-circle {
-  width: 58px;
-  height: 58px;
-  border-radius: 16px;
-  background-color: rgba(37, 99, 235, 0.1);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: rgba(37, 99, 235, 0.08);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 18px;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-bottom: 12px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .hero-dropzone-card:hover .dropzone-icon-circle {
-  transform: scale(1.1);
+  transform: scale(1.06);
 }
 
 .dropzone-cta-btn {
-  font-size: 15.5px;
-  font-weight: 700;
-  padding: 13px 36px;
-  border-radius: 9999px;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 11px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2061,7 +2118,7 @@ body.show-tool-workflow .tool-workflow-container {
 
 .dropzone-cta-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .dropzone-cta-btn:active {
@@ -2069,9 +2126,9 @@ body.show-tool-workflow .tool-workflow-container {
 }
 
 .dropzone-subtext {
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: var(--text-muted);
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .dropzone-badges {
@@ -2361,11 +2418,7 @@ body.show-tool-workflow .tool-workflow-container {
   overflow: hidden;
 }
 
-.landing-tool-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(37, 99, 235, 0.4);
-  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.14), 0 4px 12px rgba(15, 23, 42, 0.05);
-}
+
 
 .card-icon-badge {
   width: 44px;
@@ -2378,9 +2431,7 @@ body.show-tool-workflow .tool-workflow-container {
   transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.landing-tool-card:hover .card-icon-badge {
-  transform: scale(1.1) translateY(-2px);
-}
+
 
 .card-title {
   font-size: 16px;
@@ -2645,12 +2696,12 @@ body.show-tool-workflow .tool-workflow-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px;
+  padding: 24px 20px;
 }
 
 .workflow-hero-card {
   width: 100%;
-  max-width: 680px;
+  max-width: 500px;
   margin: 0 auto;
   text-align: center;
   display: flex;
@@ -2659,89 +2710,90 @@ body.show-tool-workflow .tool-workflow-container {
 }
 
 .workflow-tool-badge {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   box-shadow: var(--shadow-sm);
 }
 
 .workflow-title {
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--text-main);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  line-height: 1.25;
 }
 
 .workflow-subtitle {
-  font-size: 16px;
+  font-size: 13.5px;
   color: var(--text-muted);
-  max-width: 520px;
-  line-height: 1.5;
-  margin-bottom: 32px;
+  max-width: 440px;
+  line-height: 1.45;
+  margin-bottom: 20px;
 }
 
 .workflow-dropzone {
   width: 100%;
   background: var(--bg-surface);
-  border: 2.5px dashed var(--border-strong);
-  border-radius: 20px;
-  padding: 48px 32px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 14px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
 }
 
 .workflow-dropzone:hover,
 .workflow-dropzone.drag-active {
   border-color: var(--zone-color, #2563eb);
-  background: rgba(37, 99, 235, 0.03);
+  background: rgba(37, 99, 235, 0.02);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.12);
 }
 
 .dropzone-icon-ring {
-  width: 72px;
-  height: 72px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .workflow-primary-cta {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px 36px;
-  font-size: 17px;
-  font-weight: 700;
+  gap: 8px;
+  padding: 11px 28px;
+  font-size: 14.5px;
+  font-weight: 600;
   color: #ffffff;
   border: none;
-  border-radius: 9999px;
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .workflow-primary-cta:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.08);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
 .workflow-droptxt {
-  font-size: 14px;
+  font-size: 12.5px;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -3491,53 +3543,53 @@ body.show-tool-workflow .tool-options-sidebar {
    ========================================================================== */
 
 .editor-upload-card {
-  max-width: 620px;
+  max-width: 480px;
   width: 100%;
-  margin: 60px auto;
+  margin: 32px auto;
   background: var(--bg-card);
-  border: 2px dashed var(--border-subtle);
-  border-radius: 20px;
-  padding: 48px 36px;
+  border: 1.5px dashed var(--border-subtle);
+  border-radius: 14px;
+  padding: 26px 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .editor-upload-card.drag-over {
   border-color: var(--primary);
-  background-color: rgba(37, 99, 235, 0.04);
-  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
+  background-color: rgba(37, 99, 235, 0.03);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 .editor-upload-icon-circle {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  background: rgba(37, 99, 235, 0.09);
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.08);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .editor-upload-title {
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
   color: var(--text-main);
   letter-spacing: -0.02em;
 }
 
 .editor-upload-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
-  max-width: 460px;
-  line-height: 1.5;
-  margin-bottom: 28px;
+  max-width: 420px;
+  line-height: 1.45;
+  margin-bottom: 18px;
 }
 
 .editor-upload-actions {
@@ -3703,3 +3755,150 @@ body.show-tool-workflow .editor-paging-bar {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 2px var(--primary) !important;
 }
+
+/* Floating Contextual Bubble Toolbar */
+.annot-bubble-toolbar {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 3px 8px;
+  box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.3), 0 3px 8px rgba(0, 0, 0, 0.15);
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 120;
+  pointer-events: auto;
+  white-space: nowrap;
+  user-select: none;
+  font-size: 11px;
+  animation: bubbleFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bubbleFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.bubble-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.bubble-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.bubble-btn-step {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bubble-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+}
+
+.bubble-text-val {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 3px;
+  color: #e2e8f0;
+}
+
+.bubble-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.bubble-color-dot:hover {
+  transform: scale(1.15);
+}
+
+.bubble-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 1px;
+}
+
+/* Sejda Autosave Session Recovery Banner */
+.recovery-alert-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--bg-card);
+  color: var(--text-color);
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid var(--primary);
+  z-index: 9999;
+  animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 90vw;
+}
+
+.recovery-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.recovery-alert-content svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.recovery-alert-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+

@@ -12,6 +12,7 @@ import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from '../utils/theme.js';
 import { toolWorkflow, WORKFLOW_TOOLS_CONFIG } from './tool-workflow.js';
 import { authModal } from './auth-modal.js';
+import { router } from '../core/router.js';
 
 export class LandingPage {
   constructor() {
@@ -28,7 +29,6 @@ export class LandingPage {
   }
 
   init() {
-    this.container = document.createElement('div');
     this.container = document.createElement('div');
     this.container.id = 'landing-view';
     this.container.className = 'landing-view-container';
@@ -57,18 +57,34 @@ export class LandingPage {
 
             <!-- Convert Dropdown -->
             <div class="landing-dropdown">
-              <button class="landing-nav-link dropdown-toggle">
+              <button class="landing-nav-link dropdown-toggle" id="btn-convert-dropdown">
                 <span>Convert PDF</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </button>
               <div class="landing-dropdown-menu">
-                <button class="landing-dropdown-item" data-action="workflow:images-to-pdf">
-                  <span class="dropdown-item-title">Images to PDF</span>
-                  <span class="dropdown-item-desc">Convert JPG/PNG to PDF</span>
+                <button class="landing-dropdown-item" data-action="workflow:pdf-to-word">
+                  <span class="dropdown-item-title">PDF to Word</span>
+                  <span class="dropdown-item-desc">Convert PDF to editable DOCX</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:pdf-to-excel">
+                  <span class="dropdown-item-title">PDF to Excel</span>
+                  <span class="dropdown-item-desc">Extract tables to CSV / XLS</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:pdf-to-ppt">
+                  <span class="dropdown-item-title">PDF to PowerPoint</span>
+                  <span class="dropdown-item-desc">Convert pages to PPT slides</span>
                 </button>
                 <button class="landing-dropdown-item" data-action="workflow:to-image">
                   <span class="dropdown-item-title">PDF to JPG / PNG</span>
                   <span class="dropdown-item-desc">Extract pages as images</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:word-to-pdf">
+                  <span class="dropdown-item-title">Word to PDF</span>
+                  <span class="dropdown-item-desc">Convert DOCX to PDF</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:images-to-pdf">
+                  <span class="dropdown-item-title">Images to PDF</span>
+                  <span class="dropdown-item-desc">Convert JPG/PNG to PDF</span>
                 </button>
                 <button class="landing-dropdown-item" data-action="workflow:pdf-to-text">
                   <span class="dropdown-item-title">PDF to Text</span>
@@ -86,10 +102,6 @@ export class LandingPage {
                   <span class="dropdown-item-title">HTML to PDF</span>
                   <span class="dropdown-item-desc">Convert HTML or code to PDF</span>
                 </button>
-                <button class="landing-dropdown-item" data-action="workflow:word-to-pdf">
-                  <span class="dropdown-item-title">Word to PDF</span>
-                  <span class="dropdown-item-desc">Convert DOCX to PDF</span>
-                </button>
               </div>
             </div>
 
@@ -105,8 +117,9 @@ export class LandingPage {
                     <div class="mega-col-title">ORGANIZE & PAGES</div>
                     <button class="mega-item" data-action="workflow:split">Let's Split Pages</button>
                     <button class="mega-item" data-action="workflow:merge">Let's Merge PDF</button>
-                    <button class="mega-item" data-action="sidebar:delete">Let's Delete Pages</button>
                     <button class="mega-item" data-action="workflow:organize">Let's Organize Pages</button>
+                    <button class="mega-item" data-action="workflow:organize">Let's Delete Pages</button>
+                    <button class="mega-item" data-action="workflow:extract-pages">Let's Extract Pages</button>
                     <button class="mega-item" data-action="workflow:deskew">Let's Deskew Scans</button>
                     <button class="mega-item" data-action="workflow:split-half">Let's Split in Half</button>
                     <button class="mega-item" data-action="workflow:alternate-mix">Let's Alternate & Mix</button>
@@ -120,7 +133,7 @@ export class LandingPage {
                     <div class="mega-col-title">EDIT & SIGN</div>
                     <button class="mega-item" data-action="tool:select">Let's Edit PDF</button>
                     <button class="mega-item" data-action="tool:text">Let's Add & Edit Text</button>
-                    <button class="mega-item" data-action="tool:sign">Let's Fill & Sign</button>
+                    <button class="mega-item" data-action="workflow:sign">Let's Fill & Sign</button>
                     <button class="mega-item" data-action="tool:form">Let's Create Form Fields</button>
                     <button class="mega-item" data-action="tool:image">Let's Add Stamps</button>
                     <button class="mega-item" data-action="tool:whiteout">Let's Redact & Whiteout</button>
@@ -137,16 +150,21 @@ export class LandingPage {
                     <button class="mega-item" data-action="workflow:compare">Let's Compare PDF</button>
                     <button class="mega-item" data-action="workflow:repair">Let's Repair PDF</button>
                     <button class="mega-item" data-action="workflow:security">Let's Protect & Encrypt</button>
+                    <button class="mega-item" data-action="workflow:unlock">Let's Unlock PDF</button>
                     <button class="mega-item" data-action="workflow:watermark">Let's Watermark PDF</button>
                     <button class="mega-item" data-action="workflow:grayscale">Let's Grayscale PDF</button>
-                    <button class="mega-item" data-action="modal:pagenumbers">Let's Number Pages</button>
+                    <button class="mega-item" data-action="workflow:pagenumbers">Let's Number Pages</button>
                     <button class="mega-item" data-action="workflow:bates">Let's Bates Number</button>
                     <button class="mega-item" data-action="modal:metadata">Let's Edit Metadata</button>
-                    <button class="mega-item" data-action="action:flatten">Let's Flatten Forms</button>
+                    <button class="mega-item" data-action="workflow:flatten">Let's Flatten Forms</button>
+                    <button class="mega-item" data-action="workflow:remove-annotations">Let's Clean Annotations</button>
                   </div>
 
                   <div class="mega-column">
                     <div class="mega-col-title">CONVERT</div>
+                    <button class="mega-item" data-action="workflow:pdf-to-word">Let's PDF to Word</button>
+                    <button class="mega-item" data-action="workflow:pdf-to-excel">Let's PDF to Excel</button>
+                    <button class="mega-item" data-action="workflow:pdf-to-ppt">Let's PDF to PowerPoint</button>
                     <button class="mega-item" data-action="workflow:to-image">Let's Convert to JPG</button>
                     <button class="mega-item" data-action="workflow:extract-images">Let's Extract Images</button>
                     <button class="mega-item" data-action="workflow:pdfa">Let's PDF to PDF/A</button>
@@ -162,15 +180,12 @@ export class LandingPage {
 
           <!-- Right Header CTAs -->
           <div class="landing-header-right">
-            <button class="icon-btn" id="btn-landing-theme" title="Toggle Light / Dark Mode">
-              <svg id="landing-theme-sun" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
-              <svg id="landing-theme-moon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
-            </button>
-            <div class="user-account-wrapper" id="landing-account-wrapper">
+            <div class="user-account-wrapper" id="landing-account-wrapper" style="display: flex; align-items: center; gap: 8px;">
               <button class="btn btn-outline btn-sm user-account-btn" id="btn-landing-auth">
                 <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span class="user-name-label">Log in</span>
               </button>
+              <button class="btn btn-primary btn-sm" id="btn-landing-signup" style="padding: 6px 14px; font-weight: 600; font-size: 13px;">Sign up</button>
             </div>
           </div>
         </div>
@@ -515,7 +530,6 @@ export class LandingPage {
             <h3 class="landing-category-title">${cat.name}</h3>
             <span class="landing-category-desc">${cat.desc}</span>
           </div>
-          <span class="landing-category-count">${cat.tools.length} tools</span>
         </div>
         <div class="landing-cards-grid">
           ${cat.tools.map(tool => this.renderSingleCardHtml(tool)).join('')}
@@ -536,7 +550,7 @@ export class LandingPage {
     });
   }
 
-  handleToolAction(action, toolId = null) {
+  async handleToolAction(action, toolId = null) {
     let matchedId = toolId;
     if (!matchedId && action) {
       const match = TOOLS_CATALOG.find(t => t.action === action);
@@ -546,23 +560,42 @@ export class LandingPage {
     // 1. Direct workflow action prefix
     if (action && action.startsWith('workflow:')) {
       const toolKey = action.replace('workflow:', '');
-      toolWorkflow.openTool(toolKey);
+      router.navigate(router.getCanonicalPath(toolKey));
       return;
     }
 
-    // 2. If it's the core editor, open Studio Canvas directly
-    if (matchedId === 'edit' || action === 'tool:select') {
-      this.switchToStudio();
-      return;
-    }
-
-    // 3. If it's a dedicated workflow tool (Merge, Compress, Split, etc.), launch the dedicated tool workflow
+    // 2. If it's a dedicated workflow tool (Merge, Compress, Split, etc.), launch the dedicated tool workflow
     if (matchedId && WORKFLOW_TOOLS_CONFIG[matchedId]) {
-      toolWorkflow.openTool(matchedId);
+      router.navigate(router.getCanonicalPath(matchedId));
       return;
     }
 
-    // 4. Fallback to in-studio modal if opened from within editor context
+    // 3. Delete pages routes to interactive page organizer
+    if (matchedId === 'delete' || action === 'sidebar:delete') {
+      router.navigate('/organize_pdf');
+      return;
+    }
+
+    // 4. Ensure document is loaded if entering the editor / in-studio tools
+    if (!store.getState().pdfBytes) {
+      try {
+        const sampleBytes = await pdfEngine.createSamplePdf();
+        const info = await pdfEngine.loadPdf(sampleBytes);
+        store.setDocument(sampleBytes, 'Untitled_Document.pdf', info.numPages);
+        const filenameEl = document.getElementById('current-filename');
+        if (filenameEl) filenameEl.textContent = 'Untitled_Document.pdf';
+      } catch (e) {
+        console.warn('Auto-seed sample document error:', e);
+      }
+    }
+
+    // 5. If it's the core editor, open Studio Canvas directly
+    if (matchedId === 'edit' || action === 'tool:select') {
+      router.navigate('/edit_pdf');
+      return;
+    }
+
+    // 6. Fallback to in-studio modal if opened from within editor context
     this.switchToStudio();
     setTimeout(() => {
       allToolsModal.dispatchToolAction(action);
@@ -582,8 +615,10 @@ export class LandingPage {
     // File input change
     fileInput.onchange = async (e) => {
       const file = e.target.files[0];
-      if (file && file.type === 'application/pdf') {
+      if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
         await this.loadSelectedFile(file);
+      } else if (file) {
+        Toast.error('Please select a valid PDF document');
       }
       fileInput.value = '';
     };
@@ -600,17 +635,28 @@ export class LandingPage {
       e.preventDefault();
       dropzone.classList.remove('drag-over');
       const file = e.dataTransfer.files[0];
-      if (file && file.type === 'application/pdf') {
+      if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
         await this.loadSelectedFile(file);
       } else {
         Toast.error('Please drop a valid PDF document');
       }
     };
 
-    // Edit Sample Document button
-    sampleBtn.onclick = () => {
-      this.switchToStudio();
-      Toast.info('Editing sample document');
+    // Edit Sample Document button (creates and seeds interactive PDF)
+    sampleBtn.onclick = async () => {
+      try {
+        Toast.info('Creating interactive sample document...');
+        const sampleBytes = await pdfEngine.createSamplePdf();
+        const info = await pdfEngine.loadPdf(sampleBytes);
+        store.setDocument(sampleBytes, 'Sample_Interactive_Document.pdf', info.numPages);
+        const filenameEl = document.getElementById('current-filename');
+        if (filenameEl) filenameEl.textContent = 'Sample_Interactive_Document.pdf';
+        this.switchToStudio();
+        Toast.success('Sample document loaded! Ready to edit.');
+      } catch (err) {
+        console.error('Failed to generate sample PDF:', err);
+        this.switchToStudio();
+      }
     };
 
     // Open Studio button in header (if present)
@@ -655,16 +701,7 @@ export class LandingPage {
       };
     }
 
-    // Theme toggle on landing header
-    const themeBtn = this.container.querySelector('#btn-landing-theme');
     applyTheme(getPreferredTheme());
-
-    if (themeBtn) {
-      themeBtn.onclick = () => {
-        const nextTheme = toggleTheme();
-        Toast.info(`Switched to ${nextTheme === 'dark' ? 'Dark' : 'Light'} theme`);
-      };
-    }
 
     // User auth button & popover on landing header
     const landingAuthBtn = this.container.querySelector('#btn-landing-auth');
@@ -674,16 +711,61 @@ export class LandingPage {
         authModal.toggleAccountMenu(landingAuthBtn);
       };
     }
+
+    const landingSignupBtn = this.container.querySelector('#btn-landing-signup');
+    if (landingSignupBtn) {
+      landingSignupBtn.onclick = (e) => {
+        e.stopPropagation();
+        authModal.open('register');
+      };
+    }
     authModal.updateAllUserWidgets(store.getState().user);
+
+    // Convert dropdown toggle on click / tap
+    const convertBtn = this.container.querySelector('#btn-convert-dropdown');
+    const convertDropdown = convertBtn?.closest('.landing-dropdown');
+    if (convertBtn && convertDropdown) {
+      convertBtn.onclick = (e) => {
+        e.stopPropagation();
+        convertDropdown.classList.toggle('open');
+      };
+    }
+
+    // Mega menu dropdown toggle on click / tap
+    const megaBtn = this.container.querySelector('#btn-landing-mega-menu');
+    const megaDropdown = megaBtn?.closest('.mega-dropdown');
+    if (megaBtn && megaDropdown) {
+      megaBtn.onclick = (e) => {
+        e.stopPropagation();
+        megaDropdown.classList.toggle('open');
+      };
+    }
+
+    // Close any open navigation dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (convertDropdown && !convertDropdown.contains(e.target)) {
+        convertDropdown.classList.remove('open');
+      }
+      if (megaDropdown && !megaDropdown.contains(e.target)) {
+        megaDropdown.classList.remove('open');
+      }
+    });
+
+    // Brand logo returns to landing
+    const brandLogo = this.container.querySelector('#landing-brand-logo');
+    if (brandLogo) {
+      brandLogo.style.cursor = 'pointer';
+      brandLogo.onclick = () => router.navigate('/');
+    }
 
     // Navbar quick links
     this.container.querySelectorAll('.landing-nav-link[data-tool]').forEach(btn => {
       btn.onclick = () => {
         const tool = btn.getAttribute('data-tool');
         if (WORKFLOW_TOOLS_CONFIG[tool]) {
-          toolWorkflow.openTool(tool);
+          router.navigate(router.getCanonicalPath(tool));
         } else if (tool === 'edit') {
-          this.switchToStudio();
+          router.navigate('/edit_pdf');
         } else {
           this.handleToolAction(`modal:${tool}`, tool);
         }
@@ -705,11 +787,11 @@ export class LandingPage {
         e.preventDefault();
         const tool = link.getAttribute('data-tool');
         if (WORKFLOW_TOOLS_CONFIG[tool]) {
-          toolWorkflow.openTool(tool);
+          router.navigate(router.getCanonicalPath(tool));
         } else {
           const match = TOOLS_CATALOG.find(t => t.id === tool);
           if (match) this.handleToolAction(match.action, match.id);
-          else this.switchToStudio();
+          else router.navigate('/edit_pdf');
         }
       };
     });
@@ -731,19 +813,37 @@ export class LandingPage {
     }
   }
 
-  switchToStudio() {
-    document.body.classList.remove('show-landing');
+  switchToStudio({ updateUrl = true } = {}) {
+    document.body.classList.remove('show-landing', 'show-tool-workflow');
     document.body.classList.add('show-studio');
     window.scrollTo({ top: 0, behavior: 'instant' });
+    if (updateUrl && typeof window !== 'undefined') {
+      const canonical = '/edit_pdf';
+      if (window.location.pathname !== canonical) {
+        window.history.pushState({ path: canonical }, '', canonical);
+      }
+      if (typeof document !== 'undefined') {
+        document.title = 'Online PDF Editor — Edit PDF files directly in your browser — LetsEdit';
+      }
+    }
     if (this.onOpenStudioCallback) {
       this.onOpenStudioCallback();
     }
   }
 
-  switchToLanding() {
-    document.body.classList.remove('show-studio');
+  switchToLanding({ updateUrl = true } = {}) {
+    document.body.classList.remove('show-studio', 'show-tool-workflow');
     document.body.classList.add('show-landing');
     window.scrollTo({ top: 0, behavior: 'instant' });
+    if (updateUrl && typeof window !== 'undefined') {
+      const canonical = '/';
+      if (window.location.pathname !== canonical) {
+        window.history.pushState({ path: canonical }, '', canonical);
+      }
+      if (typeof document !== 'undefined') {
+        document.title = 'LetsEdit — All-in-One Online PDF Editor & Tools';
+      }
+    }
   }
 }
 

@@ -99,6 +99,17 @@ describe('PDF Vector Export & Feature Tests', () => {
             width: 0.05,
             height: 0.04,
             checked: true
+          },
+          {
+            id: 'dd-country',
+            type: 'form',
+            formType: 'dropdown',
+            x: 0.2,
+            y: 0.4,
+            width: 0.3,
+            height: 0.04,
+            options: ['USA', 'Canada', 'UK'],
+            value: 'Canada'
           }
         ]
       },
@@ -117,6 +128,56 @@ describe('PDF Vector Export & Feature Tests', () => {
 
     const cb = form.getCheckBox('cb_cb-agree');
     assert.strictEqual(cb.isChecked(), true);
+
+    const dd = form.getDropdown('dd_dd-country');
+    assert.deepStrictEqual(dd.getOptions(), ['USA', 'Canada', 'UK']);
+    assert.deepStrictEqual(dd.getSelected(), ['Canada']);
+  });
+
+  test('exportPdf compiles interactive Link annotations (Web URL & internal Page Jump)', async () => {
+    const state = {
+      pageCount: 2,
+      pageOrder: [1, 2],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0, 2: 0 },
+      annotations: {
+        1: [
+          {
+            id: 'link-web',
+            type: 'link',
+            targetType: 'url',
+            url: 'https://letsedit.dev',
+            x: 0.1,
+            y: 0.1,
+            width: 0.3,
+            height: 0.05
+          },
+          {
+            id: 'link-page',
+            type: 'link',
+            targetType: 'page',
+            pageTarget: 2,
+            x: 0.1,
+            y: 0.2,
+            width: 0.3,
+            height: 0.05
+          }
+        ],
+        2: []
+      },
+      watermark: null,
+      pageNumbers: null,
+      exportPassword: null
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    assert(exportedBytes instanceof Uint8Array);
+
+    const doc = await PDFDocument.load(exportedBytes);
+    const page1 = doc.getPage(0);
+    const annotsRef = page1.node.Annots();
+    assert.ok(annotsRef !== undefined, 'Page 1 should have annotations');
+    assert.strictEqual(annotsRef.size(), 2, 'Page 1 should have 2 link annotations');
   });
 
   test('exportPdf embeds document watermark across all pages', async () => {

@@ -9,6 +9,7 @@ import { Toast } from '../components/toast.js';
 import { ResizeGizmo } from './canvas/resize-gizmo.js';
 import { EraserHandler } from './canvas/eraser.js';
 import { TextClustering } from './canvas/text-clustering.js';
+import { FloatingBubbleBar } from './canvas/bubble-toolbar.js';
 
 export class CanvasManager {
   constructor(container) {
@@ -771,8 +772,8 @@ export class CanvasManager {
         ctx.restore();
       }
 
-      // Interactive DOM elements (Text, Images, Signatures, Form Controls)
-      if (['text', 'image', 'signature', 'form', 'whiteout'].includes(ann.type)) {
+      // Interactive DOM elements (Text, Images, Signatures, Form Controls, Links)
+      if (['text', 'image', 'signature', 'form', 'whiteout', 'link'].includes(ann.type)) {
         this.renderDomElement(pageNum, ann, px, py, pw, ph, domLayer);
       }
     }
@@ -857,6 +858,23 @@ export class CanvasManager {
       el.style.color = ann.color || '#000000';
       if (ann.bold) el.style.fontWeight = 'bold';
       if (ann.italic) el.style.fontStyle = 'italic';
+    } else if (ann.type === 'link') {
+      el.classList.add('annot-link-hotspot');
+      const badge = document.createElement('div');
+      badge.className = 'annot-link-badge';
+      const label = ann.targetType === 'page' ? `Page ${ann.pageTarget || 1}` : (ann.url || 'Link');
+      badge.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> <span class="link-label">${label}</span>`;
+      el.appendChild(badge);
+
+      badge.onclick = (e) => {
+        e.stopPropagation();
+        if (ann.targetType === 'page') {
+          window.dispatchEvent(new CustomEvent('letsedit:scroll-to-page', { detail: { pageNum: ann.pageTarget || 1 } }));
+          Toast.info(`Jumped to Page ${ann.pageTarget || 1}`);
+        } else if (ann.url) {
+          window.open(ann.url, '_blank');
+        }
+      };
     } else if (ann.type === 'image' || ann.type === 'signature') {
       const img = document.createElement('img');
       img.src = ann.dataUrl;
@@ -879,6 +897,19 @@ export class CanvasManager {
         rad.checked = !!ann.checked;
         rad.onchange = (e) => store.updateAnnotation(pageNum, ann.id, { checked: e.target.checked });
         el.appendChild(rad);
+      } else if (ann.formType === 'dropdown') {
+        const sel = document.createElement('select');
+        sel.className = 'form-field-select';
+        const options = ann.options || ['Option 1', 'Option 2', 'Option 3'];
+        options.forEach(opt => {
+          const optEl = document.createElement('option');
+          optEl.value = opt;
+          optEl.textContent = opt;
+          if (opt === ann.value) optEl.selected = true;
+          sel.appendChild(optEl);
+        });
+        sel.onchange = (e) => store.updateAnnotation(pageNum, ann.id, { value: e.target.value });
+        el.appendChild(sel);
       } else {
         const inp = document.createElement('input');
         inp.type = 'text';
@@ -915,6 +946,7 @@ export class CanvasManager {
     this.deselectAnnotation();
     this.selectedAnnotation = { pageNum, ann, el };
     el.classList.add('selected');
+    FloatingBubbleBar.show(pageNum, ann, el, () => this.deselectAnnotation());
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('letsedit:annotation-selected', { detail: { pageNum, ann, el } }));
     }
@@ -925,6 +957,7 @@ export class CanvasManager {
       if (this.selectedAnnotation.el) {
         this.selectedAnnotation.el.classList.remove('selected');
       }
+      FloatingBubbleBar.hide();
       this.selectedAnnotation = null;
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('letsedit:annotation-deselected'));
@@ -972,6 +1005,8 @@ export class CanvasManager {
         this.startBoxDrawing(pageNum, 'whiteout', pos, wrap);
       } else if (state.activeTool === 'shape') {
         this.startBoxDrawing(pageNum, 'shape', pos, wrap);
+      } else if (state.activeTool === 'link') {
+        this.startBoxDrawing(pageNum, 'link', pos, wrap);
       } else if (state.activeTool === 'text') {
         // Place new text at click location
         this.promptNewText(pageNum, pos, wrap);
@@ -1142,6 +1177,25 @@ export class CanvasManager {
             strokeWidth: state.activeStrokeWidth || 2,
             fillColor: state.activeFillColor || 'transparent'
           });
+        } else if (toolType === 'link') {
+          const defaultUrl = 'https://';
+          const linkInput = prompt('Enter Web URL (e.g. https://example.com) or Page Number (e.g. 2):', defaultUrl);
+          if (linkInput && linkInput.trim()) {
+            const trimmed = linkInput.trim();
+            const isPage = /^\d+$/.test(trimmed);
+            store.addAnnotation(pageNum, {
+              id: uid('link'),
+              type: 'link',
+              targetType: isPage ? 'page' : 'url',
+              url: isPage ? undefined : (trimmed.startsWith('http') ? trimmed : 'https://' + trimmed),
+              pageTarget: isPage ? parseInt(trimmed, 10) : undefined,
+              x: left / w,
+              y: top / h,
+              width: Math.max(0.12, width / w),
+              height: Math.max(0.04, height / h)
+            });
+            Toast.success(isPage ? `Link to page ${trimmed} added!` : `Link to ${trimmed} added!`);
+          }
         }
       }
     };

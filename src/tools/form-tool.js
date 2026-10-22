@@ -1,5 +1,6 @@
 /**
  * Form Fields Tool
+ * Supports Text Field, Checkbox, Radio Button, and Dropdown (Select Menu)
  */
 
 import { store } from '../core/state-store.js';
@@ -20,15 +21,18 @@ export class FormTool {
     }
 
     const isBox = formType === 'checkbox' || formType === 'radio';
+    const isDropdown = formType === 'dropdown';
     store.addAnnotation(target, {
       id: uid('form'),
       type: 'form',
       formType,
       x: 0.35,
       y: 0.5,
-      width: isBox ? 0.04 : 0.28,
+      width: isBox ? 0.04 : (isDropdown ? 0.32 : 0.28),
       height: isBox ? 0.03 : 0.045,
       placeholder: formType === 'text' ? 'Interactive input...' : undefined,
+      options: isDropdown ? ['Option 1', 'Option 2', 'Option 3'] : undefined,
+      value: isDropdown ? 'Option 1' : '',
       checked: false
     });
 

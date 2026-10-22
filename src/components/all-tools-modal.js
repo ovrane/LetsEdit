@@ -23,6 +23,7 @@ import { repairModal } from './repair-modal.js';
 import { pdfaModal } from './pdfa-modal.js';
 import { toolWorkflow, WORKFLOW_TOOLS_CONFIG } from './tool-workflow.js';
 import { downloadBlob } from '../utils/helpers.js';
+import { router } from '../core/router.js';
 import { Toast } from './toast.js';
 
 export const SEJDA_TOOL_CATEGORIES = [
@@ -38,7 +39,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#0284c7', popular: true, action: 'workflow:merge' },
       { id: 'split', title: 'Split', desc: 'Split specific page ranges or extract every page into a separate document', icon: 'split', color: '#ea580c', popular: true, action: 'workflow:split' },
       { id: 'crop', title: 'Crop', desc: 'Trim PDF margins, change PDF page size', icon: 'crop', color: '#0d9488', popular: true, action: 'workflow:crop' },
-      { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', popular: true, action: 'tool:sign' },
+      { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', popular: true, action: 'workflow:sign' },
       { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#2563eb', popular: true, action: 'workflow:pdf-to-word' },
       { id: 'extract-pages', title: 'Extract Pages', desc: 'Get a new document containing only the desired pages', icon: 'extract', color: '#ea580c', popular: true, action: 'workflow:extract-pages' }
     ]
@@ -75,7 +76,7 @@ export const SEJDA_TOOL_CATEGORIES = [
     icon: 'edit',
     tools: [
       { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#2563eb', action: 'tool:select' },
-      { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', action: 'tool:sign' },
+      { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', action: 'workflow:sign' },
       { id: 'forms', title: 'Create Forms', desc: 'Free PDF forms creator. Make existing PDF documents fillable', icon: 'check-square', color: '#10b981', action: 'tool:form' },
       { id: 'delete', title: 'Delete Pages', desc: 'Remove pages from a PDF document', icon: 'trash', color: '#ef4444', action: 'sidebar:delete' }
     ]
@@ -100,7 +101,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'security', title: 'Protect', desc: 'Protect file with password and permissions', icon: 'lock', color: '#dc2626', action: 'workflow:security' },
       { id: 'unlock', title: 'Unlock', desc: 'Remove restrictions and password from PDF files', icon: 'unlock', color: '#10b981', action: 'workflow:unlock' },
       { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#0284c7', action: 'workflow:watermark' },
-      { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'action:flatten' }
+      { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'workflow:flatten' }
     ]
   },
   {
@@ -140,9 +141,9 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'extract-images', title: 'Extract Images', desc: 'Extract images from PDF', icon: 'image', color: '#ec4899', action: 'workflow:extract-images' },
       { id: 'flip', title: 'Flip', desc: 'Mirror pages horizontally or vertically', icon: 'flip', color: '#8b5cf6', action: 'workflow:flip' },
       { id: 'grayscale', title: 'Grayscale', desc: 'Make a PDF text and images grayscale', icon: 'circle-half', color: '#475569', action: 'workflow:grayscale' },
-      { id: 'header-footer', title: 'Header & Footer', desc: 'Apply page numbers or text labels to PDF files', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
+      { id: 'header-footer', title: 'Header & Footer', desc: 'Apply page numbers or text labels to PDF files', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
       { id: 'nup', title: 'N-up', desc: 'Print multiple pages per sheet per paper. A5 plan as 4-up on A3 or A4 2-up on A3', icon: 'layout', color: '#475569', action: 'workflow:nup' },
-      { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'modal:pagenumbers' },
+      { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
       { id: 'rename', title: 'Rename', desc: 'Change document filename based on text from the PDF pages', icon: 'edit', color: '#059669', action: 'workflow:rename' },
       { id: 'repair', title: 'Repair', desc: 'Recover data from a corrupted or damaged PDF document', icon: 'tool', color: '#ef4444', action: 'workflow:repair' },
       { id: 'resize', title: 'Resize', desc: 'Add page margins and padding, Change PDF page size', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },
@@ -430,12 +431,12 @@ export class AllToolsModal {
     // 1. Dedicated tool workflow
     if (action.startsWith('workflow:')) {
       const toolKey = action.replace('workflow:', '');
-      toolWorkflow.openTool(toolKey);
+      router.navigate(router.getCanonicalPath(toolKey));
       return;
     }
 
     if (toolId && WORKFLOW_TOOLS_CONFIG[toolId]) {
-      toolWorkflow.openTool(toolId);
+      router.navigate(router.getCanonicalPath(toolId));
       return;
     }
 
@@ -448,7 +449,7 @@ export class AllToolsModal {
 
     if (action.startsWith('workflow:')) {
       const toolKey = action.replace('workflow:', '');
-      toolWorkflow.openTool(toolKey);
+      router.navigate(router.getCanonicalPath(toolKey));
       return;
     }
 

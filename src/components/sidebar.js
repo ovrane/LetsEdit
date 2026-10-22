@@ -8,6 +8,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { toolWorkflow } from './tool-workflow.js';
+import { router } from '../core/router.js';
 
 export class Sidebar {
   constructor(container) {
@@ -57,7 +58,7 @@ export class Sidebar {
 
     // Merge External PDF Workflow
     this.container.querySelector('#sidebar-merge-pdf-btn').onclick = () => {
-      toolWorkflow.openTool('merge');
+      router.navigate('/merge_pdf');
     };
 
     mergeInput.onchange = async (e) => {

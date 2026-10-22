@@ -8,11 +8,12 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { uid } from '../utils/helpers.js';
 import { searchReplace } from '../tools/search-replace.js';
+import { FormTool } from '../tools/form-tool.js';
 
 export class ToolOptionsPanel {
   constructor() {
     this.container = null;
-    this.selectedAnnotation = null; // { pageNum, ann, el }
+    this.selectedAnnotation = null;
     this.isOpen = true;
   }
 
@@ -389,6 +390,7 @@ export class ToolOptionsPanel {
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-textbox">+ Text Box</button>
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-checkbox">+ Checkbox</button>
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-radio">+ Radio Button</button>
+              <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-dropdown">+ Dropdown Menu</button>
             </div>
           </div>
 
@@ -402,10 +404,79 @@ export class ToolOptionsPanel {
         const addTxt = this.bodyEl.querySelector('#opt-btn-add-textbox');
         const addCb = this.bodyEl.querySelector('#opt-btn-add-checkbox');
         const addRad = this.bodyEl.querySelector('#opt-btn-add-radio');
+        const addDd = this.bodyEl.querySelector('#opt-btn-add-dropdown');
 
         if (addTxt) addTxt.onclick = () => document.getElementById('btn-add-form-text')?.click();
         if (addCb) addCb.onclick = () => document.getElementById('btn-add-form-checkbox')?.click();
         if (addRad) addRad.onclick = () => document.getElementById('btn-add-form-radio')?.click();
+        if (addDd) addDd.onclick = () => {
+          FormTool.addField('dropdown');
+        };
+        break;
+
+      case 'link':
+        this.setHeading('Link Options', `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`);
+        this.bodyEl.innerHTML = `
+          <div class="opt-group">
+            <div class="info-callout text-xs text-muted" style="margin-bottom:12px;">
+              🔗 <strong>Click & drag</strong> across any text or area on the page to create a clickable Link Hotspot.
+            </div>
+            <label class="opt-label">Quick Actions</label>
+            <div class="flex flex-col gap-2">
+              <button class="btn btn-sm btn-outline flex items-center justify-center gap-2" id="btn-opt-add-url-link">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>Add Web Link (URL)</span>
+              </button>
+              <button class="btn btn-sm btn-outline flex items-center justify-center gap-2" id="btn-opt-add-page-link">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>Add Internal Page Jump</span>
+              </button>
+            </div>
+          </div>
+          <div class="opt-group">
+            <label class="opt-label">Compatibility</label>
+            <p class="text-xs text-muted">Links will be permanently embedded into vector PDF format compliant with ISO 32000-1 and clickable in Acrobat, Chrome, and Apple Preview.</p>
+          </div>
+        `;
+        const addUrlBtn = this.bodyEl.querySelector('#btn-opt-add-url-link');
+        if (addUrlBtn) {
+          addUrlBtn.onclick = () => {
+            const url = prompt('Enter Website URL:', 'https://example.com');
+            if (url) {
+              store.addAnnotation(1, {
+                id: uid('link'),
+                type: 'link',
+                targetType: 'url',
+                url: url.startsWith('http') ? url : 'https://' + url,
+                x: 0.3,
+                y: 0.3,
+                width: 0.35,
+                height: 0.05
+              });
+              Toast.success('Link hotspot placed! Drag to position over text.');
+            }
+          };
+        }
+        const addPageBtn = this.bodyEl.querySelector('#btn-opt-add-page-link');
+        if (addPageBtn) {
+          addPageBtn.onclick = () => {
+            const pageStr = prompt('Enter Target Page Number (e.g. 2):', '2');
+            if (pageStr && !isNaN(parseInt(pageStr, 10))) {
+              const pageNum = parseInt(pageStr, 10);
+              store.addAnnotation(1, {
+                id: uid('link'),
+                type: 'link',
+                targetType: 'page',
+                pageTarget: pageNum,
+                x: 0.3,
+                y: 0.3,
+                width: 0.25,
+                height: 0.05
+              });
+              Toast.success(`Page jump to Page ${pageNum} placed!`);
+            }
+          };
+        }
         break;
 
       case 'replace':
@@ -511,6 +582,26 @@ export class ToolOptionsPanel {
           <input type="color" class="color-input-badge" id="opt-selected-fill" value="${ann.fill && ann.fill !== 'transparent' ? ann.fill : '#ffffff'}" />
         </div>
       `;
+    } else if (type === 'link') {
+      const isPage = ann.targetType === 'page';
+      specificControls = `
+        <div class="opt-group">
+          <label class="opt-label">Link Destination Type</label>
+          <div class="flex gap-2">
+            <button class="btn btn-sm ${!isPage ? 'btn-primary' : 'btn-outline'} flex-1" id="opt-link-type-url">Web URL</button>
+            <button class="btn btn-sm ${isPage ? 'btn-primary' : 'btn-outline'} flex-1" id="opt-link-type-page">Page Jump</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <label class="opt-label">${isPage ? 'Target Page Number' : 'Web URL'}</label>
+          <input type="${isPage ? 'number' : 'text'}" class="input-sm w-full" id="opt-selected-link-target" value="${isPage ? (ann.pageTarget || 1) : (ann.url || 'https://')}" />
+        </div>
+        <div class="opt-group">
+          <button class="btn btn-sm btn-outline w-full" id="opt-btn-test-link">
+            🔗 Test Link (${isPage ? `Jump to Page ${ann.pageTarget || 1}` : 'Open URL'})
+          </button>
+        </div>
+      `;
     }
 
     this.bodyEl.innerHTML = `
@@ -565,6 +656,47 @@ export class ToolOptionsPanel {
     if (fillInp) {
       fillInp.oninput = (e) => {
         store.updateAnnotation(pageNum, ann.id, { fill: e.target.value });
+      };
+    }
+
+    const linkTargetInp = this.bodyEl.querySelector('#opt-selected-link-target');
+    if (linkTargetInp) {
+      linkTargetInp.oninput = (e) => {
+        const val = e.target.value.trim();
+        if (ann.targetType === 'page') {
+          const p = parseInt(val, 10);
+          if (!isNaN(p)) store.updateAnnotation(pageNum, ann.id, { pageTarget: p });
+        } else {
+          store.updateAnnotation(pageNum, ann.id, { url: val });
+        }
+      };
+    }
+
+    const linkTypeUrlBtn = this.bodyEl.querySelector('#opt-link-type-url');
+    if (linkTypeUrlBtn) {
+      linkTypeUrlBtn.onclick = () => {
+        store.updateAnnotation(pageNum, ann.id, { targetType: 'url', url: ann.url || 'https://' });
+        this.render();
+      };
+    }
+
+    const linkTypePageBtn = this.bodyEl.querySelector('#opt-link-type-page');
+    if (linkTypePageBtn) {
+      linkTypePageBtn.onclick = () => {
+        store.updateAnnotation(pageNum, ann.id, { targetType: 'page', pageTarget: ann.pageTarget || 1 });
+        this.render();
+      };
+    }
+
+    const testLinkBtn = this.bodyEl.querySelector('#opt-btn-test-link');
+    if (testLinkBtn) {
+      testLinkBtn.onclick = () => {
+        if (ann.targetType === 'page') {
+          window.dispatchEvent(new CustomEvent('letsedit:scroll-to-page', { detail: { pageNum: ann.pageTarget || 1 } }));
+          Toast.info(`Jumped to Page ${ann.pageTarget || 1}`);
+        } else if (ann.url) {
+          window.open(ann.url, '_blank');
+        }
       };
     }
 

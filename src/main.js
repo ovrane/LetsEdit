@@ -31,6 +31,8 @@ import { ocrModal } from './components/ocr-modal.js';
 import { allToolsModal } from './components/all-tools-modal.js';
 import { landingPage } from './components/landing-page.js';
 import { toolOptionsPanel } from './components/tool-options-panel.js';
+import { toolWorkflow } from './components/tool-workflow.js';
+import { router } from './core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
@@ -69,16 +71,48 @@ class App {
     this.bindNavbarEvents();
     this.bindToolbarEvents();
     this.bindKeyboardShortcuts();
+    this.setupAutosave();
 
     // Check for autosave / recovery
     const recovered = this.tryRestoreAutosave();
-
     if (!recovered) {
-      // Don't auto-load a dummy sample document! Ask user for their PDF or start with blank
       this.canvasManager.renderEmptyState();
       const filenameEl = document.getElementById('current-filename');
       if (filenameEl) filenameEl.textContent = 'No document selected';
     }
+
+    // Wire HTML5 URL Router for distinct iLovePDF routes (/merge_pdf, /compress_pdf, /split_pdf, etc.)
+    router.subscribe((route) => {
+      if (route.isLanding) {
+        landingPage.switchToLanding({ updateUrl: false });
+      } else if (route.isEditor) {
+        landingPage.switchToStudio({ updateUrl: false });
+      } else if (route.toolId) {
+        toolWorkflow.openTool(route.toolId, { updateUrl: false });
+      }
+    });
+
+    router.init();
+  }
+
+  setupAutosave() {
+    store.subscribe((event, state) => {
+      if (['annotation-added', 'annotation-updated', 'annotation-removed', 'watermark-updated', 'pagenumbers-updated'].includes(event)) {
+        try {
+          const serializable = {
+            filename: state.filename || state.documentName || 'Document.pdf',
+            pageCount: state.pageCount,
+            annotations: Object.fromEntries(
+              Array.from(state.annotations.entries()).map(([k, v]) => [k, v])
+            ),
+            timestamp: Date.now()
+          };
+          localStorage.setItem('pdf_editor_recovery_v2', JSON.stringify(serializable));
+        } catch (e) {
+          console.warn('Autosave serialization failed:', e);
+        }
+      }
+    });
   }
 
   tryRestoreAutosave() {
@@ -87,12 +121,58 @@ class App {
       if (raw) {
         const data = JSON.parse(raw);
         if (data && data.annotations && Object.keys(data.annotations).length > 0) {
-          // Found recovery
-          console.log('Recovery state found');
+          const totalAnnots = Object.values(data.annotations).reduce((sum, arr) => sum + (arr?.length || 0), 0);
+          if (totalAnnots > 0) {
+            const banner = document.createElement('div');
+            banner.id = 'pdf-editor-recovery';
+            banner.className = 'recovery-alert-banner';
+            banner.innerHTML = `
+              <div class="recovery-alert-content">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>Found unsaved edits for <strong>${data.filename || 'Document'}</strong> (${totalAnnots} annotations). Restore your previous session?</span>
+              </div>
+              <div class="recovery-alert-actions">
+                <button class="btn btn-sm btn-primary" id="btn-restore-session">Restore Work</button>
+                <button class="btn btn-sm btn-outline" id="btn-discard-session">Discard</button>
+              </div>
+            `;
+            document.body.appendChild(banner);
+
+            const restoreBtn = banner.querySelector('#btn-restore-session');
+            if (restoreBtn) {
+              restoreBtn.onclick = async () => {
+                banner.remove();
+                Toast.info('Restoring session annotations...');
+                if (!store.getState().pdfBytes) {
+                  const sampleBytes = await pdfEngine.createSamplePdf();
+                  const info = await pdfEngine.loadPdf(sampleBytes);
+                  store.setDocument(sampleBytes, data.filename || 'Recovered_Document.pdf', info.numPages);
+                }
+                for (const [pageNumStr, annList] of Object.entries(data.annotations)) {
+                  const pNum = parseInt(pageNumStr, 10);
+                  if (Array.isArray(annList)) {
+                    annList.forEach(ann => store.addAnnotation(pNum, ann));
+                  }
+                }
+                Toast.success(`Successfully restored ${totalAnnots} annotations!`);
+              };
+            }
+
+            const discardBtn = banner.querySelector('#btn-discard-session');
+            if (discardBtn) {
+              discardBtn.onclick = () => {
+                banner.remove();
+                localStorage.removeItem('pdf_editor_recovery_v2');
+                Toast.info('Previous recovery data cleared.');
+              };
+            }
+
+            return true;
+          }
         }
       }
     } catch (e) {
-      // Ignore
+      console.warn('Autosave recovery error:', e);
     }
     return false;
   }
@@ -102,13 +182,13 @@ class App {
     const homeBtn = document.getElementById('btn-studio-home');
     if (homeBtn) {
       homeBtn.onclick = () => {
-        landingPage.switchToLanding();
+        router.navigate('/');
       };
     }
     const editorLogo = document.getElementById('editor-brand-logo');
     if (editorLogo) {
       editorLogo.onclick = () => {
-        landingPage.switchToLanding();
+        router.navigate('/');
       };
     }
 
@@ -190,16 +270,8 @@ class App {
       }
     };
 
-    // Dark / Light Theme Toggle
-    const themeBtn = document.getElementById('btn-toggle-theme');
+    // Initialize theme
     applyTheme(getPreferredTheme());
-
-    if (themeBtn) {
-      themeBtn.onclick = () => {
-        const next = toggleTheme();
-        Toast.info(`Switched to ${next === 'dark' ? 'Dark' : 'Light'} theme`);
-      };
-    }
 
     // All Tools Hub modal
     const allToolsBtn = document.getElementById('btn-open-all-tools');

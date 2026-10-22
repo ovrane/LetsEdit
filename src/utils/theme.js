@@ -6,9 +6,6 @@
 export function getPreferredTheme() {
   const saved = localStorage.getItem('pdf_editor_theme');
   if (saved) return saved;
-  if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
-  }
   return 'light';
 }
 

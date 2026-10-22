@@ -5,7 +5,7 @@
  * standard ISO 32000-1 AES encryption back into a compliant PDF.
  */
 
-import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, degrees, StandardFonts, PDFName, PDFString } from 'pdf-lib';
 import { hexToRgb } from '../../utils/helpers.js';
 import { applyPdfEncryption } from '../pdf-crypto.js';
 import { redactPageContentStreams } from '../pdf-redactor.js';
@@ -228,6 +228,37 @@ export class PdfExporter {
               });
             }
           }
+        } else if (ann.type === 'link') {
+          try {
+            const isPageTarget = ann.targetType === 'page';
+            const targetPageIndex = Math.max(0, Math.min(finalDoc.getPageCount() - 1, (ann.pageTarget || 1) - 1));
+            const targetPageRef = finalDoc.getPage(targetPageIndex).ref;
+
+            const linkAction = isPageTarget
+              ? {
+                  Type: 'Action',
+                  S: 'GoTo',
+                  D: [targetPageRef, PDFName.of('Fit')]
+                }
+              : {
+                  Type: 'Action',
+                  S: 'URI',
+                  URI: PDFString.of(ann.url || 'https://letsedit.dev')
+                };
+
+            const linkAnnot = finalDoc.context.obj({
+              Type: 'Annot',
+              Subtype: 'Link',
+              Rect: [pdfX, pdfY, pdfX + pdfW, pdfY + pdfH],
+              Border: [0, 0, 0],
+              C: [0.15, 0.45, 0.95],
+              A: linkAction
+            });
+            const linkRef = finalDoc.context.register(linkAnnot);
+            copiedPage.node.addAnnot(linkRef);
+          } catch (linkErr) {
+            console.error('Failed to create PDF Link annotation:', linkErr);
+          }
         } else if (ann.type === 'form') {
           try {
             const form = finalDoc.getForm();
@@ -239,6 +270,14 @@ export class PdfExporter {
               const radioGroup = form.createRadioGroup(`rg_${ann.groupName || 'default'}`);
               radioGroup.addOptionToPage(`opt_${ann.id}`, copiedPage, { x: pdfX, y: pdfY, width: Math.max(16, pdfW), height: Math.max(16, pdfH) });
               if (ann.checked) radioGroup.select(`opt_${ann.id}`);
+            } else if (ann.formType === 'dropdown') {
+              const dd = form.createDropdown(`dd_${ann.id}`);
+              dd.addToPage(copiedPage, { x: pdfX, y: pdfY, width: Math.max(80, pdfW), height: Math.max(20, pdfH) });
+              const opts = ann.options || ['Option 1', 'Option 2', 'Option 3'];
+              dd.addOptions(opts);
+              if (ann.value && opts.includes(ann.value)) {
+                dd.select(ann.value);
+              }
             } else {
               const tf = form.createTextField(`tf_${ann.id}`);
               tf.addToPage(copiedPage, { x: pdfX, y: pdfY, width: pdfW, height: pdfH });

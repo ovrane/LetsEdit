@@ -15,7 +15,7 @@ import { applyPdfEncryption } from '../core/pdf-crypto.js';
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { downloadBlob, readFileAsArrayBuffer, formatFileSize, hexToRgb } from '../utils/helpers.js';
-import { toggleTheme } from '../utils/theme.js';
+import { router } from '../core/router.js';
 import { authModal } from './auth-modal.js';
 
 // Setup PDF.js worker safely across browser and test runtimes
@@ -422,6 +422,42 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select Word file',
     dropText: 'or drop Word DOCX here',
     badge: 'DOCX to PDF'
+  },
+  sign: {
+    id: 'sign',
+    title: 'Sign PDF Document',
+    subtitle: 'Sign your document with a legally binding electronic signature (draw ink, handwritten text, or image stamp).',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>`,
+    color: '#0284c7',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file to Sign',
+    dropText: 'or drop PDF here',
+    badge: 'e-Sign PDF'
+  },
+  pagenumbers: {
+    id: 'pagenumbers',
+    title: 'Add Page Numbers to PDF',
+    subtitle: 'Stamp page numbers across all or selected pages with customizable position and format.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>`,
+    color: '#3b82f6',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Page Numbering'
+  },
+  flatten: {
+    id: 'flatten',
+    title: 'Flatten PDF Form Fields',
+    subtitle: 'Bake interactive AcroForm fields and annotations into static vectors to make them uneditable.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
+    color: '#0d9488',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF to Flatten',
+    dropText: 'or drop PDF here',
+    badge: 'Flatten Forms'
   }
 };
 
@@ -476,6 +512,21 @@ export class ToolWorkflowManager {
     this.unlockPassword = '';
     this.renameCustomName = '';
 
+    // Sign options
+    this.signMode = 'draw'; // 'draw' | 'type' | 'upload'
+    this.signName = 'Authorized Signature';
+    this.signFont = 'Caveat';
+    this.signDataUrl = null;
+    this.signDate = new Date().toISOString().split('T')[0];
+    this.includeSignDate = true;
+    this.signPos = 'bottom-right';
+
+    // Page Numbers options
+    this.pnFormat = 'Page {n} of {total}';
+    this.pnPos = 'bottom-center';
+    this.pnStartPage = 1;
+    this.pnFontSize = 10;
+
     if (typeof document !== 'undefined') {
       this.init();
     }
@@ -493,6 +544,42 @@ export class ToolWorkflowManager {
     }
   }
 
+  getSignPositionCss() {
+    switch (this.signPos) {
+      case 'top-left': return 'top: 20px; left: 20px;';
+      case 'top-center': return 'top: 20px; left: 50%; transform: translateX(-50%);';
+      case 'top-right': return 'top: 20px; right: 20px;';
+      case 'bottom-left': return 'bottom: 20px; left: 20px;';
+      case 'bottom-center': return 'bottom: 20px; left: 50%; transform: translateX(-50%);';
+      case 'bottom-right':
+      default: return 'bottom: 20px; right: 20px;';
+    }
+  }
+
+  getPnPositionCss() {
+    switch (this.pnPos) {
+      case 'top-left': return 'top: 14px; left: 14px;';
+      case 'top-center': return 'top: 14px; left: 50%; transform: translateX(-50%);';
+      case 'top-right': return 'top: 14px; right: 14px;';
+      case 'bottom-left': return 'bottom: 14px; left: 14px;';
+      case 'bottom-center': return 'bottom: 14px; left: 50%; transform: translateX(-50%);';
+      case 'bottom-right':
+      default: return 'bottom: 14px; right: 14px;';
+    }
+  }
+
+  getPnPositionLabel() {
+    const labels = {
+      'top-left': 'Header Left',
+      'top-center': 'Header Center',
+      'top-right': 'Header Right',
+      'bottom-left': 'Footer Left',
+      'bottom-center': 'Footer Center',
+      'bottom-right': 'Footer Right'
+    };
+    return labels[this.pnPos] || 'Footer Center';
+  }
+
   init() {
     this.container = document.createElement('div');
     this.container.id = 'tool-workflow-view';
@@ -501,7 +588,7 @@ export class ToolWorkflowManager {
     document.body.appendChild(this.container);
   }
 
-  openTool(toolKey) {
+  openTool(toolKey, { updateUrl = true } = {}) {
     const config = WORKFLOW_TOOLS_CONFIG[toolKey] || WORKFLOW_TOOLS_CONFIG.merge;
     this.activeTool = config;
     this.uploadedFiles = [];
@@ -529,19 +616,25 @@ export class ToolWorkflowManager {
     document.body.classList.add('show-tool-workflow');
     window.scrollTo({ top: 0, behavior: 'instant' });
 
+    if (updateUrl && typeof window !== 'undefined') {
+      const canonical = router.getCanonicalPath(config.id);
+      if (window.location.pathname !== canonical) {
+        window.history.pushState({ path: canonical }, '', canonical);
+      }
+      if (config.title && typeof document !== 'undefined') {
+        document.title = `${config.title} — LetsEdit`;
+      }
+    }
+
     this.render();
   }
 
   closeWorkflow() {
-    document.body.classList.remove('show-tool-workflow');
-    document.body.classList.add('show-landing');
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    router.navigate('/');
   }
 
   switchToStudioWithBuffer(arrayBuffer, filename) {
-    document.body.classList.remove('show-tool-workflow', 'show-landing');
-    document.body.classList.add('show-studio');
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    router.navigate('/edit_pdf');
 
     pdfEngine.loadPdf(arrayBuffer).then(info => {
       store.setDocument(arrayBuffer, filename, info.numPages);
@@ -589,9 +682,6 @@ export class ToolWorkflowManager {
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="icon-btn" id="btn-workflow-theme" title="Toggle Theme">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
-            </button>
             <div class="user-account-wrapper">
               <button class="btn btn-outline btn-sm user-account-btn" id="btn-workflow-auth">
                 <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -644,7 +734,6 @@ export class ToolWorkflowManager {
     const fileInput = this.container.querySelector('#workflow-file-input');
     const dropzone = this.container.querySelector('#workflow-dropzone');
     const sampleBtn = this.container.querySelector('#btn-workflow-sample');
-    const themeBtn = this.container.querySelector('#btn-workflow-theme');
 
     if (backBtn) backBtn.onclick = () => this.closeWorkflow();
     if (brandLogo) brandLogo.onclick = () => this.closeWorkflow();
@@ -658,12 +747,6 @@ export class ToolWorkflowManager {
       };
     }
 
-    if (themeBtn) {
-      themeBtn.onclick = () => {
-        const next = toggleTheme();
-        Toast.info(`Switched to ${next === 'dark' ? 'Dark' : 'Light'} theme`);
-      };
-    }
 
     if (fileInput) {
       fileInput.onchange = async (e) => {
@@ -1109,6 +1192,57 @@ export class ToolWorkflowManager {
                   <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: auto; display: block;" />
                 </div>
               </div>
+            ` : t.id === 'sign' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Electronic Signature Stamp</span>
+                  <span style="font-size: 11px; color: #0284c7; background: rgba(2, 132, 199, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(2, 132, 199, 0.25);">
+                    ${this.signMode === 'draw' ? 'Handwritten Ink' : (this.signMode === 'type' ? 'Calligraphic Stamp' : 'Uploaded Signature')}
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="sign-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="sign-page-img" style="width: 100%; height: auto; display: block;" />
+                  <div id="sign-preview-overlay" style="position: absolute; ${this.getSignPositionCss()}; background: rgba(255, 255, 255, 0.95); padding: 6px 12px; border-radius: 6px; border: 1.5px dashed #0284c7; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15); pointer-events: none; transition: all 0.2s ease; text-align: center;">
+                    ${this.signDataUrl ? `
+                      <img src="${this.signDataUrl}" style="height: 38px; width: auto; max-width: 120px; display: block; margin: 0 auto;" />
+                    ` : `
+                      <div style="font-family: '${this.signFont}', cursive, sans-serif; font-size: 20px; color: #0f172a; line-height: 1.2;">
+                        ${this.signName || 'Authorized Signature'}
+                      </div>
+                    `}
+                    ${this.includeSignDate ? `
+                      <div style="font-size: 9px; color: #64748b; margin-top: 2px; font-family: sans-serif;">Signed: ${this.signDate}</div>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            ` : t.id === 'pagenumbers' ? `
+              <div class="workflow-cards-toolbar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; font-size: 14px;">Page Numbering Preview</span>
+                  <span style="font-size: 11px; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.25);">
+                    ${this.getPnPositionLabel()}
+                  </span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  ${this.uploadedFiles[0]?.name || ''}
+                </div>
+              </div>
+
+              <div class="pn-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+                <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
+                  <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="pn-page-img" style="width: 100%; height: auto; display: block;" />
+                  <div id="pn-preview-badge-overlay" style="position: absolute; ${this.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #3b82f6; font-size: 10px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;">
+                    ${(this.pnFormat || 'Page {n} of {total}').replace('{n}', '1').replace('{total}', String(this.uploadedFiles[0]?.pageCount || 5))}
+                  </div>
+                </div>
+              </div>
             ` : `
               <div class="workflow-cards-toolbar">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -1119,9 +1253,15 @@ export class ToolWorkflowManager {
                     Drag cards to reorder
                   </span>
                 </div>
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                   <button class="btn btn-sm btn-outline" id="btn-workspace-sort-az" title="Sort A to Z">
-                    <span>Sort A-Z</span>
+                    <span>A-Z</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline" id="btn-workspace-sort-za" title="Sort Z to A">
+                    <span>Z-A</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline" id="btn-workspace-reverse" title="Reverse order">
+                    <span>⇄ Reverse</span>
                   </button>
                   <button class="btn btn-sm btn-outline" id="btn-workspace-clear" title="Clear all">
                     <span>Clear All</span>
@@ -1153,6 +1293,12 @@ export class ToolWorkflowManager {
                       </span>
                     </div>
                     <div class="file-card-actions">
+                      <button class="btn-icon btn-sm" data-move-left="${idx}" title="Move left" ${idx === 0 ? 'disabled style="opacity:0.35;cursor:default;"' : ''}>
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+                      </button>
+                      <button class="btn-icon btn-sm" data-move-right="${idx}" title="Move right" ${idx === this.uploadedFiles.length - 1 ? 'disabled style="opacity:0.35;cursor:default;"' : ''}>
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+                      </button>
                       <button class="btn-icon btn-sm" data-rot-idx="${idx}" title="Rotate 90°">
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
                       </button>
@@ -1217,6 +1363,9 @@ export class ToolWorkflowManager {
     if (id === 'unlock') return 'Unlock & Decrypt PDF';
     if (id === 'remove-annotations') return 'Clean Annotations';
     if (id === 'rename') return 'Save Renamed PDF';
+    if (id === 'sign') return 'Sign Document & Finish';
+    if (id === 'pagenumbers') return 'Apply Page Numbers';
+    if (id === 'flatten') return 'Flatten PDF Forms';
     return `Process with ${this.activeTool.title}`;
   }
 
@@ -1740,6 +1889,126 @@ export class ToolWorkflowManager {
       `;
     }
 
+    if (id === 'sign') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Signature Creation</label>
+          <div class="split-mode-pills" style="margin-bottom: 12px;">
+            <button type="button" class="split-mode-pill ${this.signMode === 'draw' ? 'active' : ''}" data-sign-mode="draw">
+              Draw Ink
+            </button>
+            <button type="button" class="split-mode-pill ${this.signMode === 'type' ? 'active' : ''}" data-sign-mode="type">
+              Type Name
+            </button>
+            <button type="button" class="split-mode-pill ${this.signMode === 'upload' ? 'active' : ''}" data-sign-mode="upload">
+              Upload Image
+            </button>
+          </div>
+
+          ${this.signMode === 'draw' ? `
+            <div style="background: var(--bg-surface); border: 1.5px dashed var(--border-strong); border-radius: 8px; padding: 6px; text-align: center;">
+              <canvas id="workflow-sig-canvas" width="280" height="110" style="background: white; border-radius: 6px; cursor: crosshair; touch-action: none; width: 100%; height: 110px; display: block;"></canvas>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding: 0 4px;">
+                <span style="font-size: 11px; color: var(--text-muted);">Sign with mouse / touch</span>
+                <button type="button" class="btn btn-xs btn-outline" id="btn-clear-sig-canvas">Clear</button>
+              </div>
+            </div>
+          ` : this.signMode === 'type' ? `
+            <div>
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Full Name / Initials</label>
+              <input type="text" id="workflow-sign-name" class="input-sm" value="${this.signName}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 10px;" placeholder="e.g. John Doe" />
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Calligraphic Font</label>
+              <select id="workflow-sign-font" class="input-sm" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+                <option value="Caveat" ${this.signFont === 'Caveat' ? 'selected' : ''}>Caveat (Cursive)</option>
+                <option value="Dancing Script" ${this.signFont === 'Dancing Script' ? 'selected' : ''}>Dancing Script (Flowing)</option>
+                <option value="Pacifico" ${this.signFont === 'Pacifico' ? 'selected' : ''}>Pacifico (Bold)</option>
+                <option value="Great Vibes" ${this.signFont === 'Great Vibes' ? 'selected' : ''}>Great Vibes (Formal Calligraphy)</option>
+              </select>
+            </div>
+          ` : `
+            <div>
+              <input type="file" id="workflow-sign-upload" accept="image/png,image/jpeg,image/svg+xml" style="display:none;" />
+              <button type="button" class="btn btn-sm btn-outline" id="btn-trigger-sign-upload" style="width: 100%; justify-content: center; gap: 8px; padding: 12px;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <span>Upload Signature Image</span>
+              </button>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px; text-align: center;">PNG with transparent background recommended</span>
+            </div>
+          `}
+
+          <div style="margin-top: 14px;">
+            <label class="workflow-options-label">Placement Position</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+              ${['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'].map(pos => `
+                <button type="button" class="btn btn-xs ${this.signPos === pos ? 'btn-primary' : 'btn-outline'} btn-sign-pos" data-pos="${pos}" style="font-size: 11px; padding: 6px 4px; text-transform: capitalize;">
+                  ${pos.replace('-', ' ')}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            <div>
+              <strong style="font-size: 12px; display: block; color: var(--text-main);">Include Date Stamp</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">${this.signDate}</span>
+            </div>
+            <input type="checkbox" id="chk-include-sign-date" ${this.includeSignDate ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer;" />
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'pagenumbers') {
+      const pageCount = primary.pageCount || 1;
+      return `
+        <div class="workflow-options-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="workflow-options-label" style="margin: 0;">Numbering Format</label>
+            <span style="font-size: 11px; font-weight: 600; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 2px 8px; border-radius: 12px;">
+              ${pageCount} pages total
+            </span>
+          </div>
+
+          <input type="text" id="workflow-pn-format" class="input-sm" value="${this.pnFormat}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-weight: 600; margin-bottom: 6px;" />
+          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 8px;">
+            Tokens: <code>{n}</code> = Page number, <code>{total}</code> = Total pages
+          </span>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
+            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="Page {n} of {total}">Page {n} of {total}</button>
+            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="{n} / {total}">{n} / {total}</button>
+            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="Page {n}">Page {n}</button>
+            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="- {n} -">- {n} -</button>
+          </div>
+
+          <label class="workflow-options-label">Position On Page</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
+            ${['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'].map(pos => `
+              <button type="button" class="btn btn-xs ${this.pnPos === pos ? 'btn-primary' : 'btn-outline'} btn-pn-pos" data-pos="${pos}" style="font-size: 11px; padding: 6px 4px; text-transform: capitalize;">
+                ${pos.replace('-', ' ')}
+              </button>
+            `).join('')}
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">First Number</label>
+              <input type="number" id="workflow-pn-start" class="input-sm" min="1" value="${this.pnStartPage}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Font Size</label>
+              <select id="workflow-pn-size" class="input-sm" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+                <option value="8" ${this.pnFontSize === 8 ? 'selected' : ''}>8 pt (Small)</option>
+                <option value="10" ${this.pnFontSize === 10 ? 'selected' : ''}>10 pt (Standard)</option>
+                <option value="12" ${this.pnFontSize === 12 ? 'selected' : ''}>12 pt (Medium)</option>
+                <option value="14" ${this.pnFontSize === 14 ? 'selected' : ''}>14 pt (Large)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <div class="workflow-options-group">
         <div style="background: var(--bg-surface); padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-muted); line-height: 1.5;">
@@ -1756,6 +2025,8 @@ export class ToolWorkflowManager {
     const addMoreInput = this.container.querySelector('#workspace-add-more-input');
     const clearBtn = this.container.querySelector('#btn-workspace-clear');
     const sortAzBtn = this.container.querySelector('#btn-workspace-sort-az');
+    const sortZaBtn = this.container.querySelector('#btn-workspace-sort-za');
+    const reverseBtn = this.container.querySelector('#btn-workspace-reverse');
     const execBtn = this.container.querySelector('#btn-workspace-execute');
 
     if (backBtn) backBtn.onclick = () => { this.stage = 'upload'; this.render(); };
@@ -1782,6 +2053,23 @@ export class ToolWorkflowManager {
       sortAzBtn.onclick = () => {
         this.uploadedFiles.sort((a, b) => a.name.localeCompare(b.name));
         this.render();
+        Toast.info('Sorted files A to Z');
+      };
+    }
+
+    if (sortZaBtn) {
+      sortZaBtn.onclick = () => {
+        this.uploadedFiles.sort((a, b) => b.name.localeCompare(a.name));
+        this.render();
+        Toast.info('Sorted files Z to A');
+      };
+    }
+
+    if (reverseBtn) {
+      reverseBtn.onclick = () => {
+        this.uploadedFiles.reverse();
+        this.render();
+        Toast.info('Reversed file order');
       };
     }
 
@@ -1853,6 +2141,34 @@ export class ToolWorkflowManager {
         const idx = parseInt(btn.getAttribute('data-rot-idx'), 10);
         this.uploadedFiles[idx].rotation = ((this.uploadedFiles[idx].rotation || 0) + 90) % 360;
         this.render();
+      };
+    });
+
+    // Move left single card
+    this.container.querySelectorAll('[data-move-left]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-move-left'), 10);
+        if (idx > 0) {
+          const item = this.uploadedFiles.splice(idx, 1)[0];
+          this.uploadedFiles.splice(idx - 1, 0, item);
+          this.render();
+          Toast.info(`Shifted file #${idx + 1} left`);
+        }
+      };
+    });
+
+    // Move right single card
+    this.container.querySelectorAll('[data-move-right]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-move-right'), 10);
+        if (idx < this.uploadedFiles.length - 1) {
+          const item = this.uploadedFiles.splice(idx, 1)[0];
+          this.uploadedFiles.splice(idx + 1, 0, item);
+          this.render();
+          Toast.info(`Shifted file #${idx + 1} right`);
+        }
       };
     });
 
@@ -2388,6 +2704,185 @@ export class ToolWorkflowManager {
       };
     }
 
+    // Sign Tool Controls
+    const signModePills = this.container.querySelectorAll('[data-sign-mode]');
+    signModePills.forEach(pill => {
+      pill.onclick = () => {
+        this.signMode = pill.getAttribute('data-sign-mode');
+        this.render();
+      };
+    });
+
+    const sigCanvas = this.container.querySelector('#workflow-sig-canvas');
+    const clearSigBtn = this.container.querySelector('#btn-clear-sig-canvas');
+    if (sigCanvas) {
+      const ctx = sigCanvas.getContext('2d');
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#0f172a';
+      let isDrawing = false;
+
+      const getPos = (e) => {
+        const rect = sigCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) * (sigCanvas.width / rect.width),
+          y: (clientY - rect.top) * (sigCanvas.height / rect.height)
+        };
+      };
+
+      const startDraw = (e) => {
+        e.preventDefault();
+        isDrawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      };
+
+      const moveDraw = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      };
+
+      const endDraw = (e) => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        this.signDataUrl = sigCanvas.toDataURL('image/png');
+        const overlayWrap = this.container.querySelector('#sign-preview-overlay');
+        if (overlayWrap) {
+          overlayWrap.innerHTML = `
+            <img src="${this.signDataUrl}" style="height: 38px; width: auto; max-width: 120px; display: block; margin: 0 auto;" />
+            ${this.includeSignDate ? `<div style="font-size: 9px; color: #64748b; margin-top: 2px; font-family: sans-serif;">Signed: ${this.signDate}</div>` : ''}
+          `;
+        }
+      };
+
+      sigCanvas.addEventListener('mousedown', startDraw);
+      sigCanvas.addEventListener('mousemove', moveDraw);
+      sigCanvas.addEventListener('mouseup', endDraw);
+      sigCanvas.addEventListener('mouseleave', endDraw);
+
+      sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+      sigCanvas.addEventListener('touchmove', moveDraw, { passive: false });
+      sigCanvas.addEventListener('touchend', endDraw, { passive: false });
+
+      if (clearSigBtn) {
+        clearSigBtn.onclick = () => {
+          ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+          this.signDataUrl = null;
+          this.render();
+        };
+      }
+    }
+
+    const signNameInp = this.container.querySelector('#workflow-sign-name');
+    const signFontSel = this.container.querySelector('#workflow-sign-font');
+    if (signNameInp) {
+      signNameInp.oninput = (e) => {
+        this.signName = e.target.value;
+        const overlayText = this.container.querySelector('#sign-preview-overlay div');
+        if (overlayText) overlayText.textContent = this.signName || 'Authorized Signature';
+      };
+    }
+    if (signFontSel) {
+      signFontSel.onchange = (e) => {
+        this.signFont = e.target.value;
+        const overlayText = this.container.querySelector('#sign-preview-overlay div');
+        if (overlayText) overlayText.style.fontFamily = `'${this.signFont}', cursive, sans-serif`;
+      };
+    }
+
+    const triggerUploadBtn = this.container.querySelector('#btn-trigger-sign-upload');
+    const signUploadInp = this.container.querySelector('#workflow-sign-upload');
+    if (triggerUploadBtn && signUploadInp) {
+      triggerUploadBtn.onclick = () => signUploadInp.click();
+      signUploadInp.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.signDataUrl = reader.result;
+            this.render();
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+    }
+
+    const signPosBtns = this.container.querySelectorAll('.btn-sign-pos');
+    signPosBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.signPos = btn.getAttribute('data-pos') || 'bottom-right';
+        this.render();
+      };
+    });
+
+    const includeDateCheck = this.container.querySelector('#chk-include-sign-date');
+    if (includeDateCheck) {
+      includeDateCheck.onchange = (e) => {
+        this.includeSignDate = e.target.checked;
+        this.render();
+      };
+    }
+
+    // Page Numbers Tool Controls
+    const pnFmtInp = this.container.querySelector('#workflow-pn-format');
+    const pnFmtPresets = this.container.querySelectorAll('.btn-pn-preset');
+    const pnPosBtns = this.container.querySelectorAll('.btn-pn-pos');
+    const pnStartInp = this.container.querySelector('#workflow-pn-start');
+    const pnSizeSel = this.container.querySelector('#workflow-pn-size');
+    const pnBadge = this.container.querySelector('#pn-preview-badge-overlay');
+
+    const updatePnPreview = () => {
+      if (pnBadge) {
+        const total = this.uploadedFiles[0]?.pageCount || 5;
+        pnBadge.textContent = (this.pnFormat || 'Page {n} of {total}')
+          .replace('{n}', String(this.pnStartPage || 1))
+          .replace('{total}', String(total));
+        pnBadge.style.cssText = `position: absolute; ${this.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #3b82f6; font-size: ${this.pnFontSize}px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;`;
+      }
+    };
+
+    if (pnFmtInp) {
+      pnFmtInp.oninput = (e) => {
+        this.pnFormat = e.target.value;
+        updatePnPreview();
+      };
+    }
+    pnFmtPresets.forEach(btn => {
+      btn.onclick = () => {
+        this.pnFormat = btn.getAttribute('data-fmt');
+        if (pnFmtInp) pnFmtInp.value = this.pnFormat;
+        updatePnPreview();
+      };
+    });
+    pnPosBtns.forEach(btn => {
+      btn.onclick = () => {
+        this.pnPos = btn.getAttribute('data-pos') || 'bottom-center';
+        pnPosBtns.forEach(b => {
+          b.className = b === btn ? 'btn btn-xs btn-primary btn-pn-pos' : 'btn btn-xs btn-outline btn-pn-pos';
+        });
+        updatePnPreview();
+      };
+    });
+    if (pnStartInp) {
+      pnStartInp.oninput = (e) => {
+        this.pnStartPage = parseInt(e.target.value, 10) || 1;
+        updatePnPreview();
+      };
+    }
+    if (pnSizeSel) {
+      pnSizeSel.onchange = (e) => {
+        this.pnFontSize = parseInt(e.target.value, 10) || 10;
+        updatePnPreview();
+      };
+    }
+
     // Primary Execute CTA
     if (execBtn) {
       execBtn.onclick = () => this.executeAction();
@@ -2839,6 +3334,63 @@ export class ToolWorkflowManager {
         const outBytes = await pdfDoc.save();
         this.processedBlob = new Blob([outBytes], { type: 'application/pdf' });
         this.processedFilename = `${docTitle}.pdf`;
+      } else if (t.id === 'sign') {
+        let sigBytes = null;
+
+        if (this.signDataUrl) {
+          const base64 = this.signDataUrl.split(',')[1];
+          const binStr = atob(base64);
+          sigBytes = new Uint8Array(binStr.length);
+          for (let i = 0; i < binStr.length; i++) sigBytes[i] = binStr.charCodeAt(i);
+        } else {
+          const offscreen = document.createElement('canvas');
+          offscreen.width = 400;
+          offscreen.height = 140;
+          const oCtx = offscreen.getContext('2d');
+          oCtx.fillStyle = '#0f172a';
+          oCtx.font = `italic 42px '${this.signFont}', 'Caveat', cursive, sans-serif`;
+          oCtx.textBaseline = 'middle';
+          oCtx.fillText(this.signName || 'Authorized Signature', 20, 70);
+
+          const dataUrl = offscreen.toDataURL('image/png');
+          const base64 = dataUrl.split(',')[1];
+          const binStr = atob(base64);
+          sigBytes = new Uint8Array(binStr.length);
+          for (let i = 0; i < binStr.length; i++) sigBytes[i] = binStr.charCodeAt(i);
+        }
+
+        const signedBytes = await PageOperations.signPdf(primary.bytes, {
+          imageBytes: sigBytes,
+          isPng: true,
+          position: this.signPos,
+          dateText: this.includeSignDate ? this.signDate : '',
+          targetPage: (primary.pageCount || 1) - 1,
+          width: 160,
+          height: 56
+        });
+        this.processedBlob = new Blob([signedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Signed_${primary.name}`;
+      } else if (t.id === 'pagenumbers') {
+        const numberedBytes = await PageOperations.addPageNumbers(primary.bytes, {
+          format: this.pnFormat,
+          position: this.pnPos,
+          startNumber: this.pnStartPage,
+          startPage: 1,
+          fontSize: this.pnFontSize
+        });
+        this.processedBlob = new Blob([numberedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Numbered_${primary.name}`;
+      } else if (t.id === 'flatten') {
+        const flatDoc = await PDFDocument.load(primary.bytes, { ignoreEncryption: true });
+        try {
+          const form = flatDoc.getForm();
+          form.flatten();
+        } catch (e) {
+          console.warn('Form flattening notice:', e);
+        }
+        const flatBytes = await flatDoc.save();
+        this.processedBlob = new Blob([flatBytes], { type: 'application/pdf' });
+        this.processedFilename = `Flattened_${primary.name}`;
       } else {
         this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
         this.processedFilename = `Processed_${primary.name}`;
@@ -2884,7 +3436,7 @@ export class ToolWorkflowManager {
       </header>
 
       <main class="workflow-main">
-        <div class="workflow-hero-card" style="max-width: 620px;">
+        <div class="workflow-hero-card" style="max-width: 500px;">
           <div class="workflow-success-ring">
             <svg width="48" height="48" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>

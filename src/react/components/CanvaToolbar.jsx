@@ -14,7 +14,8 @@ import {
   Layers,
   Wrench,
   RefreshCw,
-  Search
+  Search,
+  Link as LinkIcon
 } from 'lucide-react';
 import { store } from '../../core/state-store.js';
 import { allToolsModal } from '../../components/all-tools-modal.js';
@@ -23,6 +24,7 @@ import { extractImagesModal } from '../../components/extract-images-modal.js';
 const PRIMARY_TOOLS = [
   { id: 'select', label: 'Select', icon: MousePointer },
   { id: 'text', label: 'Text', icon: Type },
+  { id: 'link', label: 'Link', icon: LinkIcon },
   { id: 'draw', label: 'Draw', icon: PenLine },
   { id: 'highlight', label: 'Highlight', icon: Highlighter },
   { id: 'eraser', label: 'Eraser', icon: Eraser },
