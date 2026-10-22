@@ -43,6 +43,10 @@ export class PdfEngine {
     return await this.loader.createSamplePdf();
   }
 
+  async createBlankPdf() {
+    return await this.loader.createBlankPdf();
+  }
+
   async getPage(pageNum) {
     return await this.loader.getPage(pageNum);
   }

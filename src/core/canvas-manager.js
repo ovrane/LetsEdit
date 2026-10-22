@@ -4,7 +4,8 @@
 
 import { pdfEngine } from './pdf-engine.js';
 import { store } from './state-store.js';
-import { uid } from '../utils/helpers.js';
+import { uid, readFileAsArrayBuffer } from '../utils/helpers.js';
+import { Toast } from '../components/toast.js';
 import { ResizeGizmo } from './canvas/resize-gizmo.js';
 import { EraserHandler } from './canvas/eraser.js';
 import { TextClustering } from './canvas/text-clustering.js';
@@ -21,6 +22,7 @@ export class CanvasManager {
     this.dragTarget = null;
     this.renderedPages = new Set();
     this.pageObserver = null;
+    this.currentPageNumber = 1;
 
     this.bindGlobalEvents();
   }
@@ -31,11 +33,16 @@ export class CanvasManager {
     this.renderedPages.clear();
 
     const state = store.getState();
-    if (!state.pdfBytes || state.pageCount === 0) return;
+    if (!state.pdfBytes || state.pageCount === 0) {
+      this.renderEmptyState();
+      return;
+    }
 
     const pageOrder = state.pageOrder && state.pageOrder.length > 0
       ? state.pageOrder
       : Array.from({ length: state.pageCount }, (_, i) => i + 1);
+
+    const activePages = pageOrder.filter(p => !state.deletedPages.has(p));
 
     // Virtualized IntersectionObserver for large documents (50+ pages)
     if (typeof IntersectionObserver !== 'undefined') {
@@ -50,12 +57,14 @@ export class CanvasManager {
               this.renderedPages.add(pageNum);
               this.renderPage(pageNum);
             }
+            // Update active visible page in paging bar
+            this.updateCurrentPage(pageNum);
           }
         }
       }, {
         root: null,
         rootMargin: '600px 0px 600px 0px',
-        threshold: 0.01
+        threshold: 0.1
       });
     }
 
@@ -65,13 +74,347 @@ export class CanvasManager {
       this.container.appendChild(pageWrapper);
 
       // Render first page immediately; lazy-render remaining pages on viewport proximity
-      if (p === pageOrder[0] || !this.pageObserver) {
+      if (p === activePages[0] || !this.pageObserver) {
         this.renderedPages.add(p);
         await this.renderPage(p);
       } else {
         this.pageObserver.observe(pageWrapper);
       }
     }
+
+    this.renderPagingBar(activePages);
+    this.initScrollSync();
+  }
+
+  renderEmptyState() {
+    const pagingBar = document.getElementById('editor-paging-bar');
+    if (pagingBar) pagingBar.style.display = 'none';
+
+    const emptyWrap = document.createElement('div');
+    emptyWrap.className = 'editor-upload-card';
+    emptyWrap.id = 'editor-empty-dropzone';
+    emptyWrap.innerHTML = `
+      <div class="editor-upload-icon-circle">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M12 18v-6m-3 3l3-3 3 3"></path>
+        </svg>
+      </div>
+      <h2 class="editor-upload-title">Upload PDF to Start Editing</h2>
+      <p class="editor-upload-subtitle">
+        Edit existing text, fill & sign forms, add shapes, whiteout sensitive data, and annotate directly in your browser.
+      </p>
+
+      <div class="editor-upload-actions">
+        <input type="file" id="editor-empty-file-input" accept="application/pdf" style="display:none;" />
+        <button class="btn btn-primary btn-lg" id="btn-editor-upload-pdf">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+          <span>Choose PDF Document</span>
+        </button>
+        <button class="btn btn-outline btn-lg" id="btn-editor-blank-doc">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line></svg>
+          <span>Start with Blank Page</span>
+        </button>
+      </div>
+
+      <div class="editor-upload-drop-hint">
+        or drag and drop your PDF anywhere in this window
+      </div>
+
+      <div class="editor-upload-sample-link">
+        Want to test all features first? <button class="btn-link" id="btn-editor-load-sample">Load a sample contract</button>
+      </div>
+
+      <div class="editor-upload-features">
+        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 100% Private (No Cloud Uploads)</div>
+        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Edit Original Text</div>
+        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Sub-Second WASM Engine</div>
+      </div>
+    `;
+
+    this.container.appendChild(emptyWrap);
+
+    const fileInp = emptyWrap.querySelector('#editor-empty-file-input');
+    const uploadBtn = emptyWrap.querySelector('#btn-editor-upload-pdf');
+    const blankBtn = emptyWrap.querySelector('#btn-editor-blank-doc');
+    const sampleBtn = emptyWrap.querySelector('#btn-editor-load-sample');
+
+    if (uploadBtn && fileInp) {
+      uploadBtn.onclick = () => fileInp.click();
+      fileInp.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file && file.type === 'application/pdf') {
+          try {
+            Toast.info('Loading PDF document...');
+            const ab = await readFileAsArrayBuffer(file);
+            const info = await pdfEngine.loadPdf(ab);
+            store.setDocument(ab, file.name, info.numPages);
+            const filenameEl = document.getElementById('current-filename');
+            if (filenameEl) filenameEl.textContent = file.name;
+            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
+          } catch (err) {
+            console.error(err);
+            Toast.error('Could not load PDF');
+          }
+        }
+      };
+    }
+
+    if (blankBtn) {
+      blankBtn.onclick = async () => {
+        try {
+          Toast.info('Creating clean blank page...');
+          const blankBytes = await pdfEngine.createBlankPdf();
+          const info = await pdfEngine.loadPdf(blankBytes);
+          store.setDocument(blankBytes, 'Blank_Document.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Blank_Document.pdf';
+          Toast.success('Blank document ready! Add text, shapes, or signatures.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to create blank page');
+        }
+      };
+    }
+
+    if (sampleBtn) {
+      sampleBtn.onclick = async () => {
+        try {
+          Toast.info('Loading sample agreement...');
+          const sampleBytes = await pdfEngine.createSamplePdf();
+          const info = await pdfEngine.loadPdf(sampleBytes);
+          store.setDocument(sampleBytes, 'Sample_Agreement.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Sample_Agreement.pdf';
+          Toast.success('Sample document loaded! Ready to edit.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to load sample document');
+        }
+      };
+    }
+
+    emptyWrap.ondragover = (e) => {
+      e.preventDefault();
+      emptyWrap.classList.add('drag-over');
+    };
+    emptyWrap.ondragleave = () => {
+      emptyWrap.classList.remove('drag-over');
+    };
+    emptyWrap.ondrop = async (e) => {
+      e.preventDefault();
+      emptyWrap.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        try {
+          Toast.info('Loading PDF document...');
+          const ab = await readFileAsArrayBuffer(file);
+          const info = await pdfEngine.loadPdf(ab);
+          store.setDocument(ab, file.name, info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = file.name;
+          Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
+        } catch (err) {
+          console.error(err);
+          Toast.error('Could not load PDF');
+        }
+      } else {
+        Toast.error('Please drop a valid PDF document');
+      }
+    };
+  }
+
+  renderPagingBar(activePages) {
+    if (!activePages || activePages.length === 0) {
+      const existing = document.getElementById('editor-paging-bar');
+      if (existing) existing.style.display = 'none';
+      return;
+    }
+
+    let bar = document.getElementById('editor-paging-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'editor-paging-bar';
+      bar.className = 'editor-paging-bar';
+      document.body.appendChild(bar);
+    }
+    bar.style.display = 'flex';
+
+    const totalPages = activePages.length;
+    const currentNum = this.currentPageNumber || 1;
+
+    bar.innerHTML = `
+      <div class="paging-group">
+        <button class="paging-btn" id="paging-btn-prev" title="Previous Page (PgUp)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <span class="paging-label">
+          Page <input type="number" id="paging-input-page" class="paging-input" min="1" max="${totalPages}" value="${currentNum}" /> of ${totalPages}
+        </span>
+        <button class="paging-btn" id="paging-btn-next" title="Next Page (PgDn)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+        </button>
+      </div>
+
+      <div class="paging-divider"></div>
+
+      <div class="paging-group">
+        <button class="paging-btn" id="paging-btn-zoom-out" title="Zoom Out (-)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <span class="paging-zoom-text" id="paging-zoom-val">${Math.round((store.getState().scale || 1.0) * 100)}%</span>
+        <button class="paging-btn" id="paging-btn-zoom-in" title="Zoom In (+)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
+
+      <div class="paging-divider"></div>
+
+      <button class="paging-fit-btn" id="paging-btn-fit" title="Fit to 100% Zoom">100%</button>
+    `;
+
+    const prevBtn = bar.querySelector('#paging-btn-prev');
+    const nextBtn = bar.querySelector('#paging-btn-next');
+    const pageInp = bar.querySelector('#paging-input-page');
+    const zoomOut = bar.querySelector('#paging-btn-zoom-out');
+    const zoomIn = bar.querySelector('#paging-btn-zoom-in');
+    const zoomFit = bar.querySelector('#paging-btn-fit');
+
+    if (prevBtn) {
+      prevBtn.onclick = () => this.goToPrevPage();
+    }
+
+    if (nextBtn) {
+      nextBtn.onclick = () => this.goToNextPage();
+    }
+
+    if (pageInp) {
+      pageInp.onchange = () => {
+        const val = parseInt(pageInp.value, 10);
+        if (val >= 1 && val <= activePages.length) {
+          this.scrollToPage(activePages[val - 1]);
+        } else {
+          pageInp.value = this.currentPageNumber;
+        }
+      };
+    }
+
+    if (zoomOut) {
+      zoomOut.onclick = () => {
+        const cur = store.getState().scale;
+        store.setScale(cur - 0.15);
+      };
+    }
+
+    if (zoomIn) {
+      zoomIn.onclick = () => {
+        const cur = store.getState().scale;
+        store.setScale(cur + 0.15);
+      };
+    }
+
+    if (zoomFit) {
+      zoomFit.onclick = () => {
+        store.setScale(1.0);
+      };
+    }
+  }
+
+  goToNextPage() {
+    const state = store.getState();
+    const activePages = state.pageOrder && state.pageOrder.length > 0
+      ? state.pageOrder.filter(p => !state.deletedPages.has(p))
+      : Array.from({ length: state.pageCount }, (_, i) => i + 1).filter(p => !state.deletedPages.has(p));
+    const idx = activePages.indexOf(this.currentPageNumber);
+    if (idx !== -1 && idx < activePages.length - 1) {
+      this.scrollToPage(activePages[idx + 1]);
+    }
+  }
+
+  goToPrevPage() {
+    const state = store.getState();
+    const activePages = state.pageOrder && state.pageOrder.length > 0
+      ? state.pageOrder.filter(p => !state.deletedPages.has(p))
+      : Array.from({ length: state.pageCount }, (_, i) => i + 1).filter(p => !state.deletedPages.has(p));
+    const idx = activePages.indexOf(this.currentPageNumber);
+    if (idx > 0) {
+      this.scrollToPage(activePages[idx - 1]);
+    }
+  }
+
+  initScrollSync() {
+    if (this._scrollBound) return;
+    this._scrollBound = true;
+
+    let scrollRaf = null;
+    this.container.addEventListener('scroll', () => {
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = requestAnimationFrame(() => {
+        const state = store.getState();
+        if (!state.pdfBytes || state.pageCount === 0) return;
+
+        const viewportRect = this.container.getBoundingClientRect();
+        const viewportCenterY = viewportRect.top + viewportRect.height / 2;
+
+        let closestPage = null;
+        let minDistance = Infinity;
+
+        const activePages = state.pageOrder && state.pageOrder.length > 0
+          ? state.pageOrder.filter(p => !state.deletedPages.has(p))
+          : Array.from({ length: state.pageCount }, (_, i) => i + 1).filter(p => !state.deletedPages.has(p));
+
+        for (const pageNum of activePages) {
+          const el = document.getElementById(`page-wrap-${pageNum}`);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            const pageCenterY = rect.top + rect.height / 2;
+            const distance = Math.abs(viewportCenterY - pageCenterY);
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestPage = pageNum;
+            }
+          }
+        }
+
+        if (closestPage && closestPage !== this.currentPageNumber) {
+          this.updateCurrentPage(closestPage);
+        }
+      });
+    }, { passive: true });
+  }
+
+  scrollToPage(pageNum) {
+    const el = document.getElementById(`page-wrap-${pageNum}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.updateCurrentPage(pageNum);
+    }
+  }
+
+  updateCurrentPage(pageNum) {
+    this.currentPageNumber = pageNum;
+    const pageInp = document.getElementById('paging-input-page');
+    if (pageInp) {
+      const state = store.getState();
+      const pageOrder = state.pageOrder && state.pageOrder.length > 0
+        ? state.pageOrder.filter(p => !state.deletedPages.has(p))
+        : [];
+      const idx = pageOrder.indexOf(pageNum);
+      if (idx !== -1) {
+        pageInp.value = (idx + 1).toString();
+      }
+    }
+
+    // Highlight active page thumbnail in sidebar
+    const thumbs = document.querySelectorAll('.thumb-card');
+    thumbs.forEach(t => {
+      if (Number(t.dataset.page) === pageNum) {
+        t.classList.add('active-page-thumb');
+      } else {
+        t.classList.remove('active-page-thumb');
+      }
+    });
   }
 
   createPageElement(pageNum) {
@@ -572,6 +915,9 @@ export class CanvasManager {
     this.deselectAnnotation();
     this.selectedAnnotation = { pageNum, ann, el };
     el.classList.add('selected');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('letsedit:annotation-selected', { detail: { pageNum, ann, el } }));
+    }
   }
 
   deselectAnnotation() {
@@ -580,6 +926,9 @@ export class CanvasManager {
         this.selectedAnnotation.el.classList.remove('selected');
       }
       this.selectedAnnotation = null;
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('letsedit:annotation-deselected'));
+      }
     }
   }
 
@@ -835,13 +1184,25 @@ export class CanvasManager {
       });
 
       window.addEventListener('keydown', (e) => {
-        if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedAnnotation) {
-          if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
+        if (!e.target.matches('input, textarea, [contenteditable="true"]')) {
+          if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedAnnotation) {
             e.preventDefault();
             const { pageNum, ann } = this.selectedAnnotation;
             store.removeAnnotation(pageNum, ann.id);
             this.deselectAnnotation();
+          } else if (e.key === 'PageDown') {
+            e.preventDefault();
+            this.goToNextPage();
+          } else if (e.key === 'PageUp') {
+            e.preventDefault();
+            this.goToPrevPage();
           }
+        }
+      });
+
+      window.addEventListener('letsedit:scroll-to-page', (e) => {
+        if (e.detail?.pageNum) {
+          this.scrollToPage(e.detail.pageNum);
         }
       });
     }

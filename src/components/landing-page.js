@@ -62,25 +62,33 @@ export class LandingPage {
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </button>
               <div class="landing-dropdown-menu">
-                <button class="landing-dropdown-item" data-action="action:images-to-pdf">
+                <button class="landing-dropdown-item" data-action="workflow:images-to-pdf">
                   <span class="dropdown-item-title">Images to PDF</span>
                   <span class="dropdown-item-desc">Convert JPG/PNG to PDF</span>
                 </button>
-                <button class="landing-dropdown-item" data-action="modal:to-image">
+                <button class="landing-dropdown-item" data-action="workflow:to-image">
                   <span class="dropdown-item-title">PDF to JPG / PNG</span>
                   <span class="dropdown-item-desc">Extract pages as images</span>
                 </button>
-                <button class="landing-dropdown-item" data-action="action:extract-text">
+                <button class="landing-dropdown-item" data-action="workflow:pdf-to-text">
                   <span class="dropdown-item-title">PDF to Text</span>
                   <span class="dropdown-item-desc">Extract plain text</span>
                 </button>
-                <button class="landing-dropdown-item" data-action="modal:extract-images">
+                <button class="landing-dropdown-item" data-action="workflow:extract-images">
                   <span class="dropdown-item-title">Extract Images</span>
                   <span class="dropdown-item-desc">Extract embedded JPEG/PNGs</span>
                 </button>
-                <button class="landing-dropdown-item" data-action="modal:pdfa">
+                <button class="landing-dropdown-item" data-action="workflow:pdfa">
                   <span class="dropdown-item-title">PDF to PDF/A</span>
                   <span class="dropdown-item-desc">ISO 19005-1 compliance</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:html-to-pdf">
+                  <span class="dropdown-item-title">HTML to PDF</span>
+                  <span class="dropdown-item-desc">Convert HTML or code to PDF</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:word-to-pdf">
+                  <span class="dropdown-item-title">Word to PDF</span>
+                  <span class="dropdown-item-desc">Convert DOCX to PDF</span>
                 </button>
               </div>
             </div>
@@ -95,17 +103,17 @@ export class LandingPage {
                 <div class="mega-menu-grid">
                   <div class="mega-column">
                     <div class="mega-col-title">ORGANIZE & PAGES</div>
-                    <button class="mega-item" data-action="modal:split">Let's Split Pages</button>
-                    <button class="mega-item" data-action="sidebar:merge">Let's Merge PDF</button>
+                    <button class="mega-item" data-action="workflow:split">Let's Split Pages</button>
+                    <button class="mega-item" data-action="workflow:merge">Let's Merge PDF</button>
                     <button class="mega-item" data-action="sidebar:delete">Let's Delete Pages</button>
                     <button class="mega-item" data-action="workflow:organize">Let's Organize Pages</button>
                     <button class="mega-item" data-action="workflow:deskew">Let's Deskew Scans</button>
-                    <button class="mega-item" data-action="modal:split-half">Let's Split in Half</button>
-                    <button class="mega-item" data-action="modal:alternate-mix">Let's Alternate & Mix</button>
-                    <button class="mega-item" data-action="modal:nup">Let's N-Up Imposition</button>
-                    <button class="mega-item" data-action="modal:flip">Let's Flip Pages</button>
-                    <button class="mega-item" data-action="modal:crop">Let's Crop Margins</button>
-                    <button class="mega-item" data-action="modal:resize">Let's Resize Margins</button>
+                    <button class="mega-item" data-action="workflow:split-half">Let's Split in Half</button>
+                    <button class="mega-item" data-action="workflow:alternate-mix">Let's Alternate & Mix</button>
+                    <button class="mega-item" data-action="workflow:nup">Let's N-Up Imposition</button>
+                    <button class="mega-item" data-action="workflow:flip">Let's Flip Pages</button>
+                    <button class="mega-item" data-action="workflow:crop">Let's Crop Margins</button>
+                    <button class="mega-item" data-action="workflow:resize">Let's Resize Margins</button>
                   </div>
 
                   <div class="mega-column">
@@ -124,26 +132,28 @@ export class LandingPage {
 
                   <div class="mega-column">
                     <div class="mega-col-title">OPTIMIZE & SECURITY</div>
-                    <button class="mega-item" data-action="modal:compress">Let's Compress PDF</button>
-                    <button class="mega-item" data-action="modal:ocr">Let's OCR PDF</button>
-                    <button class="mega-item" data-action="modal:compare">Let's Compare PDF</button>
-                    <button class="mega-item" data-action="modal:repair">Let's Repair PDF</button>
-                    <button class="mega-item" data-action="modal:security">Let's Protect & Encrypt</button>
-                    <button class="mega-item" data-action="modal:watermark">Let's Watermark PDF</button>
-                    <button class="mega-item" data-action="modal:grayscale">Let's Grayscale PDF</button>
+                    <button class="mega-item" data-action="workflow:compress">Let's Compress PDF</button>
+                    <button class="mega-item" data-action="workflow:ocr-pdf">Let's OCR PDF</button>
+                    <button class="mega-item" data-action="workflow:compare">Let's Compare PDF</button>
+                    <button class="mega-item" data-action="workflow:repair">Let's Repair PDF</button>
+                    <button class="mega-item" data-action="workflow:security">Let's Protect & Encrypt</button>
+                    <button class="mega-item" data-action="workflow:watermark">Let's Watermark PDF</button>
+                    <button class="mega-item" data-action="workflow:grayscale">Let's Grayscale PDF</button>
                     <button class="mega-item" data-action="modal:pagenumbers">Let's Number Pages</button>
-                    <button class="mega-item" data-action="modal:bates">Let's Bates Number</button>
+                    <button class="mega-item" data-action="workflow:bates">Let's Bates Number</button>
                     <button class="mega-item" data-action="modal:metadata">Let's Edit Metadata</button>
                     <button class="mega-item" data-action="action:flatten">Let's Flatten Forms</button>
                   </div>
 
                   <div class="mega-column">
                     <div class="mega-col-title">CONVERT</div>
-                    <button class="mega-item" data-action="modal:to-image">Let's Convert to JPG</button>
-                    <button class="mega-item" data-action="modal:extract-images">Let's Extract Images</button>
-                    <button class="mega-item" data-action="modal:pdfa">Let's PDF to PDF/A</button>
-                    <button class="mega-item" data-action="action:images-to-pdf">Let's Images to PDF</button>
-                    <button class="mega-item" data-action="action:extract-text">Let's Extract Text</button>
+                    <button class="mega-item" data-action="workflow:to-image">Let's Convert to JPG</button>
+                    <button class="mega-item" data-action="workflow:extract-images">Let's Extract Images</button>
+                    <button class="mega-item" data-action="workflow:pdfa">Let's PDF to PDF/A</button>
+                    <button class="mega-item" data-action="workflow:images-to-pdf">Let's Images to PDF</button>
+                    <button class="mega-item" data-action="workflow:pdf-to-text">Let's Extract Text</button>
+                    <button class="mega-item" data-action="workflow:html-to-pdf">Let's HTML to PDF</button>
+                    <button class="mega-item" data-action="workflow:word-to-pdf">Let's Word to PDF</button>
                   </div>
                 </div>
               </div>
@@ -162,7 +172,6 @@ export class LandingPage {
                 <span class="user-name-label">Log in</span>
               </button>
             </div>
-            <button class="btn btn-primary" id="btn-enter-studio">Open Editor Studio</button>
           </div>
         </div>
       </header>
@@ -604,10 +613,12 @@ export class LandingPage {
       Toast.info('Editing sample document');
     };
 
-    // Open Studio button in header
-    enterStudioBtn.onclick = () => {
-      this.switchToStudio();
-    };
+    // Open Studio button in header (if present)
+    if (enterStudioBtn) {
+      enterStudioBtn.onclick = () => {
+        this.switchToStudio();
+      };
+    }
 
     // Filter Chips
     const chips = this.container.querySelectorAll('.landing-filter-chip');

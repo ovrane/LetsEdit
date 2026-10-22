@@ -27,7 +27,7 @@
   }
   </script>
 </head>
-<body class="show-landing sidebar-open">
+<body class="show-landing sidebar-open tool-sidebar-open">
 
   <!-- Main Top Navbar -->
   <header class="app-navbar">
@@ -49,7 +49,7 @@
         </div>
         <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
       </div>
-      <span class="file-name-tag" id="current-filename">Sample_Document.pdf</span>
+      <span class="file-name-tag" id="current-filename">No document selected</span>
       <input type="file" id="upload-pdf-input" accept="application/pdf" style="display:none;" />
       <button class="btn btn-sm btn-outline" id="btn-open-pdf">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -94,6 +94,10 @@
       <button class="icon-btn" id="btn-toggle-theme" title="Toggle Light / Dark Studio Mode">
         <svg id="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
         <svg id="theme-icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+      </button>
+
+      <button class="icon-btn" id="btn-toggle-tool-sidebar" title="Toggle Tool Options Sidebar">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
       </button>
 
       <button class="btn btn-primary btn-sm" id="btn-save-pdf">
@@ -428,6 +432,9 @@
 
     <!-- Main Scrollable Canvas Viewport -->
     <section class="document-viewport" id="document-viewport"></section>
+
+    <!-- Right Tool Options Sidebar -->
+    <aside class="tool-options-sidebar" id="tool-options-sidebar"></aside>
   </main>
 
   <script type="module" src="/src/main.js"></script>

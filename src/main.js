@@ -30,6 +30,7 @@ import { extractImagesModal } from './components/extract-images-modal.js';
 import { ocrModal } from './components/ocr-modal.js';
 import { allToolsModal } from './components/all-tools-modal.js';
 import { landingPage } from './components/landing-page.js';
+import { toolOptionsPanel } from './components/tool-options-panel.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
@@ -49,6 +50,7 @@ class App {
   async init() {
     const viewport = document.getElementById('document-viewport');
     const sidebarEl = document.getElementById('app-sidebar');
+    const toolSidebarEl = document.getElementById('tool-options-sidebar');
 
     // Initialize core components
     this.canvasManager = new CanvasManager(viewport);
@@ -60,6 +62,10 @@ class App {
     this.pageNumbersModal = new PageNumbersModal();
     this.securityModal = new SecurityModal();
 
+    if (toolSidebarEl) {
+      toolOptionsPanel.mount(toolSidebarEl);
+    }
+
     this.bindNavbarEvents();
     this.bindToolbarEvents();
     this.bindKeyboardShortcuts();
@@ -68,16 +74,10 @@ class App {
     const recovered = this.tryRestoreAutosave();
 
     if (!recovered) {
-      // Create and load default sample PDF
-      try {
-        const sampleBytes = await pdfEngine.createSamplePdf();
-        const info = await pdfEngine.loadPdf(sampleBytes);
-        store.setDocument(sampleBytes, 'Sample_Agreement.pdf', info.numPages);
-        Toast.success('Sample PDF loaded! Ready to edit.');
-      } catch (err) {
-        console.error('Failed to create sample PDF:', err);
-        Toast.error('Could not initialize sample document');
-      }
+      // Don't auto-load a dummy sample document! Ask user for their PDF or start with blank
+      this.canvasManager.renderEmptyState();
+      const filenameEl = document.getElementById('current-filename');
+      if (filenameEl) filenameEl.textContent = 'No document selected';
     }
   }
 
@@ -340,6 +340,10 @@ class App {
         btn.classList.add('active');
         store.setTool(tool);
 
+        // Update Right Tool Options Sidebar and open if closed
+        toolOptionsPanel.render();
+        toolOptionsPanel.toggle(true);
+
         // Adjust properties bar based on tool
         colorWrap.style.display = ['text', 'draw', 'highlight', 'shape'].includes(tool) ? 'flex' : 'none';
         fontSizeWrap.style.display = tool === 'text' ? 'flex' : 'none';
@@ -450,6 +454,12 @@ class App {
 
   bindKeyboardShortcuts() {
     window.addEventListener('keydown', (e) => {
+      // Save / Export
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        const saveBtn = document.getElementById('btn-save-pdf');
+        if (saveBtn) saveBtn.click();
+      }
       // Undo
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
         if (!e.target.matches('input, textarea')) {
@@ -464,6 +474,19 @@ class App {
           e.preventDefault();
           store.redo();
         }
+      }
+      // Zoom shortcuts
+      if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
+        e.preventDefault();
+        store.setScale(store.getState().scale + 0.15);
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === '-' || e.key === '_')) {
+        e.preventDefault();
+        store.setScale(store.getState().scale - 0.15);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+        e.preventDefault();
+        store.setScale(1.0);
       }
       // Escape to select tool
       if (e.key === 'Escape') {

@@ -155,6 +155,13 @@ export class DocumentLoader {
     return pdfBytes.buffer;
   }
 
+  async createBlankPdf() {
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.addPage([595.28, 841.89]); // A4 dimensions
+    const pdfBytes = await pdfDoc.save();
+    return pdfBytes.buffer;
+  }
+
   async getPage(pageNum) {
     if (!this.pdfDoc) throw new Error('No PDF loaded');
     return await this.pdfDoc.getPage(pageNum);

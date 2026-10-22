@@ -7,6 +7,7 @@ import { pdfEngine } from '../core/pdf-engine.js';
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
+import { toolWorkflow } from './tool-workflow.js';
 
 export class Sidebar {
   constructor(container) {
@@ -54,9 +55,9 @@ export class Sidebar {
       }
     };
 
-    // Merge External PDF
+    // Merge External PDF Workflow
     this.container.querySelector('#sidebar-merge-pdf-btn').onclick = () => {
-      mergeInput.click();
+      toolWorkflow.openTool('merge');
     };
 
     mergeInput.onchange = async (e) => {
@@ -171,10 +172,7 @@ export class Sidebar {
       // Click to scroll into view
       card.onclick = (e) => {
         if (e.target.closest('.thumb-actions')) return;
-        const targetPage = document.getElementById(`page-wrap-${p}`);
-        if (targetPage) {
-          targetPage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        window.dispatchEvent(new CustomEvent('letsedit:scroll-to-page', { detail: { pageNum: p } }));
       };
 
       // Actions

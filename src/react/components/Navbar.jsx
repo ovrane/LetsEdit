@@ -34,23 +34,16 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
     <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 flex items-center justify-between z-30 transition-colors">
       {/* Brand & Left Actions */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={onToggleMode}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition shadow-sm"
-          title={isStudioMode ? "Back to All Tools Home" : "Open Studio Editor"}
-        >
-          {isStudioMode ? (
-            <>
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>All Tools</span>
-            </>
-          ) : (
-            <>
-              <Grid className="w-3.5 h-3.5" />
-              <span>Open Studio</span>
-            </>
-          )}
-        </button>
+        {isStudioMode && (
+          <button
+            onClick={onToggleMode}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition shadow-sm"
+            title="Back to All Tools Home"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>All Tools</span>
+          </button>
+        )}
 
         <div className="lets-logo" onClick={() => onToggleMode(false)} title="LetsEdit — Home">
           <div className="lets-logo-badge">
