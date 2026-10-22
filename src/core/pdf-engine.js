@@ -79,8 +79,16 @@ export class PdfEngine {
     return await PageOperations.mergePdf(pdfBytesList);
   }
 
-  async splitPdf(rangeExpression) {
-    return await PageOperations.splitPdf(this.rawBytes, rangeExpression);
+  async splitPdf(pdfBytesOrRange = null, maybeRange = null) {
+    let bytes = this.rawBytes;
+    let range = 'all';
+    if (pdfBytesOrRange instanceof ArrayBuffer || pdfBytesOrRange instanceof Uint8Array) {
+      bytes = pdfBytesOrRange;
+      range = maybeRange || 'all';
+    } else if (typeof pdfBytesOrRange === 'string') {
+      range = pdfBytesOrRange;
+    }
+    return await PageOperations.splitPdf(bytes, range);
   }
 
   async splitInHalf(direction = 'vertical') {
@@ -100,8 +108,8 @@ export class PdfEngine {
     return await PageOperations.flipPages(bytes, options);
   }
 
-  async imagesToPdf(imagesList) {
-    return await PageOperations.imagesToPdf(imagesList);
+  async imagesToPdf(imagesList, options = {}) {
+    return await PageOperations.imagesToPdf(imagesList, options);
   }
 
   // --- Transform Operations (Margins, Compression, Grayscale) ---

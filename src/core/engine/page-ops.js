@@ -345,12 +345,17 @@ export class PageOperations {
   }
 
   /**
-   * Converts an array of images (data URL or Uint8Array/ArrayBuffer) into a clean A4 PDF.
+   * Converts an array of images into a clean PDF with custom orientation and margins.
    */
-  static async imagesToPdf(imagesList) {
+  static async imagesToPdf(imagesList, options = {}) {
     const finalDoc = await PDFDocument.create();
-    const pageW = 595.28;
-    const pageH = 841.89;
+    const orientation = options.orientation || 'portrait';
+    const margin = typeof options.margin === 'number' ? options.margin : (parseInt(options.margin, 10) || 0);
+
+    const baseW = 595.28;
+    const baseH = 841.89;
+    const pageW = orientation === 'landscape' ? baseH : baseW;
+    const pageH = orientation === 'landscape' ? baseW : baseH;
 
     for (const item of imagesList) {
       let imgBytes = item.bytes;
@@ -362,7 +367,10 @@ export class PageOperations {
       if (!imgBytes) continue;
 
       let embeddedImg;
-      const isJpg = item.isJpg || (item.dataUrl && (item.dataUrl.includes('image/jpeg') || item.dataUrl.includes('image/jpg')));
+      const u8 = new Uint8Array(imgBytes);
+      const isPng = u8[0] === 0x89 && u8[1] === 0x50 && u8[2] === 0x4E && u8[3] === 0x47;
+      const isJpg = (u8[0] === 0xFF && u8[1] === 0xD8) || (!isPng && (item.isJpg || (item.name && (item.name.toLowerCase().endsWith('.jpg') || item.name.toLowerCase().endsWith('.jpeg')))));
+
       if (isJpg) {
         embeddedImg = await finalDoc.embedJpg(imgBytes);
       } else {
@@ -370,14 +378,16 @@ export class PageOperations {
       }
 
       const imgDims = embeddedImg.scale(1.0);
-      const scale = Math.min((pageW - 40) / imgDims.width, (pageH - 40) / imgDims.height);
+      const availW = Math.max(20, pageW - margin * 2);
+      const availH = Math.max(20, pageH - margin * 2);
+      const scale = Math.min(availW / imgDims.width, availH / imgDims.height);
       const scaledW = imgDims.width * scale;
       const scaledH = imgDims.height * scale;
 
       const page = finalDoc.addPage([pageW, pageH]);
       page.drawImage(embeddedImg, {
-        x: (pageW - scaledW) / 2,
-        y: (pageH - scaledH) / 2,
+        x: margin + (availW - scaledW) / 2,
+        y: margin + (availH - scaledH) / 2,
         width: scaledW,
         height: scaledH
       });

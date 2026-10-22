@@ -2834,3 +2834,97 @@ body.show-tool-workflow .tool-workflow-container {
   align-items: center;
   justify-content: center;
 }
+
+/* Drag and Drop Card Styles */
+.workflow-file-card.dragging {
+  opacity: 0.45;
+  transform: scale(0.96);
+  border: 2px dashed var(--primary);
+  cursor: grabbing;
+}
+
+.workflow-file-card.drag-over {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.file-card-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Tool Option Pills & Controls */
+.split-mode-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.split-mode-pill {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.split-mode-pill:hover {
+  border-color: var(--primary);
+}
+
+.split-mode-pill.active {
+  border-color: var(--primary);
+  background: rgba(2, 132, 199, 0.1);
+  color: var(--primary);
+}
+
+.tool-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.tool-segmented-control {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-main);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.tool-seg-btn {
+  flex: 1;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tool-seg-btn:hover {
+  color: var(--text-main);
+}
+
+.tool-seg-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+

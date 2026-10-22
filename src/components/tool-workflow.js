@@ -2,14 +2,28 @@
  * Dedicated Tool Workflow Component (iLovePDF & Sejda Reverse-Engineered Architecture)
  * Provides focused, distraction-free tool workflows for Merge, Compress, Split, Convert, OCR, etc.
  * Features dedicated file uploaders tailored per tool (PDF only vs PDF+Images vs Images),
- * specialized processing workspaces with drag-and-drop reordering, and instant download cards.
+ * interactive drag-and-drop card reordering with real PDF.js live thumbnails & page counts,
+ * and instant single-click client-side download cards.
  */
 
+import * as pdfjsLib from 'pdfjs-dist';
+import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
+import JSZip from 'jszip';
 import { pdfEngine } from '../core/pdf-engine.js';
+import { PageOperations } from '../core/engine/page-ops.js';
+import { applyPdfEncryption } from '../core/pdf-crypto.js';
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
-import { downloadBlob, readFileAsArrayBuffer, formatFileSize } from '../utils/helpers.js';
-import { applyTheme, toggleTheme, getPreferredTheme } from '../utils/theme.js';
+import { downloadBlob, readFileAsArrayBuffer, formatFileSize, hexToRgb } from '../utils/helpers.js';
+import { toggleTheme } from '../utils/theme.js';
+
+// Setup PDF.js worker safely across browser and test runtimes
+const workerSrc = typeof window !== 'undefined'
+  ? new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+  : '';
+if (workerSrc) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+}
 
 export const WORKFLOW_TOOLS_CONFIG = {
   merge: {
@@ -76,7 +90,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     id: 'ocr-pdf',
     title: 'OCR PDF — Searchable Text',
     subtitle: 'Extract text from scanned documents and create a selectable vector text layer.',
-    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="17" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
     color: '#6366f1',
     accept: '.pdf,application/pdf',
     multiple: false,
@@ -126,18 +140,6 @@ export const WORKFLOW_TOOLS_CONFIG = {
     subtitle: 'Encrypt your PDF with standard ISO 32000-1 AES-256 encryption.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
     color: '#dc2626',
-    accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
-  },
-  bates: {
-    id: 'bates',
-    title: 'Bates Numbering PDF',
-    subtitle: 'Index legal discovery documents with custom prefix and sequential numbering.',
-    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
-    color: '#1e293b',
     accept: '.pdf,application/pdf',
     multiple: false,
     buttonText: 'Select PDF file',
@@ -246,12 +248,34 @@ export class ToolWorkflowManager {
   constructor() {
     this.container = null;
     this.activeTool = null;
-    this.uploadedFiles = []; // Array of { name, size, type, bytes, rotation, dataUrl }
+    this.uploadedFiles = []; // Array of { name, size, type, bytes, rotation, pageCount, thumbnailUrl }
     this.processedBlob = null;
     this.processedFilename = 'document.pdf';
     this.stage = 'upload'; // 'upload' | 'workspace' | 'complete'
+
+    // Tool specific configurations
     this.compressLevel = 'recommended';
-    this.splitRange = 'all';
+    this.splitMode = 'ranges'; // 'ranges' | 'all'
+    this.splitRange = '1-2';
+    this.imageDpi = '150';
+    this.imageFormat = 'image/jpeg';
+    this.imgOrientation = 'portrait'; // 'portrait' | 'landscape'
+    this.imgMargin = '0'; // '0' | '20' | '40'
+    this.watermarkText = 'CONFIDENTIAL';
+    this.watermarkOpacity = 0.3;
+    this.watermarkRotation = 45;
+    this.watermarkColor = '#94a3b8';
+    this.protectPassword = '';
+    this.protectConfirmPassword = '';
+    this.allowPrinting = true;
+    this.allowCopying = true;
+    this.rotateDegrees = 90;
+    this.cropTop = 0;
+    this.cropRight = 0;
+    this.cropBottom = 0;
+    this.cropLeft = 0;
+    this.ocrLang = 'eng';
+    this.draggedIndex = null;
 
     if (typeof document !== 'undefined') {
       this.init();
@@ -318,7 +342,6 @@ export class ToolWorkflowManager {
   renderUploadPrompt() {
     const t = this.activeTool;
     this.container.innerHTML = `
-      <!-- Tool Top Bar -->
       <header class="workflow-header">
         <div class="workflow-header-inner">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -345,7 +368,6 @@ export class ToolWorkflowManager {
         </div>
       </header>
 
-      <!-- Main Upload Hero -->
       <main class="workflow-main">
         <div class="workflow-hero-card">
           <div class="workflow-tool-badge" style="background: ${t.color}18; color: ${t.color};">
@@ -354,7 +376,6 @@ export class ToolWorkflowManager {
           <h1 class="workflow-title">${t.title}</h1>
           <p class="workflow-subtitle">${t.subtitle}</p>
 
-          <!-- Dropzone Box -->
           <div class="workflow-dropzone" id="workflow-dropzone" style="--zone-color: ${t.color};">
             <input type="file" id="workflow-file-input" accept="${t.accept}" ${t.multiple ? 'multiple' : ''} style="display: none;" />
             <div class="dropzone-icon-ring" style="background: ${t.color}15; color: ${t.color};">
@@ -434,15 +455,12 @@ export class ToolWorkflowManager {
       sampleBtn.onclick = async () => {
         Toast.info('Loading sample document...');
         const sampleBytes = await pdfEngine.createSamplePdf();
-        this.uploadedFiles = [{
+        await this.handleIncomingFiles([{
           name: 'Sample_Agreement.pdf',
           size: sampleBytes.byteLength,
           type: 'application/pdf',
-          bytes: sampleBytes,
-          rotation: 0
-        }];
-        this.stage = 'workspace';
-        this.render();
+          mockBytes: sampleBytes
+        }]);
       };
     }
   }
@@ -453,14 +471,45 @@ export class ToolWorkflowManager {
 
     for (const f of files) {
       try {
-        const bytes = await readFileAsArrayBuffer(f);
-        processed.push({
+        const bytes = f.mockBytes || (await readFileAsArrayBuffer(f));
+        const item = {
           name: f.name,
-          size: f.size,
-          type: f.type,
+          size: f.size || bytes.byteLength,
+          type: f.type || 'application/pdf',
           bytes: bytes,
-          rotation: 0
-        });
+          rotation: 0,
+          pageCount: 1,
+          thumbnailUrl: null
+        };
+
+        const isPdf = item.type === 'application/pdf' || item.name.toLowerCase().endsWith('.pdf');
+        if (isPdf && typeof document !== 'undefined') {
+          try {
+            const loadingTask = pdfjsLib.getDocument({
+              data: bytes.slice(0),
+              cMapUrl: 'https://unpkg.com/pdfjs-dist@6.4.299/cmaps/',
+              cMapPacked: true
+            });
+            const pdfDoc = await loadingTask.promise;
+            item.pageCount = pdfDoc.numPages;
+
+            const page = await pdfDoc.getPage(1);
+            const viewport = page.getViewport({ scale: 0.35 });
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            item.thumbnailUrl = canvas.toDataURL('image/jpeg', 0.85);
+            pdfDoc.destroy();
+          } catch (pdfErr) {
+            console.warn('PDF thumbnail generation skipped:', item.name, pdfErr);
+          }
+        } else if (item.type.startsWith('image/')) {
+          item.thumbnailUrl = URL.createObjectURL(new Blob([bytes], { type: item.type }));
+        }
+
+        processed.push(item);
       } catch (err) {
         console.error('Error reading file:', f.name, err);
       }
@@ -512,12 +561,17 @@ export class ToolWorkflowManager {
 
       <main class="workflow-workspace-main">
         <div class="workflow-workspace-layout">
-          <!-- Left/Center: Visual File Cards & Previews -->
+          <!-- Left/Center: Visual File Cards & Previews with Drag-and-Drop Reordering -->
           <div class="workflow-cards-area">
             <div class="workflow-cards-toolbar">
-              <span style="font-weight: 600; font-size: 14px;">
-                ${this.uploadedFiles.length} file(s) selected
-              </span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">
+                  ${this.uploadedFiles.length} file(s) selected
+                </span>
+                <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                  Drag cards to reorder
+                </span>
+              </div>
               <div style="display: flex; gap: 8px;">
                 <button class="btn btn-sm btn-outline" id="btn-workspace-sort-az" title="Sort A to Z">
                   <span>Sort A-Z</span>
@@ -531,11 +585,11 @@ export class ToolWorkflowManager {
             <!-- Cards Grid -->
             <div class="workflow-file-grid" id="workflow-file-grid">
               ${this.uploadedFiles.map((f, idx) => `
-                <div class="workflow-file-card" data-idx="${idx}" draggable="true">
+                <div class="workflow-file-card" data-idx="${idx}" draggable="true" title="Drag to reorder file #${idx + 1}">
                   <button class="file-card-delete" data-del-idx="${idx}" title="Remove file">&times;</button>
                   <div class="file-card-preview">
-                    ${f.type.startsWith('image/')
-                      ? `<img src="${URL.createObjectURL(new Blob([f.bytes], { type: f.type }))}" alt="preview" style="transform: rotate(${f.rotation || 0}deg);" />`
+                    ${f.thumbnailUrl
+                      ? `<img src="${f.thumbnailUrl}" alt="page preview" class="file-card-thumb" style="transform: rotate(${f.rotation || 0}deg);" />`
                       : `<div class="file-card-pdf-icon" style="transform: rotate(${f.rotation || 0}deg);">
                           <svg width="40" height="40" fill="none" stroke="${t.color}" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -547,7 +601,9 @@ export class ToolWorkflowManager {
                   </div>
                   <div class="file-card-details">
                     <span class="file-card-name" title="${f.name}">${f.name}</span>
-                    <span class="file-card-size">${formatFileSize(f.size)}</span>
+                    <span class="file-card-size">
+                      ${f.pageCount ? `${f.pageCount} ${f.pageCount === 1 ? 'page' : 'pages'} • ` : ''}${formatFileSize(f.size)}
+                    </span>
                   </div>
                   <div class="file-card-actions">
                     <button class="btn-icon btn-sm" data-rot-idx="${idx}" title="Rotate 90°">
@@ -585,15 +641,37 @@ export class ToolWorkflowManager {
     if (id === 'compress') return 'Compress PDF';
     if (id === 'split') return 'Split PDF';
     if (id === 'images-to-pdf') return 'Convert to PDF';
-    if (id === 'to-image') return 'Convert to JPG';
+    if (id === 'to-image') return `Convert to ${this.imageFormat === 'image/jpeg' ? 'JPG' : 'PNG'}`;
     if (id === 'ocr-pdf') return 'Run OCR';
+    if (id === 'watermark') return 'Apply Watermark';
+    if (id === 'security') return 'Encrypt & Protect PDF';
+    if (id === 'rotate') return 'Rotate PDF Pages';
+    if (id === 'crop') return 'Apply Crop';
+    if (id === 'resize') return 'Resize Margins';
+    if (id === 'grayscale') return 'Convert to Grayscale';
+    if (id === 'flip') return 'Mirror / Flip Pages';
     if (id === 'repair') return 'Repair PDF';
     if (id === 'compare') return 'Compare Documents';
+    if (id === 'pdfa') return 'Convert to PDF/A';
+    if (id === 'extract-images') return 'Extract All Images';
+    if (id === 'pdf-to-text') return 'Extract Text';
     return `Process with ${this.activeTool.title}`;
   }
 
   renderToolOptionsHtml() {
     const id = this.activeTool.id;
+    const primary = this.uploadedFiles[0] || {};
+
+    if (id === 'merge') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Merge Order</label>
+          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Files will be compiled in the sequence shown above. Drag any card to change its position or click the rotation icon to adjust page orientation.
+          </div>
+        </div>
+      `;
+    }
 
     if (id === 'compress') {
       return `
@@ -604,21 +682,21 @@ export class ToolWorkflowManager {
               <input type="radio" name="comp-level" value="extreme" ${this.compressLevel === 'extreme' ? 'checked' : ''} />
               <div>
                 <strong>Extreme Compression</strong>
-                <span>Maximum size reduction, lower DPI</span>
+                <span>Maximum size reduction, lower image DPI</span>
               </div>
             </label>
             <label class="comp-option-card ${this.compressLevel === 'recommended' ? 'selected' : ''}">
               <input type="radio" name="comp-level" value="recommended" ${this.compressLevel === 'recommended' ? 'checked' : ''} />
               <div>
                 <strong>Recommended (Default)</strong>
-                <span>Optimal balance of high quality & size</span>
+                <span>Optimal balance of high vector quality & compact size</span>
               </div>
             </label>
             <label class="comp-option-card ${this.compressLevel === 'less' ? 'selected' : ''}">
               <input type="radio" name="comp-level" value="less" ${this.compressLevel === 'less' ? 'checked' : ''} />
               <div>
                 <strong>Less Compression</strong>
-                <span>High quality, minimal compression</span>
+                <span>Lossless vector structures, highest image quality</span>
               </div>
             </label>
           </div>
@@ -627,13 +705,66 @@ export class ToolWorkflowManager {
     }
 
     if (id === 'split') {
+      const pageCount = primary.pageCount || 1;
       return `
         <div class="workflow-options-group">
-          <label class="workflow-options-label">Split Configuration</label>
-          <input type="text" id="split-range-input" class="input-sm" style="width: 100%; padding: 8px 12px; margin-top: 6px;" value="${this.splitRange}" placeholder="e.g. 1-2, 3-5 or 'all'" />
-          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
-            Type 'all' to extract every page, or comma ranges like '1-3, 4-6'.
-          </span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class="workflow-options-label" style="margin: 0;">Split Mode</label>
+            <span style="font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(2, 132, 199, 0.1); padding: 2px 8px; border-radius: 12px;">
+              ${pageCount} total pages
+            </span>
+          </div>
+          <div class="split-mode-pills">
+            <button type="button" class="split-mode-pill ${this.splitMode === 'ranges' ? 'active' : ''}" data-split-mode="ranges">
+              Custom Ranges
+            </button>
+            <button type="button" class="split-mode-pill ${this.splitMode === 'all' ? 'active' : ''}" data-split-mode="all">
+              Extract All Pages
+            </button>
+          </div>
+
+          ${this.splitMode === 'ranges' ? `
+            <div style="margin-top: 10px;">
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Page Ranges</label>
+              <input type="text" id="split-range-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" value="${this.splitRange}" placeholder="e.g. 1-2, 3-5" />
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
+                Specify comma-separated ranges. Example: <code>1-${Math.min(2, pageCount)}, ${Math.min(3, pageCount)}-${pageCount}</code>
+              </span>
+            </div>
+          ` : `
+            <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+              Every page of this document will be separated into individual PDF files bundled into a convenient ZIP package.
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    if (id === 'images-to-pdf') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Page Orientation</label>
+          <div class="tool-segmented-control" style="margin-bottom: 14px;">
+            <button type="button" class="tool-seg-btn ${this.imgOrientation === 'portrait' ? 'active' : ''}" data-img-orient="portrait">
+              Portrait (A4)
+            </button>
+            <button type="button" class="tool-seg-btn ${this.imgOrientation === 'landscape' ? 'active' : ''}" data-img-orient="landscape">
+              Landscape (A4)
+            </button>
+          </div>
+
+          <label class="workflow-options-label">Page Margin</label>
+          <div class="tool-segmented-control">
+            <button type="button" class="tool-seg-btn ${this.imgMargin === '0' ? 'active' : ''}" data-img-margin="0">
+              No Margin
+            </button>
+            <button type="button" class="tool-seg-btn ${this.imgMargin === '20' ? 'active' : ''}" data-img-margin="20">
+              Small (20pt)
+            </button>
+            <button type="button" class="tool-seg-btn ${this.imgMargin === '40' ? 'active' : ''}" data-img-margin="40">
+              Big (40pt)
+            </button>
+          </div>
         </div>
       `;
     }
@@ -641,20 +772,118 @@ export class ToolWorkflowManager {
     if (id === 'to-image') {
       return `
         <div class="workflow-options-group">
+          <label class="workflow-options-label">Image Output Format</label>
+          <div class="tool-segmented-control" style="margin-bottom: 14px;">
+            <button type="button" class="tool-seg-btn ${this.imageFormat === 'image/jpeg' ? 'active' : ''}" data-img-fmt="image/jpeg">
+              JPG (Standard)
+            </button>
+            <button type="button" class="tool-seg-btn ${this.imageFormat === 'image/png' ? 'active' : ''}" data-img-fmt="image/png">
+              PNG (Lossless)
+            </button>
+          </div>
+
           <label class="workflow-options-label">Output DPI Quality</label>
-          <select id="image-dpi-select" class="select-sm" style="width: 100%; padding: 8px 12px; margin-top: 6px;">
-            <option value="150" selected>150 DPI (Balanced Standard)</option>
-            <option value="300">300 DPI (Ultra High Print Resolution)</option>
-            <option value="72">72 DPI (Web & Screen Thumbnail)</option>
+          <select id="image-dpi-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+            <option value="150" ${this.imageDpi === '150' ? 'selected' : ''}>150 DPI (Balanced Standard)</option>
+            <option value="300" ${this.imageDpi === '300' ? 'selected' : ''}>300 DPI (Ultra High Print Quality)</option>
+            <option value="72" ${this.imageDpi === '72' ? 'selected' : ''}>72 DPI (Web & Screen Thumbnail)</option>
           </select>
+        </div>
+      `;
+    }
+
+    if (id === 'watermark') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Watermark Text</label>
+          <input type="text" id="wm-text-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" value="${this.watermarkText}" placeholder="e.g. CONFIDENTIAL" />
+
+          <div style="margin-top: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">
+              <span>Opacity</span>
+              <span id="wm-opacity-val">${Math.round(this.watermarkOpacity * 100)}%</span>
+            </div>
+            <input type="range" id="wm-opacity-range" min="0.1" max="0.9" step="0.05" value="${this.watermarkOpacity}" style="width: 100%; cursor: pointer;" />
+          </div>
+
+          <div style="margin-top: 12px;">
+            <label class="workflow-options-label">Angle</label>
+            <div class="tool-segmented-control">
+              <button type="button" class="tool-seg-btn ${this.watermarkRotation === 45 ? 'active' : ''}" data-wm-rot="45">45° Diagonal</button>
+              <button type="button" class="tool-seg-btn ${this.watermarkRotation === 0 ? 'active' : ''}" data-wm-rot="0">0° Horizontal</button>
+              <button type="button" class="tool-seg-btn ${this.watermarkRotation === 90 ? 'active' : ''}" data-wm-rot="90">90° Vertical</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'security') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Set Document Password</label>
+          <input type="password" id="protect-pwd-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 8px;" placeholder="Enter password to encrypt" value="${this.protectPassword}" />
+          <input type="password" id="protect-conf-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" placeholder="Confirm password" value="${this.protectConfirmPassword}" />
+
+          <div style="margin-top: 14px; border-top: 1px solid var(--border-subtle); padding-top: 12px;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 8px;">Permissions</span>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-main); cursor: pointer; margin-bottom: 6px;">
+              <input type="checkbox" id="protect-allow-print" ${this.allowPrinting ? 'checked' : ''} />
+              <span>Allow high-resolution printing</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-main); cursor: pointer;">
+              <input type="checkbox" id="protect-allow-copy" ${this.allowCopying ? 'checked' : ''} />
+              <span>Allow copying text and graphics</span>
+            </label>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'rotate') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Batch Rotate All Pages</label>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" class="btn btn-outline" id="btn-batch-rotate-right" style="width: 100%; justify-content: center; gap: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              <span>Rotate 90° Clockwise</span>
+            </button>
+            <button type="button" class="btn btn-outline" id="btn-batch-rotate-left" style="width: 100%; justify-content: center; gap: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38L-2.44 1.52"></path></svg>
+              <span>Rotate 90° Counter-Clockwise</span>
+            </button>
+            <button type="button" class="btn btn-outline" id="btn-batch-rotate-180" style="width: 100%; justify-content: center; gap: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              <span>Rotate 180° Upside Down</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'ocr-pdf') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Recognition Language</label>
+          <select id="ocr-lang-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+            <option value="eng" ${this.ocrLang === 'eng' ? 'selected' : ''}>English (Standard)</option>
+            <option value="spa" ${this.ocrLang === 'spa' ? 'selected' : ''}>Spanish (Español)</option>
+            <option value="fra" ${this.ocrLang === 'fra' ? 'selected' : ''}>French (Français)</option>
+            <option value="deu" ${this.ocrLang === 'deu' ? 'selected' : ''}>German (Deutsch)</option>
+            <option value="ita" ${this.ocrLang === 'ita' ? 'selected' : ''}>Italian (Italiano)</option>
+          </select>
+          <div style="background: var(--bg-surface); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 10px;">
+            Generates an invisible selectable vector text layer on top of scanned bitmaps.
+          </div>
         </div>
       `;
     }
 
     return `
       <div class="workflow-options-group">
-        <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-muted);">
-          Ready to execute 100% in your browser. No files uploaded to servers.
+        <div style="background: var(--bg-surface); padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+          Ready to execute 100% in your browser. No files are uploaded to any server.
         </div>
       </div>
     `;
@@ -696,6 +925,54 @@ export class ToolWorkflowManager {
       };
     }
 
+    // HTML5 Drag & drop card resequencing
+    const cards = this.container.querySelectorAll('.workflow-file-card');
+    cards.forEach(card => {
+      card.ondragstart = (e) => {
+        const idx = parseInt(card.getAttribute('data-idx'), 10);
+        this.draggedIndex = idx;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(idx));
+      };
+
+      card.ondragend = () => {
+        this.draggedIndex = null;
+        cards.forEach(c => {
+          c.classList.remove('dragging');
+          c.classList.remove('drag-over');
+        });
+      };
+
+      card.ondragover = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (!card.classList.contains('drag-over')) {
+          card.classList.add('drag-over');
+        }
+      };
+
+      card.ondragleave = () => {
+        card.classList.remove('drag-over');
+      };
+
+      card.ondrop = (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const targetIdx = parseInt(card.getAttribute('data-idx'), 10);
+        const sourceIdx = this.draggedIndex !== null
+          ? this.draggedIndex
+          : parseInt(e.dataTransfer.getData('text/plain'), 10);
+
+        if (!isNaN(sourceIdx) && !isNaN(targetIdx) && sourceIdx !== targetIdx) {
+          const item = this.uploadedFiles.splice(sourceIdx, 1)[0];
+          this.uploadedFiles.splice(targetIdx, 0, item);
+          this.render();
+          Toast.info(`Moved file #${sourceIdx + 1} to position #${targetIdx + 1}`);
+        }
+      };
+    });
+
     // Delete single card
     this.container.querySelectorAll('[data-del-idx]').forEach(btn => {
       btn.onclick = (e) => {
@@ -709,7 +986,7 @@ export class ToolWorkflowManager {
       };
     });
 
-    // Rotate card
+    // Rotate single card
     this.container.querySelectorAll('[data-rot-idx]').forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
@@ -727,7 +1004,13 @@ export class ToolWorkflowManager {
       };
     });
 
-    // Split range input
+    // Split mode pills & range input
+    this.container.querySelectorAll('[data-split-mode]').forEach(btn => {
+      btn.onclick = () => {
+        this.splitMode = btn.getAttribute('data-split-mode');
+        this.render();
+      };
+    });
     const splitInp = this.container.querySelector('#split-range-input');
     if (splitInp) {
       splitInp.oninput = (e) => {
@@ -735,12 +1018,106 @@ export class ToolWorkflowManager {
       };
     }
 
-    // Execute Button
+    // Images to PDF controls
+    this.container.querySelectorAll('[data-img-orient]').forEach(btn => {
+      btn.onclick = () => {
+        this.imgOrientation = btn.getAttribute('data-img-orient');
+        this.render();
+      };
+    });
+    this.container.querySelectorAll('[data-img-margin]').forEach(btn => {
+      btn.onclick = () => {
+        this.imgMargin = btn.getAttribute('data-img-margin');
+        this.render();
+      };
+    });
+
+    // PDF to Image controls
+    this.container.querySelectorAll('[data-img-fmt]').forEach(btn => {
+      btn.onclick = () => {
+        this.imageFormat = btn.getAttribute('data-img-fmt');
+        this.render();
+      };
+    });
+    const dpiSel = this.container.querySelector('#image-dpi-select');
+    if (dpiSel) {
+      dpiSel.onchange = (e) => {
+        this.imageDpi = e.target.value;
+      };
+    }
+
+    // Watermark controls
+    const wmTextInp = this.container.querySelector('#wm-text-input');
+    if (wmTextInp) {
+      wmTextInp.oninput = (e) => { this.watermarkText = e.target.value; };
+    }
+    const wmOpRange = this.container.querySelector('#wm-opacity-range');
+    const wmOpVal = this.container.querySelector('#wm-opacity-val');
+    if (wmOpRange && wmOpVal) {
+      wmOpRange.oninput = (e) => {
+        this.watermarkOpacity = parseFloat(e.target.value);
+        wmOpVal.textContent = `${Math.round(this.watermarkOpacity * 100)}%`;
+      };
+    }
+    this.container.querySelectorAll('[data-wm-rot]').forEach(btn => {
+      btn.onclick = () => {
+        this.watermarkRotation = parseInt(btn.getAttribute('data-wm-rot'), 10);
+        this.render();
+      };
+    });
+
+    // Security controls
+    const secPwd = this.container.querySelector('#protect-pwd-input');
+    const secConf = this.container.querySelector('#protect-conf-input');
+    if (secPwd) secPwd.oninput = (e) => { this.protectPassword = e.target.value; };
+    if (secConf) secConf.oninput = (e) => { this.protectConfirmPassword = e.target.value; };
+    const permPrint = this.container.querySelector('#protect-allow-print');
+    if (permPrint) permPrint.onchange = (e) => { this.allowPrinting = e.target.checked; };
+    const permCopy = this.container.querySelector('#protect-allow-copy');
+    if (permCopy) permCopy.onchange = (e) => { this.allowCopying = e.target.checked; };
+
+    // Batch rotation buttons
+    const bRight = this.container.querySelector('#btn-batch-rotate-right');
+    const bLeft = this.container.querySelector('#btn-batch-rotate-left');
+    const b180 = this.container.querySelector('#btn-batch-rotate-180');
+    if (bRight) {
+      bRight.onclick = () => {
+        this.rotateDegrees = 90;
+        this.uploadedFiles.forEach(f => { f.rotation = ((f.rotation || 0) + 90) % 360; });
+        this.render();
+        Toast.info('Rotated all pages 90° clockwise');
+      };
+    }
+    if (bLeft) {
+      bLeft.onclick = () => {
+        this.rotateDegrees = 270;
+        this.uploadedFiles.forEach(f => { f.rotation = ((f.rotation || 0) + 270) % 360; });
+        this.render();
+        Toast.info('Rotated all pages 90° counter-clockwise');
+      };
+    }
+    if (b180) {
+      b180.onclick = () => {
+        this.rotateDegrees = 180;
+        this.uploadedFiles.forEach(f => { f.rotation = ((f.rotation || 0) + 180) % 360; });
+        this.render();
+        Toast.info('Rotated all pages 180°');
+      };
+    }
+
+    // OCR language select
+    const ocrLangSel = this.container.querySelector('#ocr-lang-select');
+    if (ocrLangSel) {
+      ocrLangSel.onchange = (e) => { this.ocrLang = e.target.value; };
+    }
+
+    // Primary Execute CTA
     if (execBtn) {
       execBtn.onclick = () => this.executeAction();
     }
   }
 
+  // --- STAGE 2.5: CLIENT-SIDE EXECUTION ENGINE ---
   async executeAction() {
     if (this.uploadedFiles.length === 0) {
       Toast.error('Please add files to process');
@@ -755,25 +1132,24 @@ export class ToolWorkflowManager {
     }
 
     try {
+      const primary = this.uploadedFiles[0];
+
       if (t.id === 'merge') {
         const buffers = this.uploadedFiles.map(f => f.bytes);
-        const mergedBytes = await pdfEngine.mergePdf(buffers);
+        const mergedBytes = await PageOperations.mergePdf(buffers);
         this.processedBlob = new Blob([mergedBytes], { type: 'application/pdf' });
         this.processedFilename = 'Merged_Document.pdf';
       } else if (t.id === 'compress') {
-        const primary = this.uploadedFiles[0];
         const res = await pdfEngine.compressPdf(primary.bytes, this.compressLevel);
         this.processedBlob = new Blob([res.compressedBytes], { type: 'application/pdf' });
         this.processedFilename = `Compressed_${primary.name}`;
       } else if (t.id === 'split') {
-        const primary = this.uploadedFiles[0];
-        const splits = await pdfEngine.splitPdf(primary.bytes, this.splitRange || 'all');
+        const rangeExpr = this.splitMode === 'all' ? 'all' : (this.splitRange || 'all');
+        const splits = await PageOperations.splitPdf(primary.bytes, rangeExpr);
         if (splits.length === 1) {
           this.processedBlob = new Blob([splits[0].bytes], { type: 'application/pdf' });
           this.processedFilename = splits[0].name;
         } else {
-          // Zip results using JSZip
-          const JSZip = (await import('jszip')).default;
           const zip = new JSZip();
           splits.forEach(s => zip.file(s.name, s.bytes));
           const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -782,17 +1158,175 @@ export class ToolWorkflowManager {
         }
       } else if (t.id === 'images-to-pdf') {
         const imgList = this.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
-        const pdfBytes = await pdfEngine.imagesToPdf(imgList);
+        const pdfBytes = await PageOperations.imagesToPdf(imgList, {
+          orientation: this.imgOrientation,
+          margin: parseInt(this.imgMargin, 10) || 0
+        });
         this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
         this.processedFilename = 'Images_Combined.pdf';
+      } else if (t.id === 'to-image') {
+        const loadingTask = pdfjsLib.getDocument({
+          data: primary.bytes.slice(0),
+          cMapUrl: 'https://unpkg.com/pdfjs-dist@6.4.299/cmaps/',
+          cMapPacked: true
+        });
+        const doc = await loadingTask.promise;
+        const numPages = doc.numPages;
+        const dpi = parseInt(this.imageDpi, 10) || 150;
+        const scale = dpi / 72;
+        const mime = this.imageFormat === 'image/jpeg' ? 'image/jpeg' : 'image/png';
+        const ext = this.imageFormat === 'image/jpeg' ? 'jpg' : 'png';
+
+        const imageBlobs = [];
+        for (let p = 1; p <= numPages; p++) {
+          const page = await doc.getPage(p);
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          if (mime === 'image/jpeg') {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          const b = await new Promise(res => canvas.toBlob(res, mime, 0.92));
+          imageBlobs.push({ name: `page_${p}.${ext}`, blob: b, bytes: await b.arrayBuffer() });
+        }
+        doc.destroy();
+
+        if (imageBlobs.length === 1) {
+          this.processedBlob = imageBlobs[0].blob;
+          this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_page_1.${ext}`;
+        } else {
+          const zip = new JSZip();
+          imageBlobs.forEach(img => zip.file(img.name, img.bytes));
+          this.processedBlob = await zip.generateAsync({ type: 'blob' });
+          this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_images.zip`;
+        }
+      } else if (t.id === 'watermark') {
+        const srcDoc = await PDFDocument.load(primary.bytes);
+        const font = await srcDoc.embedFont(StandardFonts.HelveticaBold);
+        const totalPages = srcDoc.getPageCount();
+        const text = this.watermarkText || 'CONFIDENTIAL';
+        const opacity = parseFloat(this.watermarkOpacity) || 0.3;
+        const rotDeg = parseInt(this.watermarkRotation, 10) || 45;
+        const { r, g, b } = hexToRgb(this.watermarkColor || '#94a3b8');
+
+        for (let i = 0; i < totalPages; i++) {
+          const page = srcDoc.getPage(i);
+          const { width, height } = page.getSize();
+          const fontSize = Math.min(width, height) / 8;
+          const textW = font.widthOfTextAtSize(text, fontSize);
+
+          page.drawText(text, {
+            x: (width - textW * Math.cos((rotDeg * Math.PI) / 180)) / 2,
+            y: (height - textW * Math.sin((rotDeg * Math.PI) / 180)) / 2,
+            size: fontSize,
+            font,
+            color: rgb(r / 255, g / 255, b / 255),
+            opacity,
+            rotate: degrees(rotDeg)
+          });
+        }
+        const wmBytes = await srcDoc.save();
+        this.processedBlob = new Blob([wmBytes], { type: 'application/pdf' });
+        this.processedFilename = `Watermarked_${primary.name}`;
+      } else if (t.id === 'security') {
+        if (!this.protectPassword) {
+          Toast.warning('Please enter a password');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        if (this.protectPassword !== this.protectConfirmPassword) {
+          Toast.error('Passwords do not match');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        const srcDoc = await PDFDocument.load(primary.bytes);
+        applyPdfEncryption(
+          srcDoc,
+          this.protectPassword,
+          this.protectPassword,
+          {
+            printing: this.allowPrinting,
+            copying: this.allowCopying,
+            modifying: false
+          }
+        );
+        const encBytes = await srcDoc.save({ updateMetadata: false });
+        this.processedBlob = new Blob([encBytes], { type: 'application/pdf' });
+        this.processedFilename = `Protected_${primary.name}`;
+      } else if (t.id === 'rotate') {
+        const srcDoc = await PDFDocument.load(primary.bytes);
+        const totalPages = srcDoc.getPageCount();
+        const rot = parseInt(this.rotateDegrees, 10) || 90;
+        for (let i = 0; i < totalPages; i++) {
+          const page = srcDoc.getPage(i);
+          const curRot = page.getRotation().angle;
+          page.setRotation(degrees((curRot + rot) % 360));
+        }
+        const rotBytes = await srcDoc.save();
+        this.processedBlob = new Blob([rotBytes], { type: 'application/pdf' });
+        this.processedFilename = `Rotated_${primary.name}`;
+      } else if (t.id === 'grayscale') {
+        const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes);
+        this.processedBlob = new Blob([grayBytes], { type: 'application/pdf' });
+        this.processedFilename = `Grayscale_${primary.name}`;
+      } else if (t.id === 'flip') {
+        const flippedBytes = await PageOperations.flipPages(primary.bytes, { direction: 'horizontal' });
+        this.processedBlob = new Blob([flippedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Flipped_${primary.name}`;
+      } else if (t.id === 'pdfa') {
+        const pdfaBytes = await pdfEngine.convertToPdfA(primary.bytes);
+        this.processedBlob = new Blob([pdfaBytes], { type: 'application/pdf' });
+        this.processedFilename = `Archival_PDFA_${primary.name}`;
       } else if (t.id === 'repair') {
-        const primary = this.uploadedFiles[0];
         const res = await pdfEngine.repairPdf(primary.bytes);
         this.processedBlob = new Blob([res.repairedBytes], { type: 'application/pdf' });
         this.processedFilename = `Repaired_${primary.name}`;
+      } else if (t.id === 'compare') {
+        if (this.uploadedFiles.length < 2) {
+          Toast.warning('Please upload at least 2 documents to compare');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        const cmp = await pdfEngine.comparePdfs(this.uploadedFiles[0].bytes, this.uploadedFiles[1].bytes);
+        this.processedBlob = new Blob([cmp.reportPdfBytes], { type: 'application/pdf' });
+        this.processedFilename = `Comparison_Report_${this.uploadedFiles[0].name}_vs_${this.uploadedFiles[1].name}`;
+      } else if (t.id === 'extract-images') {
+        const imgs = await pdfEngine.extractImages(primary.bytes);
+        if (imgs.length === 0) {
+          Toast.warning('No embedded image objects found in this PDF');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        const zip = new JSZip();
+        imgs.forEach(im => zip.file(im.name, im.bytes));
+        this.processedBlob = await zip.generateAsync({ type: 'blob' });
+        this.processedFilename = `Extracted_Images_${primary.name}.zip`;
+      } else if (t.id === 'pdf-to-text') {
+        const text = await pdfEngine.extractDocumentText(primary.bytes);
+        this.processedBlob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_text.txt`;
+      } else if (t.id === 'ocr-pdf') {
+        Toast.info('Processing client-side OCR layer...');
+        const ocrBytes = await pdfEngine.applyOcr(primary.bytes, { lang: this.ocrLang });
+        this.processedBlob = new Blob([ocrBytes], { type: 'application/pdf' });
+        this.processedFilename = `Searchable_OCR_${primary.name}`;
       } else {
-        // Fallback for direct conversion tools
-        const primary = this.uploadedFiles[0];
         this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
         this.processedFilename = `Processed_${primary.name}`;
       }
@@ -846,7 +1380,7 @@ export class ToolWorkflowManager {
           </div>
 
           <h1 class="workflow-title" style="margin-top: 16px;">Task Complete!</h1>
-          <p class="workflow-subtitle">Your document is processed and ready to download.</p>
+          <p class="workflow-subtitle">Your document has been processed in your browser and is ready to download.</p>
 
           <div style="background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle); margin: 24px 0; text-align: left; display: flex; align-items: center; justify-content: space-between;">
             <div>
