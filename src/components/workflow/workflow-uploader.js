@@ -9,6 +9,7 @@ import { pdfEngine } from '../../core/pdf-engine.js';
 import { store } from '../../core/state-store.js';
 import { Toast } from '../toast.js';
 import { authModal } from '../auth-modal.js';
+import { mobilePairModal } from '../mobile-pair-modal.js';
 import { readFileAsArrayBuffer } from '../../utils/helpers.js';
 
 export function renderUploadPrompt(manager) {
@@ -66,11 +67,15 @@ export function renderUploadPrompt(manager) {
           <span class="workflow-format-chip">${t.badge}</span>
         </div>
 
-        ${t.id === 'scan' ? `
-          <div style="margin-top: 16px;">
-            <button type="button" class="btn btn-outline" id="btn-workflow-camera" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px 20px; border-radius: 8px;">
+        ${['scan', 'images-to-pdf'].includes(t.id) ? `
+          <div style="margin-top: 16px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" id="btn-workflow-camera" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px 18px; border-radius: 8px;">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-              <span>Snap Pages with Device Camera</span>
+              <span>Snap with Webcam</span>
+            </button>
+            <button type="button" class="btn btn-outline" id="btn-workflow-mobile-pair" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px 18px; border-radius: 8px; border-color: var(--primary); color: var(--primary);">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+              <span>Scan with Phone (QR)</span>
             </button>
           </div>
         ` : ''}
@@ -151,6 +156,35 @@ export function bindUploadEvents(manager) {
   const camBtn = manager.container.querySelector('#btn-workflow-camera');
   if (camBtn) {
     camBtn.onclick = () => openCameraScannerModal(manager);
+  }
+
+  const mobilePairBtn = manager.container.querySelector('#btn-workflow-mobile-pair');
+  if (mobilePairBtn) {
+    mobilePairBtn.onclick = () => {
+      mobilePairModal.open({
+        action: 'camera',
+        title: 'Scan Pages with Smartphone Camera',
+        subtitle: 'Scan QR code to take high-resolution document photos with your phone',
+        onComplete: async (payload) => {
+          if (payload && payload.dataUrl) {
+            const base64 = payload.dataUrl.split(',')[1];
+            const binStr = atob(base64);
+            const bytes = new Uint8Array(binStr.length);
+            for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+
+            manager.uploadedFiles.push({
+              name: payload.filename || `Phone_Scan_${manager.uploadedFiles.length + 1}.jpg`,
+              size: bytes.byteLength,
+              type: payload.mimeType || 'image/jpeg',
+              bytes,
+              rotation: 0
+            });
+            manager.stage = 'workspace';
+            manager.render();
+          }
+        }
+      });
+    };
   }
 }
 

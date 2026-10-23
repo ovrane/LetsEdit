@@ -331,6 +331,13 @@ export const ROUTE_DEFINITIONS = [
     aliases: ['/scan', '/scan-pdf', '/camera-to-pdf', '/mobile_scan'],
     title: "Scan to PDF online. Camera and Mobile Scanner — LetsEdit",
     description: "Capture documents from your device camera or scanner directly into a sharp PDF document."
+  },
+  {
+    path: '/mobile_pair',
+    toolId: 'mobile-pair',
+    aliases: ['/mobile-pair', '/pair', '/mobile-camera', '/mobile-sign'],
+    title: "Mobile Camera & Signature Pairing — LetsEdit",
+    description: "Scan documents or draw signatures with your smartphone camera and sync to desktop instantly."
   }
 ];
 

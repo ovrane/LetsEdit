@@ -6,6 +6,7 @@
 import { store } from '../core/state-store.js';
 import { uid } from '../utils/helpers.js';
 import { Toast } from '../components/toast.js';
+import { mobilePairModal } from '../components/mobile-pair-modal.js';
 
 export class SignatureTool {
   constructor() {
@@ -33,6 +34,7 @@ export class SignatureTool {
           <button class="tab-btn" data-tab="type">Type</button>
           <button class="tab-btn" data-tab="upload">Upload</button>
           <button class="tab-btn" data-tab="camera">Camera</button>
+          <button class="tab-btn" data-tab="phone">📱 Phone (QR)</button>
         </div>
 
         <div class="modal-body">
@@ -307,6 +309,30 @@ export class SignatureTool {
       Toast.success('Signature isolated from paper background!');
     };
 
+    // Phone Pairing Signature
+    let phoneExtractedUrl = null;
+    const phoneBtn = this.modal.querySelector('#btn-start-phone-sig');
+    const phoneBox = this.modal.querySelector('#phone-sig-preview-box');
+    const phoneImg = this.modal.querySelector('#phone-sig-preview-img');
+
+    if (phoneBtn) {
+      phoneBtn.onclick = () => {
+        mobilePairModal.open({
+          action: 'sign',
+          title: 'Draw Signature on Smartphone',
+          subtitle: 'Scan QR code with your phone camera to sign on your touchscreen',
+          onComplete: (payload) => {
+            if (payload && payload.dataUrl) {
+              phoneExtractedUrl = payload.dataUrl;
+              if (phoneImg) phoneImg.src = payload.dataUrl;
+              if (phoneBox) phoneBox.style.display = 'block';
+              Toast.success('Phone signature ready! Click Save Signature to place on document.');
+            }
+          }
+        });
+      };
+    }
+
     // Close / Cancel
     const close = () => {
       this.stopCamera();
@@ -349,6 +375,12 @@ export class SignatureTool {
           return;
         }
         finalDataUrl = cameraExtractedUrl;
+      } else if (this.activeTab === 'phone') {
+        if (!phoneExtractedUrl) {
+          Toast.warning('Please scan the QR code and draw a signature on your phone first');
+          return;
+        }
+        finalDataUrl = phoneExtractedUrl;
       }
 
       if (finalDataUrl) {

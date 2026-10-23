@@ -9,6 +9,7 @@ import { Toast } from '../toast.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
 import { compareModal } from '../compare-modal.js';
+import { mobilePairModal } from '../mobile-pair-modal.js';
 
 export function bindWorkspaceEvents(manager) {
   const backBtn = manager.container.querySelector('#btn-workspace-back');
@@ -972,6 +973,34 @@ export function bindWorkspaceEvents(manager) {
   const camBtn = manager.container.querySelector('#btn-workspace-camera');
   if (camBtn) {
     camBtn.onclick = () => manager.openCameraScannerModal();
+  }
+
+  const mobilePairBtn = manager.container.querySelector('#btn-workspace-mobile-pair');
+  if (mobilePairBtn) {
+    mobilePairBtn.onclick = () => {
+      mobilePairModal.open({
+        action: 'camera',
+        title: 'Scan Pages with Smartphone Camera',
+        subtitle: 'Scan QR code to take high-resolution document photos with your phone',
+        onComplete: async (payload) => {
+          if (payload && payload.dataUrl) {
+            const base64 = payload.dataUrl.split(',')[1];
+            const binStr = atob(base64);
+            const bytes = new Uint8Array(binStr.length);
+            for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+
+            manager.uploadedFiles.push({
+              name: payload.filename || `Phone_Scan_${manager.uploadedFiles.length + 1}.jpg`,
+              size: bytes.byteLength,
+              type: payload.mimeType || 'image/jpeg',
+              bytes,
+              rotation: 0
+            });
+            manager.render();
+          }
+        }
+      });
+    };
   }
 
   // Excel to PDF options listeners

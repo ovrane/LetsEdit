@@ -33,6 +33,7 @@ import { landingPage } from './components/landing-page.js';
 import { toolOptionsPanel } from './components/tool-options-panel.js';
 import { toolWorkflow } from './components/tool-workflow.js';
 import { accountPage } from './components/account-page.js';
+import { mobilePairPage } from './components/mobile-pair-page.js';
 import { router } from './core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
@@ -94,6 +95,19 @@ class App {
         accountPage.showLogin({ updateUrl: false });
       } else if (route.isRegister) {
         accountPage.showRegister({ updateUrl: false });
+      } else if (route.toolId === 'mobile-pair') {
+        const landingView = document.getElementById('landing-view');
+        const studioView = document.getElementById('studio-view');
+        if (landingView) landingView.style.display = 'none';
+        if (studioView) studioView.style.display = 'none';
+        let mobileContainer = document.getElementById('mobile-pair-container');
+        if (!mobileContainer) {
+          mobileContainer = document.createElement('div');
+          mobileContainer.id = 'mobile-pair-container';
+          document.body.appendChild(mobileContainer);
+        }
+        mobileContainer.style.display = 'block';
+        mobilePairPage.mount(mobileContainer);
       } else if (route.toolId) {
         toolWorkflow.openTool(route.toolId, { updateUrl: false });
       }

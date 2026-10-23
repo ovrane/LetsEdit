@@ -9,9 +9,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleAuthRequest } from './routes/auth-routes.js';
 import { handlePdfRequest } from './routes/pdf-routes.js';
+import { handleMobilePairRequest, PAIRING_SESSIONS } from './routes/mobile-pair-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
+export { PAIRING_SESSIONS } from './routes/mobile-pair-routes.js';
 export { serveStatic } from './static.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,6 +49,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch PDF Studio Processing endpoints
   const pdfHandled = await handlePdfRequest(req, res, pathname, method);
   if (pdfHandled) return true;
+
+  // Dispatch Mobile Camera & Signature Pairing endpoints
+  const mobilePairHandled = await handleMobilePairRequest(req, res, pathname, method);
+  if (mobilePairHandled) return true;
 
   return false;
 }
