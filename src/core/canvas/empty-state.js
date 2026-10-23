@@ -1,0 +1,150 @@
+/**
+ * Canvas Empty State Renderer
+ * Displays rich drag-and-drop zone and actions when no PDF is loaded.
+ */
+
+import { pdfEngine } from '../pdf-engine.js';
+import { store } from '../state-store.js';
+import { readFileAsArrayBuffer } from '../../utils/helpers.js';
+import { Toast } from '../../components/toast.js';
+
+export class CanvasEmptyState {
+  static render(container) {
+    const pagingBar = document.getElementById('editor-paging-bar');
+    if (pagingBar) pagingBar.style.display = 'none';
+
+    const emptyWrap = document.createElement('div');
+    emptyWrap.className = 'editor-upload-card';
+    emptyWrap.id = 'editor-empty-dropzone';
+    emptyWrap.innerHTML = `
+      <div class="editor-upload-icon-circle">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M12 18v-6m-3 3l3-3 3 3"></path>
+        </svg>
+      </div>
+      <h2 class="editor-upload-title">Upload PDF to Start Editing</h2>
+      <p class="editor-upload-subtitle">
+        Edit existing text, fill & sign forms, add shapes, whiteout sensitive data, and annotate directly in your browser.
+      </p>
+
+      <div class="editor-upload-actions">
+        <input type="file" id="editor-empty-file-input" accept="application/pdf" style="display:none;" />
+        <button class="btn btn-primary btn-lg" id="btn-editor-upload-pdf">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+          <span>Choose PDF Document</span>
+        </button>
+        <button class="btn btn-outline btn-lg" id="btn-editor-blank-doc">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line></svg>
+          <span>Start with Blank Page</span>
+        </button>
+      </div>
+
+      <div class="editor-upload-drop-hint">
+        or drag and drop your PDF anywhere in this window
+      </div>
+
+      <div class="editor-upload-sample-link">
+        Want to test all features first? <button class="btn-link" id="btn-editor-load-sample">Load a sample contract</button>
+      </div>
+
+      <div class="editor-upload-features">
+        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 100% Private (No Cloud Uploads)</div>
+        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Edit Original Text</div>
+        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Sub-Second WASM Engine</div>
+      </div>
+    `;
+
+    container.appendChild(emptyWrap);
+
+    const fileInp = emptyWrap.querySelector('#editor-empty-file-input');
+    const uploadBtn = emptyWrap.querySelector('#btn-editor-upload-pdf');
+    const blankBtn = emptyWrap.querySelector('#btn-editor-blank-doc');
+    const sampleBtn = emptyWrap.querySelector('#btn-editor-load-sample');
+
+    if (uploadBtn && fileInp) {
+      uploadBtn.onclick = () => fileInp.click();
+      fileInp.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file && file.type === 'application/pdf') {
+          try {
+            Toast.info('Loading PDF document...');
+            const ab = await readFileAsArrayBuffer(file);
+            const info = await pdfEngine.loadPdf(ab);
+            store.setDocument(ab, file.name, info.numPages);
+            const filenameEl = document.getElementById('current-filename');
+            if (filenameEl) filenameEl.textContent = file.name;
+            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
+          } catch (err) {
+            console.error(err);
+            Toast.error('Could not load PDF');
+          }
+        }
+      };
+    }
+
+    if (blankBtn) {
+      blankBtn.onclick = async () => {
+        try {
+          Toast.info('Creating clean blank page...');
+          const blankBytes = await pdfEngine.createBlankPdf();
+          const info = await pdfEngine.loadPdf(blankBytes);
+          store.setDocument(blankBytes, 'Blank_Document.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Blank_Document.pdf';
+          Toast.success('Blank document ready! Add text, shapes, or signatures.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to create blank page');
+        }
+      };
+    }
+
+    if (sampleBtn) {
+      sampleBtn.onclick = async () => {
+        try {
+          Toast.info('Loading sample agreement...');
+          const sampleBytes = await pdfEngine.createSamplePdf();
+          const info = await pdfEngine.loadPdf(sampleBytes);
+          store.setDocument(sampleBytes, 'Sample_Agreement.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Sample_Agreement.pdf';
+          Toast.success('Sample document loaded! Ready to edit.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to load sample document');
+        }
+      };
+    }
+
+    emptyWrap.ondragover = (e) => {
+      e.preventDefault();
+      emptyWrap.classList.add('drag-over');
+    };
+    emptyWrap.ondragleave = () => {
+      emptyWrap.classList.remove('drag-over');
+    };
+    emptyWrap.ondrop = async (e) => {
+      e.preventDefault();
+      emptyWrap.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        try {
+          Toast.info('Loading PDF document...');
+          const ab = await readFileAsArrayBuffer(file);
+          const info = await pdfEngine.loadPdf(ab);
+          store.setDocument(ab, file.name, info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = file.name;
+          Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
+        } catch (err) {
+          console.error(err);
+          Toast.error('Could not load PDF');
+        }
+      } else {
+        Toast.error('Please drop a valid PDF document');
+      }
+    };
+  }
+}
