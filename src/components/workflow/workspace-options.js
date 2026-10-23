@@ -2,6 +2,8 @@
  * Tool Workspace Options HTML Templates & Helpers
  */
 
+import { renderFormFillerOptionsHtml } from './workspace-form-options.js';
+
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
       case 'top-left': return 'top: 14px; left: 14px;';
@@ -53,6 +55,10 @@
   export function renderToolOptionsHtml(instance) {
     const id = instance.activeTool.id;
     const primary = instance.uploadedFiles[0] || {};
+
+    if (id === 'fill-forms') {
+      return renderFormFillerOptionsHtml(instance);
+    }
 
     if (id === 'merge') {
       return `

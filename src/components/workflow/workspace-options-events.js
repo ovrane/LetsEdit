@@ -11,6 +11,7 @@ import { Toast } from '../toast.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
 import { signRequestModal } from './sign-request-modal.js';
+import { bindFormFillerEvents } from './workspace-form-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -625,5 +626,10 @@ export function bindWorkspaceOptionsEvents(manager) {
     pptTitleInp.oninput = (e) => {
       manager.pptTitle = e.target.value;
     };
+  }
+
+  // Form Filler listeners
+  if (manager.activeTool.id === 'fill-forms') {
+    bindFormFillerEvents(manager);
   }
 }

@@ -36,6 +36,9 @@ export function renderSuccessScreen(manager) {
   } else if (t.id === 'ocr-pdf') {
     const totalWords = manager.lastOcrResult?.pagesOcr?.reduce((acc, p) => acc + (p.wordCount || 0), 0) ?? 0;
     subtitleText = `OCR recognition complete: ${totalWords.toLocaleString()} words indexed into an invisible searchable vector layer.`;
+  } else if (t.id === 'fill-forms') {
+    const count = manager.formExportData?.fieldCount ?? Object.keys(manager.formFieldValues || {}).length;
+    subtitleText = `Form processing complete: ${count} AcroForm field${count === 1 ? '' : 's'} updated and validated.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -168,6 +171,37 @@ export function renderSuccessScreen(manager) {
               <button type="button" class="btn btn-sm btn-outline" id="btn-download-ocr-txt" style="flex: 1; min-width: 140px; justify-content: center; gap: 6px; font-weight: 600;">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span>Download .TXT File</span>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
+        ${manager.formExportData ? `
+          <div class="form-export-data-card" style="background: rgba(37, 99, 235, 0.04); border: 1.5px solid rgba(37, 99, 235, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #2563eb;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 11h6"></path><path d="M9 19h4"></path></svg>
+                <span>AcroForm Data Export Hub</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: rgba(37, 99, 235, 0.12); color: #2563eb; padding: 2px 8px; border-radius: 12px;">
+                ${manager.formExportData.fieldCount || 0} Fields Extracted
+              </span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.4;">
+              Download your form values in Adobe Acrobat XML (XFDF), JSON, or tabular CSV format:
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-export-xfdf" style="flex: 1; min-width: 120px; justify-content: center; gap: 6px; font-weight: 600; font-size: 11.5px; background: white; color: #2563eb; border-color: rgba(37, 99, 235, 0.3);">
+                <span>📥 Adobe .XFDF</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-export-json" style="flex: 1; min-width: 110px; justify-content: center; gap: 6px; font-weight: 600; font-size: 11.5px; background: white; color: #2563eb; border-color: rgba(37, 99, 235, 0.3);">
+                <span>📥 JSON (.json)</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-export-csv" style="flex: 1; min-width: 110px; justify-content: center; gap: 6px; font-weight: 600; font-size: 11.5px; background: white; color: #2563eb; border-color: rgba(37, 99, 235, 0.3);">
+                <span>📥 Table (.csv)</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-copy-json" style="background: white; font-weight: 600; font-size: 11.5px;">
+                <span>📋 Copy JSON</span>
               </button>
             </div>
           </div>
@@ -380,6 +414,49 @@ export function bindSuccessEvents(manager) {
         } catch (err) {
           Toast.error('Failed to generate audit certificate: ' + err.message);
         }
+      }
+    };
+  }
+
+  // Form Data Export Buttons
+  const xfdfBtn = manager.container.querySelector('#btn-success-export-xfdf');
+  if (xfdfBtn && manager.formExportData?.xfdf) {
+    xfdfBtn.onclick = () => {
+      const base = (manager.processedFilename || 'document').replace(/\.[^/.]+$/, '');
+      const blob = new Blob([manager.formExportData.xfdf], { type: 'application/vnd.adobe.xfdf' });
+      downloadBlob(blob, `${base}_data.xfdf`);
+      Toast.success('Downloaded Adobe XFDF data file!');
+    };
+  }
+
+  const jsonBtn = manager.container.querySelector('#btn-success-export-json');
+  if (jsonBtn && manager.formExportData?.json) {
+    jsonBtn.onclick = () => {
+      const base = (manager.processedFilename || 'document').replace(/\.[^/.]+$/, '');
+      const blob = new Blob([manager.formExportData.json], { type: 'application/json' });
+      downloadBlob(blob, `${base}_data.json`);
+      Toast.success('Downloaded JSON form data!');
+    };
+  }
+
+  const csvBtn = manager.container.querySelector('#btn-success-export-csv');
+  if (csvBtn && manager.formExportData?.csv) {
+    csvBtn.onclick = () => {
+      const base = (manager.processedFilename || 'document').replace(/\.[^/.]+$/, '');
+      const blob = new Blob([manager.formExportData.csv], { type: 'text/csv' });
+      downloadBlob(blob, `${base}_data.csv`);
+      Toast.success('Downloaded CSV form data!');
+    };
+  }
+
+  const copyJsonBtn = manager.container.querySelector('#btn-success-copy-json');
+  if (copyJsonBtn && manager.formExportData?.json) {
+    copyJsonBtn.onclick = async () => {
+      try {
+        if (navigator.clipboard) await navigator.clipboard.writeText(manager.formExportData.json);
+        Toast.success('Copied JSON form data to clipboard!');
+      } catch {
+        Toast.info('Copy ready');
       }
     };
   }

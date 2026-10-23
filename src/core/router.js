@@ -305,6 +305,13 @@ export const ROUTE_DEFINITIONS = [
     description: "Add page numbers to your PDF document in headers or footers with customizable formatting."
   },
   {
+    path: '/fill_pdf',
+    toolId: 'fill-forms',
+    aliases: ['/fill-forms', '/fill_forms', '/fill-pdf', '/form-filler', '/form_filler', '/extract_form_data', '/extract-form-data'],
+    title: "Fill & Sign PDF Forms Online — Adobe Acrobat & Sejda Quality — LetsEdit",
+    description: "Fill interactive AcroForm fields, auto-populate sample data, or export and import form values to XFDF, FDF, JSON, and CSV."
+  },
+  {
     path: '/flatten_pdf',
     toolId: 'flatten',
     aliases: ['/flatten', '/flatten-pdf', '/flatten_forms'],

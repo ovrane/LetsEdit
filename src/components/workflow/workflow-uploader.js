@@ -11,6 +11,7 @@ import { Toast } from '../toast.js';
 import { authModal } from '../auth-modal.js';
 import { mobilePairModal } from '../mobile-pair-modal.js';
 import { cloudPickerModal } from '../cloud-picker-modal.js';
+import { PageOperations } from '../../core/engine/page-ops.js';
 import { readFileAsArrayBuffer } from '../../utils/helpers.js';
 
 export function renderUploadPrompt(manager) {
@@ -156,9 +157,16 @@ export function bindUploadEvents(manager) {
   if (sampleBtn) {
     sampleBtn.onclick = async () => {
       Toast.info('Loading sample document...');
-      const sampleBytes = await pdfEngine.createSamplePdf();
+      let sampleBytes;
+      let sampleName = 'Sample_Agreement.pdf';
+      if (manager.activeTool.id === 'fill-forms') {
+        sampleBytes = await PageOperations.createSampleFillableFormPdf();
+        sampleName = 'Sample_Fillable_Form.pdf';
+      } else {
+        sampleBytes = await pdfEngine.createSamplePdf();
+      }
       await handleIncomingFiles(manager, [{
-        name: 'Sample_Agreement.pdf',
+        name: sampleName,
         size: sampleBytes.byteLength,
         type: 'application/pdf',
         mockBytes: sampleBytes
@@ -299,6 +307,20 @@ export async function handleIncomingFiles(manager, files) {
       }
     } catch (e) {
       console.warn('Auto heading detection failed:', e);
+    }
+  }
+  if (manager.activeTool.id === 'fill-forms' && manager.uploadedFiles.length > 0) {
+    try {
+      const inspection = await PageOperations.inspectFormFields(manager.uploadedFiles[0].bytes);
+      manager.detectedFormFields = inspection.fields || [];
+      manager.formFieldValues = {};
+      (inspection.fields || []).forEach(f => {
+        manager.formFieldValues[f.name] = f.type === 'checkbox' ? f.isChecked : f.value;
+      });
+    } catch (e) {
+      console.warn('Auto form inspection failed:', e);
+      manager.detectedFormFields = [];
+      manager.formFieldValues = {};
     }
   }
   manager.stage = 'workspace';

@@ -417,7 +417,19 @@ export const WORKFLOW_TOOLS_CONFIG = {
     multiple: true,
     buttonText: 'Select PDF files',
     dropText: 'or drop PDF(s) here',
-    badge: 'Batch Supported'
+    badge: 'Page Numbers'
+  },
+  'fill-forms': {
+    id: 'fill-forms',
+    title: 'Fill & Sign PDF Forms',
+    subtitle: 'Inspect and fill interactive AcroForm fields, auto-populate sample data, or export/import XFDF, FDF, JSON, and CSV.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 11h6"></path><path d="M9 19h4"></path></svg>`,
+    color: '#2563eb',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select Fillable PDF',
+    dropText: 'or drop interactive form PDF here',
+    badge: 'AcroForm XFDF/JSON'
   },
   flatten: {
     id: 'flatten',

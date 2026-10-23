@@ -11,8 +11,9 @@ import { GeometryOps } from './operations/geometry-ops.js';
 import { ConvertOps } from './operations/convert-ops.js';
 import { StampOps } from './operations/stamp-ops.js';
 import { MultiSignOps } from './operations/multi-sign-ops.js';
+import { FormOps } from './operations/form-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -53,4 +54,11 @@ export class PageOperations {
   // Multi-Signer & Field Placement
   static burnSignatureFields(...args) { return MultiSignOps.burnSignatureFields(...args); }
   static compileCompletedDocument(...args) { return MultiSignOps.compileCompletedDocument(...args); }
+
+  // Form Filler & Form Data Export/Import
+  static inspectFormFields(...args) { return FormOps.inspectFormFields(...args); }
+  static fillFormFields(...args) { return FormOps.fillFormFields(...args); }
+  static exportFormData(...args) { return FormOps.exportFormData(...args); }
+  static importFormData(...args) { return FormOps.importFormData(...args); }
+  static createSampleFillableFormPdf(...args) { return FormOps.createSampleFillableFormPdf(...args); }
 }

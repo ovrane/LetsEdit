@@ -315,6 +315,31 @@ export function renderToolWorkspace(manager) {
                 </div>
               </div>
             </div>
+          ` : t.id === 'fill-forms' ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Interactive Form Visual Inspection</span>
+                <span style="font-size: 11px; color: #2563eb; background: rgba(37, 99, 235, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(37, 99, 235, 0.25);">
+                  ${manager.detectedFormFields?.length || 0} AcroForm Fields Active
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="form-filler-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div style="position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-radius: 6px; overflow: hidden; background: white; max-width: 480px; width: 100%;">
+                <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" id="form-filler-page-preview" style="width: 100%; height: auto; display: block;" />
+                <div style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.85); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; backdrop-filter: blur(4px);">
+                  Page 1 of ${manager.uploadedFiles[0]?.pageCount || 1}
+                </div>
+              </div>
+              <div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Edit values in the right panel to live-populate fields</span>
+              </div>
+            </div>
           ` : t.id === 'pdf-to-text' ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">

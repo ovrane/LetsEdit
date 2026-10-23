@@ -298,6 +298,30 @@ export async function processSingleDocument(manager, tool, file) {
       bytes: flatBytes,
       blob: new Blob([flatBytes], { type: 'application/pdf' })
     };
+  } else if (id === 'fill-forms') {
+    const fieldVals = manager.formFieldValues || {};
+    const flatten = Boolean(manager.flattenForms);
+    const filledBytes = await PageOperations.fillFormFields(primary.bytes, fieldVals, { flatten });
+
+    try {
+      const xfdfRes = await PageOperations.exportFormData(filledBytes, 'xfdf');
+      const jsonRes = await PageOperations.exportFormData(filledBytes, 'json');
+      const csvRes = await PageOperations.exportFormData(filledBytes, 'csv');
+      manager.formExportData = {
+        xfdf: xfdfRes.content,
+        json: jsonRes.content,
+        csv: csvRes.content,
+        fieldCount: Object.keys(fieldVals).length
+      };
+    } catch (e) {
+      console.warn('Form data export caching warning:', e);
+    }
+
+    return {
+      name: `Filled_${primary.name}`,
+      bytes: filledBytes,
+      blob: new Blob([filledBytes], { type: 'application/pdf' })
+    };
   } else if (id === 'redact') {
     const redactDoc = await PDFDocument.load(primary.bytes);
     const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);

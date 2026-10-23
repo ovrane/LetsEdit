@@ -12,6 +12,7 @@ import { handlePdfRequest } from './routes/pdf-routes.js';
 import { handleMobilePairRequest, PAIRING_SESSIONS } from './routes/mobile-pair-routes.js';
 import { handleSignRequest, SIGNATURE_REQUESTS } from './routes/sign-request-routes.js';
 import { handleCloudStorageRequest, CLOUD_DRIVE_STORAGE } from './routes/cloud-storage-routes.js';
+import { handleFormRequest } from './routes/form-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -65,6 +66,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Cloud Storage (Google Drive & Dropbox) endpoints
   const cloudHandled = await handleCloudStorageRequest(req, res, pathname, method);
   if (cloudHandled) return true;
+
+  // Dispatch Form Filler & Data Export/Import endpoints
+  const formHandled = await handleFormRequest(req, res, pathname, method);
+  if (formHandled) return true;
 
   return false;
 }
