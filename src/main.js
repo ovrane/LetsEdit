@@ -34,6 +34,7 @@ import { toolOptionsPanel } from './components/tool-options-panel.js';
 import { toolWorkflow } from './components/tool-workflow.js';
 import { accountPage } from './components/account-page.js';
 import { mobilePairPage } from './components/mobile-pair-page.js';
+import { recipientSignPage } from './components/recipient-sign-page.js';
 import { router } from './core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
@@ -108,6 +109,19 @@ class App {
         }
         mobileContainer.style.display = 'block';
         mobilePairPage.mount(mobileContainer);
+      } else if (route.isRecipientSigning || route.toolId === 'sign-document') {
+        const landingView = document.getElementById('landing-view');
+        const studioView = document.getElementById('studio-view');
+        if (landingView) landingView.style.display = 'none';
+        if (studioView) studioView.style.display = 'none';
+        let recContainer = document.getElementById('recipient-sign-container');
+        if (!recContainer) {
+          recContainer = document.createElement('div');
+          recContainer.id = 'recipient-sign-container';
+          document.body.appendChild(recContainer);
+        }
+        recContainer.style.display = 'block';
+        recipientSignPage.mount(recContainer);
       } else if (route.toolId) {
         toolWorkflow.openTool(route.toolId, { updateUrl: false });
       }

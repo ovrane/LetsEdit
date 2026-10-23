@@ -338,6 +338,22 @@ export const ROUTE_DEFINITIONS = [
     aliases: ['/mobile-pair', '/pair', '/mobile-camera', '/mobile-sign'],
     title: "Mobile Camera & Signature Pairing — LetsEdit",
     description: "Scan documents or draw signatures with your smartphone camera and sync to desktop instantly."
+  },
+  {
+    path: '/request_signature',
+    toolId: 'sign',
+    isRequestSignature: true,
+    aliases: ['/request-signature', '/request_signatures', '/request-signatures', '/sign_request'],
+    title: "Request PDF Signatures Online — Multi-Party e-Sign — LetsEdit",
+    description: "Invite multiple signers to fill and sign PDF documents with drag-and-drop fields and eIDAS audit trail."
+  },
+  {
+    path: '/sign_document',
+    toolId: 'sign-document',
+    isRecipientSigning: true,
+    aliases: ['/sign-document', '/sign-doc', '/sign_recipient'],
+    title: "Sign Document — LetsEdit Secure e-Sign Portal",
+    description: "Review and securely sign requested document fields with cryptographic verification."
   }
 ];
 

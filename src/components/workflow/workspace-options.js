@@ -698,8 +698,35 @@
     }
 
     if (id === 'sign') {
+      const isRequest = instance.signWorkflowMode === 'request';
       return `
         <div class="workflow-options-group">
+          <!-- Flow Switcher: Sign Myself vs Request Signatures -->
+          <div style="display: flex; gap: 6px; margin-bottom: 14px; background: var(--bg-surface); padding: 4px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-xs ${!isRequest ? 'btn-primary' : 'btn-ghost'} btn-sign-flow-mode" data-flow="self" style="flex: 1; padding: 7px 4px; font-weight: 600;">
+              👤 Sign Myself
+            </button>
+            <button type="button" class="btn btn-xs ${isRequest ? 'btn-primary' : 'btn-ghost'} btn-sign-flow-mode" data-flow="request" style="flex: 1; padding: 7px 4px; font-weight: 600;">
+              👥 Request Signatures
+            </button>
+          </div>
+
+          ${isRequest ? `
+            <div style="background: rgba(48, 5, 13, 0.04); border: 1.5px solid rgba(48, 5, 13, 0.18); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <strong style="font-size: 13px; color: #30050d;">Multi-Signer Workflow</strong>
+                <span style="font-size: 10.5px; font-weight: 700; background: #30050d; color: white; padding: 2px 8px; border-radius: 12px;">eIDAS / Adobe Sign</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin: 0 0 14px;">
+                Place interactive signature, initials, date, and form fields onto pages and send private signing links to multiple recipients.
+              </p>
+
+              <button type="button" id="btn-open-field-placer" class="workflow-primary-cta" style="background: linear-gradient(135deg, #30050d 0%, #520815 100%); width: 100%; justify-content: center; font-size: 13.5px; padding: 12px; box-shadow: 0 4px 12px rgba(48,5,13,0.25);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <span>Launch Visual Field Placer</span>
+              </button>
+            </div>
+          ` : `
           <label class="workflow-options-label">Signature Creation</label>
           <div class="split-mode-pills" style="margin-bottom: 12px;">
             <button type="button" class="split-mode-pill ${instance.signMode === 'draw' ? 'active' : ''}" data-sign-mode="draw">
@@ -793,6 +820,7 @@
               <input type="checkbox" id="chk-embed-sign-badge" ${instance.embedSignBadge !== false ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer;" />
             </div>
           </div>
+          `}
         </div>
       `;
     }

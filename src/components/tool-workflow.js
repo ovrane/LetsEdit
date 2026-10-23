@@ -99,6 +99,7 @@ export class ToolWorkflowManager {
     this.unlockPassword = '';
     this.renameCustomName = '';
 
+    this.signWorkflowMode = 'self'; // 'self' | 'request'
     this.signMode = 'draw'; // 'draw' | 'type' | 'upload'
     this.signName = 'Authorized Signature';
     this.signEmail = '';

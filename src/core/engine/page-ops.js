@@ -10,8 +10,9 @@ import { SplitOps } from './operations/split-ops.js';
 import { GeometryOps } from './operations/geometry-ops.js';
 import { ConvertOps } from './operations/convert-ops.js';
 import { StampOps } from './operations/stamp-ops.js';
+import { MultiSignOps } from './operations/multi-sign-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -48,4 +49,8 @@ export class PageOperations {
   static addPageNumbers(...args) { return StampOps.addPageNumbers(...args); }
   static signPdf(...args) { return StampOps.signPdf(...args); }
   static generateAuditCertificate(...args) { return StampOps.generateAuditCertificate(...args); }
+
+  // Multi-Signer & Field Placement
+  static burnSignatureFields(...args) { return MultiSignOps.burnSignatureFields(...args); }
+  static compileCompletedDocument(...args) { return MultiSignOps.compileCompletedDocument(...args); }
 }

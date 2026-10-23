@@ -10,6 +10,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { Toast } from '../toast.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
+import { signRequestModal } from './sign-request-modal.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -506,6 +507,26 @@ export function bindWorkspaceOptionsEvents(manager) {
   if (embedSignBadgeCheck) {
     embedSignBadgeCheck.onchange = (e) => {
       manager.embedSignBadge = e.target.checked;
+    };
+  }
+
+  const signFlowBtns = manager.container.querySelectorAll('.btn-sign-flow-mode');
+  signFlowBtns.forEach(btn => {
+    btn.onclick = () => {
+      manager.signWorkflowMode = btn.getAttribute('data-flow') || 'self';
+      manager.render();
+    };
+  });
+
+  const openPlacerBtn = manager.container.querySelector('#btn-open-field-placer');
+  if (openPlacerBtn) {
+    openPlacerBtn.onclick = () => {
+      const primary = manager.uploadedFiles[0];
+      if (primary && primary.bytes) {
+        signRequestModal.open(primary.bytes, primary.name);
+      } else {
+        Toast.error('Please upload a PDF document first.');
+      }
     };
   }
 
