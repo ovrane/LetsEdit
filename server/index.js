@@ -372,6 +372,92 @@ export async function handleBackendRequest(req, res) {
   }
 
   // -------------------------------------------------------------
+  // 8.1 Sejda Auth API: PUT /users/me (update profile)
+  // -------------------------------------------------------------
+  if (pathname === '/users/me' && method === 'PUT') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+    if (!token || !SESSIONS.has(token)) {
+      sendJson(res, 401, { error: 'Unauthorized session', valid: false });
+      return true;
+    }
+    const session = SESSIONS.get(token);
+    const body = await parseJsonBody(req);
+    if (body.name) session.name = body.name.trim();
+    if (typeof body.requires2fa === 'boolean') session.requires2fa = body.requires2fa;
+    if (body.preferences) session.preferences = { ...(session.preferences || {}), ...body.preferences };
+    SESSIONS.set(token, session);
+    sendJson(res, 200, { user: session, success: true });
+    return true;
+  }
+
+  // -------------------------------------------------------------
+  // 8.2 Developer & Automation API Keys: GET /users/api-keys
+  // -------------------------------------------------------------
+  if (pathname === '/users/api-keys' && method === 'GET') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+    if (!token || !SESSIONS.has(token)) {
+      sendJson(res, 401, { error: 'Unauthorized session' });
+      return true;
+    }
+    const session = SESSIONS.get(token);
+    const apiKeys = session.apiKeys || [];
+    sendJson(res, 200, { apiKeys });
+    return true;
+  }
+
+  // -------------------------------------------------------------
+  // 8.3 Developer & Automation API Keys: POST /users/api-keys
+  // -------------------------------------------------------------
+  if (pathname === '/users/api-keys' && method === 'POST') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+    if (!token || !SESSIONS.has(token)) {
+      sendJson(res, 401, { error: 'Unauthorized session' });
+      return true;
+    }
+    const session = SESSIONS.get(token);
+    const body = await parseJsonBody(req);
+    const label = (body.label || 'Default Automation Key').trim();
+    const newKey = {
+      id: 'key_' + Math.random().toString(36).substring(2, 10),
+      token: 'api_live_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
+      label,
+      createdAt: new Date().toISOString()
+    };
+    if (!session.apiKeys) session.apiKeys = [];
+    session.apiKeys.push(newKey);
+    SESSIONS.set(token, session);
+    sendJson(res, 201, { apiKey: newKey, success: true });
+    return true;
+  }
+
+  // -------------------------------------------------------------
+  // 8.4 Developer & Automation API Keys: DELETE /users/api-keys
+  // -------------------------------------------------------------
+  if (pathname.startsWith('/users/api-keys') && method === 'DELETE') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+    if (!token || !SESSIONS.has(token)) {
+      sendJson(res, 401, { error: 'Unauthorized session' });
+      return true;
+    }
+    const session = SESSIONS.get(token);
+    const keyId = pathname.split('/').pop();
+    if (session.apiKeys) {
+      session.apiKeys = session.apiKeys.filter(k => k.id !== keyId);
+      SESSIONS.set(token, session);
+    }
+    sendJson(res, 200, { success: true, message: 'API key revoked successfully.' });
+    return true;
+  }
+
+  // -------------------------------------------------------------
   // 9. Sejda Auth API: POST /users/logout
   // -------------------------------------------------------------
   if (pathname === '/users/logout' && method === 'POST') {
@@ -505,50 +591,25 @@ export async function handleBackendRequest(req, res) {
       const totalPages = srcDoc.getPageCount();
       const range = (body.range || 'all').trim();
 
-      const results = [];
-      if (range === 'all') {
-        for (let i = 0; i < totalPages; i++) {
-          const subDoc = await PDFDocument.create();
-          const [page] = await subDoc.copyPages(srcDoc, [i]);
-          subDoc.addPage(page);
-          const outBytes = await subDoc.save();
-          results.push({
-            name: `page_${i + 1}.pdf`,
-            pdfBase64: Buffer.from(outBytes).toString('base64'),
-            pageCount: 1
-          });
-        }
-      } else {
-        const chunks = range.split(',').map(s => s.trim()).filter(Boolean);
-        for (const chunk of chunks) {
-          const subDoc = await PDFDocument.create();
-          const pageIndices = [];
-          if (chunk.includes('-')) {
-            const [sStr, eStr] = chunk.split('-');
-            const s = Math.max(1, parseInt(sStr, 10));
-            const e = Math.min(totalPages, parseInt(eStr, 10));
-            for (let p = s; p <= e; p++) pageIndices.push(p - 1);
-          } else {
-            const p = parseInt(chunk, 10);
-            if (p >= 1 && p <= totalPages) pageIndices.push(p - 1);
-          }
-          if (pageIndices.length > 0) {
-            const copied = await subDoc.copyPages(srcDoc, pageIndices);
-            copied.forEach(p => subDoc.addPage(p));
-            const outBytes = await subDoc.save();
-            results.push({
-              name: `pages_${chunk}.pdf`,
-              pdfBase64: Buffer.from(outBytes).toString('base64'),
-              pageCount: pageIndices.length
-            });
-          }
-        }
-      }
+      const splits = await PageOperations.splitPdf(bytes, range, {
+        mode: body.mode,
+        maxBytes: body.maxBytes,
+        everyN: body.everyN
+      });
+
+      const results = splits.map(s => ({
+        name: s.name,
+        title: s.title || null,
+        pdfBase64: Buffer.from(s.bytes).toString('base64'),
+        pageCount: s.pageCount,
+        pages: s.pages
+      }));
 
       sendJson(res, 200, { splits: results, totalPages });
       return true;
     } catch (err) {
-      sendJson(res, 500, { error: 'Split failed: ' + err.message });
+      const status = err.message && err.message.includes('No bookmarks') ? 400 : 500;
+      sendJson(res, status, { error: 'Split failed: ' + err.message });
       return true;
     }
   }

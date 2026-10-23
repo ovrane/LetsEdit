@@ -5,9 +5,10 @@
 
 import { test, describe, before } from 'node:test';
 import assert from 'node:assert';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFString, PDFName } from 'pdf-lib';
 import JSZip from 'jszip';
 import { pdfEngine } from '../src/core/pdf-engine.js';
+import { PageOperations } from '../src/core/engine/page-ops.js';
 
 describe('PDF Vector Export & Feature Tests', () => {
   let sampleBytes;
@@ -332,6 +333,56 @@ describe('PDF Vector Export & Feature Tests', () => {
     // Split 'all' mode
     const allSplits = await pdfEngine.splitPdf('all');
     assert.strictEqual(allSplits.length, 2);
+
+    // Split 'every:N' mode and splitEveryN method
+    const every1 = await pdfEngine.splitEveryN(1);
+    assert.strictEqual(every1.length, 2);
+    assert.strictEqual(every1[0].pageCount, 1);
+    assert.strictEqual(every1[1].pageCount, 1);
+
+    const everyViaExpr = await pdfEngine.splitPdf('every:1');
+    assert.strictEqual(everyViaExpr.length, 2);
+
+    // Split 'size' mode and splitBySize method
+    const sizeSplits = await pdfEngine.splitBySize(100000);
+    assert.ok(sizeSplits.length >= 1);
+    assert.ok(sizeSplits[0].bytes.byteLength > 0);
+
+    // Split 'bookmarks' mode throws descriptive error when document has no outlines
+    await assert.rejects(
+      async () => await pdfEngine.splitByBookmarks(),
+      /No bookmarks or table of contents found/
+    );
+
+    // Create a 3-page document with outline bookmark on page 2 and verify splitByBookmarks
+    const docWithBm = await PDFDocument.create();
+    const p1 = docWithBm.addPage([400, 400]);
+    const p2 = docWithBm.addPage([400, 400]);
+    const p3 = docWithBm.addPage([400, 400]);
+    const ctx = docWithBm.context;
+
+    const outlineItem = ctx.obj({
+      Title: PDFString.of('Chapter 2'),
+      Dest: [p2.ref, PDFName.of('Fit')]
+    });
+    const outlineItemRef = ctx.register(outlineItem);
+
+    const outlines = ctx.obj({
+      Type: PDFName.of('Outlines'),
+      First: outlineItemRef,
+      Last: outlineItemRef,
+      Count: 1
+    });
+    const outlinesRef = ctx.register(outlines);
+    docWithBm.catalog.set(PDFName.of('Outlines'), outlinesRef);
+    const bmBytes = await docWithBm.save();
+
+    const bmSplits = await PageOperations.splitByBookmarks(bmBytes);
+    assert.strictEqual(bmSplits.length, 2);
+    assert.strictEqual(bmSplits[0].title, 'Introduction');
+    assert.strictEqual(bmSplits[0].pageCount, 1);
+    assert.strictEqual(bmSplits[1].title, 'Chapter 2');
+    assert.strictEqual(bmSplits[1].pageCount, 2);
   });
 
   test('exportPdf compiles legal Bates numbering across pages', async () => {

@@ -1,6 +1,8 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { Router, ROUTE_DEFINITIONS } from '../src/core/router.js';
+import { generateQrSvg } from '../src/utils/helpers.js';
+import { WORKFLOW_TOOLS_CONFIG, CHAIN_TOOLS } from '../src/components/tool-workflow.js';
 
 describe('iLovePDF-Compatible Router Engine Tests', () => {
   const router = new Router();
@@ -148,6 +150,28 @@ describe('iLovePDF-Compatible Router Engine Tests', () => {
     assert.equal(router.getCanonicalPath(null), '/');
   });
 
+  test('canonical /account and /login routes match with aliases', () => {
+    const acc = router.match('/account');
+    assert.equal(acc.canonicalPath, '/account');
+    assert.equal(acc.isAccount, true);
+
+    for (const alias of ['/profile', '/user', '/settings']) {
+      const match = router.match(alias);
+      assert.equal(match.canonicalPath, '/account');
+      assert.equal(match.isAccount, true);
+    }
+
+    const login = router.match('/login');
+    assert.equal(login.canonicalPath, '/login');
+    assert.equal(login.isLogin, true);
+
+    for (const alias of ['/signin', '/sign-in', '/register', '/signup']) {
+      const match = router.match(alias);
+      assert.equal(match.canonicalPath, '/login');
+      assert.equal(match.isLogin, true);
+    }
+  });
+
   test('subscription listeners receive notifications on route transitions', () => {
     let notifiedRoute = null;
     const unsub = router.subscribe((route) => {
@@ -161,4 +185,33 @@ describe('iLovePDF-Compatible Router Engine Tests', () => {
 
     unsub();
   });
+
+  test('generateQrSvg produces valid vector SVG with quiet zones and path elements', () => {
+    const svg = generateQrSvg('https://letsedit.io/download?ref=doc_12345', 180);
+    assert.ok(svg.includes('<svg'));
+    assert.ok(svg.includes('viewBox="0 0 29 29"'));
+    assert.ok(svg.includes('width="180"'));
+    assert.ok(svg.includes('height="180"'));
+    assert.ok(svg.includes('<rect width="29" height="29" fill="#ffffff" />'));
+    assert.ok(svg.includes('<path d="M'));
+  });
+
+  test('CHAIN_TOOLS provides valid workflow chaining tools with color palettes and vector icons', () => {
+    assert.ok(CHAIN_TOOLS.length >= 8);
+    for (const tool of CHAIN_TOOLS) {
+      assert.ok(tool.id);
+      assert.ok(tool.title);
+      assert.ok(tool.desc);
+      assert.ok(tool.color.startsWith('#'));
+      assert.ok(tool.icon.includes('<svg'));
+      // Verify tool exists in WORKFLOW_TOOLS_CONFIG
+      assert.ok(WORKFLOW_TOOLS_CONFIG[tool.id], `Tool ${tool.id} should be registered in WORKFLOW_TOOLS_CONFIG`);
+    }
+  });
+
+  test('WORKFLOW_TOOLS_CONFIG supports protect alias mapping to security', () => {
+    assert.equal(WORKFLOW_TOOLS_CONFIG.protect, WORKFLOW_TOOLS_CONFIG.security);
+    assert.equal(WORKFLOW_TOOLS_CONFIG.protect.id, 'security');
+  });
 });
+

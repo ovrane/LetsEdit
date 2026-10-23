@@ -9,11 +9,14 @@ import { readFileAsArrayBuffer } from '../../utils/helpers.js';
 const CATEGORIES = [
   { id: 'all', label: 'All Tools' },
   { id: 'popular', label: '⭐ Most Popular' },
-  { id: 'pages', label: 'Organize Pages' },
-  { id: 'tools', label: 'Optimize & Clean' },
-  { id: 'edit', label: 'Edit & Sign' },
-  { id: 'security', label: 'Security & Encrypt' },
-  { id: 'convert', label: 'Convert PDF' }
+  { id: 'merge', label: '🔗 Merge' },
+  { id: 'split', label: '✂ Split' },
+  { id: 'edit-sign', label: '✏ Edit & Sign' },
+  { id: 'compress-scans', label: '🗜 Compress & Scans' },
+  { id: 'security', label: '🔒 Security' },
+  { id: 'convert-from', label: '📤 Convert from PDF' },
+  { id: 'convert-to', label: '📥 Convert to PDF' },
+  { id: 'others', label: '⚡ Others' }
 ];
 
 export function LandingHero({ onDocumentLoaded }) {

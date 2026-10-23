@@ -90,7 +90,8 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', action: 'workflow:compress' },
       { id: 'scan', title: 'Scan to PDF', desc: 'Capture documents using camera or mobile scanner into clean PDF', icon: 'camera', color: '#2563eb', action: 'workflow:scan' },
       { id: 'deskew', title: 'Deskew', desc: 'Automatically straighten and deskew scanned PDF pages', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
-      { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', action: 'workflow:ocr-pdf' }
+      { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', action: 'workflow:ocr-pdf' },
+      { id: 'compare', title: 'Compare PDF', desc: 'Find differences and visually compare two PDF documents side by side', icon: 'git-pull-request', color: '#8b5cf6', action: 'workflow:compare' }
     ]
   },
   {
@@ -152,7 +153,8 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'repair', title: 'Repair', desc: 'Recover data from a corrupted or damaged PDF document', icon: 'tool', color: '#ef4444', action: 'workflow:repair' },
       { id: 'resize', title: 'Resize', desc: 'Add page margins and padding, Change PDF page size', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },
       { id: 'rotate', title: 'Rotate', desc: 'Rotate and save PDF pages permanently', icon: 'rotate', color: '#f59e0b', action: 'workflow:rotate' },
-      { id: 'remove-annotations', title: 'Remove annotations', desc: 'Batch remove highlights, strikeouts or any other annotations from a PDF document', icon: 'trash-2', color: '#dc2626', action: 'workflow:remove-annotations' }
+      { id: 'remove-annotations', title: 'Remove annotations', desc: 'Batch remove highlights, strikeouts or any other annotations from a PDF document', icon: 'trash-2', color: '#dc2626', action: 'workflow:remove-annotations' },
+      { id: 'pdfa', title: 'PDF to PDF/A', desc: 'Convert PDF documents to PDF/A for ISO 19005-1 long-term archiving', icon: 'shield', color: '#059669', action: 'workflow:pdfa' }
     ]
   }
 ];

@@ -29,6 +29,22 @@ export const ROUTE_DEFINITIONS = [
     description: "Edit PDF documents directly in your browser. Add text, shapes, signatures, and form fields."
   },
   {
+    path: '/account',
+    toolId: null,
+    isAccount: true,
+    aliases: ['/profile', '/user', '/user-account', '/settings'],
+    title: "Account Settings & Developer API Keys — LetsEdit",
+    description: "Manage your account, privacy settings, active sessions, and developer API keys."
+  },
+  {
+    path: '/login',
+    toolId: null,
+    isLogin: true,
+    aliases: ['/signin', '/sign-in', '/register', '/signup', '/sign-up'],
+    title: "Sign in to LetsEdit — Fast & Secure PDF Tools",
+    description: "Log in or create a free account to manage your documents and developer tokens."
+  },
+  {
     path: '/merge_pdf',
     toolId: 'merge',
     aliases: ['/merge', '/merge-pdf', '/combine_pdf', '/combine-pdf'],

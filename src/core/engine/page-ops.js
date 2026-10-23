@@ -79,8 +79,23 @@ export class PageOperations {
    * Splits or extracts pages from a PDF based on a range expression.
    * e.g. "1-2, 3" -> generates separate documents.
    */
-  static async splitPdf(rawBytes, rangeExpression) {
+  static async splitPdf(rawBytes, rangeExpression, options = {}) {
     if (!rawBytes) throw new Error('No PDF loaded to split');
+
+    if (options?.mode === 'size' || (typeof rangeExpression === 'string' && rangeExpression.startsWith('size:'))) {
+      const sizeParam = options?.maxBytes || parseInt(rangeExpression.replace('size:', ''), 10);
+      return await PageOperations.splitBySize(rawBytes, sizeParam);
+    }
+
+    if (options?.mode === 'bookmarks' || rangeExpression === 'bookmarks') {
+      return await PageOperations.splitByBookmarks(rawBytes);
+    }
+
+    if (options?.mode === 'every_n' || (typeof rangeExpression === 'string' && rangeExpression.startsWith('every:'))) {
+      const nParam = options?.everyN || parseInt(rangeExpression.replace('every:', ''), 10);
+      return await PageOperations.splitEveryN(rawBytes, nParam);
+    }
+
     const sourceDoc = await PDFDocument.load(rawBytes);
     const totalPages = sourceDoc.getPageCount();
 
@@ -94,7 +109,8 @@ export class PageOperations {
         results.push({
           name: `page_${i + 1}.pdf`,
           bytes,
-          pageCount: 1
+          pageCount: 1,
+          pages: `${i + 1}`
         });
       }
       return results;
@@ -128,9 +144,248 @@ export class PageOperations {
         results.push({
           name: `split_range_${g.replace(/\s+/g, '')}.pdf`,
           bytes,
-          pageCount: pageIndices.length
+          pageCount: pageIndices.length,
+          pages: g
         });
       }
+    }
+
+    return results;
+  }
+
+  /**
+   * Splits a PDF document into parts where each part is approximately or under target bytes.
+   * Conforms to Sejda Split by Size specification.
+   */
+  static async splitBySize(rawBytes, maxBytes = 5242880) {
+    if (!rawBytes) throw new Error('No PDF loaded to split');
+    const sourceDoc = await PDFDocument.load(rawBytes);
+    const totalPages = sourceDoc.getPageCount();
+    if (totalPages === 0) return [];
+
+    const effectiveMax = Math.max(1024, Number(maxBytes) || 5242880);
+    const results = [];
+    let currentChunkPages = [];
+    let partIndex = 1;
+
+    for (let i = 0; i < totalPages; i++) {
+      currentChunkPages.push(i);
+
+      // Check current subDoc size
+      const testDoc = await PDFDocument.create();
+      const copied = await testDoc.copyPages(sourceDoc, currentChunkPages);
+      copied.forEach(p => testDoc.addPage(p));
+      const testBytes = await testDoc.save();
+
+      if (testBytes.length > effectiveMax && currentChunkPages.length > 1) {
+        // Exceeded limit: remove the last page and finalize previous chunk
+        currentChunkPages.pop();
+        const chunkDoc = await PDFDocument.create();
+        const finalPages = await chunkDoc.copyPages(sourceDoc, currentChunkPages);
+        finalPages.forEach(p => chunkDoc.addPage(p));
+        const chunkBytes = await chunkDoc.save();
+
+        const startNum = currentChunkPages[0] + 1;
+        const endNum = currentChunkPages[currentChunkPages.length - 1] + 1;
+        results.push({
+          name: `part_${partIndex}_pages_${startNum}-${endNum}.pdf`,
+          bytes: chunkBytes,
+          pageCount: currentChunkPages.length,
+          size: chunkBytes.length,
+          pages: `${startNum}-${endNum}`
+        });
+
+        partIndex++;
+        // Start next chunk with current page i
+        currentChunkPages = [i];
+      }
+    }
+
+    // Save final remaining chunk
+    if (currentChunkPages.length > 0) {
+      const chunkDoc = await PDFDocument.create();
+      const finalPages = await chunkDoc.copyPages(sourceDoc, currentChunkPages);
+      finalPages.forEach(p => chunkDoc.addPage(p));
+      const chunkBytes = await chunkDoc.save();
+
+      const startNum = currentChunkPages[0] + 1;
+      const endNum = currentChunkPages[currentChunkPages.length - 1] + 1;
+      results.push({
+        name: `part_${partIndex}_pages_${startNum}-${endNum}.pdf`,
+        bytes: chunkBytes,
+        pageCount: currentChunkPages.length,
+        size: chunkBytes.length,
+        pages: `${startNum}-${endNum}`
+      });
+    }
+
+    return results;
+  }
+
+  /**
+   * Splits a PDF document by its bookmarks / table of contents outline.
+   * Conforms to Sejda Split by Bookmarks specification.
+   */
+  static async splitByBookmarks(rawBytes) {
+    if (!rawBytes) throw new Error('No PDF loaded to split');
+    const sourceDoc = await PDFDocument.load(rawBytes);
+    const totalPages = sourceDoc.getPageCount();
+    if (totalPages === 0) return [];
+
+    const pageRefMap = new Map();
+    sourceDoc.getPages().forEach((p, idx) => {
+      pageRefMap.set(p.ref.toString(), idx);
+    });
+
+    const bookmarks = [];
+    const outlinesRef = sourceDoc.catalog.get(PDFName.of('Outlines'));
+
+    if (outlinesRef) {
+      const outlinesDict = sourceDoc.context.lookup(outlinesRef);
+      if (outlinesDict) {
+        let curRef = outlinesDict.get(PDFName.of('First'));
+        const visited = new Set();
+
+        while (curRef && !visited.has(curRef.toString())) {
+          visited.add(curRef.toString());
+          const item = sourceDoc.context.lookup(curRef);
+          if (!item) break;
+
+          let title = 'Untitled Bookmark';
+          const titleObj = item.get(PDFName.of('Title'));
+          if (titleObj) {
+            title = typeof titleObj.decodeText === 'function' ? titleObj.decodeText() : titleObj.toString();
+          }
+
+          let targetPageIndex = -1;
+          const destObj = item.get(PDFName.of('Dest'));
+          const actObj = item.get(PDFName.of('A'));
+
+          const resolveDest = (d) => {
+            const resolved = sourceDoc.context.lookup(d);
+            if (Array.isArray(resolved?.asArray?.())) {
+              const targetRef = resolved.asArray()[0];
+              if (targetRef && pageRefMap.has(targetRef.toString())) {
+                return pageRefMap.get(targetRef.toString());
+              }
+            } else if (resolved && pageRefMap.has(resolved.toString())) {
+              return pageRefMap.get(resolved.toString());
+            }
+            return -1;
+          };
+
+          if (destObj) {
+            targetPageIndex = resolveDest(destObj);
+          } else if (actObj) {
+            const actDict = sourceDoc.context.lookup(actObj);
+            const actDest = actDict?.get?.(PDFName.of('D'));
+            if (actDest) {
+              targetPageIndex = resolveDest(actDest);
+            }
+          }
+
+          if (targetPageIndex >= 0 && targetPageIndex < totalPages) {
+            bookmarks.push({ title: title.trim(), pageIndex: targetPageIndex });
+          }
+
+          curRef = item.get(PDFName.of('Next'));
+        }
+      }
+    }
+
+    if (bookmarks.length === 0) {
+      throw new Error('No bookmarks or table of contents found in this PDF document.');
+    }
+
+    bookmarks.sort((a, b) => a.pageIndex - b.pageIndex);
+
+    const uniqueBookmarks = [];
+    for (const bm of bookmarks) {
+      if (!uniqueBookmarks.some(u => u.pageIndex === bm.pageIndex)) {
+        uniqueBookmarks.push(bm);
+      }
+    }
+
+    const results = [];
+
+    if (uniqueBookmarks[0].pageIndex > 0) {
+      const prefacePages = [];
+      for (let p = 0; p < uniqueBookmarks[0].pageIndex; p++) prefacePages.push(p);
+      const subDoc = await PDFDocument.create();
+      const copied = await subDoc.copyPages(sourceDoc, prefacePages);
+      copied.forEach(p => subDoc.addPage(p));
+      const bytes = await subDoc.save();
+      results.push({
+        name: '00_Introduction.pdf',
+        title: 'Introduction',
+        bytes,
+        pageCount: prefacePages.length,
+        pages: `1-${uniqueBookmarks[0].pageIndex}`
+      });
+    }
+
+    for (let i = 0; i < uniqueBookmarks.length; i++) {
+      const curBm = uniqueBookmarks[i];
+      const startP = curBm.pageIndex;
+      const endP = (i + 1 < uniqueBookmarks.length) ? (uniqueBookmarks[i + 1].pageIndex - 1) : (totalPages - 1);
+
+      const chapterPages = [];
+      for (let p = startP; p <= endP; p++) chapterPages.push(p);
+
+      if (chapterPages.length > 0) {
+        const subDoc = await PDFDocument.create();
+        const copied = await subDoc.copyPages(sourceDoc, chapterPages);
+        copied.forEach(p => subDoc.addPage(p));
+        const bytes = await subDoc.save();
+
+        const safeTitle = curBm.title.replace(/[/\\?%*:|"<>]/g, '_').trim() || `Chapter_${i + 1}`;
+        const prefix = String(i + 1).padStart(2, '0');
+        results.push({
+          name: `${prefix}_${safeTitle}.pdf`,
+          title: curBm.title,
+          bytes,
+          pageCount: chapterPages.length,
+          pages: `${startP + 1}-${endP + 1}`
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Splits a PDF document every N pages.
+   * Conforms to Sejda Extract Every N Pages mode.
+   */
+  static async splitEveryN(rawBytes, n = 1) {
+    if (!rawBytes) throw new Error('No PDF loaded to split');
+    const sourceDoc = await PDFDocument.load(rawBytes);
+    const totalPages = sourceDoc.getPageCount();
+    if (totalPages === 0) return [];
+
+    const step = Math.max(1, parseInt(n, 10) || 1);
+    const results = [];
+    let chunkIndex = 1;
+
+    for (let i = 0; i < totalPages; i += step) {
+      const pageIndices = [];
+      const end = Math.min(i + step, totalPages);
+      for (let p = i; p < end; p++) pageIndices.push(p);
+
+      const subDoc = await PDFDocument.create();
+      const copied = await subDoc.copyPages(sourceDoc, pageIndices);
+      copied.forEach(p => subDoc.addPage(p));
+      const bytes = await subDoc.save();
+
+      const startNum = i + 1;
+      const endNum = end;
+      results.push({
+        name: step === 1 ? `page_${startNum}.pdf` : `chunk_${chunkIndex}_pages_${startNum}-${endNum}.pdf`,
+        bytes,
+        pageCount: pageIndices.length,
+        pages: `${startNum}-${endNum}`
+      });
+      chunkIndex++;
     }
 
     return results;

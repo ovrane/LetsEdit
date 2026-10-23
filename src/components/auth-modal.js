@@ -12,6 +12,7 @@
 
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
+import { router } from '../core/router.js';
 
 export class AuthModal {
   constructor() {
@@ -510,7 +511,16 @@ export class AuthModal {
         <p>Unlimited client-side PDF editing, conversion & vector tools.</p>
       </div>
       <div class="account-dropdown-divider"></div>
-      <button type="button" class="account-menu-item" id="btn-popover-logout">
+      <button type="button" class="account-menu-item" id="btn-popover-account">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Account & Privacy Hub</span>
+      </button>
+      <button type="button" class="account-menu-item" id="btn-popover-api-keys">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 2l-2 2m-1.5 1.5L10 13l-4 1 1-4 7.5-7.5M16 5l3 3"></path><circle cx="7.5" cy="16.5" r="4.5"></circle><polyline points="7.5 16.5 5 19 2 19 2 16 4.5 13.5"></polyline></svg>
+        <span>Developer API Keys</span>
+      </button>
+      <div class="account-dropdown-divider"></div>
+      <button type="button" class="account-menu-item text-danger" id="btn-popover-logout">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>
         <span>Sign Out</span>
       </button>
@@ -518,6 +528,24 @@ export class AuthModal {
 
     targetButton.parentElement.appendChild(popover);
     this.activePopover = popover;
+
+    const accountBtn = popover.querySelector('#btn-popover-account');
+    if (accountBtn) {
+      accountBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.closeAccountMenu();
+        router.navigate('/account');
+      };
+    }
+
+    const apiKeysBtn = popover.querySelector('#btn-popover-api-keys');
+    if (apiKeysBtn) {
+      apiKeysBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.closeAccountMenu();
+        router.navigate('/account');
+      };
+    }
 
     const logoutBtn = popover.querySelector('#btn-popover-logout');
     if (logoutBtn) {

@@ -121,6 +121,41 @@ test('Backend API - POST /users/register creates user and returns session', asyn
   });
   assert.strictEqual(meRes.statusCode, 200);
   assert.strictEqual(meRes.body.user.email, 'morgan.test@example.com');
+  // Verify PUT /users/me updates profile name and preferences
+  const updateRes = await makeRequest('/users/me', 'PUT', {
+    name: 'Morgan Updated',
+    requires2fa: true
+  }, {
+    authorization: `Bearer ${regRes.body.token}`
+  });
+  assert.strictEqual(updateRes.statusCode, 200);
+  assert.strictEqual(updateRes.body.user.name, 'Morgan Updated');
+  assert.strictEqual(updateRes.body.user.requires2fa, true);
+
+  // Generate a developer automation API key
+  const keyCreateRes = await makeRequest('/users/api-keys', 'POST', {
+    label: 'CI/CD Pipeline Key'
+  }, {
+    authorization: `Bearer ${regRes.body.token}`
+  });
+  assert.strictEqual(keyCreateRes.statusCode, 201);
+  assert.ok(keyCreateRes.body.apiKey.token.startsWith('api_live_'));
+  assert.strictEqual(keyCreateRes.body.apiKey.label, 'CI/CD Pipeline Key');
+  const keyId = keyCreateRes.body.apiKey.id;
+
+  // List active API keys
+  const keysListRes = await makeRequest('/users/api-keys', 'GET', null, {
+    authorization: `Bearer ${regRes.body.token}`
+  });
+  assert.strictEqual(keysListRes.statusCode, 200);
+  assert.strictEqual(keysListRes.body.apiKeys.length, 1);
+
+  // Revoke the API key
+  const revokeRes = await makeRequest(`/users/api-keys/${keyId}`, 'DELETE', null, {
+    authorization: `Bearer ${regRes.body.token}`
+  });
+  assert.strictEqual(revokeRes.statusCode, 200);
+  assert.strictEqual(revokeRes.body.success, true);
 });
 
 test('Backend API - OAuth Sign-in (Google and Microsoft)', async () => {
@@ -192,6 +227,23 @@ test('Backend API - POST /api/pdf/split splits document by range or pages', asyn
   assert.strictEqual(resRange.body.splits.length, 2);
   assert.strictEqual(resRange.body.splits[0].pageCount, 2);
   assert.strictEqual(resRange.body.splits[1].pageCount, 1);
+
+  // Split every N pages (every 2 pages)
+  const resEveryN = await makeRequest('/api/pdf/split', 'POST', { pdfBase64: b64, mode: 'every_n', everyN: 2 });
+  assert.strictEqual(resEveryN.statusCode, 200);
+  assert.strictEqual(resEveryN.body.splits.length, 2);
+  assert.strictEqual(resEveryN.body.splits[0].pageCount, 2);
+  assert.strictEqual(resEveryN.body.splits[1].pageCount, 1);
+
+  // Split by max size
+  const resSize = await makeRequest('/api/pdf/split', 'POST', { pdfBase64: b64, mode: 'size', maxBytes: 50000 });
+  assert.strictEqual(resSize.statusCode, 200);
+  assert.ok(resSize.body.splits.length >= 1);
+
+  // Split by bookmarks (returns 400 when document has no bookmarks)
+  const resBm = await makeRequest('/api/pdf/split', 'POST', { pdfBase64: b64, mode: 'bookmarks' });
+  assert.strictEqual(resBm.statusCode, 400);
+  assert.ok(resBm.body.error.includes('No bookmarks'));
 });
 
 test('Backend API - POST /api/pdf/rotate rotates document pages', async () => {

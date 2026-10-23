@@ -113,8 +113,15 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
           className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
         >
           <Grid className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>All 34 Tools</span>
+          <span>All 43+ Tools</span>
         </button>
+
+        <a
+          href="/account"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
+        >
+          <span>Account & API</span>
+        </a>
 
 
         {isStudioMode && (

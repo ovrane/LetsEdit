@@ -83,16 +83,49 @@ export class PdfEngine {
     return await PageOperations.mergePdf(pdfBytesList);
   }
 
-  async splitPdf(pdfBytesOrRange = null, maybeRange = null) {
+  async splitPdf(pdfBytesOrRange = null, maybeRange = null, options = {}) {
     let bytes = this.rawBytes;
     let range = 'all';
+    let opts = options;
     if (pdfBytesOrRange instanceof ArrayBuffer || pdfBytesOrRange instanceof Uint8Array) {
       bytes = pdfBytesOrRange;
       range = maybeRange || 'all';
     } else if (typeof pdfBytesOrRange === 'string') {
       range = pdfBytesOrRange;
+      if (typeof maybeRange === 'object' && maybeRange !== null) {
+        opts = maybeRange;
+      }
     }
-    return await PageOperations.splitPdf(bytes, range);
+    return await PageOperations.splitPdf(bytes, range, opts);
+  }
+
+  async splitBySize(pdfBytesOrMax = null, maybeMax = 5242880) {
+    let bytes = this.rawBytes;
+    let maxBytes = 5242880;
+    if (pdfBytesOrMax instanceof ArrayBuffer || pdfBytesOrMax instanceof Uint8Array) {
+      bytes = pdfBytesOrMax;
+      maxBytes = maybeMax || 5242880;
+    } else if (typeof pdfBytesOrMax === 'number') {
+      maxBytes = pdfBytesOrMax;
+    }
+    return await PageOperations.splitBySize(bytes, maxBytes);
+  }
+
+  async splitByBookmarks(pdfBytes = null) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.splitByBookmarks(bytes);
+  }
+
+  async splitEveryN(pdfBytesOrN = null, maybeN = 1) {
+    let bytes = this.rawBytes;
+    let n = 1;
+    if (pdfBytesOrN instanceof ArrayBuffer || pdfBytesOrN instanceof Uint8Array) {
+      bytes = pdfBytesOrN;
+      n = maybeN || 1;
+    } else if (typeof pdfBytesOrN === 'number') {
+      n = pdfBytesOrN;
+    }
+    return await PageOperations.splitEveryN(bytes, n);
   }
 
   async splitInHalf(direction = 'vertical') {

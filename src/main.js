@@ -32,6 +32,7 @@ import { allToolsModal } from './components/all-tools-modal.js';
 import { landingPage } from './components/landing-page.js';
 import { toolOptionsPanel } from './components/tool-options-panel.js';
 import { toolWorkflow } from './components/tool-workflow.js';
+import { accountPage } from './components/account-page.js';
 import { router } from './core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
@@ -87,6 +88,10 @@ class App {
         landingPage.switchToLanding({ updateUrl: false });
       } else if (route.isEditor) {
         landingPage.switchToStudio({ updateUrl: false });
+      } else if (route.isAccount) {
+        accountPage.show({ updateUrl: false });
+      } else if (route.isLogin) {
+        accountPage.showLogin({ updateUrl: false });
       } else if (route.toolId) {
         toolWorkflow.openTool(route.toolId, { updateUrl: false });
       }

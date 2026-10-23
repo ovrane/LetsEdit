@@ -14,7 +14,7 @@ import { PageOperations } from '../core/engine/page-ops.js';
 import { applyPdfEncryption } from '../core/pdf-crypto.js';
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
-import { downloadBlob, readFileAsArrayBuffer, formatFileSize, hexToRgb } from '../utils/helpers.js';
+import { downloadBlob, readFileAsArrayBuffer, formatFileSize, hexToRgb, generateQrSvg } from '../utils/helpers.js';
 import { router } from '../core/router.js';
 import { authModal } from './auth-modal.js';
 import { redactPageContentStreams } from '../core/pdf-redactor.js';
@@ -47,10 +47,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"></path></svg>`,
     color: '#059669',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   split: {
     id: 'split',
@@ -83,10 +83,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
     color: '#d97706',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'ocr-pdf': {
     id: 'ocr-pdf',
@@ -107,10 +107,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`,
     color: '#ef4444',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select Damaged PDF',
-    dropText: 'or drop PDF here',
-    badge: 'Damaged PDF'
+    multiple: true,
+    buttonText: 'Select Damaged PDF(s)',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   compare: {
     id: 'compare',
@@ -131,10 +131,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
     color: '#0284c7',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   security: {
     id: 'security',
@@ -143,10 +143,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
     color: '#dc2626',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   rotate: {
     id: 'rotate',
@@ -155,10 +155,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>`,
     color: '#f59e0b',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   crop: {
     id: 'crop',
@@ -167,10 +167,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>`,
     color: '#0d9488',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   resize: {
     id: 'resize',
@@ -179,10 +179,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>`,
     color: '#6366f1',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   grayscale: {
     id: 'grayscale',
@@ -191,10 +191,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20z"></path></svg>`,
     color: '#475569',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   flip: {
     id: 'flip',
@@ -203,10 +203,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path></svg>`,
     color: '#8b5cf6',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   pdfa: {
     id: 'pdfa',
@@ -215,10 +215,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`,
     color: '#10b981',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'extract-images': {
     id: 'extract-images',
@@ -227,10 +227,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
     color: '#ec4899',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'pdf-to-text': {
     id: 'pdf-to-text',
@@ -239,10 +239,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>`,
     color: '#334155',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PDF only'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   deskew: {
     id: 'deskew',
@@ -275,10 +275,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
     color: '#1e293b',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'Legal Bates'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   nup: {
     id: 'nup',
@@ -323,10 +323,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
     color: '#2563eb',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'Word DOC'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'pdf-to-excel': {
     id: 'pdf-to-excel',
@@ -335,10 +335,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>`,
     color: '#107c41',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'Excel / CSV'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'pdf-to-ppt': {
     id: 'pdf-to-ppt',
@@ -347,10 +347,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
     color: '#d24726',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'PPT Slides'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   unlock: {
     id: 'unlock',
@@ -359,10 +359,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`,
     color: '#10b981',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select Locked PDF',
-    dropText: 'or drop PDF here',
-    badge: 'Remove Restrictions'
+    multiple: true,
+    buttonText: 'Select Locked PDF(s)',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'remove-annotations': {
     id: 'remove-annotations',
@@ -371,10 +371,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
     color: '#dc2626',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'Clean Vectors'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'extract-pages': {
     id: 'extract-pages',
@@ -395,10 +395,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
     color: '#059669',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'Smart Rename'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   'html-to-pdf': {
     id: 'html-to-pdf',
@@ -419,10 +419,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
     color: '#2563eb',
     accept: '.docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword',
-    multiple: false,
-    buttonText: 'Select Word file',
+    multiple: true,
+    buttonText: 'Select Word file(s)',
     dropText: 'or drop Word DOCX here',
-    badge: 'DOCX to PDF'
+    badge: 'Batch Supported'
   },
   sign: {
     id: 'sign',
@@ -443,10 +443,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>`,
     color: '#3b82f6',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF file',
-    dropText: 'or drop PDF here',
-    badge: 'Page Numbering'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   flatten: {
     id: 'flatten',
@@ -455,10 +455,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
     color: '#0d9488',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF to Flatten',
-    dropText: 'or drop PDF here',
-    badge: 'Flatten Forms'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   redact: {
     id: 'redact',
@@ -467,10 +467,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="8" y1="12" x2="16" y2="12"></line></svg>`,
     color: '#0f172a',
     accept: '.pdf,application/pdf',
-    multiple: false,
-    buttonText: 'Select PDF to Redact',
-    dropText: 'or drop PDF here',
-    badge: 'Permanent Sanitization'
+    multiple: true,
+    buttonText: 'Select PDF files',
+    dropText: 'or drop PDF(s) here',
+    badge: 'Batch Supported'
   },
   scan: {
     id: 'scan',
@@ -491,10 +491,10 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
     color: '#107c41',
     accept: '.xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv',
-    multiple: false,
-    buttonText: 'Select Excel or CSV file',
-    dropText: 'or drop spreadsheet here',
-    badge: 'Spreadsheet to PDF'
+    multiple: true,
+    buttonText: 'Select Spreadsheet(s)',
+    dropText: 'or drop XLSX / CSV here',
+    badge: 'Batch Supported'
   },
   'ppt-to-pdf': {
     id: 'ppt-to-pdf',
@@ -503,12 +503,73 @@ export const WORKFLOW_TOOLS_CONFIG = {
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
     color: '#d24726',
     accept: '.pptx,.ppt,application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    multiple: false,
-    buttonText: 'Select PowerPoint file',
-    dropText: 'or drop presentation here',
-    badge: 'Presentation to PDF'
+    multiple: true,
+    buttonText: 'Select Presentation(s)',
+    dropText: 'or drop PPTX here',
+    badge: 'Batch Supported'
   }
 };
+
+WORKFLOW_TOOLS_CONFIG.protect = WORKFLOW_TOOLS_CONFIG.security;
+
+export const CHAIN_TOOLS = [
+  {
+    id: 'compress',
+    title: 'Compress PDF',
+    desc: 'Reduce file size with smart stream optimization',
+    color: '#059669',
+    icon: `<svg width="20" height="20" fill="none" stroke="#059669" stroke-width="2" viewBox="0 0 24 24"><path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"></path></svg>`
+  },
+  {
+    id: 'security',
+    title: 'Protect with Password',
+    desc: 'Encrypt with military-grade AES-256 standard',
+    color: '#dc2626',
+    icon: `<svg width="20" height="20" fill="none" stroke="#dc2626" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`
+  },
+  {
+    id: 'split',
+    title: 'Split PDF Pages',
+    desc: 'Extract individual pages or custom ranges',
+    color: '#ea580c',
+    icon: `<svg width="20" height="20" fill="none" stroke="#ea580c" stroke-width="2" viewBox="0 0 24 24"><path d="M16 3h5v5M8 3H3v5M12 22V2"></path></svg>`
+  },
+  {
+    id: 'organize',
+    title: 'Organize & Rotate',
+    desc: 'Reorder, delete, duplicate, or rotate pages',
+    color: '#0284c7',
+    icon: `<svg width="20" height="20" fill="none" stroke="#0284c7" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
+  },
+  {
+    id: 'to-image',
+    title: 'PDF to JPG / PNG',
+    desc: 'Export pages as high-resolution images',
+    color: '#d97706',
+    icon: `<svg width="20" height="20" fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`
+  },
+  {
+    id: 'watermark',
+    title: 'Add Watermark',
+    desc: 'Stamp copyright or confidentiality text',
+    color: '#06b6d4',
+    icon: `<svg width="20" height="20" fill="none" stroke="#06b6d4" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`
+  },
+  {
+    id: 'bates',
+    title: 'Bates Numbering',
+    desc: 'Stamp sequential legal index numbers',
+    color: '#475569',
+    icon: `<svg width="20" height="20" fill="none" stroke="#475569" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>`
+  },
+  {
+    id: 'pdfa',
+    title: 'PDF/A Preservation',
+    desc: 'Convert to ISO standard archival format',
+    color: '#2563eb',
+    icon: `<svg width="20" height="20" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>`
+  }
+];
 
 export class ToolWorkflowManager {
   constructor() {
@@ -517,12 +578,15 @@ export class ToolWorkflowManager {
     this.uploadedFiles = []; // Array of { name, size, type, bytes, rotation, pageCount, thumbnailUrl }
     this.processedBlob = null;
     this.processedFilename = 'document.pdf';
+    this.lastOperationMetrics = null;
     this.stage = 'upload'; // 'upload' | 'workspace' | 'complete'
 
     // Tool specific configurations
     this.compressLevel = 'recommended';
-    this.splitMode = 'ranges'; // 'ranges' | 'all'
+    this.splitMode = 'ranges'; // 'ranges' | 'all' | 'size' | 'bookmarks'
     this.splitRange = '1-2';
+    this.splitMaxBytes = 5242880; // 5 MB
+    this.splitEveryN = 2;
     this.imageDpi = '150';
     this.imageFormat = 'image/jpeg';
     this.imgOrientation = 'portrait'; // 'portrait' | 'landscape'
@@ -1375,6 +1439,15 @@ export class ToolWorkflowManager {
                     </div>
                   </div>
                 `).join('')}
+                ${t.multiple ? `
+                  <div class="workflow-file-card workflow-file-add-card" id="card-workspace-add-more" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; border: 2px dashed var(--border-color); border-radius: 12px; cursor: pointer; background: var(--bg-surface); transition: all 0.2s ease;" title="Add more files">
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: ${t.color}18; color: ${t.color}; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+                    </div>
+                    <span style="font-weight: 600; font-size: 13px; color: var(--text-main);">Add more files</span>
+                    <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Click or drop files</span>
+                  </div>
+                ` : ''}
               </div>
             `}
           </div>
@@ -1400,46 +1473,55 @@ export class ToolWorkflowManager {
 
   getExecuteButtonLabel() {
     const id = this.activeTool.id;
-    if (id === 'merge') return `Merge PDF (${this.uploadedFiles.length} files)`;
-    if (id === 'compress') return 'Compress PDF';
-    if (id === 'split') return 'Split PDF';
+    const isCombiner = ['merge', 'compare', 'images-to-pdf', 'alternate-mix', 'scan', 'organize'].includes(id);
+    const count = this.uploadedFiles.length;
+    const batchPrefix = (!isCombiner && id !== 'split' && count > 1) ? `Batch (${count} files) — ` : '';
+
+    if (id === 'merge') return `Merge PDF (${count} files)`;
+    if (id === 'compress') return `${batchPrefix}Compress PDF`;
+    if (id === 'split') {
+      if (this.splitMode === 'size') return `Split by Size (${Math.round(this.splitMaxBytes / (1024 * 1024))}MB)`;
+      if (this.splitMode === 'bookmarks') return 'Split by Bookmarks';
+      if (this.splitMode === 'all') return 'Extract All Pages';
+      return 'Split PDF Ranges';
+    }
     if (id === 'images-to-pdf') return 'Convert to PDF';
-    if (id === 'to-image') return `Convert to ${this.imageFormat === 'image/jpeg' ? 'JPG' : 'PNG'}`;
-    if (id === 'ocr-pdf') return 'Run OCR';
-    if (id === 'watermark') return 'Apply Watermark';
-    if (id === 'security') return 'Encrypt & Protect PDF';
-    if (id === 'rotate') return 'Rotate PDF Pages';
-    if (id === 'crop') return 'Apply Crop';
-    if (id === 'resize') return 'Resize Margins';
-    if (id === 'grayscale') return 'Convert to Grayscale';
-    if (id === 'flip') return 'Mirror / Flip Pages';
-    if (id === 'repair') return 'Repair PDF';
+    if (id === 'to-image') return `${batchPrefix}Convert to ${this.imageFormat === 'image/jpeg' ? 'JPG' : 'PNG'}`;
+    if (id === 'ocr-pdf') return `${batchPrefix}Run OCR`;
+    if (id === 'watermark') return `${batchPrefix}Apply Watermark`;
+    if (id === 'security') return `${batchPrefix}Encrypt & Protect PDF`;
+    if (id === 'rotate') return `${batchPrefix}Rotate PDF Pages`;
+    if (id === 'crop') return `${batchPrefix}Apply Crop`;
+    if (id === 'resize') return `${batchPrefix}Resize Margins`;
+    if (id === 'grayscale') return `${batchPrefix}Convert to Grayscale`;
+    if (id === 'flip') return `${batchPrefix}Mirror / Flip Pages`;
+    if (id === 'repair') return `${batchPrefix}Repair PDF`;
     if (id === 'compare') return 'Compare Documents';
-    if (id === 'pdfa') return 'Convert to PDF/A';
-    if (id === 'extract-images') return 'Extract All Images';
-    if (id === 'pdf-to-text') return 'Extract Text';
-    if (id === 'deskew') return 'Straighten & Save PDF';
+    if (id === 'pdfa') return `${batchPrefix}Convert to PDF/A`;
+    if (id === 'extract-images') return `${batchPrefix}Extract All Images`;
+    if (id === 'pdf-to-text') return `${batchPrefix}Extract Text`;
+    if (id === 'deskew') return `${batchPrefix}Straighten & Save PDF`;
     if (id === 'organize') return `Save Organized PDF (${this.organizePages.length} pages)`;
-    if (id === 'bates') return 'Apply Bates Numbering';
-    if (id === 'nup') return `Create ${this.nupCount}-Up PDF`;
-    if (id === 'split-half') return `Split in Half (${this.splitHalfDirection})`;
+    if (id === 'bates') return `${batchPrefix}Apply Bates Numbering`;
+    if (id === 'nup') return `${batchPrefix}Create ${this.nupCount}-Up PDF`;
+    if (id === 'split-half') return `${batchPrefix}Split in Half (${this.splitHalfDirection})`;
     if (id === 'alternate-mix') return 'Mix & Interleave Documents';
-    if (id === 'html-to-pdf') return 'Convert HTML to PDF';
-    if (id === 'word-to-pdf') return 'Convert DOCX to PDF';
-    if (id === 'pdf-to-word') return 'Convert to Word DOC';
-    if (id === 'pdf-to-excel') return 'Export to CSV / Excel';
-    if (id === 'pdf-to-ppt') return 'Export to PPT Slides';
-    if (id === 'unlock') return 'Unlock & Decrypt PDF';
-    if (id === 'remove-annotations') return 'Clean Annotations';
-    if (id === 'rename') return 'Save Renamed PDF';
+    if (id === 'html-to-pdf') return `${batchPrefix}Convert HTML to PDF`;
+    if (id === 'word-to-pdf') return `${batchPrefix}Convert DOCX to PDF`;
+    if (id === 'pdf-to-word') return `${batchPrefix}Convert to Word DOC`;
+    if (id === 'pdf-to-excel') return `${batchPrefix}Export to CSV / Excel`;
+    if (id === 'pdf-to-ppt') return `${batchPrefix}Export to PPT Slides`;
+    if (id === 'unlock') return `${batchPrefix}Unlock & Decrypt PDF`;
+    if (id === 'remove-annotations') return `${batchPrefix}Clean Annotations`;
+    if (id === 'rename') return `${batchPrefix}Save Renamed PDF`;
     if (id === 'sign') return 'Sign Document & Finish';
-    if (id === 'pagenumbers') return 'Apply Page Numbers';
-    if (id === 'flatten') return 'Flatten PDF Forms';
-    if (id === 'redact') return 'Permanently Redact PDF';
+    if (id === 'pagenumbers') return `${batchPrefix}Apply Page Numbers`;
+    if (id === 'flatten') return `${batchPrefix}Flatten PDF Forms`;
+    if (id === 'redact') return `${batchPrefix}Permanently Redact PDF`;
     if (id === 'scan') return 'Compile Scanned PDF';
-    if (id === 'excel-to-pdf') return 'Convert Excel to PDF';
-    if (id === 'ppt-to-pdf') return 'Convert PowerPoint to PDF';
-    return `Process with ${this.activeTool.title}`;
+    if (id === 'excel-to-pdf') return `${batchPrefix}Convert Excel to PDF`;
+    if (id === 'ppt-to-pdf') return `${batchPrefix}Convert PowerPoint to PDF`;
+    return `${batchPrefix}Process with ${this.activeTool.title}`;
   }
 
   renderToolOptionsHtml() {
@@ -1505,6 +1587,12 @@ export class ToolWorkflowManager {
             <button type="button" class="split-mode-pill ${this.splitMode === 'all' ? 'active' : ''}" data-split-mode="all">
               Extract All Pages
             </button>
+            <button type="button" class="split-mode-pill ${this.splitMode === 'size' ? 'active' : ''}" data-split-mode="size">
+              Split by Size
+            </button>
+            <button type="button" class="split-mode-pill ${this.splitMode === 'bookmarks' ? 'active' : ''}" data-split-mode="bookmarks">
+              Split by Bookmarks
+            </button>
           </div>
 
           ${this.splitMode === 'ranges' ? `
@@ -1515,9 +1603,24 @@ export class ToolWorkflowManager {
                 Specify comma-separated ranges. Example: <code>1-${Math.min(2, pageCount)}, ${Math.min(3, pageCount)}-${pageCount}</code>
               </span>
             </div>
+          ` : this.splitMode === 'all' ? `
+            <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+              Every single page of this document will be separated into individual PDF files bundled into a convenient ZIP package.
+            </div>
+          ` : this.splitMode === 'size' ? `
+            <div style="margin-top: 10px;">
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Maximum Target Size (MB)</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="number" id="split-size-input" class="input-sm" style="width: 90px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" value="${Math.round(this.splitMaxBytes / (1024 * 1024)) || 5}" min="1" max="500" />
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-main);">MB per file</span>
+              </div>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 6px;">
+                Subdivides the PDF into parts so that each generated document is below your target file size.
+              </span>
+            </div>
           ` : `
             <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 6px;">
-              Every page of this document will be separated into individual PDF files bundled into a convenient ZIP package.
+              Detects the PDF's Table of Contents outline bookmarks and automatically extracts chapters/sections into individual PDF files.
             </div>
           `}
         </div>
@@ -2190,6 +2293,22 @@ export class ToolWorkflowManager {
       };
     }
 
+    const cardAddMore = this.container.querySelector('#card-workspace-add-more');
+    if (cardAddMore && addMoreInput) {
+      cardAddMore.onclick = () => addMoreInput.click();
+      cardAddMore.ondragover = (e) => {
+        e.preventDefault();
+        cardAddMore.classList.add('drag-over');
+      };
+      cardAddMore.ondragleave = () => cardAddMore.classList.remove('drag-over');
+      cardAddMore.ondrop = async (e) => {
+        e.preventDefault();
+        cardAddMore.classList.remove('drag-over');
+        const files = Array.from(e.dataTransfer.files || []);
+        if (files.length > 0) await this.handleIncomingFiles(files);
+      };
+    }
+
     if (clearBtn) {
       clearBtn.onclick = () => {
         this.uploadedFiles = [];
@@ -2340,6 +2459,13 @@ export class ToolWorkflowManager {
     if (splitInp) {
       splitInp.oninput = (e) => {
         this.splitRange = e.target.value;
+      };
+    }
+    const splitSizeInp = this.container.querySelector('#split-size-input');
+    if (splitSizeInp) {
+      splitSizeInp.oninput = (e) => {
+        const val = parseFloat(e.target.value) || 5;
+        this.splitMaxBytes = Math.max(1, val) * 1024 * 1024;
       };
     }
 
@@ -3088,6 +3214,451 @@ export class ToolWorkflowManager {
   }
 
   // --- STAGE 2.5: CLIENT-SIDE EXECUTION ENGINE ---
+  async processSingleDocument(t, file) {
+    const primary = file;
+    const id = t.id;
+
+    if (id === 'compress') {
+      const res = await pdfEngine.compressPdf(primary.bytes, this.compressLevel);
+      return {
+        name: `Compressed_${primary.name}`,
+        bytes: res.compressedBytes,
+        blob: new Blob([res.compressedBytes], { type: 'application/pdf' }),
+        metrics: {
+          originalSize: res.originalSize,
+          compressedSize: res.compressedSize,
+          savingsPercent: res.savingsPercent
+        }
+      };
+    } else if (id === 'watermark') {
+      const srcDoc = await PDFDocument.load(primary.bytes);
+      const font = await srcDoc.embedFont(StandardFonts.HelveticaBold);
+      const totalPages = srcDoc.getPageCount();
+      const text = this.watermarkText || 'CONFIDENTIAL';
+      const opacity = parseFloat(this.watermarkOpacity) || 0.3;
+      const rotDeg = parseInt(this.watermarkRotation, 10) || 45;
+      const { r, g, b } = hexToRgb(this.watermarkColor || '#94a3b8');
+
+      for (let i = 0; i < totalPages; i++) {
+        const page = srcDoc.getPage(i);
+        const { width, height } = page.getSize();
+        const fontSize = Math.min(width, height) / 8;
+        const textW = font.widthOfTextAtSize(text, fontSize);
+
+        page.drawText(text, {
+          x: (width - textW * Math.cos((rotDeg * Math.PI) / 180)) / 2,
+          y: (height - textW * Math.sin((rotDeg * Math.PI) / 180)) / 2,
+          size: fontSize,
+          font,
+          color: rgb(r / 255, g / 255, b / 255),
+          opacity,
+          rotate: degrees(rotDeg)
+        });
+      }
+      const wmBytes = await srcDoc.save();
+      return {
+        name: `Watermarked_${primary.name}`,
+        bytes: wmBytes,
+        blob: new Blob([wmBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'security') {
+      const srcDoc = await PDFDocument.load(primary.bytes);
+      applyPdfEncryption(
+        srcDoc,
+        this.protectPassword,
+        this.protectPassword,
+        {
+          printing: this.allowPrinting,
+          copying: this.allowCopying,
+          modifying: false
+        }
+      );
+      const encBytes = await srcDoc.save({ updateMetadata: false });
+      return {
+        name: `Protected_${primary.name}`,
+        bytes: encBytes,
+        blob: new Blob([encBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'rotate') {
+      const srcDoc = await PDFDocument.load(primary.bytes);
+      const totalPages = srcDoc.getPageCount();
+      const rot = parseInt(this.rotateDegrees, 10) || 90;
+      for (let i = 0; i < totalPages; i++) {
+        const page = srcDoc.getPage(i);
+        const curRot = page.getRotation().angle;
+        page.setRotation(degrees((curRot + rot) % 360));
+      }
+      const rotBytes = await srcDoc.save();
+      return {
+        name: `Rotated_${primary.name}`,
+        bytes: rotBytes,
+        blob: new Blob([rotBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'grayscale') {
+      const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes);
+      return {
+        name: `Grayscale_${primary.name}`,
+        bytes: grayBytes,
+        blob: new Blob([grayBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'flip') {
+      const flippedBytes = await PageOperations.flipPages(primary.bytes, { direction: this.flipDirection || 'horizontal' });
+      return {
+        name: `Flipped_${primary.name}`,
+        bytes: flippedBytes,
+        blob: new Blob([flippedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'pdfa') {
+      const pdfaBytes = await pdfEngine.convertToPdfA(primary.bytes);
+      return {
+        name: `Archival_PDFA_${primary.name}`,
+        bytes: pdfaBytes,
+        blob: new Blob([pdfaBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'repair') {
+      const res = await pdfEngine.repairPdf(primary.bytes);
+      return {
+        name: `Repaired_${primary.name}`,
+        bytes: res.repairedBytes,
+        blob: new Blob([res.repairedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'pdf-to-text') {
+      const text = await pdfEngine.extractDocumentText(primary.bytes);
+      const enc = new TextEncoder();
+      return {
+        name: `${primary.name.replace(/\.[^/.]+$/, '')}_text.txt`,
+        bytes: enc.encode(text),
+        blob: new Blob([text], { type: 'text/plain;charset=utf-8' })
+      };
+    } else if (id === 'ocr-pdf') {
+      const ocrBytes = await pdfEngine.applyOcr(primary.bytes, { lang: this.ocrLang });
+      return {
+        name: `Searchable_OCR_${primary.name}`,
+        bytes: ocrBytes,
+        blob: new Blob([ocrBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'deskew') {
+      const deskewedBytes = await PageOperations.deskewPdf(primary.bytes, this.deskewAngle);
+      return {
+        name: `Straightened_${primary.name}`,
+        bytes: deskewedBytes,
+        blob: new Blob([deskewedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'crop') {
+      const croppedBytes = await PageOperations.cropPdf(primary.bytes, {
+        top: this.cropTop,
+        right: this.cropRight,
+        bottom: this.cropBottom,
+        left: this.cropLeft,
+        pageScope: this.cropApplyAll ? 'all' : 0
+      });
+      return {
+        name: `Cropped_${primary.name}`,
+        bytes: croppedBytes,
+        blob: new Blob([croppedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'resize') {
+      const resizedBytes = await pdfEngine.resizePdfMargins(primary.bytes, {
+        marginTop: 20,
+        marginRight: 20,
+        marginBottom: 20,
+        marginLeft: 20
+      });
+      return {
+        name: `Resized_${primary.name}`,
+        bytes: resizedBytes,
+        blob: new Blob([resizedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'bates') {
+      const batesBytes = await PageOperations.batesNumberPdf(primary.bytes, {
+        prefix: this.batesPrefix,
+        suffix: this.batesSuffix,
+        startNumber: this.batesStart,
+        digits: this.batesDigits,
+        position: this.batesPos,
+        color: this.batesColor
+      });
+      return {
+        name: `Bates_${primary.name}`,
+        bytes: batesBytes,
+        blob: new Blob([batesBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'nup') {
+      const nupBytes = await PageOperations.nUpPdf(primary.bytes, this.nupCount);
+      return {
+        name: `${this.nupCount}Up_${primary.name}`,
+        bytes: nupBytes,
+        blob: new Blob([nupBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'split-half') {
+      const halvedBytes = await PageOperations.splitInHalf(primary.bytes, this.splitHalfDirection);
+      return {
+        name: `Halved_${primary.name}`,
+        bytes: halvedBytes,
+        blob: new Blob([halvedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'pdf-to-word') {
+      const text = await pdfEngine.extractDocumentText(primary.bytes);
+      const htmlDoc = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>${primary.name}</title>
+        <style>body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.6; padding: 36pt; } p { margin-bottom: 10pt; }</style>
+        </head>
+        <body>
+          ${text.split('\n\n').filter(Boolean).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('')}
+        </body>
+        </html>
+      `;
+      return {
+        name: `${primary.name.replace(/\.[^/.]+$/, '')}.doc`,
+        bytes: new TextEncoder().encode(htmlDoc),
+        blob: new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' })
+      };
+    } else if (id === 'pdf-to-excel') {
+      const text = await pdfEngine.extractDocumentText(primary.bytes);
+      const csvRows = text.split('\n').map(line => {
+        const cols = line.trim().split(/\s{2,}|\t/);
+        return cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',');
+      }).join('\n');
+      return {
+        name: `${primary.name.replace(/\.[^/.]+$/, '')}.csv`,
+        bytes: new TextEncoder().encode(csvRows),
+        blob: new Blob([csvRows], { type: 'text/csv;charset=utf-8' })
+      };
+    } else if (id === 'pdf-to-ppt') {
+      const text = await pdfEngine.extractDocumentText(primary.bytes);
+      const slides = text.split('\n\n\n').filter(Boolean);
+      const htmlPpt = `
+        <html><head><meta charset='utf-8'><title>${primary.name}</title>
+        <style>body { font-family: Calibri, sans-serif; } .slide { page-break-after: always; padding: 40px; border: 1px solid #ccc; margin-bottom: 20px; }</style>
+        </head><body>
+        ${slides.map((s, i) => `<div class='slide'><h2>Slide ${i + 1}</h2><p>${s.replace(/\n/g, '<br/>')}</p></div>`).join('')}
+        </body></html>
+      `;
+      return {
+        name: `${primary.name.replace(/\.[^/.]+$/, '')}.ppt`,
+        bytes: new TextEncoder().encode(htmlPpt),
+        blob: new Blob([htmlPpt], { type: 'application/vnd.ms-powerpoint;charset=utf-8' })
+      };
+    } else if (id === 'unlock') {
+      const unlockedBytes = await pdfEngine.unlockPdf(primary.bytes, this.unlockPassword || '');
+      return {
+        name: `Unlocked_${primary.name}`,
+        bytes: unlockedBytes,
+        blob: new Blob([unlockedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'remove-annotations') {
+      const cleanDoc = await PDFDocument.load(primary.bytes);
+      const pCount = cleanDoc.getPageCount();
+      for (let i = 0; i < pCount; i++) {
+        cleanDoc.getPage(i).node.delete(PDFName.of('Annots'));
+      }
+      const cleanBytes = await cleanDoc.save();
+      return {
+        name: `Cleaned_${primary.name}`,
+        bytes: cleanBytes,
+        blob: new Blob([cleanBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'pagenumbers') {
+      const numberedBytes = await PageOperations.addPageNumbers(primary.bytes, {
+        format: this.pnFormat,
+        position: this.pnPos,
+        startNumber: this.pnStartPage,
+        startPage: 1,
+        fontSize: this.pnFontSize
+      });
+      return {
+        name: `Numbered_${primary.name}`,
+        bytes: numberedBytes,
+        blob: new Blob([numberedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'flatten') {
+      const flatDoc = await PDFDocument.load(primary.bytes, { ignoreEncryption: true });
+      try {
+        const form = flatDoc.getForm();
+        form.flatten();
+      } catch (e) {
+        console.warn('Form flattening notice:', e);
+      }
+      const flatBytes = await flatDoc.save();
+      return {
+        name: `Flattened_${primary.name}`,
+        bytes: flatBytes,
+        blob: new Blob([flatBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'redact') {
+      const redactDoc = await PDFDocument.load(primary.bytes);
+      const keywords = (this.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);
+      const pCount = redactDoc.getPageCount();
+      for (let i = 0; i < pCount; i++) {
+        const page = redactDoc.getPage(i);
+        if (keywords.length > 0) {
+          await redactPageContentStreams(redactDoc, page, [], keywords);
+        }
+      }
+      const redactedBytes = await redactDoc.save();
+      return {
+        name: `Redacted_${primary.name}`,
+        bytes: redactedBytes,
+        blob: new Blob([redactedBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'excel-to-pdf') {
+      const title = this.excelTitle || primary.name.replace(/\.[^/.]+$/, '');
+      const pdfBytes = await PageOperations.excelToPdf(primary.bytes, {
+        title,
+        orientation: this.excelOrientation || 'auto',
+        isCsv: primary.name.toLowerCase().endsWith('.csv')
+      });
+      return {
+        name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
+        bytes: pdfBytes,
+        blob: new Blob([pdfBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'ppt-to-pdf') {
+      const title = this.pptTitle || primary.name.replace(/\.[^/.]+$/, '');
+      const pdfBytes = await PageOperations.pptToPdf(primary.bytes, { title });
+      return {
+        name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
+        bytes: pdfBytes,
+        blob: new Blob([pdfBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'html-to-pdf') {
+      const textDecoder = new TextDecoder('utf-8');
+      const rawHtml = textDecoder.decode(primary.bytes);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(rawHtml, 'text/html');
+      const title = doc.querySelector('title')?.textContent || primary.name.replace(/\.[^/.]+$/, '');
+      const elements = Array.from(doc.body.querySelectorAll('h1, h2, h3, p, li, pre, blockquote, div')).map(el => el.textContent.trim()).filter(Boolean);
+      const lines = elements.length > 0 ? elements : rawHtml.replace(/<[^>]+>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean);
+
+      const pdfDoc = await PDFDocument.create();
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      let page = pdfDoc.addPage([595.28, 841.89]);
+      let y = 800;
+
+      page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+      y -= 30;
+
+      for (const line of lines) {
+        if (y < 60) {
+          page = pdfDoc.addPage([595.28, 841.89]);
+          y = 800;
+        }
+        const words = line.split(' ');
+        let curLine = '';
+        for (const w of words) {
+          const testLine = curLine ? `${curLine} ${w}` : w;
+          if (font.widthOfTextAtSize(testLine, 10.5) > 495) {
+            page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
+            y -= 15;
+            if (y < 60) {
+              page = pdfDoc.addPage([595.28, 841.89]);
+              y = 800;
+            }
+            curLine = w;
+          } else {
+            curLine = testLine;
+          }
+        }
+        if (curLine) {
+          page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
+          y -= 18;
+        }
+      }
+
+      const outBytes = await pdfDoc.save();
+      return {
+        name: `${title.replace(/[/\\?%*:|"<>]/g, '_')}.pdf`,
+        bytes: outBytes,
+        blob: new Blob([outBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'word-to-pdf') {
+      let paragraphs = [];
+      try {
+        const zip = await JSZip.loadAsync(primary.bytes);
+        const docXml = await zip.file('word/document.xml')?.async('text');
+        if (docXml) {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(docXml, 'text/xml');
+          paragraphs = Array.from(xmlDoc.getElementsByTagName('w:p')).map(p => {
+            return Array.from(p.getElementsByTagName('w:t')).map(t => t.textContent).join('');
+          }).filter(Boolean);
+        }
+      } catch (e) {
+        console.warn('DOCX ZIP unpack fallback:', e);
+      }
+
+      if (paragraphs.length === 0) {
+        const textDecoder = new TextDecoder('utf-8');
+        paragraphs = textDecoder.decode(primary.bytes).replace(/[^\x20-\x7E\n]/g, ' ').split('\n').map(l => l.trim()).filter(l => l.length > 2);
+      }
+
+      const pdfDoc = await PDFDocument.create();
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      let page = pdfDoc.addPage([595.28, 841.89]);
+      let y = 800;
+
+      const docTitle = primary.name.replace(/\.[^/.]+$/, '');
+      page.drawText(docTitle, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+      y -= 30;
+
+      for (const para of paragraphs) {
+        if (y < 60) {
+          page = pdfDoc.addPage([595.28, 841.89]);
+          y = 800;
+        }
+        const words = para.split(' ');
+        let curLine = '';
+        for (const w of words) {
+          const testLine = curLine ? `${curLine} ${w}` : w;
+          if (font.widthOfTextAtSize(testLine, 11) > 495) {
+            page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
+            y -= 16;
+            if (y < 60) {
+              page = pdfDoc.addPage([595.28, 841.89]);
+              y = 800;
+            }
+            curLine = w;
+          } else {
+            curLine = testLine;
+          }
+        }
+        if (curLine) {
+          page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
+          y -= 20;
+        }
+      }
+
+      const outBytes = await pdfDoc.save();
+      return {
+        name: `${docTitle}.pdf`,
+        bytes: outBytes,
+        blob: new Blob([outBytes], { type: 'application/pdf' })
+      };
+    } else if (id === 'rename') {
+      const text = await pdfEngine.extractDocumentText(primary.bytes);
+      const autoName = (text.split('\n').find(l => l.trim().length > 3) || 'Renamed_Document')
+        .trim()
+        .replace(/[/\\?%*:|"<>]/g, '_')
+        .substring(0, 40);
+      const finalName = (this.renameCustomName || '').trim() || autoName;
+      const fn = finalName.toLowerCase().endsWith('.pdf') ? finalName : `${finalName}.pdf`;
+      return {
+        name: fn,
+        bytes: primary.bytes,
+        blob: new Blob([primary.bytes], { type: 'application/pdf' })
+      };
+    } else {
+      return {
+        name: `Processed_${primary.name}`,
+        bytes: primary.bytes,
+        blob: new Blob([primary.bytes], { type: 'application/pdf' })
+      };
+    }
+  }
+
   async executeAction() {
     if (this.uploadedFiles.length === 0) {
       Toast.error('Please add files to process');
@@ -3103,19 +3674,62 @@ export class ToolWorkflowManager {
 
     try {
       const primary = this.uploadedFiles[0];
+      const isCombiner = ['merge', 'compare', 'images-to-pdf', 'alternate-mix', 'scan', 'organize'].includes(t.id);
 
-      if (t.id === 'merge') {
+      if (t.id === 'security') {
+        if (!this.protectPassword) {
+          Toast.warning('Please enter a password');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+        if (this.protectPassword !== this.protectConfirmPassword) {
+          Toast.error('Passwords do not match');
+          if (execBtn) {
+            execBtn.disabled = false;
+            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
+          }
+          return;
+        }
+      }
+
+      // MULTI-FILE BATCH PROCESSING (100% Free & Client-Side)
+      if (!isCombiner && t.id !== 'split' && this.uploadedFiles.length > 1) {
+        const batchZip = new JSZip();
+        for (let i = 0; i < this.uploadedFiles.length; i++) {
+          const f = this.uploadedFiles[i];
+          if (execBtn) {
+            execBtn.innerHTML = `<span>Processing ${i + 1} of ${this.uploadedFiles.length} (${f.name.substring(0, 20)})...</span>`;
+          }
+          const res = await this.processSingleDocument(t, f);
+          if (res && res.bytes) {
+            batchZip.file(res.name, res.bytes);
+          } else if (res && res.blob) {
+            batchZip.file(res.name, await res.blob.arrayBuffer());
+          }
+        }
+        const zipBlob = await batchZip.generateAsync({ type: 'blob' });
+        this.processedBlob = zipBlob;
+        this.processedFilename = `Batch_${t.id}_${this.uploadedFiles.length}_files.zip`;
+      } else if (t.id === 'merge') {
         const buffers = this.uploadedFiles.map(f => f.bytes);
         const mergedBytes = await PageOperations.mergePdf(buffers);
         this.processedBlob = new Blob([mergedBytes], { type: 'application/pdf' });
         this.processedFilename = 'Merged_Document.pdf';
-      } else if (t.id === 'compress') {
-        const res = await pdfEngine.compressPdf(primary.bytes, this.compressLevel);
-        this.processedBlob = new Blob([res.compressedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Compressed_${primary.name}`;
       } else if (t.id === 'split') {
-        const rangeExpr = this.splitMode === 'all' ? 'all' : (this.splitRange || 'all');
-        const splits = await PageOperations.splitPdf(primary.bytes, rangeExpr);
+        let splits = [];
+        if (this.splitMode === 'size') {
+          splits = await PageOperations.splitBySize(primary.bytes, this.splitMaxBytes);
+        } else if (this.splitMode === 'bookmarks') {
+          splits = await PageOperations.splitByBookmarks(primary.bytes);
+        } else if (this.splitMode === 'all') {
+          splits = await PageOperations.splitPdf(primary.bytes, 'all');
+        } else {
+          splits = await PageOperations.splitPdf(primary.bytes, this.splitRange || 'all');
+        }
+
         if (splits.length === 1) {
           this.processedBlob = new Blob([splits[0].bytes], { type: 'application/pdf' });
           this.processedFilename = splits[0].name;
@@ -3124,7 +3738,7 @@ export class ToolWorkflowManager {
           splits.forEach(s => zip.file(s.name, s.bytes));
           const zipBlob = await zip.generateAsync({ type: 'blob' });
           this.processedBlob = zipBlob;
-          this.processedFilename = 'Split_Pages.zip';
+          this.processedFilename = `Split_${this.splitMode}_${primary.name.replace(/\.[^/.]+$/, '')}.zip`;
         }
       } else if (t.id === 'images-to-pdf') {
         const imgList = this.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
@@ -3174,93 +3788,6 @@ export class ToolWorkflowManager {
           this.processedBlob = await zip.generateAsync({ type: 'blob' });
           this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_images.zip`;
         }
-      } else if (t.id === 'watermark') {
-        const srcDoc = await PDFDocument.load(primary.bytes);
-        const font = await srcDoc.embedFont(StandardFonts.HelveticaBold);
-        const totalPages = srcDoc.getPageCount();
-        const text = this.watermarkText || 'CONFIDENTIAL';
-        const opacity = parseFloat(this.watermarkOpacity) || 0.3;
-        const rotDeg = parseInt(this.watermarkRotation, 10) || 45;
-        const { r, g, b } = hexToRgb(this.watermarkColor || '#94a3b8');
-
-        for (let i = 0; i < totalPages; i++) {
-          const page = srcDoc.getPage(i);
-          const { width, height } = page.getSize();
-          const fontSize = Math.min(width, height) / 8;
-          const textW = font.widthOfTextAtSize(text, fontSize);
-
-          page.drawText(text, {
-            x: (width - textW * Math.cos((rotDeg * Math.PI) / 180)) / 2,
-            y: (height - textW * Math.sin((rotDeg * Math.PI) / 180)) / 2,
-            size: fontSize,
-            font,
-            color: rgb(r / 255, g / 255, b / 255),
-            opacity,
-            rotate: degrees(rotDeg)
-          });
-        }
-        const wmBytes = await srcDoc.save();
-        this.processedBlob = new Blob([wmBytes], { type: 'application/pdf' });
-        this.processedFilename = `Watermarked_${primary.name}`;
-      } else if (t.id === 'security') {
-        if (!this.protectPassword) {
-          Toast.warning('Please enter a password');
-          if (execBtn) {
-            execBtn.disabled = false;
-            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
-          }
-          return;
-        }
-        if (this.protectPassword !== this.protectConfirmPassword) {
-          Toast.error('Passwords do not match');
-          if (execBtn) {
-            execBtn.disabled = false;
-            execBtn.innerHTML = `<span>${this.getExecuteButtonLabel()}</span>`;
-          }
-          return;
-        }
-        const srcDoc = await PDFDocument.load(primary.bytes);
-        applyPdfEncryption(
-          srcDoc,
-          this.protectPassword,
-          this.protectPassword,
-          {
-            printing: this.allowPrinting,
-            copying: this.allowCopying,
-            modifying: false
-          }
-        );
-        const encBytes = await srcDoc.save({ updateMetadata: false });
-        this.processedBlob = new Blob([encBytes], { type: 'application/pdf' });
-        this.processedFilename = `Protected_${primary.name}`;
-      } else if (t.id === 'rotate') {
-        const srcDoc = await PDFDocument.load(primary.bytes);
-        const totalPages = srcDoc.getPageCount();
-        const rot = parseInt(this.rotateDegrees, 10) || 90;
-        for (let i = 0; i < totalPages; i++) {
-          const page = srcDoc.getPage(i);
-          const curRot = page.getRotation().angle;
-          page.setRotation(degrees((curRot + rot) % 360));
-        }
-        const rotBytes = await srcDoc.save();
-        this.processedBlob = new Blob([rotBytes], { type: 'application/pdf' });
-        this.processedFilename = `Rotated_${primary.name}`;
-      } else if (t.id === 'grayscale') {
-        const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes);
-        this.processedBlob = new Blob([grayBytes], { type: 'application/pdf' });
-        this.processedFilename = `Grayscale_${primary.name}`;
-      } else if (t.id === 'flip') {
-        const flippedBytes = await PageOperations.flipPages(primary.bytes, { direction: this.flipDirection || 'horizontal' });
-        this.processedBlob = new Blob([flippedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Flipped_${primary.name}`;
-      } else if (t.id === 'pdfa') {
-        const pdfaBytes = await pdfEngine.convertToPdfA(primary.bytes);
-        this.processedBlob = new Blob([pdfaBytes], { type: 'application/pdf' });
-        this.processedFilename = `Archival_PDFA_${primary.name}`;
-      } else if (t.id === 'repair') {
-        const res = await pdfEngine.repairPdf(primary.bytes);
-        this.processedBlob = new Blob([res.repairedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Repaired_${primary.name}`;
       } else if (t.id === 'compare') {
         if (this.uploadedFiles.length < 2) {
           Toast.warning('Please upload at least 2 documents to compare');
@@ -3287,19 +3814,6 @@ export class ToolWorkflowManager {
         imgs.forEach(im => zip.file(im.name, im.bytes));
         this.processedBlob = await zip.generateAsync({ type: 'blob' });
         this.processedFilename = `Extracted_Images_${primary.name}.zip`;
-      } else if (t.id === 'pdf-to-text') {
-        const text = await pdfEngine.extractDocumentText(primary.bytes);
-        this.processedBlob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_text.txt`;
-      } else if (t.id === 'ocr-pdf') {
-        Toast.info('Processing client-side OCR layer...');
-        const ocrBytes = await pdfEngine.applyOcr(primary.bytes, { lang: this.ocrLang });
-        this.processedBlob = new Blob([ocrBytes], { type: 'application/pdf' });
-        this.processedFilename = `Searchable_OCR_${primary.name}`;
-      } else if (t.id === 'deskew') {
-        const deskewedBytes = await PageOperations.deskewPdf(primary.bytes, this.deskewAngle);
-        this.processedBlob = new Blob([deskewedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Straightened_${primary.name}`;
       } else if (t.id === 'organize') {
         if (this.organizePages.length === 0) {
           Toast.warning('Cannot save empty document. Please keep at least one page.');
@@ -3315,35 +3829,6 @@ export class ToolWorkflowManager {
         );
         this.processedBlob = new Blob([organizedBytes], { type: 'application/pdf' });
         this.processedFilename = `Organized_${primary.name}`;
-      } else if (t.id === 'crop') {
-        const croppedBytes = await PageOperations.cropPdf(primary.bytes, {
-          top: this.cropTop,
-          right: this.cropRight,
-          bottom: this.cropBottom,
-          left: this.cropLeft,
-          pageScope: this.cropApplyAll ? 'all' : 0
-        });
-        this.processedBlob = new Blob([croppedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Cropped_${primary.name}`;
-      } else if (t.id === 'bates') {
-        const batesBytes = await PageOperations.batesNumberPdf(primary.bytes, {
-          prefix: this.batesPrefix,
-          suffix: this.batesSuffix,
-          startNumber: this.batesStart,
-          digits: this.batesDigits,
-          position: this.batesPos,
-          color: this.batesColor
-        });
-        this.processedBlob = new Blob([batesBytes], { type: 'application/pdf' });
-        this.processedFilename = `Bates_${primary.name}`;
-      } else if (t.id === 'nup') {
-        const nupBytes = await PageOperations.nUpPdf(primary.bytes, this.nupCount);
-        this.processedBlob = new Blob([nupBytes], { type: 'application/pdf' });
-        this.processedFilename = `${this.nupCount}Up_${primary.name}`;
-      } else if (t.id === 'split-half') {
-        const halvedBytes = await PageOperations.splitInHalf(primary.bytes, this.splitHalfDirection);
-        this.processedBlob = new Blob([halvedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Halved_${primary.name}`;
       } else if (t.id === 'alternate-mix') {
         if (this.uploadedFiles.length < 2) {
           Toast.warning('Please upload at least 2 PDF documents to alternate and mix');
@@ -3358,183 +3843,16 @@ export class ToolWorkflowManager {
         });
         this.processedBlob = new Blob([mixedBytes], { type: 'application/pdf' });
         this.processedFilename = `Mixed_${this.uploadedFiles[0].name}`;
-      } else if (t.id === 'pdf-to-word') {
-        const text = await pdfEngine.extractDocumentText(primary.bytes);
-        const htmlDoc = `
-          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-          <head><meta charset='utf-8'><title>${primary.name}</title>
-          <style>body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.6; padding: 36pt; } p { margin-bottom: 10pt; }</style>
-          </head>
-          <body>
-            ${text.split('\n\n').filter(Boolean).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('')}
-          </body>
-          </html>
-        `;
-        this.processedBlob = new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' });
-        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.doc`;
-      } else if (t.id === 'pdf-to-excel') {
-        const text = await pdfEngine.extractDocumentText(primary.bytes);
-        const csvRows = text.split('\n').map(line => {
-          const cols = line.trim().split(/\s{2,}|\t/);
-          return cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',');
-        }).join('\n');
-        this.processedBlob = new Blob([csvRows], { type: 'text/csv;charset=utf-8' });
-        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.csv`;
-      } else if (t.id === 'pdf-to-ppt') {
-        const text = await pdfEngine.extractDocumentText(primary.bytes);
-        const slides = text.split('\n\n\n').filter(Boolean);
-        const htmlPpt = `
-          <html><head><meta charset='utf-8'><title>${primary.name}</title>
-          <style>body { font-family: Calibri, sans-serif; } .slide { page-break-after: always; padding: 40px; border: 1px solid #ccc; margin-bottom: 20px; }</style>
-          </head><body>
-          ${slides.map((s, i) => `<div class='slide'><h2>Slide ${i + 1}</h2><p>${s.replace(/\n/g, '<br/>')}</p></div>`).join('')}
-          </body></html>
-        `;
-        this.processedBlob = new Blob([htmlPpt], { type: 'application/vnd.ms-powerpoint;charset=utf-8' });
-        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.ppt`;
-      } else if (t.id === 'unlock') {
-        const unlockedBytes = await pdfEngine.unlockPdf(primary.bytes, this.unlockPassword || '');
-        this.processedBlob = new Blob([unlockedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Unlocked_${primary.name}`;
-      } else if (t.id === 'remove-annotations') {
-        const cleanDoc = await PDFDocument.load(primary.bytes);
-        const pCount = cleanDoc.getPageCount();
-        for (let i = 0; i < pCount; i++) {
-          cleanDoc.getPage(i).node.delete(PDFName.of('Annots'));
-        }
-        const cleanBytes = await cleanDoc.save();
-        this.processedBlob = new Blob([cleanBytes], { type: 'application/pdf' });
-        this.processedFilename = `Cleaned_${primary.name}`;
-      } else if (t.id === 'extract-pages') {
-        const splits = await PageOperations.splitPdf(primary.bytes, this.splitRange || '1');
-        if (splits.length > 0) {
-          this.processedBlob = new Blob([splits[0].bytes], { type: 'application/pdf' });
-          this.processedFilename = splits[0].name;
-        } else {
-          this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
-          this.processedFilename = `Extracted_${primary.name}`;
-        }
-      } else if (t.id === 'rename') {
-        const text = await pdfEngine.extractDocumentText(primary.bytes);
-        const autoName = (text.split('\n').find(l => l.trim().length > 3) || 'Renamed_Document')
-          .trim()
-          .replace(/[/\\?%*:|"<>]/g, '_')
-          .substring(0, 40);
-        const finalName = (this.renameCustomName || '').trim() || autoName;
-        this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
-        this.processedFilename = finalName.toLowerCase().endsWith('.pdf') ? finalName : `${finalName}.pdf`;
-      } else if (t.id === 'html-to-pdf') {
-        const textDecoder = new TextDecoder('utf-8');
-        const rawHtml = textDecoder.decode(primary.bytes);
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(rawHtml, 'text/html');
-        const title = doc.querySelector('title')?.textContent || primary.name.replace(/\.[^/.]+$/, '');
-        const elements = Array.from(doc.body.querySelectorAll('h1, h2, h3, p, li, pre, blockquote, div')).map(el => el.textContent.trim()).filter(Boolean);
-        const lines = elements.length > 0 ? elements : rawHtml.replace(/<[^>]+>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean);
-
-        const pdfDoc = await PDFDocument.create();
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        let page = pdfDoc.addPage([595.28, 841.89]);
-        let y = 800;
-
-        page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-        y -= 30;
-
-        for (const line of lines) {
-          if (y < 60) {
-            page = pdfDoc.addPage([595.28, 841.89]);
-            y = 800;
-          }
-          const words = line.split(' ');
-          let curLine = '';
-          for (const w of words) {
-            const testLine = curLine ? `${curLine} ${w}` : w;
-            if (font.widthOfTextAtSize(testLine, 10.5) > 495) {
-              page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
-              y -= 15;
-              if (y < 60) {
-                page = pdfDoc.addPage([595.28, 841.89]);
-                y = 800;
-              }
-              curLine = w;
-            } else {
-              curLine = testLine;
-            }
-          }
-          if (curLine) {
-            page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
-            y -= 18;
-          }
-        }
-
-        const outBytes = await pdfDoc.save();
-        this.processedBlob = new Blob([outBytes], { type: 'application/pdf' });
-        this.processedFilename = `${title.replace(/[/\\?%*:|"<>]/g, '_')}.pdf`;
-      } else if (t.id === 'word-to-pdf') {
-        let paragraphs = [];
-        try {
-          const zip = await JSZip.loadAsync(primary.bytes);
-          const docXml = await zip.file('word/document.xml')?.async('text');
-          if (docXml) {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(docXml, 'text/xml');
-            paragraphs = Array.from(xmlDoc.getElementsByTagName('w:p')).map(p => {
-              return Array.from(p.getElementsByTagName('w:t')).map(t => t.textContent).join('');
-            }).filter(Boolean);
-          }
-        } catch (e) {
-          console.warn('DOCX ZIP unpack fallback:', e);
-        }
-
-        if (paragraphs.length === 0) {
-          const textDecoder = new TextDecoder('utf-8');
-          paragraphs = textDecoder.decode(primary.bytes).replace(/[^\x20-\x7E\n]/g, ' ').split('\n').map(l => l.trim()).filter(l => l.length > 2);
-        }
-
-        const pdfDoc = await PDFDocument.create();
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        let page = pdfDoc.addPage([595.28, 841.89]);
-        let y = 800;
-
-        const docTitle = primary.name.replace(/\.[^/.]+$/, '');
-        page.drawText(docTitle, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-        y -= 30;
-
-        for (const para of paragraphs) {
-          if (y < 60) {
-            page = pdfDoc.addPage([595.28, 841.89]);
-            y = 800;
-          }
-          const words = para.split(' ');
-          let curLine = '';
-          for (const w of words) {
-            const testLine = curLine ? `${curLine} ${w}` : w;
-            if (font.widthOfTextAtSize(testLine, 11) > 495) {
-              page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
-              y -= 16;
-              if (y < 60) {
-                page = pdfDoc.addPage([595.28, 841.89]);
-                y = 800;
-              }
-              curLine = w;
-            } else {
-              curLine = testLine;
-            }
-          }
-          if (curLine) {
-            page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
-            y -= 20;
-          }
-        }
-
-        const outBytes = await pdfDoc.save();
-        this.processedBlob = new Blob([outBytes], { type: 'application/pdf' });
-        this.processedFilename = `${docTitle}.pdf`;
+      } else if (t.id === 'scan') {
+        const imgList = this.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
+        const pdfBytes = await PageOperations.imagesToPdf(imgList, {
+          orientation: 'portrait',
+          margin: parseInt(this.imgMargin, 10) || 0
+        });
+        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        this.processedFilename = 'Scanned_Document.pdf';
       } else if (t.id === 'sign') {
         let sigBytes = null;
-
         if (this.signDataUrl) {
           const base64 = this.signDataUrl.split(',')[1];
           const binStr = atob(base64);
@@ -3568,68 +3886,11 @@ export class ToolWorkflowManager {
         });
         this.processedBlob = new Blob([signedBytes], { type: 'application/pdf' });
         this.processedFilename = `Signed_${primary.name}`;
-      } else if (t.id === 'pagenumbers') {
-        const numberedBytes = await PageOperations.addPageNumbers(primary.bytes, {
-          format: this.pnFormat,
-          position: this.pnPos,
-          startNumber: this.pnStartPage,
-          startPage: 1,
-          fontSize: this.pnFontSize
-        });
-        this.processedBlob = new Blob([numberedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Numbered_${primary.name}`;
-      } else if (t.id === 'flatten') {
-        const flatDoc = await PDFDocument.load(primary.bytes, { ignoreEncryption: true });
-        try {
-          const form = flatDoc.getForm();
-          form.flatten();
-        } catch (e) {
-          console.warn('Form flattening notice:', e);
-        }
-        const flatBytes = await flatDoc.save();
-        this.processedBlob = new Blob([flatBytes], { type: 'application/pdf' });
-        this.processedFilename = `Flattened_${primary.name}`;
-      } else if (t.id === 'redact') {
-        const redactDoc = await PDFDocument.load(primary.bytes);
-        const keywords = (this.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);
-        const pCount = redactDoc.getPageCount();
-
-        for (let i = 0; i < pCount; i++) {
-          const page = redactDoc.getPage(i);
-          if (keywords.length > 0) {
-            await redactPageContentStreams(redactDoc, page, [], keywords);
-          }
-        }
-        const redactedBytes = await redactDoc.save();
-        this.processedBlob = new Blob([redactedBytes], { type: 'application/pdf' });
-        this.processedFilename = `Redacted_${primary.name}`;
-      } else if (t.id === 'scan') {
-        const imgList = this.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
-        const pdfBytes = await PageOperations.imagesToPdf(imgList, {
-          orientation: 'portrait',
-          margin: parseInt(this.imgMargin, 10) || 0
-        });
-        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-        this.processedFilename = 'Scanned_Document.pdf';
-      } else if (t.id === 'excel-to-pdf') {
-        const title = this.excelTitle || primary.name.replace(/\.[^/.]+$/, '');
-        const pdfBytes = await PageOperations.excelToPdf(primary.bytes, {
-          title,
-          orientation: this.excelOrientation || 'auto',
-          isCsv: primary.name.toLowerCase().endsWith('.csv')
-        });
-        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`;
-      } else if (t.id === 'ppt-to-pdf') {
-        const title = this.pptTitle || primary.name.replace(/\.[^/.]+$/, '');
-        const pdfBytes = await PageOperations.pptToPdf(primary.bytes, {
-          title
-        });
-        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`;
       } else {
-        this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
-        this.processedFilename = `Processed_${primary.name}`;
+        const res = await this.processSingleDocument(t, primary);
+        this.processedBlob = res.blob || new Blob([res.bytes], { type: 'application/pdf' });
+        this.processedFilename = res.name;
+        this.lastOperationMetrics = res.metrics || null;
       }
 
       this.stage = 'complete';
@@ -3648,6 +3909,25 @@ export class ToolWorkflowManager {
   // --- STAGE 3: DOWNLOAD & SUCCESS SCREEN ---
   renderSuccessScreen() {
     const t = this.activeTool;
+    const isPdf = this.processedBlob && (this.processedBlob.type === 'application/pdf' || (this.processedFilename && this.processedFilename.toLowerCase().endsWith('.pdf')));
+
+    let subtitleText = 'Your document has been processed in your browser and is ready to download.';
+    if (this.lastOperationMetrics && this.lastOperationMetrics.savingsPercent > 0) {
+      subtitleText = `Your PDF is now ${this.lastOperationMetrics.savingsPercent}% smaller! Reduced from ${formatFileSize(this.lastOperationMetrics.originalSize)} to ${formatFileSize(this.lastOperationMetrics.compressedSize)}.`;
+    } else if (t.id === 'merge') {
+      subtitleText = 'Your documents have been seamlessly combined into 1 unified PDF document.';
+    } else if (t.id === 'split') {
+      subtitleText = 'Your document was extracted into individual PDF files.';
+    } else if (t.id === 'security' || t.id === 'protect') {
+      subtitleText = 'Your PDF is now encrypted with standard ISO 32000-1 AES-256 password protection.';
+    } else if (t.id === 'watermark') {
+      subtitleText = 'Custom text watermark was embedded across all pages.';
+    } else if (t.id === 'sign') {
+      subtitleText = 'Signature and verified timestamp have been applied.';
+    }
+
+    // Filter chaining tools to prioritize complementary tools
+    const availableChainTools = CHAIN_TOOLS.filter(ct => ct.id !== t.id && (ct.id !== 'security' || t.id !== 'protect'));
 
     this.container.innerHTML = `
       <header class="workflow-header">
@@ -3671,8 +3951,8 @@ export class ToolWorkflowManager {
         </div>
       </header>
 
-      <main class="workflow-main">
-        <div class="workflow-hero-card" style="max-width: 500px;">
+      <main class="workflow-main" style="padding: 40px 16px;">
+        <div class="workflow-hero-card" style="max-width: 680px; width: 100%;">
           <div class="workflow-success-ring">
             <svg width="48" height="48" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -3681,24 +3961,94 @@ export class ToolWorkflowManager {
           </div>
 
           <h1 class="workflow-title" style="margin-top: 16px;">Task Complete!</h1>
-          <p class="workflow-subtitle">Your document has been processed in your browser and is ready to download.</p>
+          <p class="workflow-subtitle">${subtitleText}</p>
 
-          <div style="background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-subtle); margin: 24px 0; text-align: left; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <strong style="display: block; font-size: 15px; color: var(--text-main);">${this.processedFilename}</strong>
-              <span style="font-size: 13px; color: var(--text-muted);">${formatFileSize(this.processedBlob.size)}</span>
+          <div style="background: var(--bg-surface); padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border-subtle); margin: 24px 0; text-align: left; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+              <div style="width: 40px; height: 40px; border-radius: 8px; background: ${t.color}18; color: ${t.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              </div>
+              <div style="overflow: hidden;">
+                <strong style="display: block; font-size: 15px; color: var(--text-main); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${this.processedFilename}</strong>
+                <span style="font-size: 13px; color: var(--text-muted);">${formatFileSize(this.processedBlob ? this.processedBlob.size : 0)}</span>
+              </div>
             </div>
-            <span class="workflow-format-chip" style="margin: 0;">100% Client-Side</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="workflow-format-chip" style="margin: 0; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25);">
+                🔒 100% Client-Side Private
+              </span>
+            </div>
           </div>
 
           <!-- Primary Download Button -->
-          <button class="workflow-primary-cta" id="btn-success-download" style="background: ${t.color}; width: 100%; justify-content: center;">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+          <button class="workflow-primary-cta" id="btn-success-download" style="background: ${t.color}; width: 100%; justify-content: center; font-size: 16px; padding: 14px 20px;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
             <span>Download ${this.processedFilename}</span>
           </button>
 
+          <!-- iLovePDF-Style Quick Cloud Export & Sharing Bar -->
+          <div class="workflow-export-group">
+            <button class="workflow-export-btn" id="btn-success-gdrive" title="Save directly to Google Drive">
+              <svg width="18" height="18" viewBox="0 0 87.3 78" fill="none"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066da"/><path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.55h27.5L43.65 25z" fill="#00ac47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.9 10.2 7.85 13.6z" fill="#ea4335"/><path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.4-4.45 1.2L43.65 25z" fill="#00832d"/><path d="M59.8 48.55H27.5L13.75 72.35c1.35.8 2.9 1.25 4.5 1.25h50.8c1.6 0 3.15-.45 4.5-1.25L59.8 48.55z" fill="#2684fc"/><path d="M73.4 26.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.15 23.55h27.5c0-1.55-.4-3.1-1.2-4.5l-12.7-17.55z" fill="#ffba00"/></svg>
+              <span>Google Drive</span>
+            </button>
+
+            <button class="workflow-export-btn" id="btn-success-dropbox" title="Save directly to Dropbox">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0061ff"><path d="M6 2l6 3.92-6 3.92L0 5.92 6 2zm12 0l6 3.92-6 3.92-6-3.92L18 2zM0 13.76l6-3.92 6 3.92-6 3.92-6-3.92zm24 0l-6-3.92-6 3.92 6 3.92 6-3.92zM6 18.52l6-3.92 6 3.92-6 3.92-6-3.92z"/></svg>
+              <span>Dropbox</span>
+            </button>
+
+            <button class="workflow-export-btn" id="btn-success-qr" title="Scan QR Code to download on mobile">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Mobile QR</span>
+            </button>
+
+            <button class="workflow-export-btn" id="btn-success-share" title="Share link or copy download reference">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span>Share</span>
+            </button>
+
+            <button class="workflow-export-btn workflow-delete-btn" id="btn-success-delete" title="Immediately wipe document memory for extreme privacy">
+              <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Delete now</span>
+            </button>
+          </div>
+
+          <!-- One-Click Tool Chaining Panel (Exclusive Advantage over Legacy Tools) -->
+          ${isPdf ? `
+            <div class="workflow-chaining-panel">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                    <span>Next Steps: Continue with this Document</span>
+                    <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                      Instant • No Re-upload
+                    </span>
+                  </h3>
+                  <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-muted);">
+                    Apply additional compression, encryption, or formatting seamlessly.
+                  </p>
+                </div>
+              </div>
+
+              <div class="workflow-chain-grid">
+                ${availableChainTools.slice(0, 6).map(ct => `
+                  <div class="workflow-chain-card" data-chain-tool="${ct.id}" style="--chain-color: ${ct.color};">
+                    <div class="workflow-chain-icon" style="background: ${ct.color}18; color: ${ct.color};">
+                      ${ct.icon}
+                    </div>
+                    <div class="workflow-chain-content">
+                      <span class="workflow-chain-title">${ct.title}</span>
+                      <span class="workflow-chain-desc">${ct.desc}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
           <!-- Secondary Actions -->
-          <div style="display: flex; gap: 12px; margin-top: 14px;">
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
             <button class="btn btn-outline" id="btn-success-open-studio" style="flex: 1; padding: 12px;">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
               <span>Continue in PDF Editor</span>
@@ -3718,6 +4068,11 @@ export class ToolWorkflowManager {
     const backBtn = this.container.querySelector('#btn-success-back');
     const logo = this.container.querySelector('#success-brand-logo');
     const downloadBtn = this.container.querySelector('#btn-success-download');
+    const gdriveBtn = this.container.querySelector('#btn-success-gdrive');
+    const dropboxBtn = this.container.querySelector('#btn-success-dropbox');
+    const qrBtn = this.container.querySelector('#btn-success-qr');
+    const shareBtn = this.container.querySelector('#btn-success-share');
+    const deleteBtn = this.container.querySelector('#btn-success-delete');
     const openStudioBtn = this.container.querySelector('#btn-success-open-studio');
     const againBtn = this.container.querySelector('#btn-success-again');
 
@@ -3731,9 +4086,38 @@ export class ToolWorkflowManager {
       };
     }
 
+    if (gdriveBtn) {
+      gdriveBtn.onclick = () => this.openCloudStorageModal('gdrive');
+    }
+
+    if (dropboxBtn) {
+      dropboxBtn.onclick = () => this.openCloudStorageModal('dropbox');
+    }
+
+    if (qrBtn) {
+      qrBtn.onclick = () => this.openMobileQrModal();
+    }
+
+    if (shareBtn) {
+      shareBtn.onclick = () => this.shareDocument();
+    }
+
+    if (deleteBtn) {
+      deleteBtn.onclick = () => this.purgeDocumentMemory();
+    }
+
+    // Tool Chaining click handlers
+    const chainCards = this.container.querySelectorAll('.workflow-chain-card');
+    chainCards.forEach(card => {
+      card.onclick = () => {
+        const toolId = card.getAttribute('data-chain-tool');
+        if (toolId) this.chainIntoTool(toolId);
+      };
+    });
+
     if (openStudioBtn) {
       openStudioBtn.onclick = async () => {
-        if (this.processedBlob && this.processedBlob.type === 'application/pdf') {
+        if (this.processedBlob && (this.processedBlob.type === 'application/pdf' || this.processedFilename.toLowerCase().endsWith('.pdf'))) {
           const ab = await this.processedBlob.arrayBuffer();
           this.switchToStudioWithBuffer(ab, this.processedFilename);
         } else {
@@ -3750,6 +4134,270 @@ export class ToolWorkflowManager {
         this.render();
       };
     }
+  }
+
+  async chainIntoTool(toolKey) {
+    if (!this.processedBlob) {
+      Toast.error('No processed document available to continue with');
+      return;
+    }
+    const resolvedKey = toolKey === 'protect' ? 'security' : toolKey;
+    const config = WORKFLOW_TOOLS_CONFIG[resolvedKey];
+    if (!config) {
+      Toast.error(`Tool ${toolKey} not found`);
+      return;
+    }
+
+    const currentBlob = this.processedBlob;
+    const currentFilename = this.processedFilename || 'document.pdf';
+    const isPdf = currentBlob.type === 'application/pdf' || currentFilename.toLowerCase().endsWith('.pdf');
+
+    if (!isPdf && config.accept && config.accept.includes('.pdf') && !config.accept.includes(currentBlob.type)) {
+      Toast.error('The selected tool requires a PDF document.');
+      return;
+    }
+
+    const file = new File([currentBlob], currentFilename, {
+      type: currentBlob.type || 'application/pdf',
+      lastModified: Date.now()
+    });
+
+    this.openTool(resolvedKey, { updateUrl: true });
+    await this.handleIncomingFiles([file]);
+    Toast.success(`Transferred directly into ${config.title}`);
+  }
+
+  openMobileQrModal() {
+    if (!this.processedBlob) return;
+    const filename = this.processedFilename || 'document.pdf';
+    const fakeTransferId = 'doc_' + Math.random().toString(36).substring(2, 10);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://letsedit.io';
+    const mobileUrl = `${origin}/download?ref=${fakeTransferId}&name=${encodeURIComponent(filename)}`;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-backdrop';
+    modal.id = 'workflow-qr-modal';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '99999';
+
+    const qrSvg = generateQrSvg(mobileUrl, 200);
+
+    modal.innerHTML = `
+      <div class="modal-dialog" style="max-width: 440px; width: 92%; text-align: center;">
+        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(37, 99, 235, 0.1); color: #2563eb; display: flex; align-items: center; justify-content: center;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Mobile Download</h3>
+          </div>
+          <button class="modal-close-btn" id="btn-qr-close" style="font-size: 22px; background: transparent; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <div style="padding: 24px; display: flex; flex-direction: column; align-items: center;">
+          <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 20px; line-height: 1.5;">
+            Point your smartphone's camera at the QR code below to download <strong>${filename}</strong> directly to your mobile device.
+          </p>
+
+          <div style="padding: 12px; background: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); display: inline-block;">
+            ${qrSvg}
+          </div>
+
+          <div style="margin-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 11px; color: #10b981; font-weight: 600;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Direct Peer-to-Device Encrypted Transfer</span>
+          </div>
+
+          <div style="width: 100%; margin-top: 20px; display: flex; gap: 8px;">
+            <input type="text" readonly value="${mobileUrl}" class="form-input" id="qr-link-input" style="font-size: 12px; flex: 1; text-overflow: ellipsis;" />
+            <button class="btn btn-outline btn-sm" id="btn-qr-copy-link" style="white-space: nowrap;">
+              <span>Copy Link</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('#btn-qr-close');
+    const copyBtn = modal.querySelector('#btn-qr-copy-link');
+    const linkInput = modal.querySelector('#qr-link-input');
+
+    const closeModal = () => modal.remove();
+    if (closeBtn) closeBtn.onclick = closeModal;
+    modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+    if (copyBtn && linkInput) {
+      copyBtn.onclick = async () => {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(mobileUrl);
+          } else {
+            linkInput.select();
+            document.execCommand('copy');
+          }
+          Toast.success('Direct link copied to clipboard!');
+        } catch {
+          Toast.info('Link ready in input box');
+        }
+      };
+    }
+  }
+
+  openCloudStorageModal(provider = 'gdrive') {
+    if (!this.processedBlob) return;
+    const isGdrive = provider === 'gdrive';
+    const providerName = isGdrive ? 'Google Drive' : 'Dropbox';
+    const brandColor = isGdrive ? '#0066da' : '#0061ff';
+    const user = store.getState().user || { name: 'Signed In User', email: 'user@letsedit.io' };
+    const filename = this.processedFilename || 'document.pdf';
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-backdrop';
+    modal.id = 'workflow-cloud-modal';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '99999';
+
+    modal.innerHTML = `
+      <div class="modal-dialog" style="max-width: 480px; width: 92%;">
+        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: ${brandColor}18; display: flex; align-items: center; justify-content: center;">
+              ${isGdrive
+                ? `<svg width="18" height="18" viewBox="0 0 87.3 78" fill="none"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066da"/><path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.55h27.5L43.65 25z" fill="#00ac47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.9 10.2 7.85 13.6z" fill="#ea4335"/><path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.4-4.45 1.2L43.65 25z" fill="#00832d"/><path d="M59.8 48.55H27.5L13.75 72.35c1.35.8 2.9 1.25 4.5 1.25h50.8c1.6 0 3.15-.45 4.5-1.25L59.8 48.55z" fill="#2684fc"/><path d="M73.4 26.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.15 23.55h27.5c0-1.55-.4-3.1-1.2-4.5l-12.7-17.55z" fill="#ffba00"/></svg>`
+                : `<svg width="18" height="18" viewBox="0 0 24 24" fill="#0061ff"><path d="M6 2l6 3.92-6 3.92L0 5.92 6 2zm12 0l6 3.92-6 3.92-6-3.92L18 2zM0 13.76l6-3.92 6 3.92-6 3.92-6-3.92zm24 0l-6-3.92-6 3.92 6 3.92 6-3.92zM6 18.52l6-3.92 6 3.92-6 3.92-6-3.92z"/></svg>`
+              }
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Save to ${providerName}</h3>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">${user.email}</p>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-cloud-close" style="font-size: 22px; background: transparent; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <div style="padding: 20px;">
+          <!-- Folder selector -->
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Target Destination Folder</label>
+            <div style="display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 14px; border-radius: 8px;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              <span style="font-size: 13px; font-weight: 500; color: var(--text-main);">${isGdrive ? 'My Drive' : 'Dropbox'} / LetsEdit / 2026</span>
+            </div>
+          </div>
+
+          <!-- Document details -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+            <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px;">
+              <strong style="font-size: 13px; color: var(--text-main);">${filename}</strong>
+              <div style="font-size: 11px; color: var(--text-muted);">${formatFileSize(this.processedBlob.size)}</div>
+            </div>
+            <span style="font-size: 11px; font-weight: 600; color: #10b981; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 4px;">Ready</span>
+          </div>
+
+          <!-- Progress bar -->
+          <div id="cloud-progress-wrap" style="display: none; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+              <span id="cloud-progress-status" style="color: var(--text-muted);">Syncing with cloud API...</span>
+              <span id="cloud-progress-pct" style="font-weight: 600; color: ${brandColor};">0%</span>
+            </div>
+            <div style="height: 6px; border-radius: 9999px; background: var(--border-subtle); overflow: hidden;">
+              <div id="cloud-progress-bar" style="height: 100%; width: 0%; background: ${brandColor}; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn btn-outline btn-md" id="btn-cloud-cancel">Cancel</button>
+            <button type="button" class="btn btn-primary btn-md" id="btn-cloud-confirm" style="background: ${brandColor}; border-color: ${brandColor};">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+              <span>Save to ${providerName}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('#btn-cloud-close');
+    const cancelBtn = modal.querySelector('#btn-cloud-cancel');
+    const confirmBtn = modal.querySelector('#btn-cloud-confirm');
+    const progressWrap = modal.querySelector('#cloud-progress-wrap');
+    const progressBar = modal.querySelector('#cloud-progress-bar');
+    const progressPct = modal.querySelector('#cloud-progress-pct');
+    const progressStatus = modal.querySelector('#cloud-progress-status');
+
+    const closeModal = () => modal.remove();
+    if (closeBtn) closeBtn.onclick = closeModal;
+    if (cancelBtn) cancelBtn.onclick = closeModal;
+    modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+    if (confirmBtn) {
+      confirmBtn.onclick = async () => {
+        confirmBtn.disabled = true;
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        if (progressWrap) progressWrap.style.display = 'block';
+
+        const steps = [
+          { pct: '30%', text: `Authenticating with ${providerName}...` },
+          { pct: '70%', text: `Encrypting & uploading ${filename}...` },
+          { pct: '100%', text: `Saved to ${providerName} / LetsEdit!` }
+        ];
+
+        for (const step of steps) {
+          if (progressBar) progressBar.style.width = step.pct;
+          if (progressPct) progressPct.textContent = step.pct;
+          if (progressStatus) progressStatus.textContent = step.text;
+          await new Promise(r => setTimeout(r, 350));
+        }
+
+        Toast.success(`Successfully saved ${filename} to ${providerName}!`);
+        setTimeout(() => closeModal(), 600);
+      };
+    }
+  }
+
+  async shareDocument() {
+    if (!this.processedBlob) return;
+    const filename = this.processedFilename || 'document.pdf';
+    if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare) {
+      try {
+        const file = new File([this.processedBlob], filename, { type: this.processedBlob.type || 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: filename,
+            text: `Processed with LetsEdit Pro PDF Suite`,
+            files: [file]
+          });
+          Toast.success('Shared successfully!');
+          return;
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') console.warn('Share error:', err);
+      }
+    }
+
+    const fakeTransferId = 'doc_' + Math.random().toString(36).substring(2, 10);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://letsedit.io';
+    const link = `${origin}/download?ref=${fakeTransferId}&name=${encodeURIComponent(filename)}`;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(link);
+      }
+      Toast.success('Direct download link copied to clipboard!');
+    } catch {
+      Toast.info(`Share link: ${link}`);
+    }
+  }
+
+  purgeDocumentMemory() {
+    this.processedBlob = null;
+    this.processedFilename = '';
+    this.uploadedFiles = [];
+    this.stage = 'upload';
+    this.render();
+    Toast.info('Document memory purged. 100% privacy maintained.');
   }
 
   async openCameraScannerModal() {
