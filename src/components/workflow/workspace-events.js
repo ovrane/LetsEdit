@@ -295,6 +295,20 @@ export function bindWorkspaceEvents(manager) {
     };
   }
 
+  // PDF/A profile select
+  const pdfaRadios = manager.container.querySelectorAll('input[name="pdfa-profile-choice"]');
+  pdfaRadios.forEach(radio => {
+    radio.onchange = (e) => {
+      manager.pdfaProfile = e.target.value;
+      manager.container.querySelectorAll('.pdfa-profile-card').forEach(card => {
+        const inp = card.querySelector('input');
+        const isSelected = inp && inp.value === manager.pdfaProfile;
+        card.style.borderColor = isSelected ? 'var(--primary)' : 'var(--border-subtle)';
+        card.style.background = isSelected ? 'var(--primary-light)' : 'var(--bg-card)';
+      });
+    };
+  });
+
   // OCR language select
   const ocrLangSel = manager.container.querySelector('#ocr-lang-select');
   if (ocrLangSel) {

@@ -2123,127 +2123,135 @@ body.show-tool-workflow .tool-workflow-container {
   margin: 0 auto 36px;
 }
 
-/* Hero Dropzone Card - Compact & Professional */
-.hero-dropzone-card {
-  max-width: 500px;
-  margin: 0 auto 24px;
-  background-color: var(--bg-surface);
-  border: 1.5px dashed var(--border-strong);
-  border-radius: 16px;
-  padding: 24px 20px;
-  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Hero Fast Search & Popular Tools Launch Hub */
+.hero-actions-hub {
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 16px;
 }
 
-.hero-dropzone-card:hover,
-.hero-dropzone-card.drag-over {
-  border-color: var(--primary);
-  background-color: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px -4px rgba(48, 5, 13, 0.14), 0 2px 8px rgba(15, 23, 42, 0.04);
-}
-
-.dropzone-icon-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background-color: rgba(48, 5, 13, 0.08);
-  color: var(--primary);
+.hero-search-bar-wrap {
+  position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.hero-dropzone-card:hover .dropzone-icon-circle {
-  transform: scale(1.06);
-}
-
-.dropzone-cta-btn {
-  font-size: 14.5px;
-  font-weight: 600;
-  padding: 11px 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(48, 5, 13, 0.25);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 9999px;
+  padding: 4px 18px;
+  box-shadow: 0 4px 20px -2px rgba(48, 5, 13, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.dropzone-cta-btn:hover {
+.hero-search-bar-wrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 8px 30px -4px rgba(48, 5, 13, 0.2), 0 0 0 3px var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(48, 5, 13, 0.35);
 }
 
-.dropzone-cta-btn:active {
-  transform: scale(0.98);
-}
-
-.dropzone-subtext {
-  font-size: 12.5px;
+.hero-search-icon {
   color: var(--text-muted);
-  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
 }
 
-.dropzone-badges {
+.hero-search-bar-wrap:focus-within .hero-search-icon {
+  color: var(--primary);
+}
+
+.hero-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-main);
+  outline: none;
+}
+
+.hero-search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+.hero-search-clear {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+
+.hero-search-clear:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.hero-popular-pills {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 14px;
   flex-wrap: wrap;
 }
 
-.format-tag {
-  font-size: 11px;
-  font-weight: 600;
+.hero-popular-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  padding: 3px 10px;
-  border-radius: 9999px;
-  letter-spacing: 0.02em;
+  margin-right: 2px;
 }
 
-.dropzone-footer-actions {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
-  width: 100%;
-}
-
-.dropzone-sample-btn {
-  background: transparent;
-  border: none;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--primary);
-  cursor: pointer;
+.hero-popular-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
   border-radius: 9999px;
-  transition: all 0.15s ease;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-.dropzone-sample-btn:hover {
-  background-color: var(--primary-light);
-  text-decoration: none;
+.hero-popular-pill svg {
+  color: var(--primary);
+  transition: transform 0.18s ease;
 }
 
-.dropzone-sample-btn svg {
-  transition: transform 0.2s ease;
+.hero-popular-pill:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(48, 5, 13, 0.12);
 }
 
-.dropzone-sample-btn:hover svg {
-  transform: translateX(3px);
+.hero-popular-pill:hover svg {
+  transform: scale(1.1);
+}
+
+.hero-popular-pill:active {
+  transform: scale(0.97);
 }
 
 /* Hero Value & Proof Bar */

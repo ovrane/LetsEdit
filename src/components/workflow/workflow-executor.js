@@ -111,11 +111,15 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([flippedBytes], { type: 'application/pdf' })
     };
   } else if (id === 'pdfa') {
-    const pdfaBytes = await pdfEngine.convertToPdfA(primary.bytes);
+    const profile = instance.pdfaProfile || 'pdfa-1b';
+    const pdfaBytes = await pdfEngine.convertToPdfA(primary.bytes, { profile });
+    const validation = await pdfEngine.validatePdfA(pdfaBytes);
+    const cleanPrefix = profile.toUpperCase().replace('-', '_');
     return {
-      name: `Archival_PDFA_${primary.name}`,
+      name: `${cleanPrefix}_${primary.name}`,
       bytes: pdfaBytes,
-      blob: new Blob([pdfaBytes], { type: 'application/pdf' })
+      blob: new Blob([pdfaBytes], { type: 'application/pdf' }),
+      validation
     };
   } else if (id === 'repair') {
     const res = await pdfEngine.repairPdf(primary.bytes);

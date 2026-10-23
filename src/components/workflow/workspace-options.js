@@ -275,6 +275,48 @@
       `;
     }
 
+    if (id === 'pdfa') {
+      const currentProfile = instance.pdfaProfile || 'pdfa-1b';
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">ISO Conformance Profile</label>
+          <div class="pdfa-profile-cards" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+            <label class="pdfa-profile-card ${currentProfile === 'pdfa-1b' ? 'active' : ''}" style="display: flex; gap: 10px; padding: 10px 12px; border: 1.5px solid ${currentProfile === 'pdfa-1b' ? 'var(--primary)' : 'var(--border-subtle)'}; border-radius: 8px; cursor: pointer; background: ${currentProfile === 'pdfa-1b' ? 'var(--primary-light)' : 'var(--bg-card)'};">
+              <input type="radio" name="pdfa-profile-choice" value="pdfa-1b" ${currentProfile === 'pdfa-1b' ? 'checked' : ''} style="margin-top: 3px;" />
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">PDF/A-1b (ISO 19005-1)</div>
+                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">Standard legal archival. Guarantees long-term visual appearance and uncompressed xref compatibility.</div>
+              </div>
+            </label>
+
+            <label class="pdfa-profile-card ${currentProfile === 'pdfa-2b' ? 'active' : ''}" style="display: flex; gap: 10px; padding: 10px 12px; border: 1.5px solid ${currentProfile === 'pdfa-2b' ? 'var(--primary)' : 'var(--border-subtle)'}; border-radius: 8px; cursor: pointer; background: ${currentProfile === 'pdfa-2b' ? 'var(--primary-light)' : 'var(--bg-card)'};">
+              <input type="radio" name="pdfa-profile-choice" value="pdfa-2b" ${currentProfile === 'pdfa-2b' ? 'checked' : ''} style="margin-top: 3px;" />
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">PDF/A-2b (ISO 19005-2)</div>
+                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">Modern PDF 1.7 standard. Preserves transparencies, layers, JPEG 2000 images, and object streams.</div>
+              </div>
+            </label>
+
+            <label class="pdfa-profile-card ${currentProfile === 'pdfa-3b' ? 'active' : ''}" style="display: flex; gap: 10px; padding: 10px 12px; border: 1.5px solid ${currentProfile === 'pdfa-3b' ? 'var(--primary)' : 'var(--border-subtle)'}; border-radius: 8px; cursor: pointer; background: ${currentProfile === 'pdfa-3b' ? 'var(--primary-light)' : 'var(--bg-card)'};">
+              <input type="radio" name="pdfa-profile-choice" value="pdfa-3b" ${currentProfile === 'pdfa-3b' ? 'checked' : ''} style="margin-top: 3px;" />
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">PDF/A-3b (ISO 19005-3)</div>
+                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">Electronic invoicing & attachments. Conforms to Factur-X / ZUGFeRD with XML attachment support.</div>
+              </div>
+            </label>
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
+            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: #10b981; margin-bottom: 4px;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Automated Verification Enforced</span>
+            </div>
+            Embeds standard sRGB OutputIntents, ISO XMP Metadata packets, and strips non-compliant encryption.
+          </div>
+        </div>
+      `;
+    }
+
     if (id === 'ocr-pdf') {
       return `
         <div class="workflow-options-group">

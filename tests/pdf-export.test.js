@@ -737,14 +737,31 @@ describe('PDF Vector Export & Feature Tests', () => {
     assert(reportDoc.getPageCount() >= 1);
   });
 
-  test('convertToPdfA conforms to ISO 19005-1 with OutputIntents', async () => {
+  test('convertToPdfA conforms to ISO 19005-1/2/3 with OutputIntents & XMP', async () => {
     const sampleBytes = await pdfEngine.createSamplePdf();
-    const pdfaBytes = await pdfEngine.convertToPdfA(sampleBytes);
-    assert(pdfaBytes.byteLength > 200);
 
-    const pdfaDoc = await PDFDocument.load(pdfaBytes, { updateMetadata: false });
-    assert.strictEqual(pdfaDoc.getPageCount(), 2);
-    assert(pdfaDoc.getProducer().includes('PDF/A'));
+    // 1. PDF/A-1b
+    const pdfa1Bytes = await pdfEngine.convertToPdfA(sampleBytes, { profile: 'pdfa-1b' });
+    assert(pdfa1Bytes.byteLength > 200);
+    const val1 = await pdfEngine.validatePdfA(pdfa1Bytes);
+    assert.strictEqual(val1.isValid, true);
+    assert.strictEqual(val1.profile, 'PDF/A-1b');
+    assert.strictEqual(val1.part, 1);
+    assert.strictEqual(val1.conformance, 'B');
+
+    // 2. PDF/A-2b
+    const pdfa2Bytes = await pdfEngine.convertToPdfA(sampleBytes, { profile: 'pdfa-2b' });
+    const val2 = await pdfEngine.validatePdfA(pdfa2Bytes);
+    assert.strictEqual(val2.isValid, true);
+    assert.strictEqual(val2.profile, 'PDF/A-2b');
+    assert.strictEqual(val2.part, 2);
+
+    // 3. PDF/A-3b
+    const pdfa3Bytes = await pdfEngine.convertToPdfA(sampleBytes, { profile: 'pdfa-3b' });
+    const val3 = await pdfEngine.validatePdfA(pdfa3Bytes);
+    assert.strictEqual(val3.isValid, true);
+    assert.strictEqual(val3.profile, 'PDF/A-3b');
+    assert.strictEqual(val3.part, 3);
   });
 
   test('mergePdf combines multiple PDFs and image files into a single unified document', async () => {

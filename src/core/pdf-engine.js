@@ -203,9 +203,14 @@ export class PdfEngine {
     return await RepairCompareOperations.comparePdfs(pdfABytes, pdfBBytes);
   }
 
-  async convertToPdfA(pdfBytes = null) {
+  async convertToPdfA(pdfBytes = null, options = {}) {
     const bytes = pdfBytes || this.rawBytes;
-    return await RepairCompareOperations.convertToPdfA(bytes);
+    return await RepairCompareOperations.convertToPdfA(bytes, options);
+  }
+
+  async validatePdfA(pdfBytes = null) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await RepairCompareOperations.validatePdfA(bytes);
   }
 
   // --- Extraction & Client-Side OCR ---

@@ -95,48 +95,46 @@ export function LandingHero({ onDocumentLoaded }) {
           Edit existing text, merge, sign, compress, and convert documents directly in your browser. Powered by client-side WebAssembly — 100% free, unlimited, and your confidential files never leave your device.
         </p>
 
-        {/* Hero Dropzone Card */}
-        <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDragging(false);
-            if (e.dataTransfer.files?.[0]) handleFileUpload(e.dataTransfer.files[0]);
-          }}
-          className={`w-full max-w-2xl rounded-2xl p-8 sm:p-10 border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-black/40 ${
-            isDragging
-              ? 'border-[#30050d] bg-[#30050d]/5 dark:bg-[#30050d]/20 scale-[1.01]'
-              : 'border-slate-300 dark:border-slate-700 hover:border-[#30050d]/70'
-          }`}
-        >
-          <div className="w-14 h-14 rounded-2xl bg-[#30050d]/10 dark:bg-[#30050d]/30 text-[#30050d] dark:text-[#d46374] border border-[#30050d]/20 dark:border-[#801426]/40 flex items-center justify-center mb-5">
-            <Upload className="w-7 h-7" />
+        {/* Hero Fast Search & Popular Shortcuts Hub */}
+        <div className="w-full max-w-2xl flex flex-col items-center gap-4 mb-4">
+          <div className="w-full flex items-center bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-full px-5 py-3 shadow-lg shadow-slate-200/50 dark:shadow-black/40 focus-within:border-[#30050d] focus-within:ring-2 focus-within:ring-[#30050d]/20 transition">
+            <Search className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search 43+ PDF tools (e.g. Edit, Merge, Compress, Split, Sign, OCR)..."
+              className="w-full bg-transparent text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 outline-none"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none p-1"
+              >
+                &times;
+              </button>
+            )}
           </div>
 
-          <label className="cursor-pointer mb-3">
-            <input
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
-            />
-            <span className="px-7 py-3 rounded-full bg-[#30050d] hover:bg-[#4a0914] active:scale-95 text-white text-sm sm:text-base font-bold shadow-md shadow-[#30050d]/25 transition inline-block">
-              Select PDF file
-            </span>
-          </label>
-
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mb-3">
-            or drag and drop your PDF here
-          </p>
-
-          <button
-            onClick={handleSamplePdf}
-            className="text-xs font-semibold text-[#30050d] dark:text-[#d46374] hover:underline flex items-center gap-1"
-          >
-            <span>Or try with a sample document</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">Popular:</span>
+            {[
+              { id: 'edit', title: 'Edit PDF', action: 'workflow:edit' },
+              { id: 'merge', title: 'Merge PDF', action: 'workflow:merge' },
+              { id: 'compress', title: 'Compress', action: 'workflow:compress' },
+              { id: 'split', title: 'Split PDF', action: 'workflow:split' },
+              { id: 'sign', title: 'Fill & Sign', action: 'workflow:sign' },
+              { id: 'to-image', title: 'PDF to JPG', action: 'workflow:to-image' }
+            ].map(pill => (
+              <button
+                key={pill.id}
+                onClick={() => handleToolClick(pill)}
+                className="px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#30050d] text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-sm hover:shadow transition flex items-center gap-1.5"
+              >
+                <span>{pill.title}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Trust Badges */}

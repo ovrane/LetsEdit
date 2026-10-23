@@ -83,6 +83,29 @@ export function renderSuccessScreen(manager) {
           </div>
         </div>
 
+        ${manager.executionResult?.validation ? `
+          <div class="pdfa-validation-certificate" style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #065f46;">
+                <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>ISO 19005 Compliance Certificate</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">
+                ${manager.executionResult.validation.profile || 'PDF/A Verified'}
+              </span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+              ${manager.executionResult.validation.checks.map(c => `
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                  <span style="color: #10b981; font-weight: bold;">✔</span>
+                  <span style="font-weight: 600; color: var(--text-main);">${c.name}:</span>
+                  <span>${c.detail}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
         <!-- Primary Download Button -->
         <button class="workflow-primary-cta" id="btn-success-download" style="background: ${t.color}; width: 100%; justify-content: center; font-size: 16px; padding: 14px 20px;">
           <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
