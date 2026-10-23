@@ -64,6 +64,7 @@ export function sendJson(res, statusCode, data, headers = {}) {
     ...headers
   });
   res.end(jsonStr);
+  return true;
 }
 
 // Helper to generate secure random token

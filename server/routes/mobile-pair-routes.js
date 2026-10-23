@@ -14,7 +14,7 @@ export const PAIRING_SESSIONS = new Map();
 const SESSION_TTL_MS = 20 * 60 * 1000;
 
 // Periodic cleanup of expired pairing sessions
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [id, session] of PAIRING_SESSIONS.entries()) {
     if (now > session.expiresAt) {
@@ -22,6 +22,9 @@ setInterval(() => {
     }
   }
 }, 60 * 1000);
+if (cleanupTimer && typeof cleanupTimer.unref === 'function') {
+  cleanupTimer.unref();
+}
 
 export async function handleMobilePairRequest(req, res, pathname, method) {
   // 1. Create a new pairing session

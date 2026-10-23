@@ -106,6 +106,21 @@ export class SignatureTool {
               </div>
             </div>
           </div>
+
+          <!-- Tab 5: Phone (QR Touchscreen Signature) -->
+          <div class="tab-content" id="tab-phone" style="display:none; text-align:center; padding: 20px 10px;">
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+              Draw a smooth ink signature on your smartphone touchscreen using your finger or stylus:
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-start-phone-sig" style="margin: 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; font-weight: 600;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+              <span>Scan QR with Smartphone</span>
+            </button>
+            <div id="phone-sig-preview-box" style="display:none; margin-top: 18px; border: 1.5px dashed var(--border-subtle); border-radius: 12px; padding: 14px; background: white;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748b; display: block; margin-bottom: 8px;">Received Phone Signature:</span>
+              <img id="phone-sig-preview-img" style="max-height: 85px; max-width: 100%; object-fit: contain;" />
+            </div>
+          </div>
         </div>
 
         <div class="modal-footer">
