@@ -32,12 +32,13 @@ export class MergeOps {
   /**
    * Merges multiple independent PDF buffers into one document.
    */
-  static async mergePdf(fileList) {
+  static async mergePdf(fileList, options = {}) {
     if (!Array.isArray(fileList) || fileList.length === 0) {
       throw new Error('No files provided to merge');
     }
     const finalDoc = await PDFDocument.create();
-    for (const item of fileList) {
+    for (let i = 0; i < fileList.length; i++) {
+      const item = fileList[i];
       const bytes = item.bytes || item;
       const u8 = new Uint8Array(bytes);
       // Check if PDF (starts with %PDF: 0x25, 0x50, 0x44, 0x46)
@@ -68,6 +69,15 @@ export class MergeOps {
           y: (pageH - scaledH) / 2,
           width: scaledW,
           height: scaledH
+        });
+      }
+
+      if (typeof options.onProgress === 'function') {
+        options.onProgress({
+          current: i + 1,
+          total: fileList.length,
+          item,
+          percent: Math.round(((i + 1) / fileList.length) * 100)
         });
       }
     }

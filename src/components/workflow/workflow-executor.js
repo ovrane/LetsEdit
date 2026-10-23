@@ -15,6 +15,7 @@ import { applyPdfEncryption } from '../../core/pdf-crypto.js';
 import { redactPageContentStreams } from '../../core/pdf-redactor.js';
 import { Toast } from '../toast.js';
 import { hexToRgb } from '../../utils/helpers.js';
+import { batchProgressModal } from './batch-progress-modal.js';
 
 export async function processSingleDocument(manager, tool, file) {
   const primary = file;
@@ -508,25 +509,76 @@ export async function executeAction(manager) {
 
     // MULTI-FILE BATCH PROCESSING (100% Free & Client-Side)
     if (!isCombiner && t.id !== 'split' && manager.uploadedFiles.length > 1) {
+      batchProgressModal.startBatch({
+        title: `Batch ${t.name || 'Processing'}: ${manager.uploadedFiles.length} Documents`,
+        subtitle: `Executing ${t.name || 'action'} across all files • Zero telemetry`,
+        files: manager.uploadedFiles
+      });
+
       const batchZip = new JSZip();
       for (let i = 0; i < manager.uploadedFiles.length; i++) {
-        const f = manager.uploadedFiles[i];
-        if (execBtn) {
-          execBtn.innerHTML = `<span>Processing ${i + 1} of ${manager.uploadedFiles.length} (${f.name.substring(0, 20)})...</span>`;
+        if (batchProgressModal.isCancelled) {
+          Toast.info('Batch processing cancelled');
+          break;
         }
-        const res = await processSingleDocument(manager, t, f);
-        if (res && res.bytes) {
-          batchZip.file(res.name, res.bytes);
-        } else if (res && res.blob) {
-          batchZip.file(res.name, await res.blob.arrayBuffer());
+
+        const f = manager.uploadedFiles[i];
+        batchProgressModal.updateFileProgress(i, 20, 'Processing...');
+
+        if (execBtn) {
+          execBtn.innerHTML = `<span>Processing ${i + 1} of ${manager.uploadedFiles.length} (${f.name.substring(0, 16)})...</span>`;
+        }
+
+        try {
+          const res = await processSingleDocument(manager, t, f);
+          let metric = null;
+          if (res && res.metrics && res.metrics.savingsPercent) {
+            metric = `-${res.metrics.savingsPercent}%`;
+          }
+          if (res && res.bytes) {
+            batchZip.file(res.name, res.bytes);
+          } else if (res && res.blob) {
+            batchZip.file(res.name, await res.blob.arrayBuffer());
+          }
+          batchProgressModal.completeFile(i, { metric });
+        } catch (err) {
+          console.error(`Error processing file ${f.name}:`, err);
+          batchProgressModal.failFile(i, err);
         }
       }
+
+      if (!batchProgressModal.isCancelled) {
+        batchProgressModal.finish();
+      }
+
       const zipBlob = await batchZip.generateAsync({ type: 'blob' });
       manager.processedBlob = zipBlob;
       manager.processedFilename = `Batch_${t.id}_${manager.uploadedFiles.length}_files.zip`;
     } else if (t.id === 'merge') {
+      if (manager.uploadedFiles.length > 1) {
+        batchProgressModal.startBatch({
+          title: `Merging ${manager.uploadedFiles.length} Documents into Single PDF`,
+          subtitle: 'Combining pages and streams in sequence • Zero telemetry',
+          files: manager.uploadedFiles
+        });
+      }
+
       const buffers = manager.uploadedFiles.map(f => f.bytes);
-      const mergedBytes = await PageOperations.mergePdf(buffers);
+      const mergedBytes = await PageOperations.mergePdf(buffers, {
+        onProgress: ({ current, total }) => {
+          if (manager.uploadedFiles.length > 1) {
+            batchProgressModal.completeFile(current - 1);
+            if (current < total) {
+              batchProgressModal.updateFileProgress(current, 25, 'Merging...');
+            }
+          }
+        }
+      });
+
+      if (manager.uploadedFiles.length > 1 && !batchProgressModal.isCancelled) {
+        batchProgressModal.finish();
+      }
+
       manager.processedBlob = new Blob([mergedBytes], { type: 'application/pdf' });
       manager.processedFilename = 'Merged_Document.pdf';
     } else if (t.id === 'split') {
@@ -552,11 +604,32 @@ export async function executeAction(manager) {
         manager.processedFilename = `Split_${manager.splitMode}_${primary.name.replace(/\.[^/.]+$/, '')}.zip`;
       }
     } else if (t.id === 'images-to-pdf') {
+      if (manager.uploadedFiles.length > 1) {
+        batchProgressModal.startBatch({
+          title: `Converting ${manager.uploadedFiles.length} Images to PDF`,
+          subtitle: `Generating vector A4 pages with ${manager.imgOrientation} layout`,
+          files: manager.uploadedFiles
+        });
+      }
+
       const imgList = manager.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
       const pdfBytes = await PageOperations.imagesToPdf(imgList, {
         orientation: manager.imgOrientation,
-        margin: parseInt(manager.imgMargin, 10) || 0
+        margin: parseInt(manager.imgMargin, 10) || 0,
+        onProgress: ({ current, total }) => {
+          if (manager.uploadedFiles.length > 1) {
+            batchProgressModal.completeFile(current - 1);
+            if (current < total) {
+              batchProgressModal.updateFileProgress(current, 35, 'Embedding...');
+            }
+          }
+        }
       });
+
+      if (manager.uploadedFiles.length > 1 && !batchProgressModal.isCancelled) {
+        batchProgressModal.finish();
+      }
+
       manager.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
       manager.processedFilename = 'Images_Combined.pdf';
     } else if (t.id === 'to-image') {

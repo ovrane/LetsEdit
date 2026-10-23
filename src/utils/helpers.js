@@ -73,12 +73,14 @@ export function uint8ArrayToBase64(bytes) {
     binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
-}export function formatFileSize(bytes) {
+}
+export function formatFileSize(bytes) {
   if (!bytes || bytes <= 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i] || 'MB'}`;
 }
+export const formatBytes = formatFileSize;
 
 /**
  * Deterministic SVG QR Code Generator (Zero External Dependencies)

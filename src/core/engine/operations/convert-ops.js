@@ -21,7 +21,8 @@ export class ConvertOps {
     const pageW = orientation === 'landscape' ? baseH : baseW;
     const pageH = orientation === 'landscape' ? baseW : baseH;
 
-    for (const item of imagesList) {
+    for (let i = 0; i < imagesList.length; i++) {
+      const item = imagesList[i];
       let imgBytes = item.bytes;
       if (!imgBytes && item.dataUrl) {
         if (typeof fetch !== 'undefined') {
@@ -55,6 +56,15 @@ export class ConvertOps {
         width: scaledW,
         height: scaledH
       });
+
+      if (typeof options.onProgress === 'function') {
+        options.onProgress({
+          current: i + 1,
+          total: imagesList.length,
+          item,
+          percent: Math.round(((i + 1) / imagesList.length) * 100)
+        });
+      }
     }
 
     return await finalDoc.save();
