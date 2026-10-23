@@ -44,9 +44,9 @@ export class FlipModal {
           <div class="form-group" style="margin-bottom:16px;">
             <label style="display:block; font-size:12px; font-weight:600; margin-bottom:8px;">Flip Direction</label>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
-              <label class="flip-option-card" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:12px 8px; border:2px solid var(--primary, #2563eb); border-radius:8px; cursor:pointer; background:rgba(37,99,235,0.04);">
+              <label class="flip-option-card" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:12px 8px; border:2px solid var(--primary, #30050d); border-radius:8px; cursor:pointer; background:rgba(48,5,13,0.04);">
                 <input type="radio" name="flip-direction" value="horizontal" checked style="display:none;" />
-                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:6px; color:var(--primary, #2563eb);">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:6px; color:var(--primary, #30050d);">
                   <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path>
                 </svg>
                 <div style="font-size:12px; font-weight:600;">Horizontal</div>
@@ -123,10 +123,10 @@ export class FlipModal {
           const svg = c.querySelector('svg');
           if (svg) svg.style.color = 'var(--text-main, #334155)';
         });
-        card.style.borderColor = 'var(--primary, #2563eb)';
-        card.style.background = 'rgba(37,99,235,0.04)';
+        card.style.borderColor = 'var(--primary, #30050d)';
+        card.style.background = 'rgba(48,5,13,0.04)';
         const svg = card.querySelector('svg');
-        if (svg) svg.style.color = 'var(--primary, #2563eb)';
+        if (svg) svg.style.color = 'var(--primary, #30050d)';
         const input = card.querySelector('input');
         if (input) input.checked = true;
       };

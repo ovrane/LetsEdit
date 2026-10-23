@@ -46,7 +46,7 @@ export class SignatureTool {
               <div class="color-picker-row">
                 <span>Ink:</span>
                 <button class="color-dot active" data-color="#0f172a" style="background:#0f172a;"></button>
-                <button class="color-dot" data-color="#1d4ed8" style="background:#1d4ed8;"></button>
+                <button class="color-dot" data-color="#30050d" style="background:#30050d;"></button>
                 <button class="color-dot" data-color="#047857" style="background:#047857;"></button>
               </div>
               <button class="btn btn-outline" id="clear-signature-btn">Clear Pad</button>

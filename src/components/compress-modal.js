@@ -44,7 +44,7 @@ export class CompressModal {
               <div id="compress-file-name" style="font-size:13px; font-weight:600; color:var(--text-main, #0f172a);">Document.pdf</div>
               <div id="compress-orig-size" style="font-size:12px; color:var(--text-muted, #64748b);">Original Size: --</div>
             </div>
-            <span style="font-size:11px; font-weight:600; padding:3px 8px; border-radius:12px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Ready</span>
+            <span style="font-size:11px; font-weight:600; padding:3px 8px; border-radius:12px; background:rgba(48,5,13,0.08); color:var(--primary, #30050d);">Ready</span>
           </div>
 
           <!-- Compression Levels -->

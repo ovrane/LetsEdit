@@ -33,7 +33,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Merge PDF files',
     subtitle: 'Combine PDFs and images in the order you want with the easiest PDF merger available.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>`,
-    color: '#0284c7',
+    color: '#30050d',
     accept: '.pdf,image/png,image/jpeg,image/webp,image/jpg',
     multiple: true,
     buttonText: 'Select PDF & Image files',
@@ -129,7 +129,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Add Watermark to PDF',
     subtitle: 'Stamp text or an image across all pages with custom rotation and opacity.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
-    color: '#0284c7',
+    color: '#30050d',
     accept: '.pdf,application/pdf',
     multiple: true,
     buttonText: 'Select PDF files',
@@ -261,7 +261,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Organize PDF Pages',
     subtitle: 'Sort, rotate, and delete PDF pages in a visual interactive grid with drag-and-drop reordering.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
-    color: '#2563eb',
+    color: '#30050d',
     accept: '.pdf,application/pdf',
     multiple: false,
     buttonText: 'Select PDF file',
@@ -321,7 +321,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Convert PDF to Word DOC',
     subtitle: 'Extract text, formatting, and layout from PDF into an editable Word document.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
-    color: '#2563eb',
+    color: '#30050d',
     accept: '.pdf,application/pdf',
     multiple: true,
     buttonText: 'Select PDF files',
@@ -405,7 +405,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Convert HTML to PDF',
     subtitle: 'Convert web pages, HTML files, or raw code into a clean, vector PDF document.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
-    color: '#0284c7',
+    color: '#30050d',
     accept: '.html,.htm,text/html,text/plain',
     multiple: false,
     buttonText: 'Select HTML file',
@@ -417,7 +417,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Convert Word DOCX to PDF',
     subtitle: 'Creates a clean PDF document from Microsoft Word DOCX files client-side.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
-    color: '#2563eb',
+    color: '#30050d',
     accept: '.docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword',
     multiple: true,
     buttonText: 'Select Word file(s)',
@@ -429,7 +429,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Sign PDF Document',
     subtitle: 'Sign your document with a legally binding electronic signature (draw ink, handwritten text, or image stamp).',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>`,
-    color: '#0284c7',
+    color: '#30050d',
     accept: '.pdf,application/pdf',
     multiple: false,
     buttonText: 'Select PDF file to Sign',
@@ -441,7 +441,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Add Page Numbers to PDF',
     subtitle: 'Stamp page numbers across all or selected pages with customizable position and format.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="8" y1="12" x2="16" y2="12"></line><line x1="12" y1="8" x2="12" y2="16"></line></svg>`,
-    color: '#3b82f6',
+    color: '#30050d',
     accept: '.pdf,application/pdf',
     multiple: true,
     buttonText: 'Select PDF files',
@@ -477,7 +477,7 @@ export const WORKFLOW_TOOLS_CONFIG = {
     title: 'Scan to PDF',
     subtitle: 'Capture documents from your device camera or mobile scanner directly into a sharp PDF document.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`,
-    color: '#2563eb',
+    color: '#30050d',
     accept: 'image/*,.pdf',
     multiple: true,
     buttonText: 'Scan Document / Camera',
@@ -538,8 +538,8 @@ export const CHAIN_TOOLS = [
     id: 'organize',
     title: 'Organize & Rotate',
     desc: 'Reorder, delete, duplicate, or rotate pages',
-    color: '#0284c7',
-    icon: `<svg width="20" height="20" fill="none" stroke="#0284c7" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
+    color: '#30050d',
+    icon: `<svg width="20" height="20" fill="none" stroke="#30050d" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
   },
   {
     id: 'to-image',
@@ -566,8 +566,8 @@ export const CHAIN_TOOLS = [
     id: 'pdfa',
     title: 'PDF/A Preservation',
     desc: 'Convert to ISO standard archival format',
-    color: '#2563eb',
-    icon: `<svg width="20" height="20" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>`
+    color: '#30050d',
+    icon: `<svg width="20" height="20" fill="none" stroke="#30050d" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>`
   }
 ];
 
@@ -1329,7 +1329,7 @@ export class ToolWorkflowManager {
               <div class="workflow-cards-toolbar">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-weight: 600; font-size: 14px;">Electronic Signature Stamp</span>
-                  <span style="font-size: 11px; color: #0284c7; background: rgba(2, 132, 199, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(2, 132, 199, 0.25);">
+                  <span style="font-size: 11px; color: #30050d; background: rgba(48, 5, 13, 0.08); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(48, 5, 13, 0.25);">
                     ${this.signMode === 'draw' ? 'Handwritten Ink' : (this.signMode === 'type' ? 'Calligraphic Stamp' : 'Uploaded Signature')}
                   </span>
                 </div>
@@ -1341,7 +1341,7 @@ export class ToolWorkflowManager {
               <div class="sign-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
                 <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
                   <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="sign-page-img" style="width: 100%; height: auto; display: block;" />
-                  <div id="sign-preview-overlay" style="position: absolute; ${this.getSignPositionCss()}; background: rgba(255, 255, 255, 0.95); padding: 6px 12px; border-radius: 6px; border: 1.5px dashed #0284c7; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15); pointer-events: none; transition: all 0.2s ease; text-align: center;">
+                  <div id="sign-preview-overlay" style="position: absolute; ${this.getSignPositionCss()}; background: rgba(255, 255, 255, 0.95); padding: 6px 12px; border-radius: 6px; border: 1.5px dashed #30050d; box-shadow: 0 4px 12px rgba(48, 5, 13, 0.15); pointer-events: none; transition: all 0.2s ease; text-align: center;">
                     ${this.signDataUrl ? `
                       <img src="${this.signDataUrl}" style="height: 38px; width: auto; max-width: 120px; display: block; margin: 0 auto;" />
                     ` : `
@@ -1359,7 +1359,7 @@ export class ToolWorkflowManager {
               <div class="workflow-cards-toolbar">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-weight: 600; font-size: 14px;">Page Numbering Preview</span>
-                  <span style="font-size: 11px; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.25);">
+                  <span style="font-size: 11px; color: #30050d; background: rgba(48, 5, 13, 0.08); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(48, 5, 13, 0.25);">
                     ${this.getPnPositionLabel()}
                   </span>
                 </div>
@@ -1371,7 +1371,7 @@ export class ToolWorkflowManager {
               <div class="pn-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
                 <div style="position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); border-radius: 4px; overflow: hidden; background: white; max-width: 320px;">
                   <img src="${this.uploadedFiles[0]?.thumbnailUrl || ''}" id="pn-page-img" style="width: 100%; height: auto; display: block;" />
-                  <div id="pn-preview-badge-overlay" style="position: absolute; ${this.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #3b82f6; font-size: 10px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;">
+                  <div id="pn-preview-badge-overlay" style="position: absolute; ${this.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #30050d; font-size: 10px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;">
                     ${(this.pnFormat || 'Page {n} of {total}').replace('{n}', '1').replace('{total}', String(this.uploadedFiles[0]?.pageCount || 5))}
                   </div>
                 </div>
@@ -1576,7 +1576,7 @@ export class ToolWorkflowManager {
         <div class="workflow-options-group">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <label class="workflow-options-label" style="margin: 0;">Split Mode</label>
-            <span style="font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(2, 132, 199, 0.1); padding: 2px 8px; border-radius: 12px;">
+            <span style="font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(48, 5, 13, 0.08); padding: 2px 8px; border-radius: 12px;">
               ${pageCount} total pages
             </span>
           </div>
@@ -1803,7 +1803,7 @@ export class ToolWorkflowManager {
         <div class="workflow-options-group">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <label class="workflow-options-label" style="margin: 0;">Organize Summary</label>
-            <span style="font-size: 12px; font-weight: 600; color: var(--primary); background: rgba(37, 99, 235, 0.1); padding: 2px 8px; border-radius: 12px;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--primary); background: rgba(48, 5, 13, 0.08); padding: 2px 8px; border-radius: 12px;">
               ${this.organizePages.length} active pages
             </span>
           </div>
@@ -2140,7 +2140,7 @@ export class ToolWorkflowManager {
         <div class="workflow-options-group">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <label class="workflow-options-label" style="margin: 0;">Numbering Format</label>
-            <span style="font-size: 11px; font-weight: 600; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 2px 8px; border-radius: 12px;">
+            <span style="font-size: 11px; font-weight: 600; color: #30050d; background: rgba(48, 5, 13, 0.08); padding: 2px 8px; border-radius: 12px;">
               ${pageCount} pages total
             </span>
           </div>
@@ -3119,7 +3119,7 @@ export class ToolWorkflowManager {
         pnBadge.textContent = (this.pnFormat || 'Page {n} of {total}')
           .replace('{n}', String(this.pnStartPage || 1))
           .replace('{total}', String(total));
-        pnBadge.style.cssText = `position: absolute; ${this.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #3b82f6; font-size: ${this.pnFontSize}px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;`;
+        pnBadge.style.cssText = `position: absolute; ${this.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #30050d; font-size: ${this.pnFontSize}px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;`;
       }
     };
 
@@ -4186,7 +4186,7 @@ export class ToolWorkflowManager {
       <div class="modal-dialog" style="max-width: 440px; width: 92%; text-align: center;">
         <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(37, 99, 235, 0.1); color: #2563eb; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(48, 5, 13, 0.08); color: #30050d; display: flex; align-items: center; justify-content: center;">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </div>
             <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Mobile Download</h3>
@@ -4416,7 +4416,7 @@ export class ToolWorkflowManager {
       <div class="modal-dialog" style="max-width: 680px; width: 95%;">
         <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #30050d; display: flex; align-items: center; justify-content: center; color: white;">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
             </div>
             <div>

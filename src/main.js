@@ -92,6 +92,8 @@ class App {
         accountPage.show({ updateUrl: false });
       } else if (route.isLogin) {
         accountPage.showLogin({ updateUrl: false });
+      } else if (route.isRegister) {
+        accountPage.showRegister({ updateUrl: false });
       } else if (route.toolId) {
         toolWorkflow.openTool(route.toolId, { updateUrl: false });
       }

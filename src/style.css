@@ -5,6 +5,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Dancing+Script:wght@700&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #30050d;
+  --color-primary-hover: #4a0914;
+  --color-primary-light: rgba(48, 5, 13, 0.08);
+  --color-primary-glow: rgba(48, 5, 13, 0.25);
+  --color-accent: #5e0b1a;
+  --color-wine-50: #fdf2f4;
+  --color-wine-100: #fbe6e9;
+  --color-wine-200: #f6ced4;
+  --color-wine-300: #efa6b3;
+  --color-wine-400: #e37489;
+  --color-wine-500: #d44763;
+  --color-wine-600: #be2e4e;
+  --color-wine-700: #a0203d;
+  --color-wine-800: #851c35;
+  --color-wine-900: #30050d;
+  --color-wine-950: #1a0207;
+}
+
 :root {
   --bg-app: #f1f5f9;
   --bg-surface: #ffffff;
@@ -17,10 +36,11 @@
   --text-main: #0f172a;
   --text-muted: #64748b;
   --text-inverse: #ffffff;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --accent: #0ea5e9;
+  --primary: #30050d;
+  --primary-hover: #4a0914;
+  --primary-light: rgba(48, 5, 13, 0.08);
+  --primary-glow: rgba(48, 5, 13, 0.25);
+  --accent: #5e0b1a;
   --danger: #ef4444;
   --success: #10b981;
   --warning: #f59e0b;
@@ -47,7 +67,11 @@
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-inverse: #0f172a;
-  --primary-light: rgba(37, 99, 235, 0.25);
+  --primary: #801426;
+  --primary-hover: #9e1931;
+  --primary-light: rgba(128, 20, 38, 0.25);
+  --primary-glow: rgba(128, 20, 38, 0.4);
+  --accent: #d46374;
   --shadow-paper: 0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
@@ -71,8 +95,8 @@
 }
 
 [data-theme="dark"] .landing-tool-card:hover {
-  border-color: rgba(96, 165, 250, 0.5) !important;
-  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.8), 0 0 20px -4px var(--tool-accent, rgba(37, 99, 235, 0.4)) !important;
+  border-color: var(--primary-glow) !important;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.8), 0 0 20px -4px var(--tool-accent, var(--primary-glow)) !important;
 }
 
 [data-theme="dark"] .landing-nav-link {
@@ -91,7 +115,7 @@
 
 [data-theme="dark"] .mega-item:hover {
   background-color: var(--primary-light) !important;
-  color: #60a5fa !important;
+  color: var(--accent, #d46374) !important;
 }
 
 [data-theme="dark"] .modal-dialog {
@@ -130,7 +154,7 @@ body.dark-mode .btn-outline {
 body.dark-mode .btn-outline:hover {
   background: var(--primary-light) !important;
   border-color: var(--primary) !important;
-  color: #60a5fa !important;
+  color: var(--accent, #d46374) !important;
 }
 
 [data-theme="dark"] .btn-secondary,
@@ -186,7 +210,7 @@ body.dark-mode .dropdown-item {
 [data-theme="dark"] .dropdown-item:hover,
 body.dark-mode .dropdown-item:hover {
   background: var(--primary-light) !important;
-  color: #60a5fa !important;
+  color: var(--accent, #d46374) !important;
 }
 
 [data-theme="dark"] .toast-item,
@@ -207,9 +231,9 @@ body.dark-mode .toast-item {
 }
 
 [data-theme="dark"] .tool-btn.active {
-  background: rgba(37, 99, 235, 0.25);
-  color: #60a5fa;
-  border-color: #3b82f6;
+  background: var(--primary-light);
+  color: var(--accent, #d46374);
+  border-color: var(--primary);
 }
 
 [data-theme="dark"] .pdf-page-wrap,
@@ -282,12 +306,12 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: #2563eb;
+  background: linear-gradient(135deg, #30050d 0%, #540917 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 2px 8px rgba(48, 5, 13, 0.4);
   flex-shrink: 0;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -308,12 +332,12 @@ body {
 }
 
 .lets-logo-accent {
-  color: #2563eb;
+  color: #30050d;
   font-weight: 800;
 }
 
 [data-theme="dark"] .lets-logo-accent {
-  color: #60a5fa;
+  color: #d46374;
 }
 
 .brand-title {
@@ -539,7 +563,7 @@ body {
 
 .tool-card-item:hover {
   border-color: var(--primary) !important;
-  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.18) !important;
+  box-shadow: 0 8px 24px -4px rgba(48, 5, 13, 0.18) !important;
   transform: translateY(-2px);
 }
 
@@ -806,8 +830,8 @@ body:not(.sidebar-open) .app-sidebar {
 }
 
 .text-item:hover {
-  background: rgba(37, 99, 235, 0.12);
-  box-shadow: 0 0 0 1.5px rgba(37, 99, 235, 0.45);
+  background: rgba(48, 5, 13, 0.12);
+  box-shadow: 0 0 0 1.5px rgba(48, 5, 13, 0.45);
   border-radius: 3px;
   cursor: text;
 }
@@ -848,7 +872,7 @@ body:not(.sidebar-open) .app-sidebar {
 
 .annot-item.selected {
   border: 1.5px solid var(--primary) !important;
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 0 1px rgba(48, 5, 13, 0.25);
   z-index: 15;
 }
 
@@ -900,8 +924,8 @@ body:not(.sidebar-open) .app-sidebar {
 
 /* Link Hotspot Annotation */
 .annot-link-hotspot {
-  background: rgba(37, 99, 235, 0.08);
-  border: 1.5px dashed #2563eb !important;
+  background: rgba(48, 5, 13, 0.08);
+  border: 1.5px dashed #30050d !important;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -909,8 +933,8 @@ body:not(.sidebar-open) .app-sidebar {
 }
 
 .annot-link-hotspot:hover {
-  background: rgba(37, 99, 235, 0.18);
-  border-color: #1d4ed8 !important;
+  background: rgba(48, 5, 13, 0.18);
+  border-color: #4a0914 !important;
 }
 
 .annot-link-badge {
@@ -937,7 +961,7 @@ body:not(.sidebar-open) .app-sidebar {
 }
 
 .annot-link-badge:hover {
-  background: #2563eb;
+  background: #30050d;
 }
 
 .form-field-select {
@@ -1004,7 +1028,7 @@ body:not(.sidebar-open) .app-sidebar {
 .live-drag-box {
   position: absolute;
   border: 2px dashed var(--primary);
-  background: rgba(37, 99, 235, 0.1);
+  background: rgba(48, 5, 13, 0.1);
   pointer-events: none;
   z-index: 50;
 }
@@ -1049,12 +1073,12 @@ body:not(.sidebar-open) .app-sidebar {
 .btn-primary {
   background: var(--primary);
   color: white;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 2px 4px rgba(48, 5, 13, 0.25);
 }
 
 .btn-primary:hover {
   background: var(--primary-hover);
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 8px rgba(48, 5, 13, 0.35);
 }
 
 .btn-secondary {
@@ -1070,12 +1094,11 @@ body:not(.sidebar-open) .app-sidebar {
 .btn-outline {
   background: var(--bg-surface);
   color: var(--text-main);
-  border: 1px solid var(--border-strong);
 }
 
 .btn-outline:hover {
   background: var(--bg-app);
-  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .btn-outline:hover {
@@ -1124,7 +1147,7 @@ body:not(.sidebar-open) .app-sidebar {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 10000 !important;
   animation: fadeIn 0.15s ease-out;
 }
 
@@ -1395,7 +1418,7 @@ body:not(.sidebar-open) .app-sidebar {
 
 .form-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(48, 5, 13, 0.15);
 }
 
 .form-sub-links {
@@ -1559,14 +1582,14 @@ body:not(.sidebar-open) .app-sidebar {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0284c7, #2563eb);
+  background: linear-gradient(135deg, #30050d, #5e0b1a);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 2px 6px rgba(48, 5, 13, 0.3);
   flex-shrink: 0;
 }
 
@@ -1593,8 +1616,8 @@ body:not(.sidebar-open) .app-sidebar {
 }
 
 .account-plan-card {
-  background: rgba(2, 132, 199, 0.08);
-  border: 1px solid rgba(2, 132, 199, 0.2);
+  background: rgba(48, 5, 13, 0.08);
+  border: 1px solid rgba(48, 5, 13, 0.2);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 12px;
@@ -1604,7 +1627,7 @@ body:not(.sidebar-open) .app-sidebar {
   display: inline-block;
   font-size: 10px;
   font-weight: 700;
-  color: #0284c7;
+  color: #30050d;
   letter-spacing: 0.5px;
   margin-bottom: 2px;
 }
@@ -1838,12 +1861,12 @@ body.show-tool-workflow .tool-workflow-container {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #2563eb;
+  background: #30050d;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 6px rgba(48, 5, 13, 0.3);
 }
 
 .landing-brand .brand-text {
@@ -1857,7 +1880,7 @@ body.show-tool-workflow .tool-workflow-container {
 }
 
 .landing-brand .brand-name-bold {
-  color: #2563eb;
+  color: #30050d;
   font-weight: 800;
 }
 
@@ -1901,12 +1924,12 @@ body.show-tool-workflow .tool-workflow-container {
   padding: 7px 18px;
   font-weight: 600;
   font-size: 13.5px;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(48, 5, 13, 0.3);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .landing-header-right #btn-enter-studio:hover {
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 4px 14px rgba(48, 5, 13, 0.45);
   transform: translateY(-1px);
 }
 
@@ -2045,15 +2068,15 @@ body.show-tool-workflow .tool-workflow-container {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(37, 99, 235, 0.22);
+  background-color: rgba(48, 5, 13, 0.08);
+  border: 1px solid rgba(48, 5, 13, 0.22);
   color: var(--primary);
   font-size: 12px;
   font-weight: 600;
   padding: 6px 16px;
   border-radius: 9999px;
   margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 1px 3px rgba(48, 5, 13, 0.08);
 }
 
 .badge-dot {
@@ -2075,13 +2098,13 @@ body.show-tool-workflow .tool-workflow-container {
 }
 
 .hero-title-accent {
-  color: #2563eb;
+  color: #30050d;
   position: relative;
   display: inline-block;
 }
 
 [data-theme="dark"] .hero-title-accent {
-  color: #60a5fa;
+  color: #d46374;
 }
 
 .landing-hero-subtitle {
@@ -2112,14 +2135,14 @@ body.show-tool-workflow .tool-workflow-container {
   border-color: var(--primary);
   background-color: var(--primary-light);
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.14), 0 2px 8px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 24px -4px rgba(48, 5, 13, 0.14), 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .dropzone-icon-circle {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background-color: rgba(37, 99, 235, 0.08);
+  background-color: rgba(48, 5, 13, 0.08);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -2137,7 +2160,7 @@ body.show-tool-workflow .tool-workflow-container {
   font-weight: 600;
   padding: 11px 30px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 2px 10px rgba(48, 5, 13, 0.25);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2146,7 +2169,7 @@ body.show-tool-workflow .tool-workflow-container {
 
 .dropzone-cta-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 14px rgba(48, 5, 13, 0.35);
 }
 
 .dropzone-cta-btn:active {
@@ -2303,7 +2326,7 @@ body.show-tool-workflow .tool-workflow-container {
 
 .landing-search-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  box-shadow: 0 0 0 3px rgba(48, 5, 13, 0.18);
 }
 
 .landing-search-clear {
@@ -2366,7 +2389,7 @@ body.show-tool-workflow .tool-workflow-container {
   background-color: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 2px 8px rgba(48, 5, 13, 0.35);
 }
 
 /* Category Group Container (Sejda + iLovePDF Layout) */
@@ -2419,8 +2442,8 @@ body.show-tool-workflow .tool-workflow-container {
   font-size: 11.5px;
   font-weight: 700;
   color: var(--primary);
-  background: rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(37, 99, 235, 0.16);
+  background: rgba(48, 5, 13, 0.08);
+  border: 1px solid rgba(48, 5, 13, 0.16);
   padding: 3px 10px;
   border-radius: 9999px;
 }
@@ -2714,7 +2737,7 @@ body.show-tool-workflow .tool-workflow-container {
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 9999px;
-  background: rgba(37, 99, 235, 0.1);
+  background: rgba(48, 5, 13, 0.1);
   color: var(--primary);
   margin-left: 8px;
 }
@@ -2783,10 +2806,10 @@ body.show-tool-workflow .tool-workflow-container {
 
 .workflow-dropzone:hover,
 .workflow-dropzone.drag-active {
-  border-color: var(--zone-color, #2563eb);
-  background: rgba(37, 99, 235, 0.02);
+  border-color: var(--zone-color, #30050d);
+  background: var(--primary-light, rgba(48, 5, 13, 0.04));
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 10px 24px -4px var(--primary-glow, rgba(48, 5, 13, 0.15));
 }
 
 .dropzone-icon-ring {
@@ -3065,7 +3088,7 @@ body.show-tool-workflow .tool-workflow-container {
 
 .comp-option-card.selected {
   border-color: var(--primary);
-  background: rgba(37, 99, 235, 0.05);
+  background: rgba(48, 5, 13, 0.05);
 }
 
 .comp-option-card strong {
@@ -3235,7 +3258,7 @@ body.show-tool-workflow .tool-workflow-container {
 /* Workspace Add-More-Files Card */
 .workflow-file-add-card:hover {
   border-color: var(--primary) !important;
-  background: rgba(2, 132, 199, 0.04) !important;
+  background: var(--primary-light, rgba(48, 5, 13, 0.04)) !important;
   transform: translateY(-2px);
 }
 
@@ -3250,7 +3273,7 @@ body.show-tool-workflow .tool-workflow-container {
 
 .workflow-file-card.drag-over {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+  box-shadow: 0 0 0 3px var(--primary-glow, rgba(48, 5, 13, 0.25));
   transform: translateY(-4px) scale(1.02);
 }
 
@@ -3290,7 +3313,7 @@ body.show-tool-workflow .tool-workflow-container {
 
 .split-mode-pill.active {
   border-color: var(--primary);
-  background: rgba(2, 132, 199, 0.1);
+  background: var(--primary-light, rgba(48, 5, 13, 0.1));
   color: var(--primary);
 }
 
@@ -3430,7 +3453,7 @@ body.show-tool-workflow .tool-workflow-container {
 .organize-action-btn.btn-rotate-page:hover {
   color: var(--primary);
   border-color: var(--primary);
-  background: rgba(37, 99, 235, 0.08);
+  background: rgba(48, 5, 13, 0.08);
 }
 
 .organize-action-btn.btn-delete-page:hover {
@@ -3670,7 +3693,7 @@ body.show-tool-workflow .tool-options-sidebar {
 
 .info-callout {
   padding: 10px 12px;
-  background: rgba(37, 99, 235, 0.06);
+  background: rgba(48, 5, 13, 0.06);
   border-left: 3px solid var(--primary);
   border-radius: 4px;
   line-height: 1.45;
@@ -3709,15 +3732,15 @@ body.show-tool-workflow .tool-options-sidebar {
 
 .editor-upload-card.drag-over {
   border-color: var(--primary);
-  background-color: rgba(37, 99, 235, 0.03);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  background-color: rgba(48, 5, 13, 0.03);
+  box-shadow: 0 0 0 4px rgba(48, 5, 13, 0.12);
 }
 
 .editor-upload-icon-circle {
   width: 46px;
   height: 46px;
   border-radius: 12px;
-  background: rgba(37, 99, 235, 0.08);
+  background: rgba(48, 5, 13, 0.08);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -4139,7 +4162,7 @@ body.show-tool-workflow .editor-paging-bar {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  background: linear-gradient(135deg, #30050d, #5e0b1a);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -4147,7 +4170,7 @@ body.show-tool-workflow .editor-paging-bar {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 14px;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(48, 5, 13, 0.3);
 }
 
 .account-user-info h3 {
@@ -4223,7 +4246,7 @@ body.show-tool-workflow .editor-paging-bar {
 }
 
 .account-nav-link.active {
-  background: rgba(37, 99, 235, 0.1);
+  background: rgba(48, 5, 13, 0.1);
   color: var(--primary);
 }
 

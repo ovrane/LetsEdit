@@ -22,7 +22,7 @@ export class SecurityModal {
       <div class="modal-dialog" style="max-width: 500px;">
         <div class="modal-header">
           <div style="display:flex; align-items:center; gap:8px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30050d" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             <h3>PDF Security & Encryption</h3>
           </div>
           <button class="modal-close-btn">&times;</button>
@@ -30,7 +30,7 @@ export class SecurityModal {
 
         <div class="modal-body">
           <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin-bottom:16px; display:flex; gap:10px;">
-            <div style="color:#2563eb; font-weight:700;">AES-256</div>
+            <div style="color:#30050d; font-weight:700;">AES-256</div>
             <div style="font-size:12px; color:#1e40af; line-height:1.4;">
               Secures your exported document with industry standard encryption. Anyone opening this PDF will be required to input this password.
             </div>
@@ -104,7 +104,7 @@ export class SecurityModal {
       fill.style.width = `${score}%`;
       if (score <= 25) fill.style.background = '#ef4444';
       else if (score <= 50) fill.style.background = '#f59e0b';
-      else if (score <= 75) fill.style.background = '#3b82f6';
+      else if (score <= 75) fill.style.background = '#30050d';
       else fill.style.background = '#10b981';
     };
 

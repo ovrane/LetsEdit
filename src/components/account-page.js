@@ -16,6 +16,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { router } from '../core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from '../utils/theme.js';
+import { firebaseAuth } from '../core/firebase-auth.js';
 
 export class AccountPage {
   constructor() {
@@ -52,15 +53,17 @@ export class AccountPage {
     window.scrollTo({ top: 0, behavior: 'instant' });
 
     const user = store.getState().user;
-    if (mode === 'login' || !user) {
-      this.authMode = 'login';
+    if (mode === 'login' || mode === 'register' || !user) {
+      this.authMode = mode === 'register' ? 'register' : 'login';
       this.renderFullPageAuth();
       if (updateUrl && typeof window !== 'undefined') {
-        const canonical = '/login';
+        const canonical = this.authMode === 'register' ? '/register' : '/login';
         if (window.location.pathname !== canonical) {
           window.history.pushState({ path: canonical }, '', canonical);
         }
-        document.title = 'Sign in to LetsEdit — Fast & Secure PDF Tools';
+        document.title = this.authMode === 'register'
+          ? 'Create Free Account — LetsEdit'
+          : 'Sign in to LetsEdit — Fast & Secure PDF Tools';
       }
     } else {
       this.render();
@@ -76,6 +79,10 @@ export class AccountPage {
 
   showLogin({ updateUrl = true } = {}) {
     this.show({ updateUrl, mode: 'login' });
+  }
+
+  showRegister({ updateUrl = true } = {}) {
+    this.show({ updateUrl, mode: 'register' });
   }
 
   render() {
@@ -245,7 +252,7 @@ export class AccountPage {
               <h2>Your Active Plan</h2>
               <p>Enjoy unlimited, unthrottled PDF editing with zero subscription fees.</p>
             </div>
-            <span class="account-plan-badge" style="background:#2563eb; color:white; padding:6px 14px; border-radius:999px; font-weight:700; font-size:12px;">PRO UNLIMITED ACTIVE</span>
+            <span class="account-plan-badge" style="background:var(--primary, #30050d); color:white; padding:6px 14px; border-radius:999px; font-weight:700; font-size:12px;">PRO UNLIMITED ACTIVE</span>
           </div>
           <div class="account-card-body">
             <div class="plan-comparison-box">
@@ -605,68 +612,57 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
     if (form) {
       form.onsubmit = async (e) => {
         e.preventDefault();
-        const email = emailInp.value.trim();
+        const email = emailInp ? emailInp.value.trim() : '';
         const pwdInp = this.container.querySelector('#full-auth-password');
         const pwd = pwdInp ? pwdInp.value : '';
         const nameInp = this.container.querySelector('#full-auth-name');
         const name = nameInp ? nameInp.value.trim() : email.split('@')[0];
 
-        const user = {
-          email,
-          name: name || 'Alex Morgan',
-          plan: 'Free Pro',
-          requires2fa: false,
-          apiKeys: [
-            {
-              id: 'key_live_' + Math.random().toString(36).substring(2, 8),
-              token: 'api_live_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-              label: 'Production Key',
-              createdAt: new Date().toISOString()
-            }
-          ]
-        };
-
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('rememberedEmail', email);
+        if (!email || !pwd) {
+          Toast.warning('Please enter your email and password');
+          return;
         }
 
-        store.setUser(user);
-        Toast.success(`Welcome to LetsEdit, ${user.name}!`);
-        this.show({ updateUrl: true, mode: 'account' });
+        try {
+          let user;
+          if (this.authMode === 'register') {
+            user = await firebaseAuth.signUpWithEmail(email, pwd, name);
+          } else {
+            user = await firebaseAuth.signInWithEmail(email, pwd);
+          }
+          Toast.success(`Welcome to LetsEdit, ${user.name}!`);
+          this.show({ updateUrl: true, mode: 'account' });
+        } catch (err) {
+          Toast.error(err.message || 'Authentication error');
+        }
       };
     }
 
     const googleBtn = this.container.querySelector('#btn-full-google-login');
     if (googleBtn) {
-      googleBtn.onclick = () => {
-        const user = {
-          email: 'alex.morgan@gmail.com',
-          name: 'Alex Morgan',
-          provider: 'google',
-          plan: 'Free Pro',
-          requires2fa: false,
-          apiKeys: []
-        };
-        store.setUser(user);
-        Toast.success('Signed in with Google');
-        this.show({ updateUrl: true, mode: 'account' });
+      googleBtn.onclick = async () => {
+        try {
+          Toast.info('Connecting to Google Account...');
+          const user = await firebaseAuth.signInWithGoogle();
+          Toast.success(`Signed in as ${user.name}`);
+          this.show({ updateUrl: true, mode: 'account' });
+        } catch (err) {
+          Toast.error('Google Sign-in failed: ' + err.message);
+        }
       };
     }
 
     const msftBtn = this.container.querySelector('#btn-full-msft-login');
     if (msftBtn) {
-      msftBtn.onclick = () => {
-        const user = {
-          email: 'alex.morgan@outlook.com',
-          name: 'Alex Morgan',
-          provider: 'microsoft',
-          plan: 'Free Pro',
-          requires2fa: false,
-          apiKeys: []
-        };
-        store.setUser(user);
-        Toast.success('Signed in with Microsoft');
-        this.show({ updateUrl: true, mode: 'account' });
+      msftBtn.onclick = async () => {
+        try {
+          Toast.info('Connecting to Microsoft Account...');
+          const user = await firebaseAuth.signInWithMicrosoft();
+          Toast.success(`Signed in as ${user.name}`);
+          this.show({ updateUrl: true, mode: 'account' });
+        } catch (err) {
+          Toast.error('Microsoft Sign-in failed: ' + err.message);
+        }
       };
     }
   }
@@ -684,8 +680,8 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
 
     const logoutBtn = this.container.querySelector('#btn-account-logout');
     if (logoutBtn) {
-      logoutBtn.onclick = () => {
-        store.setUser(null);
+      logoutBtn.onclick = async () => {
+        await firebaseAuth.signOut();
         Toast.info('Signed out of LetsEdit');
         this.showLogin({ updateUrl: true });
       };
@@ -805,3 +801,4 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
 }
 
 export const accountPage = new AccountPage();
+

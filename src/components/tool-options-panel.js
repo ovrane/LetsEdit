@@ -128,7 +128,7 @@ export class ToolOptionsPanel {
           <div class="opt-group">
             <label class="opt-label">Text Color</label>
             <div class="color-palette-grid">
-              ${['#000000', '#1e293b', '#2563eb', '#dc2626', '#059669', '#7c3aed', '#ea580c', '#0891b2'].map(c => `
+              ${['#000000', '#1e293b', '#30050d', '#dc2626', '#059669', '#7c3aed', '#ea580c', '#0891b2'].map(c => `
                 <button class="color-swatch-btn ${state.activeColor === c ? 'active' : ''}" style="background-color:${c};" data-color="${c}"></button>
               `).join('')}
             </div>
@@ -168,7 +168,7 @@ export class ToolOptionsPanel {
           <div class="opt-group">
             <label class="opt-label">Stroke & Border Color</label>
             <div class="color-palette-grid">
-              ${['#000000', '#2563eb', '#dc2626', '#059669', '#7c3aed', '#ea580c', '#64748b', '#ffffff'].map(c => `
+              ${['#000000', '#30050d', '#dc2626', '#059669', '#7c3aed', '#ea580c', '#64748b', '#ffffff'].map(c => `
                 <button class="color-swatch-btn ${state.activeColor === c ? 'active' : ''}" style="background-color:${c};" data-color="${c}"></button>
               `).join('')}
             </div>
@@ -198,7 +198,7 @@ export class ToolOptionsPanel {
           <div class="opt-group">
             <label class="opt-label">Ink Color</label>
             <div class="color-palette-grid">
-              ${['#000000', '#1e3a8a', '#2563eb', '#dc2626', '#059669', '#7c3aed'].map(c => `
+              ${['#000000', '#1e3a8a', '#30050d', '#dc2626', '#059669', '#7c3aed'].map(c => `
                 <button class="color-swatch-btn ${state.activeColor === c ? 'active' : ''}" style="background-color:${c};" data-color="${c}"></button>
               `).join('')}
             </div>
@@ -350,7 +350,7 @@ export class ToolOptionsPanel {
               ${[
                 { text: 'APPROVED', color: '#16a34a' },
                 { text: 'REJECTED', color: '#dc2626' },
-                { text: 'CONFIDENTIAL', color: '#2563eb' },
+                { text: 'CONFIDENTIAL', color: '#30050d' },
                 { text: 'PAID', color: '#059669' },
                 { text: 'VOID', color: '#ea580c' },
                 { text: 'FINAL', color: '#7c3aed' }

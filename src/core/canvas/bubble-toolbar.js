@@ -84,7 +84,7 @@ export class FloatingBubbleBar {
     }
 
     if (colorDot) {
-      const palette = ['#000000', '#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#ffffff'];
+      const palette = ['#000000', '#30050d', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#ffffff'];
       colorDot.onclick = (e) => {
         e.stopPropagation();
         const cur = (ann.color || ann.strokeColor || '#000000').toLowerCase();

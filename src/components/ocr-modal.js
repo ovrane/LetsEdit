@@ -29,7 +29,7 @@ export class OcrModal {
       <div class="modal-dialog modal-lg" style="max-width: 680px;">
         <div class="modal-header">
           <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:36px; height:36px; border-radius:10px; background:rgba(37,99,235,0.12); color:#2563eb; display:flex; align-items:center; justify-content:center;">
+            <div style="width:36px; height:36px; border-radius:10px; background:rgba(48,5,13,0.08); color:#30050d; display:flex; align-items:center; justify-content:center;">
               <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M4 7V4h16v3M9 20h6M12 4v16"></path>
               </svg>
@@ -81,7 +81,7 @@ export class OcrModal {
               <span id="ocr-progress-percent" style="font-size:12px; font-weight:700; color:var(--primary);">0%</span>
             </div>
             <div style="width:100%; height:8px; background:var(--border-subtle); border-radius:4px; overflow:hidden;">
-              <div id="ocr-progress-bar" style="width:0%; height:100%; background:linear-gradient(90deg, #2563eb, #6366f1); transition:width 0.2s ease;"></div>
+              <div id="ocr-progress-bar" style="width:0%; height:100%; background:linear-gradient(90deg, #30050d, #5e0b1a); transition:width 0.2s ease;"></div>
             </div>
           </div>
 
@@ -95,7 +95,7 @@ export class OcrModal {
           </div>
 
           <div style="background:rgba(37,99,235,0.06); border:1px solid rgba(37,99,235,0.18); border-radius:10px; padding:12px 14px; display:flex; gap:10px; align-items:flex-start;">
-            <svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <svg width="18" height="18" fill="none" stroke="#30050d" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             <p style="font-size:11.5px; color:var(--text-muted); line-height:1.5; margin:0;">
               <strong>100% In-Browser Privacy:</strong> OCR recognition runs locally inside your browser via WebAssembly. Your documents are never transmitted to any external server.
             </p>

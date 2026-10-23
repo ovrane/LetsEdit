@@ -33,14 +33,14 @@ export const SEJDA_TOOL_CATEGORIES = [
     desc: 'The most frequently used tools for fast PDF tasks',
     icon: 'star',
     tools: [
-      { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#2563eb', popular: true, action: 'tool:select' },
+      { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#30050d', popular: true, action: 'tool:select' },
       { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', popular: true, action: 'workflow:compress' },
       { id: 'delete', title: 'Delete Pages', desc: 'Remove pages from a PDF document', icon: 'trash', color: '#ef4444', popular: true, action: 'sidebar:delete' },
-      { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#0284c7', popular: true, action: 'workflow:merge' },
+      { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#30050d', popular: true, action: 'workflow:merge' },
       { id: 'split', title: 'Split', desc: 'Split specific page ranges or extract every page into a separate document', icon: 'split', color: '#ea580c', popular: true, action: 'workflow:split' },
       { id: 'crop', title: 'Crop', desc: 'Trim PDF margins, change PDF page size', icon: 'crop', color: '#0d9488', popular: true, action: 'workflow:crop' },
       { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', popular: true, action: 'workflow:sign' },
-      { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#2563eb', popular: true, action: 'workflow:pdf-to-word' },
+      { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#30050d', popular: true, action: 'workflow:pdf-to-word' },
       { id: 'extract-pages', title: 'Extract Pages', desc: 'Get a new document containing only the desired pages', icon: 'extract', color: '#ea580c', popular: true, action: 'workflow:extract-pages' }
     ]
   },
@@ -51,8 +51,8 @@ export const SEJDA_TOOL_CATEGORIES = [
     icon: 'merge',
     tools: [
       { id: 'alternate-mix', title: 'Alternate & Mix', desc: 'Mixes pages from 2 or more documents, alternating between them', icon: 'shuffle', color: '#0891b2', action: 'workflow:alternate-mix' },
-      { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#0284c7', action: 'workflow:merge' },
-      { id: 'organize', title: 'Organize', desc: 'Arrange and reorder PDF pages', icon: 'grid', color: '#2563eb', action: 'workflow:organize' }
+      { id: 'merge', title: 'Merge', desc: 'Combine multiple PDFs and images into one', icon: 'merge', color: '#30050d', action: 'workflow:merge' },
+      { id: 'organize', title: 'Organize', desc: 'Arrange and reorder PDF pages', icon: 'grid', color: '#30050d', action: 'workflow:organize' }
     ]
   },
   {
@@ -66,7 +66,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'split-bookmarks', title: 'Split by bookmarks', desc: 'Extract chapters to separate documents based on the bookmarks in the table of contents', icon: 'bookmark', color: '#f59e0b', action: 'workflow:split' },
       { id: 'split-half', title: 'Split in half', desc: 'Split two page layout scans, A3 to double A4 or A4 to double A5', icon: 'book', color: '#4f46e5', action: 'workflow:split-half' },
       { id: 'split-size', title: 'Split by size', desc: 'Get multiple smaller documents with specific file sizes', icon: 'layers', color: '#6366f1', action: 'workflow:split' },
-      { id: 'split-text', title: 'Split by text', desc: 'Extract separate documents when specific text changes from page to page', icon: 'type', color: '#0284c7', action: 'workflow:split' }
+      { id: 'split-text', title: 'Split by text', desc: 'Extract separate documents when specific text changes from page to page', icon: 'type', color: '#30050d', action: 'workflow:split' }
     ]
   },
   {
@@ -75,7 +75,7 @@ export const SEJDA_TOOL_CATEGORIES = [
     desc: 'Full editing, handwriting signatures, and interactive forms',
     icon: 'edit',
     tools: [
-      { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#2563eb', action: 'tool:select' },
+      { id: 'edit', title: 'PDF Editor', desc: 'Edit PDF files for free. Fill & sign PDF. Add text, links, images and shapes. Edit existing PDF text. Annotate PDF', icon: 'edit', color: '#30050d', action: 'tool:select' },
       { id: 'sign', title: 'Fill & Sign', desc: 'Add signature to PDF. Fill out PDF forms', icon: 'sign', color: '#7c3aed', action: 'workflow:sign' },
       { id: 'forms', title: 'Create Forms', desc: 'Free PDF forms creator. Make existing PDF documents fillable', icon: 'check-square', color: '#10b981', action: 'tool:form' },
       { id: 'delete', title: 'Delete Pages', desc: 'Remove pages from a PDF document', icon: 'trash', color: '#ef4444', action: 'sidebar:delete' }
@@ -88,7 +88,7 @@ export const SEJDA_TOOL_CATEGORIES = [
     icon: 'compress',
     tools: [
       { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', action: 'workflow:compress' },
-      { id: 'scan', title: 'Scan to PDF', desc: 'Capture documents using camera or mobile scanner into clean PDF', icon: 'camera', color: '#2563eb', action: 'workflow:scan' },
+      { id: 'scan', title: 'Scan to PDF', desc: 'Capture documents using camera or mobile scanner into clean PDF', icon: 'camera', color: '#30050d', action: 'workflow:scan' },
       { id: 'deskew', title: 'Deskew', desc: 'Automatically straighten and deskew scanned PDF pages', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
       { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', action: 'workflow:ocr-pdf' },
       { id: 'compare', title: 'Compare PDF', desc: 'Find differences and visually compare two PDF documents side by side', icon: 'git-pull-request', color: '#8b5cf6', action: 'workflow:compare' }
@@ -103,7 +103,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'security', title: 'Protect', desc: 'Protect file with password and permissions', icon: 'lock', color: '#dc2626', action: 'workflow:security' },
       { id: 'unlock', title: 'Unlock', desc: 'Remove restrictions and password from PDF files', icon: 'unlock', color: '#10b981', action: 'workflow:unlock' },
       { id: 'redact', title: 'Redact', desc: 'Permanently remove sensitive text, words and coordinates from PDF streams', icon: 'shield', color: '#0f172a', action: 'workflow:redact' },
-      { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#0284c7', action: 'workflow:watermark' },
+      { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#30050d', action: 'workflow:watermark' },
       { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'workflow:flatten' }
     ]
   },
@@ -117,7 +117,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'to-image', title: 'PDF to JPG', desc: 'Get PDF pages converted to JPG, PNG or TIFF images', icon: 'image', color: '#d97706', action: 'workflow:to-image' },
       { id: 'pdf-to-ppt', title: 'PDF to PPT', desc: 'Convert PDF to PowerPoint online', icon: 'ppt', color: '#d24726', action: 'workflow:pdf-to-ppt' },
       { id: 'pdf-to-text', title: 'PDF to Text', desc: 'Copies all text from the PDF document and extracts it to a separate text file', icon: 'align-left', color: '#334155', action: 'workflow:pdf-to-text' },
-      { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#2563eb', action: 'workflow:pdf-to-word' }
+      { id: 'pdf-to-word', title: 'PDF to Word', desc: 'Convert from PDF to DOC online', icon: 'word', color: '#30050d', action: 'workflow:pdf-to-word' }
     ]
   },
   {
@@ -126,9 +126,9 @@ export const SEJDA_TOOL_CATEGORIES = [
     desc: 'Generate PDF documents from Web, Images, and Word files',
     icon: 'upload-cloud',
     tools: [
-      { id: 'html-to-pdf', title: 'HTML to PDF', desc: 'Convert web pages or HTML files to PDF documents', icon: 'code', color: '#0284c7', action: 'workflow:html-to-pdf' },
+      { id: 'html-to-pdf', title: 'HTML to PDF', desc: 'Convert web pages or HTML files to PDF documents', icon: 'code', color: '#30050d', action: 'workflow:html-to-pdf' },
       { id: 'images-to-pdf', title: 'JPG to PDF', desc: 'Convert Images to PDF', icon: 'images', color: '#d97706', action: 'workflow:images-to-pdf' },
-      { id: 'word-to-pdf', title: 'Word to PDF', desc: 'Creates a PDF document from Microsoft Word .docx', icon: 'word', color: '#2563eb', action: 'workflow:word-to-pdf' },
+      { id: 'word-to-pdf', title: 'Word to PDF', desc: 'Creates a PDF document from Microsoft Word .docx', icon: 'word', color: '#30050d', action: 'workflow:word-to-pdf' },
       { id: 'excel-to-pdf', title: 'Excel to PDF', desc: 'Convert Excel spreadsheets and CSV tables into styled PDF tables', icon: 'excel', color: '#107c41', action: 'workflow:excel-to-pdf' },
       { id: 'ppt-to-pdf', title: 'PowerPoint to PDF', desc: 'Convert PowerPoint PPTX presentation slides into formatted PDF slide decks', icon: 'ppt', color: '#d24726', action: 'workflow:ppt-to-pdf' }
     ]
@@ -191,7 +191,7 @@ export class AllToolsModal {
       <div class="modal-dialog" style="max-width: 920px; max-height: 88vh; display: flex; flex-direction: column;">
         <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle);">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; color: white;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #30050d, #5e0b1a); display: flex; align-items: center; justify-content: center; color: white;">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
             </div>
             <div>

@@ -259,7 +259,7 @@ export class CompareModal {
         badgeBg = 'rgba(245,158,11,0.12)';
         label = `Modified (+${p.addedWords.length}, -${p.removedWords.length})`;
       } else if (p.diffType === 'added') {
-        badgeColor = '#3b82f6';
+        badgeColor = '#30050d';
         badgeBg = 'rgba(59,130,246,0.12)';
         label = 'Added Page';
       } else if (p.diffType === 'removed') {

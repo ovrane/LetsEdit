@@ -40,9 +40,17 @@ export const ROUTE_DEFINITIONS = [
     path: '/login',
     toolId: null,
     isLogin: true,
-    aliases: ['/signin', '/sign-in', '/register', '/signup', '/sign-up'],
+    aliases: ['/signin', '/sign-in'],
     title: "Sign in to LetsEdit — Fast & Secure PDF Tools",
-    description: "Log in or create a free account to manage your documents and developer tokens."
+    description: "Log in to your account to manage your documents and developer tokens."
+  },
+  {
+    path: '/register',
+    toolId: null,
+    isRegister: true,
+    aliases: ['/signup', '/sign-up'],
+    title: "Create Free Account — LetsEdit",
+    description: "Create a free account to manage your documents and developer tokens."
   },
   {
     path: '/merge_pdf',

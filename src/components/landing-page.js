@@ -250,7 +250,7 @@ export class LandingPage {
                 <span><strong>100% Private</strong> &bull; Zero Server Uploads</span>
               </div>
               <div class="trust-pill">
-                <svg width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                <svg width="16" height="16" fill="none" stroke="#30050d" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
                 <span><strong>Sub-Second Speed</strong> &bull; Client-Side WASM</span>
               </div>
               <div class="trust-pill">
@@ -299,7 +299,7 @@ export class LandingPage {
         <section class="landing-features-section">
           <div class="features-inner">
             <div class="feature-item">
-              <div class="feature-icon" style="background: rgba(37,99,235,0.1); color: #2563eb;">
+              <div class="feature-icon" style="background: rgba(48,5,13,0.08); color: #30050d;">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               </div>
               <h3>100% Private & Confidential</h3>

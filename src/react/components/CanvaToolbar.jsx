@@ -75,7 +75,7 @@ export function CanvaToolbar({ onAction }) {
             onClick={() => handleSelectTool(id)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               activeTool === id
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-[#30050d] text-white shadow-sm'
                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -93,7 +93,7 @@ export function CanvaToolbar({ onAction }) {
             onClick={() => toggleDropdown('pages')}
             className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
           >
-            <Layers className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <Layers className="w-3.5 h-3.5 text-[#30050d] dark:text-[#d46374]" />
             <span>Pages</span>
             <ChevronDown className="w-3 h-3 text-slate-400" />
           </button>
@@ -220,7 +220,7 @@ export function CanvaToolbar({ onAction }) {
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
           title="Find & Replace Text"
         >
-          <Search className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <Search className="w-3.5 h-3.5 text-[#30050d] dark:text-[#d46374]" />
           <span className="hidden md:inline">Find</span>
         </button>
       </div>

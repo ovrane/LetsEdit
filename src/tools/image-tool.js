@@ -78,16 +78,16 @@ export class ImageTool {
               </div>
 
               <!-- Received Stamp -->
-              <div class="stamp-card" data-stamp="RECEIVED" data-color="#2563eb" style="border: 2px solid #2563eb; border-radius:6px; padding:12px; text-align:center; cursor:pointer; background:#eff6ff; transition: transform 0.1s, box-shadow 0.1s;">
-                <div style="font-weight:900; font-size:18px; color:#2563eb; letter-spacing:2px; text-transform:uppercase; border:2px solid #2563eb; padding:6px; border-radius:4px;">
+              <div class="stamp-card" data-stamp="RECEIVED" data-color="#30050d" style="border: 2px solid #30050d; border-radius:6px; padding:12px; text-align:center; cursor:pointer; background:rgba(48,5,13,0.04); transition: transform 0.1s, box-shadow 0.1s;">
+                <div style="font-weight:900; font-size:18px; color:#30050d; letter-spacing:2px; text-transform:uppercase; border:2px solid #30050d; padding:6px; border-radius:4px;">
                   RECEIVED
                 </div>
                 <div style="font-size:10px; color:#1d4ed8; font-weight:700; margin-top:4px;">DATE: ${todayDate}</div>
               </div>
 
               <!-- Sign Here Stamp -->
-              <div class="stamp-card" data-stamp="SIGN HERE" data-color="#0284c7" style="border: 2px solid #0284c7; border-radius:6px; padding:12px; text-align:center; cursor:pointer; background:#f0f9ff; transition: transform 0.1s, box-shadow 0.1s;">
-                <div style="font-weight:900; font-size:18px; color:#0284c7; letter-spacing:1px; text-transform:uppercase; border:2px solid #0284c7; padding:6px; border-radius:4px; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <div class="stamp-card" data-stamp="SIGN HERE" data-color="#30050d" style="border: 2px solid #30050d; border-radius:6px; padding:12px; text-align:center; cursor:pointer; background:rgba(48,5,13,0.04); transition: transform 0.1s, box-shadow 0.1s;">
+                <div style="font-weight:900; font-size:18px; color:#30050d; letter-spacing:1px; text-transform:uppercase; border:2px solid #30050d; padding:6px; border-radius:4px; display:flex; align-items:center; justify-content:center; gap:6px;">
                   <span>➔ SIGN HERE</span>
                 </div>
                 <div style="font-size:10px; color:#0369a1; font-weight:700; margin-top:4px;">AUTHORIZED SIGNATURE</div>

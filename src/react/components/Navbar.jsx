@@ -54,14 +54,14 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
               type="text"
               value={docTitle}
               onChange={handleTitleChange}
-              className="text-xs font-medium bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-blue-500 rounded px-1.5 py-1 text-slate-800 dark:text-slate-200 outline-none max-w-[180px] truncate"
+              className="text-xs font-medium bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-[#30050d] rounded px-1.5 py-1 text-slate-800 dark:text-slate-200 outline-none max-w-[180px] truncate"
               title="Click to rename document"
             />
             <button
               onClick={onOpenPdf}
               className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
             >
-              <FolderOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <FolderOpen className="w-3.5 h-3.5 text-[#30050d] dark:text-[#d46374]" />
               <span>Open</span>
             </button>
           </div>
@@ -112,7 +112,7 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
           onClick={() => allToolsModal.show()}
           className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
         >
-          <Grid className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <Grid className="w-3.5 h-3.5 text-[#30050d] dark:text-[#d46374]" />
           <span>All 43+ Tools</span>
         </button>
 
@@ -127,7 +127,7 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
         {isStudioMode && (
           <button
             onClick={onExportPdf}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 active:scale-95 transition"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-[#30050d] to-[#4a0914] hover:from-[#4a0914] hover:to-[#5e0b1a] text-white shadow-md shadow-[#30050d]/20 active:scale-95 transition"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export PDF</span>
