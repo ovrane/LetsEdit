@@ -102,6 +102,14 @@ export class LandingPage {
                   <span class="dropdown-item-title">HTML to PDF</span>
                   <span class="dropdown-item-desc">Convert HTML or code to PDF</span>
                 </button>
+                <button class="landing-dropdown-item" data-action="workflow:excel-to-pdf">
+                  <span class="dropdown-item-title">Excel to PDF</span>
+                  <span class="dropdown-item-desc">Convert XLS/CSV to PDF</span>
+                </button>
+                <button class="landing-dropdown-item" data-action="workflow:ppt-to-pdf">
+                  <span class="dropdown-item-title">PowerPoint to PDF</span>
+                  <span class="dropdown-item-desc">Convert PPTX to PDF slides</span>
+                </button>
               </div>
             </div>
 
@@ -146,11 +154,13 @@ export class LandingPage {
                   <div class="mega-column">
                     <div class="mega-col-title">OPTIMIZE & SECURITY</div>
                     <button class="mega-item" data-action="workflow:compress">Let's Compress PDF</button>
+                    <button class="mega-item" data-action="workflow:scan">Let's Scan to PDF</button>
                     <button class="mega-item" data-action="workflow:ocr-pdf">Let's OCR PDF</button>
                     <button class="mega-item" data-action="workflow:compare">Let's Compare PDF</button>
                     <button class="mega-item" data-action="workflow:repair">Let's Repair PDF</button>
                     <button class="mega-item" data-action="workflow:security">Let's Protect & Encrypt</button>
                     <button class="mega-item" data-action="workflow:unlock">Let's Unlock PDF</button>
+                    <button class="mega-item" data-action="workflow:redact">Let's Redact PDF</button>
                     <button class="mega-item" data-action="workflow:watermark">Let's Watermark PDF</button>
                     <button class="mega-item" data-action="workflow:grayscale">Let's Grayscale PDF</button>
                     <button class="mega-item" data-action="workflow:pagenumbers">Let's Number Pages</button>
@@ -172,6 +182,8 @@ export class LandingPage {
                     <button class="mega-item" data-action="workflow:pdf-to-text">Let's Extract Text</button>
                     <button class="mega-item" data-action="workflow:html-to-pdf">Let's HTML to PDF</button>
                     <button class="mega-item" data-action="workflow:word-to-pdf">Let's Word to PDF</button>
+                    <button class="mega-item" data-action="workflow:excel-to-pdf">Let's Excel to PDF</button>
+                    <button class="mega-item" data-action="workflow:ppt-to-pdf">Let's PowerPoint to PDF</button>
                   </div>
                 </div>
               </div>

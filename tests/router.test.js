@@ -61,7 +61,11 @@ describe('iLovePDF-Compatible Router Engine Tests', () => {
       { path: '/rename_pdf', toolId: 'rename' },
       { path: '/pagenumber_pdf', toolId: 'pagenumbers' },
       { path: '/flatten_pdf', toolId: 'flatten' },
-      { path: '/extract_pages_pdf', toolId: 'extract-pages' }
+      { path: '/extract_pages_pdf', toolId: 'extract-pages' },
+      { path: '/redact_pdf', toolId: 'redact' },
+      { path: '/scan_pdf', toolId: 'scan' },
+      { path: '/powerpoint_to_pdf', toolId: 'ppt-to-pdf' },
+      { path: '/excel_to_pdf', toolId: 'excel-to-pdf' }
     ];
 
     for (const exp of expectations) {
@@ -106,7 +110,15 @@ describe('iLovePDF-Compatible Router Engine Tests', () => {
       { alias: '/pagenumbers', canonical: '/pagenumber_pdf' },
       { alias: '/page-numbers', canonical: '/pagenumber_pdf' },
       { alias: '/flatten', canonical: '/flatten_pdf' },
-      { alias: '/extract-pages', canonical: '/extract_pages_pdf' }
+      { alias: '/extract-pages', canonical: '/extract_pages_pdf' },
+      { alias: '/redact', canonical: '/redact_pdf' },
+      { alias: '/whiteout_pdf', canonical: '/redact_pdf' },
+      { alias: '/scan', canonical: '/scan_pdf' },
+      { alias: '/scan-pdf', canonical: '/scan_pdf' },
+      { alias: '/excel-to-pdf', canonical: '/excel_to_pdf' },
+      { alias: '/excel2pdf', canonical: '/excel_to_pdf' },
+      { alias: '/ppt-to-pdf', canonical: '/powerpoint_to_pdf' },
+      { alias: '/powerpoint-to-pdf', canonical: '/powerpoint_to_pdf' }
     ];
 
     for (const pair of aliasPairs) {

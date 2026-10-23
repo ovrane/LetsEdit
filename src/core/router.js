@@ -79,14 +79,14 @@ export const ROUTE_DEFINITIONS = [
   },
   {
     path: '/powerpoint_to_pdf',
-    toolId: 'word-to-pdf',
+    toolId: 'ppt-to-pdf',
     aliases: ['/powerpoint-to-pdf', '/ppt-to-pdf', '/ppt2pdf'],
     title: "Convert POWERPOINT to PDF — LetsEdit",
     description: "Convert presentation slides into high-fidelity PDF documents."
   },
   {
     path: '/excel_to_pdf',
-    toolId: 'pdf-to-excel',
+    toolId: 'excel-to-pdf',
     aliases: ['/excel-to-pdf', '/excel2pdf'],
     title: "Convert EXCEL to PDF — LetsEdit",
     description: "Convert spreadsheets into formatted PDF tables."
@@ -293,6 +293,20 @@ export const ROUTE_DEFINITIONS = [
     aliases: ['/extract-pages', '/extract-pages-pdf', '/extract_pages'],
     title: "Extract Pages from PDF online — Free Tool — LetsEdit",
     description: "Select and extract custom pages into a new independent PDF document."
+  },
+  {
+    path: '/redact_pdf',
+    toolId: 'redact',
+    aliases: ['/redact', '/redact-pdf', '/whiteout_pdf', '/whiteout-pdf', '/sanitize_pdf'],
+    title: "Redact PDF online. Permanently remove sensitive data — LetsEdit",
+    description: "Permanently scrub confidential text, words, and coordinates from underlying PDF streams."
+  },
+  {
+    path: '/scan_pdf',
+    toolId: 'scan',
+    aliases: ['/scan', '/scan-pdf', '/camera-to-pdf', '/mobile_scan'],
+    title: "Scan to PDF online. Camera and Mobile Scanner — LetsEdit",
+    description: "Capture documents from your device camera or scanner directly into a sharp PDF document."
   }
 ];
 

@@ -833,6 +833,75 @@ describe('PDF Vector Export & Feature Tests', () => {
     const doc = await PDFDocument.load(pdfBytes);
     assert.strictEqual(doc.getPageCount(), 1);
   });
+
+  test('excelToPdf converts CSV and XLSX spreadsheet data into styled vector PDF table', async () => {
+    // 1. Test CSV conversion
+    const csvContent = 'Product,Units Sold,Revenue,Profit\nWidget A,150,$3000,$1200\nWidget B,220,$4400,$1800\nWidget C,95,$1900,$750';
+    const csvPdfBytes = await pdfEngine.excelToPdf(csvContent, { title: 'Q3 Sales Report', isCsv: true });
+    assert(csvPdfBytes.byteLength > 500);
+
+    const docCsv = await PDFDocument.load(csvPdfBytes);
+    assert.strictEqual(docCsv.getPageCount(), 1);
+
+    // 2. Test OpenXML XLSX package in memory
+    const zip = new JSZip();
+    zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>');
+    zip.file('xl/sharedStrings.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <si><t>Department</t></si>
+        <si><t>Headcount</t></si>
+        <si><t>Engineering</t></si>
+        <si><t>Design</t></si>
+      </sst>
+    `);
+    zip.file('xl/worksheets/sheet1.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <sheetData>
+          <row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c></row>
+          <row r="2"><c r="A2" t="s"><v>2</v></c><c r="B2"><v>45</v></c></row>
+          <row r="3"><c r="A3" t="s"><v>3</v></c><c r="B3"><v>12</v></c></row>
+        </sheetData>
+      </worksheet>
+    `);
+    const xlsxBytes = await zip.generateAsync({ type: 'uint8array' });
+
+    const xlsxPdfBytes = await pdfEngine.excelToPdf(xlsxBytes, { title: 'Headcount Summary' });
+    assert(xlsxPdfBytes.byteLength > 500);
+    const docXlsx = await PDFDocument.load(xlsxPdfBytes);
+    assert.strictEqual(docXlsx.getPageCount(), 1);
+  });
+
+  test('pptToPdf converts PowerPoint presentation package into styled landscape PDF slides', async () => {
+    const zip = new JSZip();
+    zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>');
+    zip.file('ppt/slides/slide1.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+        <p:cSld><p:spTree>
+          <p:sp><p:txBody><a:p><a:r><a:t>Executive Summary</a:t></a:r></a:p></p:txBody></p:sp>
+          <p:sp><p:txBody><a:p><a:r><a:t>Achieved 140% annual revenue growth in FY26.</a:t></a:r></a:p></p:txBody></p:sp>
+          <p:sp><p:txBody><a:p><a:r><a:t>Zero data breach incidents; complete privacy architecture.</a:t></a:r></a:p></p:txBody></p:sp>
+        </p:spTree></p:cSld>
+      </p:sld>
+    `);
+    zip.file('ppt/slides/slide2.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+        <p:cSld><p:spTree>
+          <p:sp><p:txBody><a:p><a:r><a:t>Strategic Vision 2027</a:t></a:r></a:p></p:txBody></p:sp>
+          <p:sp><p:txBody><a:p><a:r><a:t>Expanding pure client-side PDF vector operations worldwide.</a:t></a:r></a:p></p:txBody></p:sp>
+        </p:spTree></p:cSld>
+      </p:sld>
+    `);
+    const pptxBytes = await zip.generateAsync({ type: 'uint8array' });
+
+    const pdfBytes = await pdfEngine.pptToPdf(pptxBytes, { title: 'Q4 Board Deck' });
+    assert(pdfBytes.byteLength > 500);
+
+    const doc = await PDFDocument.load(pdfBytes);
+    assert.strictEqual(doc.getPageCount(), 2);
+    const sz1 = doc.getPage(0).getSize();
+    assert.strictEqual(sz1.width, 841.89);
+    assert.strictEqual(sz1.height, 595.28);
+  });
 });
 
 

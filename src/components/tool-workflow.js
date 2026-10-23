@@ -17,6 +17,7 @@ import { Toast } from './toast.js';
 import { downloadBlob, readFileAsArrayBuffer, formatFileSize, hexToRgb } from '../utils/helpers.js';
 import { router } from '../core/router.js';
 import { authModal } from './auth-modal.js';
+import { redactPageContentStreams } from '../core/pdf-redactor.js';
 
 // Setup PDF.js worker safely across browser and test runtimes
 const workerSrc = typeof window !== 'undefined'
@@ -458,6 +459,54 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF to Flatten',
     dropText: 'or drop PDF here',
     badge: 'Flatten Forms'
+  },
+  redact: {
+    id: 'redact',
+    title: 'Redact PDF — Remove Sensitive Data',
+    subtitle: 'Permanently sanitize confidential text, words, and coordinates from underlying PDF streams.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="8" y1="12" x2="16" y2="12"></line></svg>`,
+    color: '#0f172a',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF to Redact',
+    dropText: 'or drop PDF here',
+    badge: 'Permanent Sanitization'
+  },
+  scan: {
+    id: 'scan',
+    title: 'Scan to PDF',
+    subtitle: 'Capture documents from your device camera or mobile scanner directly into a sharp PDF document.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`,
+    color: '#2563eb',
+    accept: 'image/*,.pdf',
+    multiple: true,
+    buttonText: 'Scan Document / Camera',
+    dropText: 'or snap pictures / upload scans',
+    badge: 'Camera & Scanner'
+  },
+  'excel-to-pdf': {
+    id: 'excel-to-pdf',
+    title: 'Excel to PDF Converter',
+    subtitle: 'Convert Excel spreadsheets (.xlsx, .xls) and CSV tables into beautifully formatted PDF documents.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+    color: '#107c41',
+    accept: '.xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv',
+    multiple: false,
+    buttonText: 'Select Excel or CSV file',
+    dropText: 'or drop spreadsheet here',
+    badge: 'Spreadsheet to PDF'
+  },
+  'ppt-to-pdf': {
+    id: 'ppt-to-pdf',
+    title: 'PowerPoint to PDF Converter',
+    subtitle: 'Convert PowerPoint presentations (.pptx, .ppt) into crisp, presentation-ready vector PDF slide decks.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
+    color: '#d24726',
+    accept: '.pptx,.ppt,application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    multiple: false,
+    buttonText: 'Select PowerPoint file',
+    dropText: 'or drop presentation here',
+    badge: 'Presentation to PDF'
   }
 };
 
@@ -715,6 +764,15 @@ export class ToolWorkflowManager {
             <span class="workflow-format-chip">${t.badge}</span>
           </div>
 
+          ${t.id === 'scan' ? `
+            <div style="margin-top: 16px;">
+              <button type="button" class="btn btn-outline" id="btn-workflow-camera" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px 20px; border-radius: 8px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <span>Snap Pages with Device Camera</span>
+              </button>
+            </div>
+          ` : ''}
+
           <div style="margin-top: 24px;">
             <button class="workflow-sample-link" id="btn-workflow-sample">
               Or test with Sample Document
@@ -787,6 +845,11 @@ export class ToolWorkflowManager {
           mockBytes: sampleBytes
         }]);
       };
+    }
+
+    const camBtn = this.container.querySelector('#btn-workflow-camera');
+    if (camBtn) {
+      camBtn.onclick = () => this.openCameraScannerModal();
     }
   }
 
@@ -929,6 +992,12 @@ export class ToolWorkflowManager {
             <span class="workflow-active-badge">${t.title}</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
+            ${t.id === 'scan' ? `
+              <button class="btn btn-sm btn-primary" id="btn-workspace-camera" style="display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <span>Snap with Camera</span>
+              </button>
+            ` : ''}
             <button class="btn btn-sm btn-outline" id="btn-workspace-add-more">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
               <span>Add more files</span>
@@ -1366,6 +1435,10 @@ export class ToolWorkflowManager {
     if (id === 'sign') return 'Sign Document & Finish';
     if (id === 'pagenumbers') return 'Apply Page Numbers';
     if (id === 'flatten') return 'Flatten PDF Forms';
+    if (id === 'redact') return 'Permanently Redact PDF';
+    if (id === 'scan') return 'Compile Scanned PDF';
+    if (id === 'excel-to-pdf') return 'Convert Excel to PDF';
+    if (id === 'ppt-to-pdf') return 'Convert PowerPoint to PDF';
     return `Process with ${this.activeTool.title}`;
   }
 
@@ -2004,6 +2077,82 @@ export class ToolWorkflowManager {
                 <option value="14" ${this.pnFontSize === 14 ? 'selected' : ''}>14 pt (Large)</option>
               </select>
             </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'redact') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Sensitive Words or Phrases to Redact</label>
+          <textarea id="workflow-redact-keywords" class="input-sm" placeholder="Enter keywords to redact (e.g. John Doe, Confidential, 123-45-6789), separated by commas..." style="width: 100%; height: 75px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-size: 13px; line-height: 1.4; resize: vertical; margin-bottom: 12px;">${this.redactKeywords || ''}</textarea>
+
+          <label class="workflow-options-label">Redaction Appearance</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+            <button type="button" class="btn btn-xs ${this.redactColor === '#000000' ? 'btn-primary' : 'btn-outline'} btn-redact-color" data-color="#000000" style="padding: 8px; font-weight: 600;">
+              Blackout Box
+            </button>
+            <button type="button" class="btn btn-xs ${this.redactColor === '#ffffff' ? 'btn-primary' : 'btn-outline'} btn-redact-color" data-color="#ffffff" style="padding: 8px; font-weight: 600;">
+              Whiteout Box
+            </button>
+          </div>
+
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #ef4444; line-height: 1.5;">
+            <strong>Permanent Vector Redaction:</strong> The underlying text stream operators are permanently scrubbed from the PDF binary so sensitive information cannot be copied or retrieved.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'scan') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Scanner Optimization</label>
+          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-main);">
+              <input type="checkbox" id="chk-scan-contrast" checked style="width: 16px; height: 16px;" />
+              <span>Auto-enhance document contrast</span>
+            </label>
+          </div>
+
+          <label class="workflow-options-label">Page Margins</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button type="button" class="btn btn-xs ${this.imgMargin === '0' ? 'btn-primary' : 'btn-outline'} btn-scan-margin" data-margin="0">Fit to Edge</button>
+            <button type="button" class="btn btn-xs ${this.imgMargin === '20' ? 'btn-primary' : 'btn-outline'} btn-scan-margin" data-margin="20">Add Margin (20pt)</button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'excel-to-pdf') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Document Title</label>
+          <input type="text" id="workflow-excel-title" class="input-sm" value="${this.excelTitle || primary.name?.replace(/\.[^/.]+$/, '') || 'Spreadsheet Report'}" placeholder="Spreadsheet Report" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
+
+          <label class="workflow-options-label">Page Orientation</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+            <button type="button" class="btn btn-xs ${(!this.excelOrientation || this.excelOrientation === 'auto') ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="auto">Auto</button>
+            <button type="button" class="btn btn-xs ${this.excelOrientation === 'portrait' ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="portrait">Portrait</button>
+            <button type="button" class="btn btn-xs ${this.excelOrientation === 'landscape' ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="landscape">Landscape</button>
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Supports Excel (.xlsx, .xls) and CSV sheets. Generates vector tables with styled headers, alternating row colors, and auto-pagination.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'ppt-to-pdf') {
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Presentation Title</label>
+          <input type="text" id="workflow-ppt-title" class="input-sm" value="${this.pptTitle || primary.name?.replace(/\.[^/.]+$/, '') || 'Presentation Deck'}" placeholder="Presentation Deck" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
+
+          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Converts slide texts, bullets, and titles into 16:9 widescreen landscape PDF presentation pages with executive header banners and footer slide counters.
           </div>
         </div>
       `;
@@ -2883,6 +3032,55 @@ export class ToolWorkflowManager {
       };
     }
 
+    // Redaction workspace listeners
+    const redactInp = this.container.querySelector('#workflow-redact-keywords');
+    if (redactInp) {
+      redactInp.oninput = (e) => {
+        this.redactKeywords = e.target.value;
+      };
+    }
+    this.container.querySelectorAll('.btn-redact-color').forEach(btn => {
+      btn.onclick = () => {
+        this.redactColor = btn.getAttribute('data-color') || '#000000';
+        this.render();
+      };
+    });
+
+    // Scanner workspace listeners
+    this.container.querySelectorAll('.btn-scan-margin').forEach(btn => {
+      btn.onclick = () => {
+        this.imgMargin = btn.getAttribute('data-margin') || '0';
+        this.render();
+      };
+    });
+
+    const camBtn = this.container.querySelector('#btn-workspace-camera');
+    if (camBtn) {
+      camBtn.onclick = () => this.openCameraScannerModal();
+    }
+
+    // Excel to PDF options listeners
+    const excelTitleInp = this.container.querySelector('#workflow-excel-title');
+    if (excelTitleInp) {
+      excelTitleInp.oninput = (e) => {
+        this.excelTitle = e.target.value;
+      };
+    }
+    this.container.querySelectorAll('.btn-excel-orient').forEach(btn => {
+      btn.onclick = () => {
+        this.excelOrientation = btn.getAttribute('data-orient') || 'auto';
+        this.render();
+      };
+    });
+
+    // PPT to PDF options listeners
+    const pptTitleInp = this.container.querySelector('#workflow-ppt-title');
+    if (pptTitleInp) {
+      pptTitleInp.oninput = (e) => {
+        this.pptTitle = e.target.value;
+      };
+    }
+
     // Primary Execute CTA
     if (execBtn) {
       execBtn.onclick = () => this.executeAction();
@@ -3391,6 +3589,44 @@ export class ToolWorkflowManager {
         const flatBytes = await flatDoc.save();
         this.processedBlob = new Blob([flatBytes], { type: 'application/pdf' });
         this.processedFilename = `Flattened_${primary.name}`;
+      } else if (t.id === 'redact') {
+        const redactDoc = await PDFDocument.load(primary.bytes);
+        const keywords = (this.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);
+        const pCount = redactDoc.getPageCount();
+
+        for (let i = 0; i < pCount; i++) {
+          const page = redactDoc.getPage(i);
+          if (keywords.length > 0) {
+            await redactPageContentStreams(redactDoc, page, [], keywords);
+          }
+        }
+        const redactedBytes = await redactDoc.save();
+        this.processedBlob = new Blob([redactedBytes], { type: 'application/pdf' });
+        this.processedFilename = `Redacted_${primary.name}`;
+      } else if (t.id === 'scan') {
+        const imgList = this.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
+        const pdfBytes = await PageOperations.imagesToPdf(imgList, {
+          orientation: 'portrait',
+          margin: parseInt(this.imgMargin, 10) || 0
+        });
+        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        this.processedFilename = 'Scanned_Document.pdf';
+      } else if (t.id === 'excel-to-pdf') {
+        const title = this.excelTitle || primary.name.replace(/\.[^/.]+$/, '');
+        const pdfBytes = await PageOperations.excelToPdf(primary.bytes, {
+          title,
+          orientation: this.excelOrientation || 'auto',
+          isCsv: primary.name.toLowerCase().endsWith('.csv')
+        });
+        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`;
+      } else if (t.id === 'ppt-to-pdf') {
+        const title = this.pptTitle || primary.name.replace(/\.[^/.]+$/, '');
+        const pdfBytes = await PageOperations.pptToPdf(primary.bytes, {
+          title
+        });
+        this.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        this.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`;
       } else {
         this.processedBlob = new Blob([primary.bytes], { type: 'application/pdf' });
         this.processedFilename = `Processed_${primary.name}`;
@@ -3514,6 +3750,114 @@ export class ToolWorkflowManager {
         this.render();
       };
     }
+  }
+
+  async openCameraScannerModal() {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      Toast.error('Camera access is not supported by your browser environment.');
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-backdrop';
+    modal.id = 'workflow-camera-modal';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '99999';
+
+    modal.innerHTML = `
+      <div class="modal-dialog" style="max-width: 680px; width: 95%;">
+        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700;">Camera Document Scanner</h3>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Position document inside viewfinder and click Snap</p>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="btn-cam-close" style="font-size: 24px; background: transparent; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <div style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+          <div style="position: relative; width: 100%; max-width: 560px; height: 380px; border-radius: 12px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+            <video id="cam-scanner-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <div style="position: absolute; inset: 20px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 8px; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);">
+              <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.65); padding: 4px 10px; border-radius: 4px; font-size: 11px; color: white;">Align Document Here</div>
+            </div>
+          </div>
+          <canvas id="cam-scanner-canvas" style="display: none;"></canvas>
+
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button type="button" class="btn btn-primary btn-md" id="btn-cam-snap" style="display: flex; align-items: center; gap: 8px; padding: 10px 22px; font-weight: 600;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
+              <span>Snap Page</span>
+            </button>
+            <button type="button" class="btn btn-outline btn-md" id="btn-cam-done" style="padding: 10px 18px;">
+              <span>Done (${this.uploadedFiles.length} pages)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    let stream = null;
+    const video = modal.querySelector('#cam-scanner-video');
+    const canvas = modal.querySelector('#cam-scanner-canvas');
+    const snapBtn = modal.querySelector('#btn-cam-snap');
+    const doneBtn = modal.querySelector('#btn-cam-done');
+    const closeBtn = modal.querySelector('#btn-cam-close');
+
+    const stopStream = () => {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      modal.remove();
+    };
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+      });
+      video.srcObject = stream;
+    } catch (err) {
+      console.error('Camera open error:', err);
+      Toast.error('Could not access camera: ' + err.message);
+      modal.remove();
+      return;
+    }
+
+    closeBtn.onclick = stopStream;
+    doneBtn.onclick = () => {
+      stopStream();
+      if (this.stage === 'upload' && this.uploadedFiles.length > 0) {
+        this.stage = 'workspace';
+      }
+      this.render();
+    };
+
+    snapBtn.onclick = () => {
+      if (!video.videoWidth || !video.videoHeight) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const pageNum = this.uploadedFiles.length + 1;
+        const file = new File([blob], `Scanned_Page_${pageNum}.jpg`, { type: 'image/jpeg' });
+        await this.handleIncomingFiles([file]);
+        Toast.success(`Captured Page #${pageNum}!`);
+        const doneSpan = doneBtn.querySelector('span');
+        if (doneSpan) {
+          doneSpan.textContent = `Done (${this.uploadedFiles.length} pages)`;
+        }
+      }, 'image/jpeg', 0.92);
+    };
   }
 }
 

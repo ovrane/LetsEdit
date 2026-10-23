@@ -301,3 +301,93 @@ test('PageOperations.signPdf - embeds signature and date stamp on target page', 
   assert.strictEqual(outDoc.getPageCount(), 1);
 });
 
+test('Backend API - POST /api/pdf/redact draws solid cover boxes', async () => {
+  const doc = await PDFDocument.create();
+  doc.addPage([500, 500]);
+  const b64 = Buffer.from(await doc.save()).toString('base64');
+
+  const res = await makeRequest('/api/pdf/redact', 'POST', {
+    pdfBase64: b64,
+    boxes: [{ pageIndex: 0, x: 50, y: 50, width: 200, height: 30 }],
+    color: 'black'
+  });
+
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.redactedBoxesCount, 1);
+  assert.ok(res.body.pdfBase64);
+});
+
+test('Backend API - POST /api/pdf/flatten flattens AcroForm fields', async () => {
+  const doc = await PDFDocument.create();
+  const page = doc.addPage([500, 500]);
+  const form = doc.getForm();
+  const tf = form.createTextField('testField');
+  tf.setText('Sample text');
+  tf.addToPage(page, { x: 50, y: 50, width: 150, height: 25 });
+  const b64 = Buffer.from(await doc.save()).toString('base64');
+
+  const res = await makeRequest('/api/pdf/flatten', 'POST', {
+    pdfBase64: b64
+  });
+
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.flattened, true);
+  assert.ok(res.body.pdfBase64);
+});
+
+test('Backend API - POST /api/pdf/excel-to-pdf converts CSV and spreadsheets', async () => {
+  const csv = 'City,Population,Region\nNew York,8336817,Northeast\nLos Angeles,3979576,West\nChicago,2693976,Midwest';
+  const res = await makeRequest('/api/pdf/excel-to-pdf', 'POST', {
+    csvText: csv,
+    title: 'US Cities Report'
+  });
+
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.pageCount, 1);
+  assert.strictEqual(res.body.title, 'US Cities Report');
+  assert.ok(res.body.pdfBase64);
+});
+
+test('Backend API - POST /api/pdf/ppt-to-pdf converts presentation slides', async () => {
+  const text = 'Slide 1: Executive Overview\nKey metric: 99.9% uptime\nSlide 2: Architecture\nDecoupled backend and pure client-side processing';
+  const res = await makeRequest('/api/pdf/ppt-to-pdf', 'POST', {
+    text: text,
+    title: 'Tech Architecture'
+  });
+
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.pageCount, 2);
+  assert.ok(res.body.pdfBase64);
+});
+
+test('Backend API - POST /api/pdf/repair reconstructs and validates document', async () => {
+  const doc = await PDFDocument.create();
+  doc.addPage([400, 400]);
+  const b64 = Buffer.from(await doc.save()).toString('base64');
+
+  const res = await makeRequest('/api/pdf/repair', 'POST', {
+    pdfBase64: b64
+  });
+
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.repaired, true);
+  assert.strictEqual(res.body.pageCount, 1);
+  assert.ok(res.body.pdfBase64);
+});
+
+test('Backend API - POST /api/pdf/grayscale converts document streams', async () => {
+  const doc = await PDFDocument.create();
+  doc.addPage([400, 400]);
+  const b64 = Buffer.from(await doc.save()).toString('base64');
+
+  const res = await makeRequest('/api/pdf/grayscale', 'POST', {
+    pdfBase64: b64
+  });
+
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.grayscale, true);
+  assert.strictEqual(res.body.pageCount, 1);
+  assert.ok(res.body.pdfBase64);
+});
+
+

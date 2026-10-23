@@ -88,6 +88,7 @@ export const SEJDA_TOOL_CATEGORIES = [
     icon: 'compress',
     tools: [
       { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', action: 'workflow:compress' },
+      { id: 'scan', title: 'Scan to PDF', desc: 'Capture documents using camera or mobile scanner into clean PDF', icon: 'camera', color: '#2563eb', action: 'workflow:scan' },
       { id: 'deskew', title: 'Deskew', desc: 'Automatically straighten and deskew scanned PDF pages', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
       { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', action: 'workflow:ocr-pdf' }
     ]
@@ -100,6 +101,7 @@ export const SEJDA_TOOL_CATEGORIES = [
     tools: [
       { id: 'security', title: 'Protect', desc: 'Protect file with password and permissions', icon: 'lock', color: '#dc2626', action: 'workflow:security' },
       { id: 'unlock', title: 'Unlock', desc: 'Remove restrictions and password from PDF files', icon: 'unlock', color: '#10b981', action: 'workflow:unlock' },
+      { id: 'redact', title: 'Redact', desc: 'Permanently remove sensitive text, words and coordinates from PDF streams', icon: 'shield', color: '#0f172a', action: 'workflow:redact' },
       { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#0284c7', action: 'workflow:watermark' },
       { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'workflow:flatten' }
     ]
@@ -125,7 +127,9 @@ export const SEJDA_TOOL_CATEGORIES = [
     tools: [
       { id: 'html-to-pdf', title: 'HTML to PDF', desc: 'Convert web pages or HTML files to PDF documents', icon: 'code', color: '#0284c7', action: 'workflow:html-to-pdf' },
       { id: 'images-to-pdf', title: 'JPG to PDF', desc: 'Convert Images to PDF', icon: 'images', color: '#d97706', action: 'workflow:images-to-pdf' },
-      { id: 'word-to-pdf', title: 'Word to PDF', desc: 'Creates a PDF document from Microsoft Word .docx', icon: 'word', color: '#2563eb', action: 'workflow:word-to-pdf' }
+      { id: 'word-to-pdf', title: 'Word to PDF', desc: 'Creates a PDF document from Microsoft Word .docx', icon: 'word', color: '#2563eb', action: 'workflow:word-to-pdf' },
+      { id: 'excel-to-pdf', title: 'Excel to PDF', desc: 'Convert Excel spreadsheets and CSV tables into styled PDF tables', icon: 'excel', color: '#107c41', action: 'workflow:excel-to-pdf' },
+      { id: 'ppt-to-pdf', title: 'PowerPoint to PDF', desc: 'Convert PowerPoint PPTX presentation slides into formatted PDF slide decks', icon: 'ppt', color: '#d24726', action: 'workflow:ppt-to-pdf' }
     ]
   },
   {
@@ -278,6 +282,7 @@ export class AllToolsModal {
       bookmark: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>',
       unlock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path>',
       'trash-2': '<polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>',
+      camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle>',
       extract: '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>'
     };
 

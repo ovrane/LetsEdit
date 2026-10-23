@@ -205,6 +205,14 @@ export class PdfEngine {
   async wordToPdf(docxBytes, options = {}) {
     return await PageOperations.wordToPdf(docxBytes, options);
   }
+
+  async excelToPdf(fileBytes, options = {}) {
+    return await PageOperations.excelToPdf(fileBytes, options);
+  }
+
+  async pptToPdf(pptxBytes, options = {}) {
+    return await PageOperations.pptToPdf(pptxBytes, options);
+  }
 }
 
 export const pdfEngine = new PdfEngine();

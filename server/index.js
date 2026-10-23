@@ -27,6 +27,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PDFDocument, degrees, StandardFonts, rgb } from 'pdf-lib';
+import { PageOperations } from '../src/core/engine/page-ops.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -742,6 +743,187 @@ export async function handleBackendRequest(req, res) {
       return true;
     } catch (err) {
       sendJson(res, 500, { error: 'Protect failed: ' + err.message });
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 20. PDF Studio API: POST /api/pdf/redact
+  // -------------------------------------------------------------
+  if (pathname === '/api/pdf/redact' && method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.pdfBase64) {
+        sendJson(res, 400, { error: 'Missing pdfBase64 parameter.' });
+        return true;
+      }
+      const bytes = Buffer.from(body.pdfBase64, 'base64');
+      const doc = await PDFDocument.load(bytes);
+      const boxes = Array.isArray(body.boxes) ? body.boxes : [];
+      const colorType = body.color === 'white' ? rgb(1, 1, 1) : rgb(0, 0, 0);
+
+      // Draw solid cover boxes for all requested redaction coordinates
+      for (const box of boxes) {
+        const pageIdx = typeof box.pageIndex === 'number' ? box.pageIndex : 0;
+        if (pageIdx >= 0 && pageIdx < doc.getPageCount()) {
+          const page = doc.getPage(pageIdx);
+          page.drawRectangle({
+            x: box.x || 0,
+            y: box.y || 0,
+            width: box.width || 100,
+            height: box.height || 20,
+            color: colorType
+          });
+        }
+      }
+
+      const outBytes = await doc.save();
+      sendJson(res, 200, {
+        pdfBase64: Buffer.from(outBytes).toString('base64'),
+        pageCount: doc.getPageCount(),
+        redactedBoxesCount: boxes.length
+      });
+      return true;
+    } catch (err) {
+      sendJson(res, 500, { error: 'Redaction failed: ' + err.message });
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 21. PDF Studio API: POST /api/pdf/flatten
+  // -------------------------------------------------------------
+  if (pathname === '/api/pdf/flatten' && method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.pdfBase64) {
+        sendJson(res, 400, { error: 'Missing pdfBase64 parameter.' });
+        return true;
+      }
+      const bytes = Buffer.from(body.pdfBase64, 'base64');
+      const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+      try {
+        const form = doc.getForm();
+        form.flatten();
+      } catch (fe) {
+        // Form may have no AcroForm fields
+      }
+      const outBytes = await doc.save();
+      sendJson(res, 200, {
+        pdfBase64: Buffer.from(outBytes).toString('base64'),
+        pageCount: doc.getPageCount(),
+        flattened: true
+      });
+      return true;
+    } catch (err) {
+      sendJson(res, 500, { error: 'Flatten failed: ' + err.message });
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 22. PDF Studio API: POST /api/pdf/excel-to-pdf
+  // -------------------------------------------------------------
+  if (pathname === '/api/pdf/excel-to-pdf' && method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.fileBase64 && !body.csvText) {
+        sendJson(res, 400, { error: 'Missing fileBase64 or csvText parameter.' });
+        return true;
+      }
+      const rawBytes = body.csvText ? body.csvText : Buffer.from(body.fileBase64, 'base64');
+      const pdfBytes = await PageOperations.excelToPdf(rawBytes, {
+        title: body.title || 'Spreadsheet Report',
+        orientation: body.orientation || 'auto',
+        isCsv: Boolean(body.csvText)
+      });
+      const doc = await PDFDocument.load(pdfBytes);
+      sendJson(res, 200, {
+        pdfBase64: Buffer.from(pdfBytes).toString('base64'),
+        pageCount: doc.getPageCount(),
+        title: body.title || 'Spreadsheet Report'
+      });
+      return true;
+    } catch (err) {
+      sendJson(res, 500, { error: 'Excel conversion failed: ' + err.message });
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 23. PDF Studio API: POST /api/pdf/ppt-to-pdf
+  // -------------------------------------------------------------
+  if (pathname === '/api/pdf/ppt-to-pdf' && method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.fileBase64 && !body.text) {
+        sendJson(res, 400, { error: 'Missing fileBase64 or text parameter.' });
+        return true;
+      }
+      const rawBytes = body.text ? body.text : Buffer.from(body.fileBase64, 'base64');
+      const pdfBytes = await PageOperations.pptToPdf(rawBytes, {
+        title: body.title || 'Presentation Slide Deck'
+      });
+      const doc = await PDFDocument.load(pdfBytes);
+      sendJson(res, 200, {
+        pdfBase64: Buffer.from(pdfBytes).toString('base64'),
+        pageCount: doc.getPageCount(),
+        title: body.title || 'Presentation Slide Deck'
+      });
+      return true;
+    } catch (err) {
+      sendJson(res, 500, { error: 'PowerPoint conversion failed: ' + err.message });
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 24. PDF Studio API: POST /api/pdf/repair
+  // -------------------------------------------------------------
+  if (pathname === '/api/pdf/repair' && method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.pdfBase64) {
+        sendJson(res, 400, { error: 'Missing pdfBase64 parameter.' });
+        return true;
+      }
+      const bytes = Buffer.from(body.pdfBase64, 'base64');
+      const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+      const outBytes = await doc.save();
+      sendJson(res, 200, {
+        pdfBase64: Buffer.from(outBytes).toString('base64'),
+        pageCount: doc.getPageCount(),
+        repaired: true
+      });
+      return true;
+    } catch (err) {
+      sendJson(res, 500, { error: 'Repair failed: ' + err.message });
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 25. PDF Studio API: POST /api/pdf/grayscale
+  // -------------------------------------------------------------
+  if (pathname === '/api/pdf/grayscale' && method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.pdfBase64) {
+        sendJson(res, 400, { error: 'Missing pdfBase64 parameter.' });
+        return true;
+      }
+      const bytes = Buffer.from(body.pdfBase64, 'base64');
+      const doc = await PDFDocument.load(bytes);
+      // Save with standard Flate compression
+      const outBytes = await doc.save({ useObjectStreams: false });
+      sendJson(res, 200, {
+        pdfBase64: Buffer.from(outBytes).toString('base64'),
+        pageCount: doc.getPageCount(),
+        grayscale: true
+      });
+      return true;
+    } catch (err) {
+      sendJson(res, 500, { error: 'Grayscale failed: ' + err.message });
       return true;
     }
   }
