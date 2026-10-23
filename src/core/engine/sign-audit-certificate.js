@@ -23,7 +23,8 @@ export async function computeSha256Hex(bytes) {
 
   // Node.js test environment fallback
   try {
-    const nodeCrypto = await import('node:crypto');
+    const mod = 'node' + ':crypto';
+    const nodeCrypto = await import(/* @vite-ignore */ mod);
     return nodeCrypto.createHash('sha256').update(Buffer.from(u8)).digest('hex');
   } catch (e) {
     // Pure JS 64-char hex fallback

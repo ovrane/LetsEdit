@@ -10,12 +10,15 @@ import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
 import { compareModal } from '../compare-modal.js';
 import { mobilePairModal } from '../mobile-pair-modal.js';
+import { cloudPickerModal } from '../cloud-picker-modal.js';
 import { bindWorkspaceOptionsEvents } from './workspace-options-events.js';
 
 export function bindWorkspaceEvents(manager) {
   const backBtn = manager.container.querySelector('#btn-workspace-back');
   const logo = manager.container.querySelector('#workspace-brand-logo');
   const addMoreBtn = manager.container.querySelector('#btn-workspace-add-more');
+  const gdriveBtn = manager.container.querySelector('#btn-workspace-gdrive');
+  const dropboxBtn = manager.container.querySelector('#btn-workspace-dropbox');
   const addMoreInput = manager.container.querySelector('#workspace-add-more-input');
   const clearBtn = manager.container.querySelector('#btn-workspace-clear');
   const sortAzBtn = manager.container.querySelector('#btn-workspace-sort-az');
@@ -32,6 +35,26 @@ export function bindWorkspaceEvents(manager) {
       const files = Array.from(e.target.files);
       if (files.length > 0) await manager.handleIncomingFiles(files);
       addMoreInput.value = '';
+    };
+  }
+
+  if (gdriveBtn) {
+    gdriveBtn.onclick = () => {
+      cloudPickerModal.open('gdrive', {
+        onFilesSelected: async (files) => {
+          if (files && files.length > 0) await manager.handleIncomingFiles(files);
+        }
+      });
+    };
+  }
+
+  if (dropboxBtn) {
+    dropboxBtn.onclick = () => {
+      cloudPickerModal.open('dropbox', {
+        onFilesSelected: async (files) => {
+          if (files && files.length > 0) await manager.handleIncomingFiles(files);
+        }
+      });
     };
   }
 

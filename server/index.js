@@ -11,11 +11,13 @@ import { handleAuthRequest } from './routes/auth-routes.js';
 import { handlePdfRequest } from './routes/pdf-routes.js';
 import { handleMobilePairRequest, PAIRING_SESSIONS } from './routes/mobile-pair-routes.js';
 import { handleSignRequest, SIGNATURE_REQUESTS } from './routes/sign-request-routes.js';
+import { handleCloudStorageRequest, CLOUD_DRIVE_STORAGE } from './routes/cloud-storage-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
 export { PAIRING_SESSIONS } from './routes/mobile-pair-routes.js';
 export { SIGNATURE_REQUESTS } from './routes/sign-request-routes.js';
+export { CLOUD_DRIVE_STORAGE } from './routes/cloud-storage-routes.js';
 export { serveStatic } from './static.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -59,6 +61,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Multi-Signer Signature Request endpoints
   const signHandled = await handleSignRequest(req, res, pathname, method);
   if (signHandled) return true;
+
+  // Dispatch Cloud Storage (Google Drive & Dropbox) endpoints
+  const cloudHandled = await handleCloudStorageRequest(req, res, pathname, method);
+  if (cloudHandled) return true;
 
   return false;
 }

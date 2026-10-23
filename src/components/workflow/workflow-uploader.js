@@ -10,6 +10,7 @@ import { store } from '../../core/state-store.js';
 import { Toast } from '../toast.js';
 import { authModal } from '../auth-modal.js';
 import { mobilePairModal } from '../mobile-pair-modal.js';
+import { cloudPickerModal } from '../cloud-picker-modal.js';
 import { readFileAsArrayBuffer } from '../../utils/helpers.js';
 
 export function renderUploadPrompt(manager) {
@@ -65,6 +66,18 @@ export function renderUploadPrompt(manager) {
           </button>
           <span class="workflow-droptxt">${t.dropText}</span>
           <span class="workflow-format-chip">${t.badge}</span>
+        </div>
+
+        <div class="workflow-cloud-quick-actions" style="margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Or import from:</span>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-uploader-gdrive" title="Import from Google Drive" style="display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 12px; background: var(--bg-card);">
+            <svg width="15" height="15" viewBox="0 0 87.3 78" fill="none"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066da"/><path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.55h27.5L43.65 25z" fill="#00ac47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.9 10.2 7.85 13.6z" fill="#ea4335"/><path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.4-4.45 1.2L43.65 25z" fill="#00832d"/><path d="M59.8 48.55H27.5L13.75 72.35c1.35.8 2.9 1.25 4.5 1.25h50.8c1.6 0 3.15-.45 4.5-1.25L59.8 48.55z" fill="#2684fc"/><path d="M73.4 26.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.15 23.55h27.5c0-1.55-.4-3.1-1.2-4.5l-12.7-17.55z" fill="#ffba00"/></svg>
+            <span>Google Drive</span>
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-uploader-dropbox" title="Import from Dropbox" style="display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 12px; background: var(--bg-card);">
+            <svg width="15" height="15" fill="#0061ff" viewBox="0 0 24 24"><path d="M7.05 3.5L1.5 7.14l4.5 3.59 5.55-3.64-4.5-3.59zm9.9 0l-4.5 3.59 5.55 3.64 4.5-3.59-5.55-3.64zM1.5 14.33l5.55 3.64 4.5-3.59-5.55-3.64-4.5 3.59zm21 0l-4.5-3.59-5.55 3.64 4.5 3.59 5.55-3.64zM7.05 19.06l4.5 3.59 4.5-3.59-4.5-3.59-4.5 3.59z"/></svg>
+            <span>Dropbox</span>
+          </button>
         </div>
 
         ${['scan', 'images-to-pdf'].includes(t.id) ? `
@@ -182,6 +195,28 @@ export function bindUploadEvents(manager) {
             manager.stage = 'workspace';
             manager.render();
           }
+        }
+      });
+    };
+  }
+
+  const gdriveBtn = manager.container.querySelector('#btn-uploader-gdrive');
+  if (gdriveBtn) {
+    gdriveBtn.onclick = () => {
+      cloudPickerModal.open('gdrive', {
+        onFilesSelected: async (selectedFiles) => {
+          await handleIncomingFiles(manager, selectedFiles);
+        }
+      });
+    };
+  }
+
+  const dropboxBtn = manager.container.querySelector('#btn-uploader-dropbox');
+  if (dropboxBtn) {
+    dropboxBtn.onclick = () => {
+      cloudPickerModal.open('dropbox', {
+        onFilesSelected: async (selectedFiles) => {
+          await handleIncomingFiles(manager, selectedFiles);
         }
       });
     };

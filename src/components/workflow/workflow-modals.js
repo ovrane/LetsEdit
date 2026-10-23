@@ -5,6 +5,7 @@
 import { generateQrSvg } from '../../utils/helpers.js';
 import { store } from '../../core/state-store.js';
 import { Toast } from '../toast.js';
+import { CloudStorageService } from '../../core/cloud-storage.js';
 
 export function openMobileQrModal(manager) {
   if (!manager.processedBlob) return;
@@ -169,17 +170,52 @@ export function openCloudStorageModal(manager, provider = 'gdrive') {
   if (confirmBtn) {
     confirmBtn.onclick = async () => {
       confirmBtn.disabled = true;
-      confirmBtn.innerHTML = `<span>Saving...</span>`;
+      confirmBtn.innerHTML = `<span>Saving to ${providerName}...</span>`;
       statusBox.style.display = 'block';
+      statusBox.style.background = 'rgba(16, 185, 129, 0.08)';
+      statusBox.style.color = '#10b981';
       statusMsg.textContent = `Encrypting & uploading to ${providerName}...`;
 
-      setTimeout(() => {
-        statusMsg.textContent = `Successfully saved to ${providerName}!`;
-        Toast.success(`File successfully saved to your ${providerName} root folder.`);
-        setTimeout(() => {
-          closeModal();
-        }, 1200);
-      }, 900);
+      try {
+        const customFilename = modal.querySelector('#cloud-filename-input')?.value.trim() || filename;
+        const uploadRes = await CloudStorageService.uploadDocument(
+          provider,
+          manager.processedBlob,
+          customFilename,
+          `LetsEdit / ${new Date().getFullYear()} Exports`
+        );
+
+        statusBox.innerHTML = `
+          <div style="font-weight: 700; margin-bottom: 4px;">Successfully saved to ${providerName}!</div>
+          <div style="font-size: 11.5px; opacity: 0.9; margin-bottom: 8px;">Path: ${uploadRes.folder}/${uploadRes.file?.name || customFilename}</div>
+          <div style="display: flex; gap: 8px; justify-content: center; margin-top: 6px;">
+            <a href="${uploadRes.shareUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline" style="background: white; text-decoration: none;">View in Cloud</a>
+            <button type="button" class="btn btn-xs btn-outline" id="btn-copy-cloud-share" style="background: white;">Copy Share Link</button>
+          </div>
+        `;
+
+        const copyShareBtn = modal.querySelector('#btn-copy-cloud-share');
+        if (copyShareBtn) {
+          copyShareBtn.onclick = async () => {
+            try {
+              if (navigator.clipboard) await navigator.clipboard.writeText(uploadRes.shareUrl);
+              Toast.success('Direct share link copied!');
+            } catch {
+              Toast.info('Link: ' + uploadRes.shareUrl);
+            }
+          };
+        }
+
+        Toast.success(`Successfully saved to your ${providerName}!`);
+        confirmBtn.innerHTML = `<span>Saved</span>`;
+      } catch (err) {
+        statusBox.style.background = 'rgba(239, 68, 68, 0.08)';
+        statusBox.style.color = '#ef4444';
+        statusMsg.textContent = `Upload failed: ${err.message}`;
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = `<span>Retry Save</span>`;
+        Toast.error(err.message);
+      }
     };
   }
 }
