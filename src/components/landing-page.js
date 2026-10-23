@@ -739,7 +739,12 @@ export class LandingPage {
     if (landingAuthBtn) {
       landingAuthBtn.onclick = (e) => {
         e.stopPropagation();
-        authModal.toggleAccountMenu(landingAuthBtn);
+        const user = store.getState().user;
+        if (user) {
+          authModal.toggleAccountMenu(landingAuthBtn);
+        } else {
+          router.navigate('/login');
+        }
       };
     }
 
@@ -747,7 +752,7 @@ export class LandingPage {
     if (landingSignupBtn) {
       landingSignupBtn.onclick = (e) => {
         e.stopPropagation();
-        authModal.open('register');
+        router.navigate('/register');
       };
     }
     authModal.updateAllUserWidgets(store.getState().user);

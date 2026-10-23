@@ -165,10 +165,20 @@ describe('iLovePDF-Compatible Router Engine Tests', () => {
     assert.equal(login.canonicalPath, '/login');
     assert.equal(login.isLogin, true);
 
-    for (const alias of ['/signin', '/sign-in', '/register', '/signup']) {
+    for (const alias of ['/signin', '/sign-in']) {
       const match = router.match(alias);
       assert.equal(match.canonicalPath, '/login');
       assert.equal(match.isLogin, true);
+    }
+
+    const reg = router.match('/register');
+    assert.equal(reg.canonicalPath, '/register');
+    assert.equal(reg.isRegister, true);
+
+    for (const alias of ['/signup', '/sign-up']) {
+      const match = router.match(alias);
+      assert.equal(match.canonicalPath, '/register');
+      assert.equal(match.isRegister, true);
     }
   });
 

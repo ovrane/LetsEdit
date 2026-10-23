@@ -1440,7 +1440,8 @@ body:not(.sidebar-open) .app-sidebar {
 }
 
 /* Cloudflare Turnstile Simulation Widget */
-.turnstile-box {
+.turnstile-box,
+.turnstile-mock-box {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -1451,7 +1452,8 @@ body:not(.sidebar-open) .app-sidebar {
   margin-bottom: 16px;
 }
 
-.turnstile-check-label {
+.turnstile-check-label,
+.turnstile-label {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1461,11 +1463,13 @@ body:not(.sidebar-open) .app-sidebar {
   color: var(--text-main);
 }
 
-.turnstile-check-label input {
+.turnstile-check-label input,
+.turnstile-label input {
   display: none;
 }
 
-.turnstile-custom-box {
+.turnstile-custom-box,
+.turnstile-check {
   width: 24px;
   height: 24px;
   border: 2px solid var(--border-strong);
@@ -1476,12 +1480,14 @@ body:not(.sidebar-open) .app-sidebar {
   transition: var(--transition);
 }
 
-.turnstile-check-label input:checked + .turnstile-custom-box {
+.turnstile-check-label input:checked + .turnstile-custom-box,
+.turnstile-label input:checked + .turnstile-check {
   background: #10b981;
   border-color: #10b981;
 }
 
-.turnstile-check-label input:checked + .turnstile-custom-box:after {
+.turnstile-check-label input:checked + .turnstile-custom-box:after,
+.turnstile-label input:checked + .turnstile-check:after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -1491,7 +1497,8 @@ body:not(.sidebar-open) .app-sidebar {
   font-size: 14px;
 }
 
-.turnstile-badge {
+.turnstile-badge,
+.turnstile-branding {
   text-align: right;
   font-size: 10px;
   color: var(--text-muted);
@@ -1499,7 +1506,8 @@ body:not(.sidebar-open) .app-sidebar {
   flex-direction: column;
 }
 
-.turnstile-badge span {
+.turnstile-badge span,
+.turnstile-branding span {
   font-weight: 700;
   color: #f97316;
 }

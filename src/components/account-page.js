@@ -532,10 +532,11 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
               <label class="turnstile-label">
                 <input type="checkbox" id="chk-full-turnstile" checked />
                 <span class="turnstile-check"></span>
-                <span>I am human (Cloudflare Turnstile Verified)</span>
+                <span>I am human</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#f38020"><path d="M18.8 12.8c-.2-1.8-1.5-3.3-3.2-3.8-.4-2.8-2.8-5-5.6-5-2.6 0-4.8 1.8-5.4 4.3C2 8.7 0 11 0 13.8 0 17 2.6 19.6 5.8 19.6h12.5c2.6 0 4.7-2.1 4.7-4.7 0-1-.3-1.8-1-2.5l-3.2.4z"/></svg>
+
               </label>
               <div class="turnstile-branding">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#f38020"><path d="M18.8 12.8c-.2-1.8-1.5-3.3-3.2-3.8-.4-2.8-2.8-5-5.6-5-2.6 0-4.8 1.8-5.4 4.3C2 8.7 0 11 0 13.8 0 17 2.6 19.6 5.8 19.6h12.5c2.6 0 4.7-2.1 4.7-4.7 0-1-.3-1.8-1-2.5l-3.2.4z"/></svg>
                 <span>Privacy • Terms</span>
               </div>
             </div>
@@ -579,6 +580,10 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
       tabSignIn.onclick = () => {
         this.authMode = 'login';
         this.renderFullPageAuth();
+        if (typeof window !== 'undefined') {
+          window.history.pushState({ path: '/login' }, '', '/login');
+          document.title = 'Sign in to LetsEdit — Fast & Secure PDF Tools';
+        }
       };
     }
 
@@ -587,6 +592,10 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
       tabReg.onclick = () => {
         this.authMode = 'register';
         this.renderFullPageAuth();
+        if (typeof window !== 'undefined') {
+          window.history.pushState({ path: '/register' }, '', '/register');
+          document.title = 'Create Free Account — LetsEdit';
+        }
       };
     }
 
