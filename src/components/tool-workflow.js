@@ -99,14 +99,18 @@ export class ToolWorkflowManager {
     this.unlockPassword = '';
     this.renameCustomName = '';
 
-    // Sign options
     this.signMode = 'draw'; // 'draw' | 'type' | 'upload'
     this.signName = 'Authorized Signature';
+    this.signEmail = '';
     this.signFont = 'Caveat';
     this.signDataUrl = null;
     this.signDate = new Date().toISOString().split('T')[0];
     this.includeSignDate = true;
     this.signPos = 'bottom-right';
+    this.appendAuditCertificate = true;
+    this.embedSignBadge = true;
+    this.lastAuditRecord = null;
+    this.standaloneAuditPdfBytes = null;
 
     // Page Numbers options
     this.pnFormat = 'Page {n} of {total}';

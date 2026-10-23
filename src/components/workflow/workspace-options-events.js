@@ -488,6 +488,27 @@ export function bindWorkspaceOptionsEvents(manager) {
     };
   }
 
+  const signEmailInp = manager.container.querySelector('#workflow-sign-email');
+  if (signEmailInp) {
+    signEmailInp.oninput = (e) => {
+      manager.signEmail = e.target.value.trim();
+    };
+  }
+
+  const appendAuditCertCheck = manager.container.querySelector('#chk-append-audit-cert');
+  if (appendAuditCertCheck) {
+    appendAuditCertCheck.onchange = (e) => {
+      manager.appendAuditCertificate = e.target.checked;
+    };
+  }
+
+  const embedSignBadgeCheck = manager.container.querySelector('#chk-embed-sign-badge');
+  if (embedSignBadgeCheck) {
+    embedSignBadgeCheck.onchange = (e) => {
+      manager.embedSignBadge = e.target.checked;
+    };
+  }
+
   // Page Numbers Tool Controls
   const pnFmtInp = manager.container.querySelector('#workflow-pn-format');
   const pnFmtPresets = manager.container.querySelectorAll('.btn-pn-preset');

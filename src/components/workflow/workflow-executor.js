@@ -767,12 +767,27 @@ export async function executeAction(manager) {
         isPng: true,
         position: manager.signPos,
         dateText: manager.includeSignDate ? manager.signDate : '',
+        signerName: manager.signName || 'Authorized Signer',
+        signerEmail: manager.signEmail || '',
+        appendAuditCertificate: manager.appendAuditCertificate !== false,
+        embedBadge: manager.embedSignBadge !== false,
         targetPage: (primary.pageCount || 1) - 1,
         width: 160,
         height: 56
       });
       manager.processedBlob = new Blob([signedBytes], { type: 'application/pdf' });
       manager.processedFilename = `Signed_${primary.name}`;
+      manager.lastAuditRecord = signedBytes.auditRecord || null;
+      if (manager.lastAuditRecord) {
+        try {
+          manager.standaloneAuditPdfBytes = await PageOperations.generateAuditCertificate(manager.lastAuditRecord, {
+            signatureBytes: sigBytes,
+            isPng: true
+          });
+        } catch (err) {
+          console.warn('[WorkflowExecutor] Standalone audit cert generation failed:', err);
+        }
+      }
     } else if (t.id === 'ocr-pdf') {
       const ocrResult = await pdfEngine.applyOcr(primary.bytes, {
         language: manager.ocrLang || 'eng',

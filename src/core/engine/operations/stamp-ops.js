@@ -4,8 +4,21 @@
  */
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import {
+  buildAuditRecord,
+  renderAuditCertificatePage,
+  generateStandaloneAuditCertificatePdf,
+  computeSha256Hex
+} from '../sign-audit-certificate.js';
 
 export class StampOps {
+  /**
+   * Generates a standalone PDF document containing the legal Electronic Signature Audit Certificate.
+   */
+  static async generateAuditCertificate(auditRecord, options = {}) {
+    return await generateStandaloneAuditCertificatePdf(auditRecord, options);
+  }
+
   /**
    * Stamps legal Bates numbering sequentially across all document pages.
    */
@@ -150,6 +163,16 @@ export class StampOps {
       }
     }
 
+    const auditRecord = await buildAuditRecord({
+      documentName: options.documentName || 'Document.pdf',
+      originalBytes: rawBytes,
+      signatureImageBytes: imageBytes,
+      signerName: options.signerName || 'Authorized Signer',
+      signerEmail: options.signerEmail || 'signer@letsedit.dev',
+      signatureType: options.signatureType || (options.isTyped ? 'Typewritten Calligraphy Signature' : 'Electronic Touch / Ink Signature'),
+      signingDate: options.dateText || new Date()
+    });
+
     for (let i = 0; i < numPages; i++) {
       const [page] = await finalDoc.copyPages(sourceDoc, [i]);
       const shouldSign = options.applyToAll ? true : (i === targetPage);
@@ -184,11 +207,43 @@ export class StampOps {
             color: rgb(0.35, 0.35, 0.35)
           });
         }
+
+        if (options.embedBadge) {
+          const badgeText = `[VERIFIED] eIDAS Verified | ID: ${auditRecord.transactionId} | SHA: ${auditRecord.originalHash.substring(0, 10)}...`;
+          const bWidth = helvetica.widthOfTextAtSize(badgeText, 6.5);
+          const bY = dateText ? Math.max(4, sigY - 26) : Math.max(4, sigY - 14);
+          page.drawRectangle({
+            x: sigX + (signWidth - bWidth) / 2 - 4,
+            y: bY - 2,
+            width: bWidth + 8,
+            height: 10,
+            color: rgb(0.96, 0.98, 0.99),
+            borderColor: rgb(0.02, 0.6, 0.35),
+            borderWidth: 0.5
+          });
+          page.drawText(badgeText, {
+            x: sigX + (signWidth - bWidth) / 2,
+            y: bY,
+            size: 6.5,
+            font: helvetica,
+            color: rgb(0.02, 0.45, 0.25)
+          });
+        }
       }
 
       finalDoc.addPage(page);
     }
 
-    return await finalDoc.save();
+    if (options.appendAuditCertificate) {
+      await renderAuditCertificatePage(finalDoc, auditRecord, {
+        signatureBytes: imageBytes,
+        isPng
+      });
+    }
+
+    const savedBytes = await finalDoc.save();
+    auditRecord.signedHash = await computeSha256Hex(savedBytes);
+    savedBytes.auditRecord = auditRecord;
+    return savedBytes;
   }
 }

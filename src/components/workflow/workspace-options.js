@@ -762,6 +762,37 @@
             </div>
             <input type="checkbox" id="chk-include-sign-date" ${instance.includeSignDate ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer;" />
           </div>
+
+          <div style="margin-top: 14px;">
+            <label class="workflow-options-label">Signer Email (Audit Record)</label>
+            <input type="email" id="workflow-sign-email" class="input-sm" placeholder="signer@example.com" value="${instance.signEmail || ''}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-size: 12px;" />
+          </div>
+
+          <div style="margin-top: 14px; padding: 12px; background: rgba(48, 5, 13, 0.04); border: 1px solid rgba(48, 5, 13, 0.15); border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #30050d; color: #fff; font-size: 11px;">🔒</span>
+              <strong style="font-size: 12px; color: #30050d;">eIDAS & ESIGN Cryptographic Audit</strong>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 10px 0; line-height: 1.4;">
+              Generates SHA-256 tamper-evident integrity hashes, legal transaction IDs, and vector verification QR codes.
+            </p>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-top: 1px dashed rgba(48, 5, 13, 0.1);">
+              <div>
+                <strong style="font-size: 12px; display: block; color: var(--text-main);">Append Audit Sheet to PDF</strong>
+                <span style="font-size: 10.5px; color: var(--text-muted);">Adds official 1-page certificate to document</span>
+              </div>
+              <input type="checkbox" id="chk-append-audit-cert" ${instance.appendAuditCertificate !== false ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-top: 1px dashed rgba(48, 5, 13, 0.1); margin-top: 4px;">
+              <div>
+                <strong style="font-size: 12px; display: block; color: var(--text-main);">Embed Tamper Badge</strong>
+                <span style="font-size: 10.5px; color: var(--text-muted);">Displays verified seal under signature</span>
+              </div>
+              <input type="checkbox" id="chk-embed-sign-badge" ${instance.embedSignBadge !== false ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer;" />
+            </div>
+          </div>
         </div>
       `;
     }

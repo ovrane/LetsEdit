@@ -47,4 +47,5 @@ export class PageOperations {
   static batesNumberPdf(...args) { return StampOps.batesNumberPdf(...args); }
   static addPageNumbers(...args) { return StampOps.addPageNumbers(...args); }
   static signPdf(...args) { return StampOps.signPdf(...args); }
+  static generateAuditCertificate(...args) { return StampOps.generateAuditCertificate(...args); }
 }

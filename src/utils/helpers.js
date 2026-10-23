@@ -83,10 +83,10 @@ export function formatFileSize(bytes) {
 export const formatBytes = formatFileSize;
 
 /**
- * Deterministic SVG QR Code Generator (Zero External Dependencies)
- * Generates valid vector QR pattern with standard finder markers, timing lines, and quiet zones.
+ * Deterministic 25x25 QR Matrix Generator (Zero External Dependencies)
+ * Returns a 25x25 boolean grid representing dark and light modules.
  */
-export function generateQrSvg(text = '', displaySize = 180) {
+export function generateQrMatrix(text = '') {
   const N = 25; // Standard 25x25 QR Matrix
   const grid = Array.from({ length: N }, () => Array(N).fill(false));
   const reserved = Array.from({ length: N }, () => Array(N).fill(false));
@@ -163,6 +163,16 @@ export function generateQrSvg(text = '', displaySize = 180) {
     }
   }
 
+  return grid;
+}
+
+/**
+ * Deterministic SVG QR Code Generator (Zero External Dependencies)
+ * Generates valid vector QR pattern with standard finder markers, timing lines, and quiet zones.
+ */
+export function generateQrSvg(text = '', displaySize = 180) {
+  const grid = generateQrMatrix(text);
+  const N = grid.length;
   let paths = '';
   for (let r = 0; r < N; r++) {
     for (let c = 0; c < N; c++) {

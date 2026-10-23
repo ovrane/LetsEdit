@@ -10,6 +10,7 @@ import { openMobileQrModal, openCloudStorageModal } from './workflow-modals.js';
 import { compareModal } from '../compare-modal.js';
 import { Toast } from '../toast.js';
 import { downloadBlob, formatFileSize } from '../../utils/helpers.js';
+import { PageOperations } from '../../core/engine/page-ops.js';
 
 export function renderSuccessScreen(manager) {
   const t = manager.activeTool;
@@ -172,6 +173,54 @@ export function renderSuccessScreen(manager) {
           </div>
         ` : ''}
 
+        ${t.id === 'sign' && manager.lastAuditRecord ? `
+          <div class="sign-audit-trail-card" style="background: rgba(48, 5, 13, 0.04); border: 1.5px solid rgba(48, 5, 13, 0.18); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #30050d;">
+                <svg width="18" height="18" fill="none" stroke="#30050d" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>eIDAS & ESIGN Cryptographic Audit Trail</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #10b981; color: white; padding: 2px 8px; border-radius: 12px;">
+                Verified & Tamper-Evident
+              </span>
+            </div>
+
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.4;">
+              Digital signature was cryptographically sealed with an immutable SHA-256 integrity hash, legal transaction ID, and vector verification QR code.
+            </p>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 11px; font-family: monospace;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="color: var(--text-muted);">Transaction ID:</span>
+                <strong style="color: var(--text-main);">${manager.lastAuditRecord.transactionId}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="color: var(--text-muted);">Signer:</span>
+                <span style="color: var(--text-main); font-weight: 600;">${manager.lastAuditRecord.signerName}${manager.lastAuditRecord.signerEmail ? ` &lt;${manager.lastAuditRecord.signerEmail}&gt;` : ''}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-muted);">Doc SHA-256:</span>
+                <span style="color: var(--text-main); font-size: 10px; max-width: 220px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="${manager.lastAuditRecord.originalHash}">
+                  ${manager.lastAuditRecord.originalHash.substring(0, 16)}...${manager.lastAuditRecord.originalHash.slice(-8)}
+                </span>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-copy-sign-hash" style="flex: 1; min-width: 130px; justify-content: center; gap: 6px; font-weight: 600; font-size: 11.5px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy SHA-256 Hash</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-download-audit-cert" style="flex: 1; min-width: 150px; justify-content: center; gap: 6px; font-weight: 600; font-size: 11.5px; background: rgba(48, 5, 13, 0.05); color: #30050d; border-color: rgba(48, 5, 13, 0.2);">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Download Audit Sheet (.PDF)</span>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
         <!-- Primary Download Button -->
         <button class="workflow-primary-cta" id="btn-success-download" style="background: ${t.color}; width: 100%; justify-content: center; font-size: 16px; padding: 14px 20px;">
           <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
@@ -299,6 +348,38 @@ export function bindSuccessEvents(manager) {
         const textBlob = new Blob([manager.lastOcrResult.fullText], { type: 'text/plain;charset=utf-8' });
         downloadBlob(textBlob, `${(manager.processedFilename || 'document').replace(/\.[^/.]+$/, '')}_transcript.txt`);
         Toast.success('Downloaded transcript TXT file!');
+      }
+    };
+  }
+
+  const copySignHashBtn = manager.container.querySelector('#btn-copy-sign-hash');
+  if (copySignHashBtn) {
+    copySignHashBtn.onclick = () => {
+      if (manager.lastAuditRecord?.originalHash) {
+        navigator.clipboard.writeText(manager.lastAuditRecord.originalHash);
+        Toast.success('Cryptographic SHA-256 hash copied to clipboard!');
+      }
+    };
+  }
+
+  const downloadAuditCertBtn = manager.container.querySelector('#btn-download-audit-cert');
+  if (downloadAuditCertBtn) {
+    downloadAuditCertBtn.onclick = async () => {
+      if (manager.standaloneAuditPdfBytes) {
+        const certBlob = new Blob([manager.standaloneAuditPdfBytes], { type: 'application/pdf' });
+        const certName = `Audit_Certificate_${manager.lastAuditRecord?.transactionId || 'Record'}.pdf`;
+        downloadBlob(certBlob, certName);
+        Toast.success('Downloaded legal audit certificate!');
+      } else if (manager.lastAuditRecord) {
+        try {
+          const certBytes = await PageOperations.generateAuditCertificate(manager.lastAuditRecord);
+          const certBlob = new Blob([certBytes], { type: 'application/pdf' });
+          const certName = `Audit_Certificate_${manager.lastAuditRecord.transactionId || 'Record'}.pdf`;
+          downloadBlob(certBlob, certName);
+          Toast.success('Downloaded legal audit certificate!');
+        } catch (err) {
+          Toast.error('Failed to generate audit certificate: ' + err.message);
+        }
       }
     };
   }
