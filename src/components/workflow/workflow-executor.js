@@ -137,11 +137,16 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([text], { type: 'text/plain;charset=utf-8' })
     };
   } else if (id === 'ocr-pdf') {
-    const ocrBytes = await pdfEngine.applyOcr(primary.bytes, { lang: manager.ocrLang });
+    const ocrResult = await pdfEngine.applyOcr(primary.bytes, {
+      language: manager.ocrLang || 'eng',
+      pageRange: manager.ocrPageRange || 'all'
+    });
+    const ocrBytes = ocrResult.pdfBytes || ocrResult;
     return {
-      name: `Searchable_OCR_${primary.name}`,
+      name: `Searchable_OCR_${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
       bytes: ocrBytes,
-      blob: new Blob([ocrBytes], { type: 'application/pdf' })
+      blob: new Blob([ocrBytes], { type: 'application/pdf' }),
+      ocrResult
     };
   } else if (id === 'deskew') {
     const deskewedBytes = await PageOperations.deskewPdf(primary.bytes, manager.deskewAngle);
@@ -695,11 +700,26 @@ export async function executeAction(manager) {
       });
       manager.processedBlob = new Blob([signedBytes], { type: 'application/pdf' });
       manager.processedFilename = `Signed_${primary.name}`;
+    } else if (t.id === 'ocr-pdf') {
+      const ocrResult = await pdfEngine.applyOcr(primary.bytes, {
+        language: manager.ocrLang || 'eng',
+        pageRange: manager.ocrPageRange || 'all',
+        onProgress: (p) => {
+          if (execBtn) {
+            execBtn.innerHTML = `<span>OCR Page ${p.page}/${p.totalPages} (${p.progress}%)</span>`;
+          }
+        }
+      });
+      const ocrBytes = ocrResult.pdfBytes || ocrResult;
+      manager.processedBlob = new Blob([ocrBytes], { type: 'application/pdf' });
+      manager.processedFilename = `Searchable_OCR_${primary.name.replace(/\.[^/.]+$/, '')}.pdf`;
+      manager.lastOcrResult = ocrResult;
     } else {
       const res = await processSingleDocument(manager, t, primary);
       manager.processedBlob = res.blob || new Blob([res.bytes], { type: 'application/pdf' });
       manager.processedFilename = res.name;
       manager.lastOperationMetrics = res.metrics || null;
+      if (res.ocrResult) manager.lastOcrResult = res.ocrResult;
     }
 
     manager.stage = 'complete';

@@ -321,15 +321,35 @@
       return `
         <div class="workflow-options-group">
           <label class="workflow-options-label">Recognition Language</label>
-          <select id="ocr-lang-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
+          <select id="ocr-lang-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
             <option value="eng" ${instance.ocrLang === 'eng' ? 'selected' : ''}>English (Standard)</option>
             <option value="spa" ${instance.ocrLang === 'spa' ? 'selected' : ''}>Spanish (Español)</option>
             <option value="fra" ${instance.ocrLang === 'fra' ? 'selected' : ''}>French (Français)</option>
             <option value="deu" ${instance.ocrLang === 'deu' ? 'selected' : ''}>German (Deutsch)</option>
             <option value="ita" ${instance.ocrLang === 'ita' ? 'selected' : ''}>Italian (Italiano)</option>
+            <option value="por" ${instance.ocrLang === 'por' ? 'selected' : ''}>Portuguese (Português)</option>
+            <option value="chi_sim" ${instance.ocrLang === 'chi_sim' ? 'selected' : ''}>Chinese Simplified (中文简体)</option>
+            <option value="jpn" ${instance.ocrLang === 'jpn' ? 'selected' : ''}>Japanese (日本語)</option>
+            <option value="rus" ${instance.ocrLang === 'rus' ? 'selected' : ''}>Russian (Русский)</option>
+            <option value="ara" ${instance.ocrLang === 'ara' ? 'selected' : ''}>Arabic (العربية)</option>
           </select>
-          <div style="background: var(--bg-surface); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 10px;">
-            Generates an invisible selectable vector text layer on top of scanned bitmaps.
+
+          <label class="workflow-options-label">Page Range</label>
+          <select id="ocr-range-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="all" ${(instance.ocrPageRange || 'all') === 'all' ? 'selected' : ''}>All Document Pages</option>
+            <option value="1" ${instance.ocrPageRange === '1' ? 'selected' : ''}>First Page Only</option>
+            <option value="custom" ${instance.ocrPageRange && instance.ocrPageRange !== 'all' && instance.ocrPageRange !== '1' ? 'selected' : ''}>Custom Range (e.g. 1-3)</option>
+          </select>
+
+          <div id="ocr-custom-range-wrap" style="display: ${instance.ocrPageRange && instance.ocrPageRange !== 'all' && instance.ocrPageRange !== '1' ? 'block' : 'none'}; margin-bottom: 12px;">
+            <input type="text" id="ocr-custom-range-input" class="input-sm" placeholder="e.g. 1-2, 4" value="${instance.ocrPageRange && instance.ocrPageRange !== 'all' && instance.ocrPageRange !== '1' ? instance.ocrPageRange : ''}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
+          </div>
+
+          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            <div style="font-weight: 600; color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              <span>⚡ WebAssembly OCR Engine</span>
+            </div>
+            Extracts character bounding boxes directly in your browser and injects an invisible vector text layer (ISO 32000-1 mode 3 Tr) over the scanned image. 100% private.
           </div>
         </div>
       `;

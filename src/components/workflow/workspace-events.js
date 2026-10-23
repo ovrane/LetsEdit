@@ -325,10 +325,30 @@ export function bindWorkspaceEvents(manager) {
     };
   }
 
-  // OCR language select
+  // OCR language & page range select
   const ocrLangSel = manager.container.querySelector('#ocr-lang-select');
   if (ocrLangSel) {
     ocrLangSel.onchange = (e) => { manager.ocrLang = e.target.value; };
+  }
+  const ocrRangeSel = manager.container.querySelector('#ocr-range-select');
+  const ocrCustomWrap = manager.container.querySelector('#ocr-custom-range-wrap');
+  const ocrCustomInp = manager.container.querySelector('#ocr-custom-range-input');
+  if (ocrRangeSel) {
+    ocrRangeSel.onchange = (e) => {
+      const val = e.target.value;
+      if (val === 'custom') {
+        if (ocrCustomWrap) ocrCustomWrap.style.display = 'block';
+        manager.ocrPageRange = ocrCustomInp ? ocrCustomInp.value.trim() : '1';
+      } else {
+        if (ocrCustomWrap) ocrCustomWrap.style.display = 'none';
+        manager.ocrPageRange = val;
+      }
+    };
+  }
+  if (ocrCustomInp) {
+    ocrCustomInp.oninput = (e) => {
+      manager.ocrPageRange = e.target.value.trim();
+    };
   }
 
   // Deskew controls

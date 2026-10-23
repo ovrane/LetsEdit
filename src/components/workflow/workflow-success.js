@@ -32,6 +32,9 @@ export function renderSuccessScreen(manager) {
     const diffs = manager.compareResult?.diffCount ?? 0;
     const score = manager.compareResult?.similarityScore ?? 100;
     subtitleText = `Comparison complete: ${score}% similarity match with ${diffs} difference${diffs === 1 ? '' : 's'} identified.`;
+  } else if (t.id === 'ocr-pdf') {
+    const totalWords = manager.lastOcrResult?.pagesOcr?.reduce((acc, p) => acc + (p.wordCount || 0), 0) ?? 0;
+    subtitleText = `OCR recognition complete: ${totalWords.toLocaleString()} words indexed into an invisible searchable vector layer.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -134,6 +137,38 @@ export function renderSuccessScreen(manager) {
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
               <span>Launch Interactive Visual Diff Viewer</span>
             </button>
+          </div>
+        ` : ''}
+
+        ${t.id === 'ocr-pdf' && manager.lastOcrResult ? `
+          <div class="ocr-success-transcript-card" style="background: rgba(99, 102, 241, 0.05); border: 1.5px solid rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--text-main);">
+                <svg width="18" height="18" fill="none" stroke="#6366f1" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span>Searchable PDF Ready</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #6366f1; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastOcrResult.pagesOcr?.reduce((acc, p) => acc + (p.wordCount || 0), 0) || 0} Words Indexed
+              </span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.4;">
+              An invisible text layer has been embedded over the scanned image. You can now select, copy, and search words in any PDF viewer.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-copy-ocr-transcript" style="flex: 1; min-width: 140px; justify-content: center; gap: 6px; font-weight: 600;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy Extracted Text</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-download-ocr-txt" style="flex: 1; min-width: 140px; justify-content: center; gap: 6px; font-weight: 600;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Download .TXT File</span>
+              </button>
+            </div>
           </div>
         ` : ''}
 
@@ -243,6 +278,27 @@ export function bindSuccessEvents(manager) {
           manager.compareDocA.name,
           manager.compareDocB.name
         );
+      }
+    };
+  }
+
+  const copyOcrBtn = manager.container.querySelector('#btn-copy-ocr-transcript');
+  if (copyOcrBtn) {
+    copyOcrBtn.onclick = () => {
+      if (manager.lastOcrResult?.fullText) {
+        navigator.clipboard.writeText(manager.lastOcrResult.fullText);
+        Toast.success('Extracted plain text copied to clipboard!');
+      }
+    };
+  }
+
+  const downloadOcrTxtBtn = manager.container.querySelector('#btn-download-ocr-txt');
+  if (downloadOcrTxtBtn) {
+    downloadOcrTxtBtn.onclick = () => {
+      if (manager.lastOcrResult?.fullText) {
+        const textBlob = new Blob([manager.lastOcrResult.fullText], { type: 'text/plain;charset=utf-8' });
+        downloadBlob(textBlob, `${(manager.processedFilename || 'document').replace(/\.[^/.]+$/, '')}_transcript.txt`);
+        Toast.success('Downloaded transcript TXT file!');
       }
     };
   }

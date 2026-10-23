@@ -56,6 +56,8 @@ export class OcrModal {
                 <option value="por">Portuguese (Português)</option>
                 <option value="chi_sim">Chinese Simplified (中文)</option>
                 <option value="jpn">Japanese (日本語)</option>
+                <option value="rus">Russian (Русский)</option>
+                <option value="ara">Arabic (العربية)</option>
               </select>
             </div>
 

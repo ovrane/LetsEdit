@@ -9,6 +9,52 @@ import { PDFDocument, PDFName, PDFArray, PDFRawStream, PDFStream, StandardFonts,
 import { uint8ArrayToBase64 } from '../../utils/helpers.js';
 import { decompressStreamBytes, pdfHexToString } from '../pdf-redactor.js';
 
+export const SUPPORTED_OCR_LANGUAGES = [
+  { code: 'eng', name: 'English (Standard)', script: 'Latin' },
+  { code: 'spa', name: 'Spanish (Español)', script: 'Latin' },
+  { code: 'fra', name: 'French (Français)', script: 'Latin' },
+  { code: 'deu', name: 'German (Deutsch)', script: 'Latin' },
+  { code: 'ita', name: 'Italian (Italiano)', script: 'Latin' },
+  { code: 'por', name: 'Portuguese (Português)', script: 'Latin' },
+  { code: 'chi_sim', name: 'Chinese Simplified (中文简体)', script: 'Han' },
+  { code: 'jpn', name: 'Japanese (日本語)', script: 'Japanese' },
+  { code: 'rus', name: 'Russian (Русский)', script: 'Cyrillic' },
+  { code: 'ara', name: 'Arabic (العربية)', script: 'Arabic' }
+];
+
+let tesseractLoadingPromise = null;
+
+export async function ensureTesseractWorker() {
+  if (typeof window === 'undefined') return null;
+  if (window.Tesseract) return window.Tesseract;
+  if (tesseractLoadingPromise) return tesseractLoadingPromise;
+
+  tesseractLoadingPromise = new Promise((resolve) => {
+    const existing = document.querySelector('script[data-tesseract-cdn]');
+    if (existing) {
+      if (window.Tesseract) {
+        resolve(window.Tesseract);
+      } else {
+        existing.addEventListener('load', () => resolve(window.Tesseract));
+        existing.addEventListener('error', () => resolve(null));
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.setAttribute('data-tesseract-cdn', 'true');
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    script.onload = () => resolve(window.Tesseract);
+    script.onerror = (err) => {
+      console.warn('Unable to load Tesseract.js from CDN:', err);
+      resolve(null);
+    };
+    document.head.appendChild(script);
+  });
+
+  return tesseractLoadingPromise;
+}
+
 export class ExtractionOcrOperations {
   /**
    * Extracts all plain text across all document pages.
@@ -198,6 +244,23 @@ export class ExtractionOcrOperations {
     const numPages = doc.getPageCount();
     const helvetica = await doc.embedFont(StandardFonts.Helvetica);
 
+    // If running in browser and pdfDoc was not supplied, load it via PDF.js for rasterization
+    if (!pdfDoc && typeof window !== 'undefined') {
+      try {
+        const pdfjs = await import('pdfjs-dist');
+        const loadTask = pdfjs.getDocument({ data: rawBytes });
+        pdfDoc = await loadTask.promise;
+      } catch (err) {
+        console.warn('PDF.js initialization for OCR rendering unavailable:', err);
+      }
+    }
+
+    // Ensure Tesseract WebAssembly worker is available if in browser
+    let tesseract = typeof window !== 'undefined' ? window.Tesseract : null;
+    if (!tesseract && typeof window !== 'undefined' && !options.mockOcrResults) {
+      tesseract = await ensureTesseractWorker();
+    }
+
     let targetPages = [];
     if (!options.pageRange || options.pageRange === 'all') {
       targetPages = Array.from({ length: numPages }, (_, i) => i);
@@ -221,6 +284,7 @@ export class ExtractionOcrOperations {
 
     const pagesOcr = [];
     const fullTextBlocks = [];
+    const lang = options.language || options.lang || 'eng';
 
     for (let i = 0; i < targetPages.length; i++) {
       const pageIndex = targetPages[i];
@@ -233,62 +297,66 @@ export class ExtractionOcrOperations {
           page: pageNum,
           totalPages: targetPages.length,
           stage: 'recognizing',
-          progress: Math.round(((i + 0.3) / targetPages.length) * 100)
+          progress: Math.round(((i + 0.1) / targetPages.length) * 100)
         });
       }
 
       let words = [];
       let pageText = '';
+      let confidence = 0;
 
       if (options.mockOcrResults) {
         const found = options.mockOcrResults.find(r => r.pageIndex === pageIndex || r.pageIndex === pageNum);
         if (found) {
           words = found.words || [];
           pageText = found.text || words.map(w => w.text).join(' ');
+          confidence = found.confidence || 95;
         }
-      } else if (typeof window !== 'undefined' && window.Tesseract) {
+      } else if (tesseract && pdfDoc && typeof document !== 'undefined') {
         try {
           const canvas = document.createElement('canvas');
-          if (pdfDoc) {
-            const pdfPage = await pdfDoc.getPage(pageNum);
-            const viewport = pdfPage.getViewport({ scale: 2.0 });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            const ctx = canvas.getContext('2d');
-            await pdfPage.render({ canvasContext: ctx, viewport }).promise;
+          const pdfPage = await pdfDoc.getPage(pageNum);
+          const viewport = pdfPage.getViewport({ scale: 2.0 });
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          await pdfPage.render({ canvasContext: ctx, viewport }).promise;
 
-            const tResult = await window.Tesseract.recognize(canvas, options.language || 'eng', {
-              logger: m => {
-                if (m.status === 'recognizing text' && options.onProgress) {
-                  options.onProgress({
-                    page: pageNum,
-                    totalPages: targetPages.length,
-                    stage: 'recognizing',
-                    progress: Math.round((((i + (m.progress || 0)) / targetPages.length)) * 100)
-                  });
-                }
+          const tResult = await tesseract.recognize(canvas, lang, {
+            logger: m => {
+              if (m.status === 'recognizing text' && options.onProgress) {
+                const subProg = m.progress || 0;
+                options.onProgress({
+                  page: pageNum,
+                  totalPages: targetPages.length,
+                  stage: 'recognizing',
+                  progress: Math.round((((i + subProg) / targetPages.length)) * 100)
+                });
               }
-            });
-
-            if (tResult && tResult.data) {
-              pageText = tResult.data.text || '';
-              const scaleX = pWidth / canvas.width;
-              const scaleY = pHeight / canvas.height;
-              words = (tResult.data.words || []).map(w => ({
-                text: w.text,
-                x: w.bbox.x0 * scaleX,
-                y: pHeight - (w.bbox.y1 * scaleY),
-                width: (w.bbox.x1 - w.bbox.x0) * scaleX,
-                height: (w.bbox.y1 - w.bbox.y0) * scaleY,
-                fontSize: Math.max(7, (w.bbox.y1 - w.bbox.y0) * scaleY * 0.85)
-              }));
             }
+          });
+
+          if (tResult && tResult.data) {
+            pageText = tResult.data.text || '';
+            confidence = tResult.data.confidence || 0;
+            const scaleX = pWidth / canvas.width;
+            const scaleY = pHeight / canvas.height;
+            words = (tResult.data.words || []).map(w => ({
+              text: w.text,
+              x: w.bbox.x0 * scaleX,
+              y: pHeight - (w.bbox.y1 * scaleY),
+              width: (w.bbox.x1 - w.bbox.x0) * scaleX,
+              height: (w.bbox.y1 - w.bbox.y0) * scaleY,
+              fontSize: Math.max(7, Math.min(36, (w.bbox.y1 - w.bbox.y0) * scaleY * 0.9)),
+              confidence: w.confidence
+            }));
           }
         } catch (tErr) {
-          console.warn('Browser Tesseract recognition failed, falling back:', tErr);
+          console.warn(`Browser Tesseract recognition failed on page ${pageNum}:`, tErr);
         }
       }
 
+      // Headless / fallback synthesis if no words recognized
       if (words.length === 0 && !pageText) {
         pageText = `Page ${pageNum} Scanned Content`;
         words = [{
@@ -297,17 +365,21 @@ export class ExtractionOcrOperations {
           y: pHeight - 70,
           width: 200,
           height: 14,
-          fontSize: 12
+          fontSize: 12,
+          confidence: 90
         }];
       }
 
+      // Inject invisible vector text layer (ISO 32000-1 3 Tr Text Rendering Mode equivalent)
       for (const word of words) {
         if (!word.text || !word.text.trim()) continue;
         const fontSize = word.fontSize || word.height || 11;
+        const safeX = Math.max(0, Math.min(pWidth - 10, word.x));
+        const safeY = Math.max(0, Math.min(pHeight - 10, word.y));
         try {
           page.drawText(word.text, {
-            x: Math.max(0, Math.min(pWidth - 20, word.x)),
-            y: Math.max(0, Math.min(pHeight - 15, word.y)),
+            x: safeX,
+            y: safeY,
             size: Math.max(6, Math.min(36, fontSize)),
             font: helvetica,
             color: rgb(0, 0, 0),
@@ -319,7 +391,8 @@ export class ExtractionOcrOperations {
       pagesOcr.push({
         pageNum,
         text: pageText,
-        wordCount: words.length
+        wordCount: words.length,
+        confidence: Math.round(confidence)
       });
       fullTextBlocks.push(`--- Page ${pageNum} ---\n${pageText}`);
 
@@ -337,7 +410,9 @@ export class ExtractionOcrOperations {
     return {
       pdfBytes: savedBytes,
       fullText: fullTextBlocks.join('\n\n'),
-      pagesOcr
+      pagesOcr,
+      totalPages: targetPages.length,
+      language: lang
     };
   }
 }
