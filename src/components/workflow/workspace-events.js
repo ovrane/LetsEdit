@@ -8,6 +8,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { Toast } from '../toast.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
+import { compareModal } from '../compare-modal.js';
 
 export function bindWorkspaceEvents(manager) {
   const backBtn = manager.container.querySelector('#btn-workspace-back');
@@ -308,6 +309,21 @@ export function bindWorkspaceEvents(manager) {
       });
     };
   });
+
+  // Quick compare visual diff launcher
+  const quickCompareBtn = manager.container.querySelector('#btn-options-quick-compare-preview');
+  if (quickCompareBtn) {
+    quickCompareBtn.onclick = () => {
+      if (manager.uploadedFiles.length >= 2) {
+        compareModal.showWithBytes(
+          manager.uploadedFiles[0].bytes,
+          manager.uploadedFiles[1].bytes,
+          manager.uploadedFiles[0].name,
+          manager.uploadedFiles[1].name
+        );
+      }
+    };
+  }
 
   // OCR language select
   const ocrLangSel = manager.container.querySelector('#ocr-lang-select');

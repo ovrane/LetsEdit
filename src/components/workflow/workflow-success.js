@@ -7,6 +7,7 @@
 
 import { CHAIN_TOOLS, WORKFLOW_TOOLS_CONFIG } from './tools-config.js';
 import { openMobileQrModal, openCloudStorageModal } from './workflow-modals.js';
+import { compareModal } from '../compare-modal.js';
 import { Toast } from '../toast.js';
 import { downloadBlob, formatFileSize } from '../../utils/helpers.js';
 
@@ -27,6 +28,10 @@ export function renderSuccessScreen(manager) {
     subtitleText = 'Custom text watermark was embedded across all pages.';
   } else if (t.id === 'sign') {
     subtitleText = 'Signature and verified timestamp have been applied.';
+  } else if (t.id === 'compare') {
+    const diffs = manager.compareResult?.diffCount ?? 0;
+    const score = manager.compareResult?.similarityScore ?? 100;
+    subtitleText = `Comparison complete: ${score}% similarity match with ${diffs} difference${diffs === 1 ? '' : 's'} identified.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -103,6 +108,32 @@ export function renderSuccessScreen(manager) {
                 </div>
               `).join('')}
             </div>
+          </div>
+        ` : ''}
+
+        ${t.id === 'compare' ? `
+          <div class="compare-success-action-card" style="background: rgba(48, 5, 13, 0.04); border: 1.5px solid rgba(48, 5, 13, 0.18); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--text-main);">
+                <svg width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2.2" viewBox="0 0 24 24">
+                  <rect x="2" y="4" width="8" height="16" rx="1.5"></rect>
+                  <rect x="14" y="4" width="8" height="16" rx="1.5"></rect>
+                  <line x1="10" y1="9" x2="14" y2="9"></line>
+                  <line x1="10" y1="15" x2="14" y2="15"></line>
+                </svg>
+                <span>Interactive Visual Inspection</span>
+              </div>
+              <span style="font-size: 11.5px; font-weight: 700; background: ${manager.compareResult?.similarityScore >= 90 ? '#10b981' : '#f59e0b'}; color: white; padding: 2px 10px; border-radius: 9999px;">
+                ${manager.compareResult?.similarityScore ?? 100}% Match
+              </span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.4;">
+              Inspect side-by-side pages with synchronized scroll, drag the before/after wipe divider, or blend opacity ghost layers.
+            </p>
+            <button class="workflow-primary-cta" id="btn-open-interactive-diff" style="background: linear-gradient(135deg, var(--primary) 0%, #4a0d17 100%); width: 100%; justify-content: center; font-size: 15px; padding: 12px 18px; box-shadow: 0 4px 12px rgba(48,5,13,0.25); border: none;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>Launch Interactive Visual Diff Viewer</span>
+            </button>
           </div>
         ` : ''}
 
@@ -201,6 +232,20 @@ export function bindSuccessEvents(manager) {
   const deleteBtn = manager.container.querySelector('#btn-success-delete');
   const openStudioBtn = manager.container.querySelector('#btn-success-open-studio');
   const againBtn = manager.container.querySelector('#btn-success-again');
+
+  const openDiffBtn = manager.container.querySelector('#btn-open-interactive-diff');
+  if (openDiffBtn) {
+    openDiffBtn.onclick = () => {
+      if (manager.compareDocA && manager.compareDocB) {
+        compareModal.showWithBytes(
+          manager.compareDocA.bytes,
+          manager.compareDocB.bytes,
+          manager.compareDocA.name,
+          manager.compareDocB.name
+        );
+      }
+    };
+  }
 
   if (backBtn) backBtn.onclick = () => manager.closeWorkflow();
   if (logo) logo.onclick = () => manager.closeWorkflow();

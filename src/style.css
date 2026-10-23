@@ -4592,3 +4592,207 @@ body.show-tool-workflow .editor-paging-bar {
   font-size: 14px;
   color: var(--text-muted);
 }
+
+/* Compare PDF Visual Diff Styles */
+.compare-mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: var(--bg-surface);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+}
+
+.compare-mode-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.compare-mode-tab:hover {
+  color: var(--text-main);
+  background: rgba(48, 5, 13, 0.04);
+}
+
+.compare-mode-tab.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(48, 5, 13, 0.2);
+}
+
+.compare-view-stage {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.compare-doc-col {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.compare-doc-header {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.compare-doc-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.compare-doc-badge.badge-a {
+  background: rgba(48, 5, 13, 0.1);
+  color: var(--primary);
+}
+
+.compare-doc-badge.badge-b {
+  background: rgba(236, 72, 153, 0.15);
+  color: #ec4899;
+}
+
+.compare-doc-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.compare-canvas-scroll-wrap {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: #525659;
+  border-radius: 0 0 10px 10px;
+}
+
+.compare-preview-canvas {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  max-width: 100%;
+  height: auto !important;
+  background: white;
+}
+
+/* Wipe Slider View */
+.compare-wipe-container {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  background: #525659;
+  user-select: none;
+  touch-action: none;
+}
+
+.compare-wipe-canvas-base {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+}
+
+.compare-wipe-overlay-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.compare-wipe-canvas-overlay {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+
+.compare-wipe-handle-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  box-shadow: 0 0 10px rgba(48, 5, 13, 0.6);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.compare-wipe-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Opacity Overlay View */
+.compare-opacity-container {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  background: #525659;
+}
+
+.compare-opacity-canvas-base {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+}
+
+.compare-opacity-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.05s linear;
+}

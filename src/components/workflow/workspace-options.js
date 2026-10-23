@@ -544,6 +544,50 @@
       `;
     }
 
+    if (id === 'compare') {
+      const fileCount = instance.uploadedFiles.length;
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Comparison Settings</label>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+            ${fileCount < 2 
+              ? 'Please upload at least 2 PDF documents (Base Document A and Modified Document B) to begin comparison.' 
+              : `Comparing <strong>${instance.uploadedFiles[0].name}</strong> with <strong>${instance.uploadedFiles[1].name}</strong>.`
+            }
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label class="workflow-options-label">Diff Inspection Modes</label>
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
+              LetsEdit offers 4 client-side visual inspection modes:
+            </div>
+            <ul style="font-size: 12px; color: var(--text-main); margin: 0; padding-left: 18px; line-height: 1.6;">
+              <li><strong>Side-by-Side:</strong> Synchronized dual-canvas viewport scroll.</li>
+              <li><strong>Wipe Slider:</strong> Draggable split-handle wipe divider.</li>
+              <li><strong>Opacity Ghost:</strong> 0–100% blend overlay for subtle alterations.</li>
+              <li><strong>Diffs List:</strong> Word-by-word additions & deletions ledger.</li>
+            </ul>
+          </div>
+
+          ${fileCount >= 2 ? `
+            <button type="button" class="btn btn-outline" id="btn-options-quick-compare-preview" style="width: 100%; justify-content: center; gap: 8px; margin-bottom: 12px; border-color: var(--primary); color: var(--primary); font-weight: 600;">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="2" y="4" width="8" height="16" rx="1.5"></rect>
+                <rect x="14" y="4" width="8" height="16" rx="1.5"></rect>
+                <line x1="10" y1="9" x2="14" y2="9"></line>
+                <line x1="10" y1="15" x2="14" y2="15"></line>
+              </svg>
+              <span>Launch Visual Diff Viewer</span>
+            </button>
+          ` : ''}
+
+          <div style="font-size: 11px; color: var(--text-muted); background: var(--bg-surface); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            🔒 100% client-side. Neither document is ever transmitted to a server.
+          </div>
+        </div>
+      `;
+    }
+
     if (id === 'flip') {
       return `
         <div class="workflow-options-group">

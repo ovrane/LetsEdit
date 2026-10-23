@@ -605,7 +605,10 @@ export async function executeAction(manager) {
       }
       const cmp = await pdfEngine.comparePdfs(manager.uploadedFiles[0].bytes, manager.uploadedFiles[1].bytes);
       manager.processedBlob = new Blob([cmp.reportPdfBytes], { type: 'application/pdf' });
-      manager.processedFilename = `Comparison_Report_${manager.uploadedFiles[0].name}_vs_${manager.uploadedFiles[1].name}`;
+      manager.processedFilename = `Comparison_Report_${manager.uploadedFiles[0].name.replace(/\.[^/.]+$/, '')}_vs_${manager.uploadedFiles[1].name.replace(/\.[^/.]+$/, '')}.pdf`;
+      manager.compareResult = cmp;
+      manager.compareDocA = manager.uploadedFiles[0];
+      manager.compareDocB = manager.uploadedFiles[1];
     } else if (t.id === 'extract-images') {
       const imgs = await pdfEngine.extractImages(primary.bytes);
       if (imgs.length === 0) {
