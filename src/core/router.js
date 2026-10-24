@@ -319,6 +319,13 @@ export const ROUTE_DEFINITIONS = [
     description: "Makes fillable forms and annotations permanent vectors to prevent further editing."
   },
   {
+    path: '/edit_pdf_metadata',
+    toolId: 'edit-metadata',
+    aliases: ['/edit-metadata', '/edit_metadata', '/edit-pdf-metadata', '/metadata', '/pdf-properties', '/pdf_properties'],
+    title: "Edit PDF Metadata & Adobe XMP Online — LetsEdit",
+    description: "Inspect and edit Document Properties, Title, Author, Subject, Keywords, and synchronize ISO 16684-1 Adobe XMP streams."
+  },
+  {
     path: '/extract_pages_pdf',
     toolId: 'extract-pages',
     aliases: ['/extract-pages', '/extract-pages-pdf', '/extract_pages'],

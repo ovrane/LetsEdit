@@ -142,7 +142,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'bates', title: 'Bates Numbering', desc: 'Bates stamp multiple files at once', icon: 'shield', color: '#1e293b', action: 'workflow:bates' },
       { id: 'create-bookmarks', title: 'Create Bookmarks', desc: 'Create PDF Bookmarks', icon: 'bookmark', color: '#7c3aed', action: 'modal:metadata' },
       { id: 'crop', title: 'Crop', desc: 'Trim PDF margins, change PDF page size', icon: 'crop', color: '#0d9488', action: 'workflow:crop' },
-      { id: 'metadata', title: 'Edit Metadata', desc: 'Change PDF Author, Title, Keywords, Subject and other metadata fields', icon: 'file-text', color: '#64748b', action: 'modal:metadata' },
+      { id: 'metadata', title: 'Edit Metadata & XMP', desc: 'Change PDF Author, Title, Keywords, Subject and synchronize Adobe XMP schemas', icon: 'file-text', color: '#6366f1', action: 'workflow:edit-metadata' },
       { id: 'extract-images', title: 'Extract Images', desc: 'Extract images from PDF', icon: 'image', color: '#ec4899', action: 'workflow:extract-images' },
       { id: 'flip', title: 'Flip', desc: 'Mirror pages horizontally or vertically', icon: 'flip', color: '#8b5cf6', action: 'workflow:flip' },
       { id: 'grayscale', title: 'Grayscale', desc: 'Make a PDF text and images grayscale', icon: 'circle-half', color: '#475569', action: 'workflow:grayscale' },

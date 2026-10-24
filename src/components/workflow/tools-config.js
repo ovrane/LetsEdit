@@ -490,10 +490,25 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select Presentation(s)',
     dropText: 'or drop PPTX here',
     badge: 'Batch Supported'
+  },
+  'edit-metadata': {
+    id: 'edit-metadata',
+    title: 'Edit PDF Metadata & Adobe XMP',
+    subtitle: 'Inspect and edit document properties, Title, Author, Subject, Keywords, and synchronize ISO 16684-1 Adobe XMP packet streams.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+    color: '#6366f1',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Adobe XMP & Info Dict'
   }
 };
 
 WORKFLOW_TOOLS_CONFIG.protect = WORKFLOW_TOOLS_CONFIG.security;
+WORKFLOW_TOOLS_CONFIG.metadata = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
+WORKFLOW_TOOLS_CONFIG['edit-pdf-metadata'] = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
+WORKFLOW_TOOLS_CONFIG['pdf-properties'] = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
 
 export const CHAIN_TOOLS = [
   {

@@ -15,6 +15,7 @@ import { handleCloudStorageRequest, CLOUD_DRIVE_STORAGE } from './routes/cloud-s
 import { handleFormRequest } from './routes/form-routes.js';
 import { handleRepairRequest } from './routes/repair-routes.js';
 import { handleSplitMergeRequest } from './routes/split-merge-routes.js';
+import { handleMetadataRequest } from './routes/metadata-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -80,6 +81,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Advanced Merge & Split endpoints
   const splitMergeHandled = await handleSplitMergeRequest(req, res, pathname, method);
   if (splitMergeHandled) return true;
+
+  // Dispatch PDF Metadata & Adobe XMP endpoints
+  const metadataHandled = await handleMetadataRequest(req, res, pathname, method);
+  if (metadataHandled) return true;
 
   return false;
 }

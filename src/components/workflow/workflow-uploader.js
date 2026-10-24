@@ -165,6 +165,9 @@ export function bindUploadEvents(manager) {
       } else if (manager.activeTool.id === 'repair') {
         sampleBytes = await PageOperations.createCorruptTestPdf();
         sampleName = 'Corrupted_Sample_Document.pdf';
+      } else if (manager.activeTool.id === 'edit-metadata') {
+        sampleBytes = await PageOperations.createSampleMetadataPdf();
+        sampleName = 'Sample_Metadata_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }
@@ -324,6 +327,15 @@ export async function handleIncomingFiles(manager, files) {
       console.warn('Auto form inspection failed:', e);
       manager.detectedFormFields = [];
       manager.formFieldValues = {};
+    }
+  }
+  if (manager.activeTool.id === 'edit-metadata' && manager.uploadedFiles.length > 0) {
+    try {
+      const inspection = await PageOperations.inspectMetadata(manager.uploadedFiles[0].bytes);
+      manager.documentMetadata = inspection;
+    } catch (e) {
+      console.warn('Auto metadata inspection failed:', e);
+      manager.documentMetadata = null;
     }
   }
   manager.stage = 'workspace';

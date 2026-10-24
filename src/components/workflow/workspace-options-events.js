@@ -14,6 +14,7 @@ import { signRequestModal } from './sign-request-modal.js';
 import { bindFormFillerEvents } from './workspace-form-options.js';
 import { bindRepairDiagnosticEvents } from './repair-diagnostic-view.js';
 import { bindSplitMergeEvents } from './workspace-split-merge-options.js';
+import { bindMetadataEvents } from './workspace-metadata-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -643,5 +644,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Advanced Split & Merge listeners
   if (['merge', 'split'].includes(manager.activeTool.id)) {
     bindSplitMergeEvents(manager);
+  }
+
+  // PDF Metadata & XMP listeners
+  if (manager.activeTool.id === 'edit-metadata') {
+    bindMetadataEvents(manager);
   }
 }

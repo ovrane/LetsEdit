@@ -56,6 +56,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'scan') return 'Compile Scanned PDF';
   if (id === 'excel-to-pdf') return `${batchPrefix}Convert Excel to PDF`;
   if (id === 'ppt-to-pdf') return `${batchPrefix}Convert PowerPoint to PDF`;
+  if (id === 'edit-metadata') return 'Apply Metadata & Sync XMP';
   return `${batchPrefix}Process with ${manager.activeTool.title}`;
 }
 
@@ -338,6 +339,31 @@ export function renderToolWorkspace(manager) {
               <div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 <span>Edit values in the right panel to live-populate fields</span>
+              </div>
+            </div>
+          ` : t.id === 'edit-metadata' ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Document Properties & XMP Schema Inspection</span>
+                <span style="font-size: 11px; color: #6366f1; background: rgba(99, 102, 241, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">
+                  ${manager.documentMetadata?.hasXmp ? 'ISO 16684-1 Synced' : 'Ready to Sync'}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="metadata-center-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div style="position: relative; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border-radius: 6px; overflow: hidden; background: white; max-width: 380px; width: 100%;">
+                <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" id="metadata-page-preview" style="width: 100%; height: auto; display: block;" />
+                <div style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.85); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; backdrop-filter: blur(4px);">
+                  ${manager.uploadedFiles[0]?.pageCount || 1} Page${manager.uploadedFiles[0]?.pageCount === 1 ? '' : 's'}
+                </div>
+              </div>
+              <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Adobe Acrobat Pro standard document properties & Dublin Core XMP metadata editor</span>
               </div>
             </div>
           ` : t.id === 'pdf-to-text' ? `

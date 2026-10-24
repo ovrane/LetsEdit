@@ -325,6 +325,44 @@ export async function processSingleDocument(manager, tool, file) {
       bytes: filledBytes,
       blob: new Blob([filledBytes], { type: 'application/pdf' })
     };
+  } else if (id === 'edit-metadata') {
+    if (manager.metadataPendingStrip) {
+      const sanitizedBytes = await PageOperations.stripMetadata(primary.bytes);
+      const inspection = await PageOperations.inspectMetadata(sanitizedBytes);
+      manager.lastMetadataResult = inspection;
+      return {
+        name: `Sanitized_${primary.name}`,
+        bytes: sanitizedBytes,
+        blob: new Blob([sanitizedBytes], { type: 'application/pdf' }),
+        metadataResult: inspection
+      };
+    }
+
+    const title = document.getElementById('meta-input-title')?.value ?? manager.documentMetadata?.info?.title ?? '';
+    const author = document.getElementById('meta-input-author')?.value ?? manager.documentMetadata?.info?.author ?? '';
+    const subject = document.getElementById('meta-input-subject')?.value ?? manager.documentMetadata?.info?.subject ?? '';
+    const keywords = document.getElementById('meta-input-keywords')?.value ?? manager.documentMetadata?.info?.keywords ?? '';
+    const creator = document.getElementById('meta-input-creator')?.value ?? manager.documentMetadata?.info?.creator ?? 'LetsEdit PDF Studio';
+    const producer = document.getElementById('meta-input-producer')?.value ?? manager.documentMetadata?.info?.producer ?? 'LetsEdit Pro PDF Engine';
+
+    const syncXmp = document.getElementById('meta-chk-sync-xmp')?.checked ?? true;
+    const updateModTime = document.getElementById('meta-chk-update-modtime')?.checked ?? true;
+
+    const updatedBytes = await PageOperations.updateMetadata(
+      primary.bytes,
+      { title, author, subject, keywords, creator, producer },
+      { syncXmp, updateModificationDate: updateModTime }
+    );
+
+    const reInspection = await PageOperations.inspectMetadata(updatedBytes);
+    manager.lastMetadataResult = reInspection;
+
+    return {
+      name: `Updated_${primary.name}`,
+      bytes: updatedBytes,
+      blob: new Blob([updatedBytes], { type: 'application/pdf' }),
+      metadataResult: reInspection
+    };
   } else if (id === 'redact') {
     const redactDoc = await PDFDocument.load(primary.bytes);
     const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);

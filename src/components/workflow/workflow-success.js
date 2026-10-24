@@ -43,6 +43,11 @@ export function renderSuccessScreen(manager) {
     const pages = manager.lastRepairResult?.pageCount ?? 1;
     const objs = manager.lastRepairResult?.recoveredObjects ?? 0;
     subtitleText = `Repair complete: ${pages} page${pages === 1 ? '' : 's'} secured, ${objs} indirect objects rebuilt, and cross-reference index restored.`;
+  } else if (t.id === 'edit-metadata') {
+    const isStripped = !manager.lastMetadataResult?.info?.title && !manager.lastMetadataResult?.info?.author && !manager.lastMetadataResult?.hasXmp;
+    subtitleText = isStripped
+      ? 'Document metadata and Adobe XMP tracking streams permanently wiped.'
+      : 'Document Properties and ISO 16684-1 Adobe XMP packet updated and synchronized.';
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -234,6 +239,36 @@ export function renderSuccessScreen(manager) {
               <button type="button" class="btn btn-sm btn-outline" id="btn-success-repair-log" style="background: white; color: #065f46; border-color: rgba(16, 185, 129, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
                 <span>Download Repair Audit Log (.txt)</span>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(t.id === 'edit-metadata' && manager.lastMetadataResult) ? `
+          <div class="metadata-success-telemetry-card" style="background: rgba(99, 102, 241, 0.05); border: 1.5px solid rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #4338ca;">
+                <svg width="18" height="18" fill="none" stroke="#6366f1" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Adobe Acrobat Properties & ISO 16684-1 XMP Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #6366f1; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastMetadataResult.hasXmp ? '✓ XMP Synchronized' : 'Sanitized'}
+              </span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+              <div><strong>Title:</strong> <span style="color:var(--text-main);">${manager.lastMetadataResult.info?.title || '<em>None</em>'}</span></div>
+              <div><strong>Author:</strong> <span style="color:var(--text-main);">${manager.lastMetadataResult.info?.author || '<em>None</em>'}</span></div>
+              <div><strong>Producer:</strong> <span style="color:var(--text-main);">${manager.lastMetadataResult.info?.producer || '<em>None</em>'}</span></div>
+              <div><strong>Keywords:</strong> <span style="color:var(--text-main);">${manager.lastMetadataResult.info?.keywords || '<em>None</em>'}</span></div>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-download-xmp" style="background: white; color: #4338ca; border-color: rgba(99, 102, 241, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+                <span>Download .XMP Packet</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-download-json" style="background: white; color: #4338ca; border-color: rgba(99, 102, 241, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+                <span>Download Metadata JSON</span>
               </button>
             </div>
           </div>
@@ -500,6 +535,25 @@ export function bindSuccessEvents(manager) {
       const blob = new Blob([manager.lastRepairResult.diagnosticLog], { type: 'text/plain;charset=utf-8' });
       downloadBlob(blob, `${base}_repair_audit.txt`);
       Toast.success('Downloaded repair audit log!');
+    };
+  }
+
+  const downloadXmpBtn = manager.container.querySelector('#btn-success-download-xmp');
+  if (downloadXmpBtn && manager.lastMetadataResult?.xmpPacket) {
+    downloadXmpBtn.onclick = () => {
+      const blob = new Blob([manager.lastMetadataResult.xmpPacket], { type: 'application/rdf+xml;charset=utf-8' });
+      downloadBlob(blob, (manager.processedFilename || 'metadata').replace(/\.[^/.]+$/, '') + '.xmp');
+      Toast.success('Downloaded Adobe XMP packet sidecar!');
+    };
+  }
+
+  const downloadJsonBtn = manager.container.querySelector('#btn-success-download-json');
+  if (downloadJsonBtn && manager.lastMetadataResult) {
+    downloadJsonBtn.onclick = () => {
+      const jsonStr = JSON.stringify(manager.lastMetadataResult, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      downloadBlob(blob, (manager.processedFilename || 'metadata').replace(/\.[^/.]+$/, '') + '.json');
+      Toast.success('Downloaded metadata JSON manifest!');
     };
   }
 

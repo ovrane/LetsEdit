@@ -5,6 +5,7 @@
 import { renderFormFillerOptionsHtml } from './workspace-form-options.js';
 import { renderRepairDiagnosticOptionsHtml } from './repair-diagnostic-view.js';
 import { renderAdvancedMergeOptionsHtml, renderAdvancedSplitOptionsHtml } from './workspace-split-merge-options.js';
+import { renderMetadataOptionsHtml } from './workspace-metadata-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -902,6 +903,10 @@ import { renderAdvancedMergeOptionsHtml, renderAdvancedSplitOptionsHtml } from '
           </div>
         </div>
       `;
+    }
+
+    if (id === 'edit-metadata') {
+      return renderMetadataOptionsHtml(instance);
     }
 
     return `

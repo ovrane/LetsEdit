@@ -13,8 +13,9 @@ import { StampOps } from './operations/stamp-ops.js';
 import { MultiSignOps } from './operations/multi-sign-ops.js';
 import { FormOps } from './operations/form-ops.js';
 import { RepairOps } from './operations/repair-ops.js';
+import { MetadataOps } from './operations/metadata-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -69,4 +70,12 @@ export class PageOperations {
   static repairPdfAdvanced(...args) { return RepairOps.repairPdfAdvanced(...args); }
   static diagnosePdf(...args) { return RepairOps.diagnosePdf(...args); }
   static createCorruptTestPdf(...args) { return RepairOps.createCorruptTestPdf(...args); }
+
+  // PDF Metadata & Adobe XMP Operations
+  static inspectMetadata(...args) { return MetadataOps.inspectMetadata(...args); }
+  static updateMetadata(...args) { return MetadataOps.updateMetadata(...args); }
+  static stripMetadata(...args) { return MetadataOps.stripMetadata(...args); }
+  static generateXmpPacket(...args) { return MetadataOps.generateXmpPacket(...args); }
+  static createSampleMetadataPdf(...args) { return MetadataOps.createSampleMetadataPdf(...args); }
 }
+
