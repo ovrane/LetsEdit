@@ -134,6 +134,7 @@ export function getLandingTemplateHtml() {
                   <button class="mega-item" data-action="workflow:watermark">Let's Watermark PDF</button>
                   <button class="mega-item" data-action="workflow:grayscale">Let's Grayscale PDF</button>
                   <button class="mega-item" data-action="workflow:pagenumbers">Let's Number Pages</button>
+                  <button class="mega-item" data-action="workflow:pagelabels">Let's Page Labels</button>
                   <button class="mega-item" data-action="workflow:bates">Let's Bates Number</button>
                   <button class="mega-item" data-action="workflow:edit-metadata">Let's Edit Metadata & XMP</button>
                   <button class="mega-item" data-action="workflow:flatten">Let's Flatten Forms</button>

@@ -16,6 +16,7 @@ import { handleFormRequest } from './routes/form-routes.js';
 import { handleRepairRequest } from './routes/repair-routes.js';
 import { handleSplitMergeRequest } from './routes/split-merge-routes.js';
 import { handleMetadataRequest } from './routes/metadata-routes.js';
+import { handlePageLabelsRequest } from './routes/pagelabels-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -85,6 +86,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch PDF Metadata & Adobe XMP endpoints
   const metadataHandled = await handleMetadataRequest(req, res, pathname, method);
   if (metadataHandled) return true;
+
+  // Dispatch ISO 32000-1 PageLabels endpoints
+  const pageLabelsHandled = await handlePageLabelsRequest(req, res, pathname, method);
+  if (pageLabelsHandled) return true;
 
   return false;
 }

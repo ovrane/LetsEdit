@@ -363,6 +363,39 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([updatedBytes], { type: 'application/pdf' }),
       metadataResult: reInspection
     };
+  } else if (id === 'pagelabels') {
+    if (manager.pageLabelsPendingRemove) {
+      const sanitizedBytes = await PageOperations.removePageLabels(primary.bytes);
+      const inspection = await PageOperations.inspectPageLabels(sanitizedBytes);
+      manager.lastPageLabelsResult = inspection;
+      return {
+        name: `DefaultNumbered_${primary.name}`,
+        bytes: sanitizedBytes,
+        blob: new Blob([sanitizedBytes], { type: 'application/pdf' }),
+        pageLabelsResult: inspection
+      };
+    }
+
+    const sections = manager.pageLabelSections || [
+      { fromPage: 1, toPage: primary.pageCount || 1, style: 'D', prefix: '', startAt: 1 }
+    ];
+    const stampVisual = manager.pageLabelsStampVisual !== false;
+    const position = manager.pageLabelsPosition || 'bottom-center';
+
+    const updatedBytes = await PageOperations.applyPageLabels(primary.bytes, sections, {
+      stampVisual,
+      position
+    });
+
+    const inspection = await PageOperations.inspectPageLabels(updatedBytes);
+    manager.lastPageLabelsResult = inspection;
+
+    return {
+      name: `PageLabeled_${primary.name}`,
+      bytes: updatedBytes,
+      blob: new Blob([updatedBytes], { type: 'application/pdf' }),
+      pageLabelsResult: inspection
+    };
   } else if (id === 'redact') {
     const redactDoc = await PDFDocument.load(primary.bytes);
     const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);

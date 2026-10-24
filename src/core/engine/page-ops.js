@@ -14,8 +14,10 @@ import { MultiSignOps } from './operations/multi-sign-ops.js';
 import { FormOps } from './operations/form-ops.js';
 import { RepairOps } from './operations/repair-ops.js';
 import { MetadataOps } from './operations/metadata-ops.js';
+import { PageLabelsOps } from './operations/pagelabels-ops.js';
+import { SanitizeOps } from './operations/sanitize-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -77,5 +79,16 @@ export class PageOperations {
   static stripMetadata(...args) { return MetadataOps.stripMetadata(...args); }
   static generateXmpPacket(...args) { return MetadataOps.generateXmpPacket(...args); }
   static createSampleMetadataPdf(...args) { return MetadataOps.createSampleMetadataPdf(...args); }
+
+  // ISO 32000-1 PageLabels Operations
+  static inspectPageLabels(...args) { return PageLabelsOps.inspectPageLabels(...args); }
+  static applyPageLabels(...args) { return PageLabelsOps.applyPageLabels(...args); }
+  static removePageLabels(...args) { return PageLabelsOps.removePageLabels(...args); }
+  static createSamplePageLabelsPdf(...args) { return PageLabelsOps.createSamplePageLabelsPdf(...args); }
+
+  // Deep Document Sanitization & Hidden Information Cleaner
+  static inspectHiddenData(...args) { return SanitizeOps.inspectHiddenData(...args); }
+  static sanitizeDocument(...args) { return SanitizeOps.sanitizeDocument(...args); }
+  static createSampleExposedPdf(...args) { return SanitizeOps.createSampleExposedPdf(...args); }
 }
 

@@ -168,6 +168,9 @@ export function bindUploadEvents(manager) {
       } else if (manager.activeTool.id === 'edit-metadata') {
         sampleBytes = await PageOperations.createSampleMetadataPdf();
         sampleName = 'Sample_Metadata_Document.pdf';
+      } else if (manager.activeTool.id === 'pagelabels') {
+        sampleBytes = await PageOperations.createSamplePageLabelsPdf();
+        sampleName = 'Sample_PageLabels_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }
@@ -336,6 +339,16 @@ export async function handleIncomingFiles(manager, files) {
     } catch (e) {
       console.warn('Auto metadata inspection failed:', e);
       manager.documentMetadata = null;
+    }
+  }
+  if (manager.activeTool.id === 'pagelabels' && manager.uploadedFiles.length > 0) {
+    try {
+      const inspection = await PageOperations.inspectPageLabels(manager.uploadedFiles[0].bytes);
+      manager.pageLabelsInspection = inspection;
+      manager.pageLabelSections = inspection.sections || [];
+    } catch (e) {
+      console.warn('Auto page labels inspection failed:', e);
+      manager.pageLabelsInspection = null;
     }
   }
   manager.stage = 'workspace';

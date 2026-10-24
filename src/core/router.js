@@ -326,6 +326,13 @@ export const ROUTE_DEFINITIONS = [
     description: "Inspect and edit Document Properties, Title, Author, Subject, Keywords, and synchronize ISO 16684-1 Adobe XMP streams."
   },
   {
+    path: '/page_labels',
+    toolId: 'pagelabels',
+    aliases: ['/page-labels', '/pagelabels', '/pdf-page-labels', '/pdf_page_labels'],
+    title: "Multi-Section Page Labels — Adobe Acrobat Standard — LetsEdit",
+    description: "Divide documents into sections with Roman, Arabic, or alphabetic page numbering schemes in ISO 32000-1 /PageLabels."
+  },
+  {
     path: '/extract_pages_pdf',
     toolId: 'extract-pages',
     aliases: ['/extract-pages', '/extract-pages-pdf', '/extract_pages'],

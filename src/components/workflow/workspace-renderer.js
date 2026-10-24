@@ -57,6 +57,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'excel-to-pdf') return `${batchPrefix}Convert Excel to PDF`;
   if (id === 'ppt-to-pdf') return `${batchPrefix}Convert PowerPoint to PDF`;
   if (id === 'edit-metadata') return 'Apply Metadata & Sync XMP';
+  if (id === 'pagelabels') return 'Apply Multi-Section Page Labels';
   return `${batchPrefix}Process with ${manager.activeTool.title}`;
 }
 
@@ -364,6 +365,31 @@ export function renderToolWorkspace(manager) {
               <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span>Adobe Acrobat Pro standard document properties & Dublin Core XMP metadata editor</span>
+              </div>
+            </div>
+          ` : t.id === 'pagelabels' ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Multi-Section Page Labels Preview</span>
+                <span style="font-size: 11px; color: #6366f1; background: rgba(99, 102, 241, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">
+                  ${manager.pageLabelSections?.length || 1} Section${manager.pageLabelSections?.length === 1 ? '' : 's'} Configured
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="pagelabels-center-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div style="position: relative; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border-radius: 6px; overflow: hidden; background: white; max-width: 380px; width: 100%;">
+                <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" id="pagelabels-page-preview" style="width: 100%; height: auto; display: block;" />
+                <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.9); color: #38bdf8; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px); border: 1px solid rgba(56, 189, 248, 0.3);">
+                  Label: ${manager.pageLabelsInspection?.pageLabels?.[0]?.label || 'i'}
+                </div>
+              </div>
+              <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>ISO 32000-1 PageLabels number tree embedded in PDF catalog</span>
               </div>
             </div>
           ` : t.id === 'pdf-to-text' ? `

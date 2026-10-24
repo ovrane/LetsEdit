@@ -48,6 +48,9 @@ export function renderSuccessScreen(manager) {
     subtitleText = isStripped
       ? 'Document metadata and Adobe XMP tracking streams permanently wiped.'
       : 'Document Properties and ISO 16684-1 Adobe XMP packet updated and synchronized.';
+  } else if (t.id === 'pagelabels') {
+    const secCount = manager.lastPageLabelsResult?.sections?.length || 1;
+    subtitleText = `Multi-section page labeling applied across ${manager.lastPageLabelsResult?.totalPages || 1} pages (${secCount} section${secCount === 1 ? '' : 's'} configured in ISO 32000-1 /PageLabels catalog).`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -270,6 +273,28 @@ export function renderSuccessScreen(manager) {
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
                 <span>Download Metadata JSON</span>
               </button>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(t.id === 'pagelabels' && manager.lastPageLabelsResult) ? `
+          <div class="pagelabels-success-telemetry-card" style="background: rgba(99, 102, 241, 0.05); border: 1.5px solid rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #4338ca;">
+                <svg width="18" height="18" fill="none" stroke="#6366f1" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>ISO 32000-1 PageLabels Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #6366f1; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastPageLabelsResult.sections?.length || 1} Sections Synchronized
+              </span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+              ${(manager.lastPageLabelsResult.sections || []).map((s, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); padding: 4px 8px; border-radius: 4px;">
+                  <span><strong>Section ${idx + 1}:</strong> Pages ${s.fromPage} to ${s.toPage}</span>
+                  <span style="font-weight: 600; color: #4338ca;">Style: ${s.style === 'r' ? 'Roman (i, ii)' : s.style === 'R' ? 'Roman (I, II)' : s.style === 'a' ? 'Letters (a, b)' : s.style === 'A' ? 'Letters (A, B)' : 'Decimal (1, 2)'}${s.prefix ? ` [Prefix: "${s.prefix}"]` : ''}</span>
+                </div>
+              `).join('')}
             </div>
           </div>
         ` : ''}

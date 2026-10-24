@@ -149,6 +149,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'header-footer', title: 'Header & Footer', desc: 'Apply page numbers or text labels to PDF files', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
       { id: 'nup', title: 'N-up', desc: 'Print multiple pages per sheet per paper. A5 plan as 4-up on A3 or A4 2-up on A3', icon: 'layout', color: '#475569', action: 'workflow:nup' },
       { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
+      { id: 'pagelabels', title: 'Page Labels (Multi-Section)', desc: 'Divide documents into sections with Roman, Arabic, or alphabetic schemes in ISO 32000-1 /PageLabels', icon: 'hash', color: '#6366f1', action: 'workflow:pagelabels' },
       { id: 'rename', title: 'Rename', desc: 'Change document filename based on text from the PDF pages', icon: 'edit', color: '#059669', action: 'workflow:rename' },
       { id: 'repair', title: 'Repair', desc: 'Recover data from a corrupted or damaged PDF document', icon: 'tool', color: '#ef4444', action: 'workflow:repair' },
       { id: 'resize', title: 'Resize', desc: 'Add page margins and padding, Change PDF page size', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },

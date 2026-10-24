@@ -15,6 +15,7 @@ import { bindFormFillerEvents } from './workspace-form-options.js';
 import { bindRepairDiagnosticEvents } from './repair-diagnostic-view.js';
 import { bindSplitMergeEvents } from './workspace-split-merge-options.js';
 import { bindMetadataEvents } from './workspace-metadata-options.js';
+import { bindPageLabelsEvents } from './workspace-pagelabels-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -649,5 +650,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // PDF Metadata & XMP listeners
   if (manager.activeTool.id === 'edit-metadata') {
     bindMetadataEvents(manager);
+  }
+
+  // ISO 32000-1 PageLabels listeners
+  if (manager.activeTool.id === 'pagelabels') {
+    bindPageLabelsEvents(manager);
   }
 }

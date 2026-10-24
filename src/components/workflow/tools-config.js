@@ -502,6 +502,18 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF file',
     dropText: 'or drop PDF here',
     badge: 'Adobe XMP & Info Dict'
+  },
+  pagelabels: {
+    id: 'pagelabels',
+    title: 'Multi-Section Page Labels',
+    subtitle: 'Divide documents into sections with Roman, Arabic, or alphabetic numbering schemes embedded in the ISO 32000-1 /PageLabels catalog.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line></svg>`,
+    color: '#6366f1',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'ISO 32000-1 /PageLabels'
   }
 };
 
@@ -509,6 +521,8 @@ WORKFLOW_TOOLS_CONFIG.protect = WORKFLOW_TOOLS_CONFIG.security;
 WORKFLOW_TOOLS_CONFIG.metadata = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
 WORKFLOW_TOOLS_CONFIG['edit-pdf-metadata'] = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
 WORKFLOW_TOOLS_CONFIG['pdf-properties'] = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
+WORKFLOW_TOOLS_CONFIG['page-labels'] = WORKFLOW_TOOLS_CONFIG.pagelabels;
+WORKFLOW_TOOLS_CONFIG['pdf-page-labels'] = WORKFLOW_TOOLS_CONFIG.pagelabels;
 
 export const CHAIN_TOOLS = [
   {

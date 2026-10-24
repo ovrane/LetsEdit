@@ -6,6 +6,7 @@ import { renderFormFillerOptionsHtml } from './workspace-form-options.js';
 import { renderRepairDiagnosticOptionsHtml } from './repair-diagnostic-view.js';
 import { renderAdvancedMergeOptionsHtml, renderAdvancedSplitOptionsHtml } from './workspace-split-merge-options.js';
 import { renderMetadataOptionsHtml } from './workspace-metadata-options.js';
+import { renderPageLabelsOptionsHtml } from './workspace-pagelabels-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -907,6 +908,10 @@ import { renderMetadataOptionsHtml } from './workspace-metadata-options.js';
 
     if (id === 'edit-metadata') {
       return renderMetadataOptionsHtml(instance);
+    }
+
+    if (id === 'pagelabels') {
+      return renderPageLabelsOptionsHtml(instance);
     }
 
     return `
