@@ -17,6 +17,7 @@ import { bindSplitMergeEvents } from './workspace-split-merge-options.js';
 import { bindMetadataEvents } from './workspace-metadata-options.js';
 import { bindPageLabelsEvents } from './workspace-pagelabels-options.js';
 import { bindSanitizeEvents } from './workspace-sanitize-options.js';
+import { bindOutlineEvents } from './workspace-outline-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -661,5 +662,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Deep Document Sanitization listeners
   if (['sanitize', 'sanitize-pdf'].includes(manager.activeTool.id)) {
     bindSanitizeEvents(manager);
+  }
+
+  // Document Outlines & Bookmarks listeners
+  if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(manager.activeTool.id)) {
+    bindOutlineEvents(manager);
   }
 }

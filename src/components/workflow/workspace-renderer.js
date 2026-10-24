@@ -59,6 +59,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'edit-metadata') return 'Apply Metadata & Sync XMP';
   if (id === 'pagelabels') return 'Apply Multi-Section Page Labels';
   if (['sanitize', 'sanitize-pdf'].includes(id)) return `${batchPrefix}Sanitize & Remove Hidden Data`;
+  if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(id)) return 'Apply Bookmarks & Outline Tree';
   return `${batchPrefix}Process with ${manager.activeTool.title}`;
 }
 
@@ -416,6 +417,31 @@ export function renderToolWorkspace(manager) {
               <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                 <span>Full catalog strip: XMP, PieceInfo, OpenActions, and orphaned object stream purge</span>
+              </div>
+            </div>
+          ` : ['bookmarks', 'outlines', 'pdf-bookmarks'].includes(t.id) ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Document Bookmarks & Outline Tree</span>
+                <span style="font-size: 11px; color: #6366f1; background: rgba(99, 102, 241, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">
+                  ${manager.outlineItems?.length || 0} Root Section${manager.outlineItems?.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="bookmarks-center-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div style="position: relative; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border-radius: 6px; overflow: hidden; background: white; max-width: 380px; width: 100%;">
+                <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" id="bookmarks-page-preview" style="width: 100%; height: auto; display: block;" />
+                <div style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); color: #a5b4fc; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; backdrop-filter: blur(4px); border: 1px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 4px;">
+                  <span>📑</span> ${manager.outlineItems?.[0]?.title || 'Interactive Outline'}
+                </div>
+              </div>
+              <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>ISO 32000-1 /Outlines hierarchy embedded in document catalog</span>
               </div>
             </div>
           ` : t.id === 'pdf-to-text' ? `

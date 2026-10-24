@@ -18,6 +18,7 @@ import { handleSplitMergeRequest } from './routes/split-merge-routes.js';
 import { handleMetadataRequest } from './routes/metadata-routes.js';
 import { handlePageLabelsRequest } from './routes/pagelabels-routes.js';
 import { handleSanitizeRequest } from './routes/sanitize-routes.js';
+import { handleOutlineRequest } from './routes/outline-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -95,6 +96,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Deep Document Sanitization & Hidden Information Cleaner endpoints
   const sanitizeHandled = await handleSanitizeRequest(req, res, pathname, method);
   if (sanitizeHandled) return true;
+
+  // Dispatch Document Outlines & Hierarchical Bookmarks endpoints
+  const outlineHandled = await handleOutlineRequest(req, res, pathname, method);
+  if (outlineHandled) return true;
 
   return false;
 }

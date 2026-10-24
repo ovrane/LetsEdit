@@ -526,6 +526,18 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF to Sanitize',
     dropText: 'or drop confidential PDF here',
     badge: 'Adobe Anti-Forensics & Privacy'
+  },
+  bookmarks: {
+    id: 'bookmarks',
+    title: 'Document Bookmarks & Outline',
+    subtitle: 'Create, edit, nest, and color-code interactive navigation bookmark outlines in the ISO 32000-1 /Outlines hierarchy.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`,
+    color: '#6366f1',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'ISO 32000-1 /Outlines'
   }
 };
 
@@ -538,6 +550,9 @@ WORKFLOW_TOOLS_CONFIG['pdf-page-labels'] = WORKFLOW_TOOLS_CONFIG.pagelabels;
 WORKFLOW_TOOLS_CONFIG['sanitize-pdf'] = WORKFLOW_TOOLS_CONFIG.sanitize;
 WORKFLOW_TOOLS_CONFIG['clean-pdf'] = WORKFLOW_TOOLS_CONFIG.sanitize;
 WORKFLOW_TOOLS_CONFIG['remove-hidden-info'] = WORKFLOW_TOOLS_CONFIG.sanitize;
+WORKFLOW_TOOLS_CONFIG.outlines = WORKFLOW_TOOLS_CONFIG.bookmarks;
+WORKFLOW_TOOLS_CONFIG['pdf-bookmarks'] = WORKFLOW_TOOLS_CONFIG.bookmarks;
+WORKFLOW_TOOLS_CONFIG['edit-bookmarks'] = WORKFLOW_TOOLS_CONFIG.bookmarks;
 
 export const CHAIN_TOOLS = [
   {

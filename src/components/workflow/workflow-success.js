@@ -55,6 +55,9 @@ export function renderSuccessScreen(manager) {
     const count = manager.lastSanitizeResult?.removedItemsCount ?? 0;
     const saved = manager.lastSanitizeResult?.bytesSaved ?? 0;
     subtitleText = `Document sanitized: ${count} sensitive hidden item${count === 1 ? '' : 's'} permanently purged and unreferenced indirect objects eliminated (${formatFileSize(saved)} saved).`;
+  } else if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(t.id)) {
+    const bmCount = manager.lastOutlinesResult?.totalBookmarks || (manager.outlineItems?.length || 0);
+    subtitleText = `Document outlines synchronized: ${bmCount} interactive navigation bookmark${bmCount === 1 ? '' : 's'} embedded into the ISO 32000-1 /Outlines hierarchy.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -328,6 +331,37 @@ export function renderSuccessScreen(manager) {
             <button type="button" class="btn btn-sm btn-outline" id="btn-success-download-sanitize-audit" style="background: white; color: #065f46; border-color: rgba(16, 185, 129, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
               <span>Download Sanitization Audit (.txt)</span>
+            </button>
+          </div>
+        ` : ''}
+
+        ${(['bookmarks', 'outlines', 'pdf-bookmarks'].includes(t.id) && manager.lastOutlinesResult) ? `
+          <div class="bookmarks-success-telemetry-card" style="background: rgba(99, 102, 241, 0.05); border: 1.5px solid rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #4338ca;">
+                <svg width="18" height="18" fill="none" stroke="#6366f1" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>ISO 32000-1 Bookmarks Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #6366f1; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastOutlinesResult.totalBookmarks} Bookmarks Embedded
+              </span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+              ${(manager.lastOutlinesResult.items || []).slice(0, 5).map((item, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); padding: 4px 8px; border-radius: 4px;">
+                  <span style="color: ${item.color || '#3b82f6'}; font-weight: ${item.bold ? '700' : '400'}; font-style: ${item.italic ? 'italic' : 'normal'};">
+                    📑 ${item.title}
+                  </span>
+                  <span style="color: #6366f1; font-weight: 600;">Page ${item.pageNumber}</span>
+                </div>
+              `).join('')}
+              ${(manager.lastOutlinesResult.items?.length || 0) > 5 ? `
+                <div style="font-size: 11px; color: #94a3b8; text-align: center;">+ ${manager.lastOutlinesResult.items.length - 5} more sections</div>
+              ` : ''}
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" id="btn-success-download-toc-md" style="background: white; color: #4338ca; border-color: rgba(99, 102, 241, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+              <span>Download Table of Contents (.md)</span>
             </button>
           </div>
         ` : ''}
@@ -641,6 +675,16 @@ export function bindSuccessEvents(manager) {
       const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
       downloadBlob(blob, (manager.processedFilename || 'sanitized_document').replace(/\.[^/.]+$/, '') + '_sanitize_audit.txt');
       Toast.success('Downloaded sanitization audit certificate!');
+    };
+  }
+
+  const downloadTocBtn = manager.container.querySelector('#btn-success-download-toc-md');
+  if (downloadTocBtn && manager.lastOutlinesResult?.items) {
+    downloadTocBtn.onclick = () => {
+      const md = PageOperations.exportToMarkdownTOC(manager.lastOutlinesResult.items);
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      downloadBlob(blob, (manager.processedFilename || 'document').replace(/\.[^/.]+$/, '') + '_table_of_contents.md');
+      Toast.success('Downloaded table of contents (.md)!');
     };
   }
 

@@ -8,6 +8,7 @@ import { renderAdvancedMergeOptionsHtml, renderAdvancedSplitOptionsHtml } from '
 import { renderMetadataOptionsHtml } from './workspace-metadata-options.js';
 import { renderPageLabelsOptionsHtml } from './workspace-pagelabels-options.js';
 import { renderSanitizeOptionsHtml } from './workspace-sanitize-options.js';
+import { renderOutlineOptionsHtml } from './workspace-outline-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -917,6 +918,10 @@ import { renderSanitizeOptionsHtml } from './workspace-sanitize-options.js';
 
     if (id === 'sanitize' || id === 'sanitize-pdf') {
       return renderSanitizeOptionsHtml(instance);
+    }
+
+    if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(id)) {
+      return renderOutlineOptionsHtml(instance);
     }
 
     return `

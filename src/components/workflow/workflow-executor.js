@@ -413,6 +413,22 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([sanitizedBytes], { type: 'application/pdf' }),
       sanitizeReport: sanitizedBytes.report
     };
+  } else if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(id)) {
+    let updatedBytes;
+    if (manager.outlinesPendingRemove) {
+      updatedBytes = await PageOperations.removeOutlines(primary.bytes);
+    } else {
+      const items = manager.outlineItems || [];
+      updatedBytes = await PageOperations.applyOutlines(primary.bytes, items);
+    }
+    const inspection = await PageOperations.inspectOutlines(updatedBytes);
+    manager.lastOutlinesResult = inspection;
+    return {
+      name: `Bookmarked_${primary.name}`,
+      bytes: updatedBytes,
+      blob: new Blob([updatedBytes], { type: 'application/pdf' }),
+      outlinesResult: inspection
+    };
   } else if (id === 'redact') {
     const redactDoc = await PDFDocument.load(primary.bytes);
     const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);

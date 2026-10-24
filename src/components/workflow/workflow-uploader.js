@@ -174,6 +174,9 @@ export function bindUploadEvents(manager) {
       } else if (['sanitize', 'sanitize-pdf'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleExposedPdf();
         sampleName = 'Sample_Exposed_Document.pdf';
+      } else if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleOutlinesPdf();
+        sampleName = 'Sample_Bookmarked_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }
@@ -361,6 +364,16 @@ export async function handleIncomingFiles(manager, files) {
     } catch (e) {
       console.warn('Auto sanitize inspection failed:', e);
       manager.sanitizeInspection = null;
+    }
+  }
+  if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(manager.activeTool.id) && manager.uploadedFiles.length > 0) {
+    try {
+      const inspection = await PageOperations.inspectOutlines(manager.uploadedFiles[0].bytes);
+      manager.outlinesInspection = inspection;
+      manager.outlineItems = inspection.items || [];
+    } catch (e) {
+      console.warn('Auto outlines inspection failed:', e);
+      manager.outlinesInspection = null;
     }
   }
   manager.stage = 'workspace';

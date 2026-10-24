@@ -340,6 +340,13 @@ export const ROUTE_DEFINITIONS = [
     description: "Permanently scrub hidden metadata, tracking scripts, embedded files, private application data, and purge unreferenced objects."
   },
   {
+    path: '/bookmarks',
+    toolId: 'bookmarks',
+    aliases: ['/outlines', '/pdf-bookmarks', '/pdf_bookmarks', '/edit-bookmarks', '/edit_bookmarks', '/bookmarks-pdf'],
+    title: "PDF Bookmarks & Outline Editor — Adobe Acrobat Standard — LetsEdit",
+    description: "Create, edit, nest, and color-code interactive navigation bookmark outlines in the ISO 32000-1 /Outlines hierarchy."
+  },
+  {
     path: '/extract_pages_pdf',
     toolId: 'extract-pages',
     aliases: ['/extract-pages', '/extract-pages-pdf', '/extract_pages'],

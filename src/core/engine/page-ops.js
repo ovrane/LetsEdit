@@ -16,8 +16,9 @@ import { RepairOps } from './operations/repair-ops.js';
 import { MetadataOps } from './operations/metadata-ops.js';
 import { PageLabelsOps } from './operations/pagelabels-ops.js';
 import { SanitizeOps } from './operations/sanitize-ops.js';
+import { OutlineOps } from './operations/outline-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -90,5 +91,12 @@ export class PageOperations {
   static inspectHiddenData(...args) { return SanitizeOps.inspectHiddenData(...args); }
   static sanitizeDocument(...args) { return SanitizeOps.sanitizeDocument(...args); }
   static createSampleExposedPdf(...args) { return SanitizeOps.createSampleExposedPdf(...args); }
+
+  // Document Outlines & Hierarchical Bookmarks (ISO 32000-1 Clause 12.3.3)
+  static inspectOutlines(...args) { return OutlineOps.inspectOutlines(...args); }
+  static applyOutlines(...args) { return OutlineOps.applyOutlines(...args); }
+  static removeOutlines(...args) { return OutlineOps.removeOutlines(...args); }
+  static exportToMarkdownTOC(...args) { return OutlineOps.exportToMarkdownTOC(...args); }
+  static createSampleOutlinesPdf(...args) { return OutlineOps.createSampleOutlinesPdf(...args); }
 }
 
