@@ -58,6 +58,10 @@ export function renderSuccessScreen(manager) {
   } else if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(t.id)) {
     const bmCount = manager.lastOutlinesResult?.totalBookmarks || (manager.outlineItems?.length || 0);
     subtitleText = `Document outlines synchronized: ${bmCount} interactive navigation bookmark${bmCount === 1 ? '' : 's'} embedded into the ISO 32000-1 /Outlines hierarchy.`;
+  } else if (['header-footer', 'header_footer', 'add-header-footer'].includes(t.id)) {
+    const stamped = manager.lastHeaderFooterResult?.appliedCount ?? 0;
+    const total = manager.lastHeaderFooterResult?.totalPages ?? 0;
+    subtitleText = `Multi-zone headers & footers stamped across ${stamped} of ${total} pages with ISO 32000-1 dynamic macro variable interpolation.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -363,6 +367,38 @@ export function renderSuccessScreen(manager) {
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
               <span>Download Table of Contents (.md)</span>
             </button>
+          </div>
+        ` : ''}
+
+        ${(['header-footer', 'header_footer', 'add-header-footer'].includes(t.id) && manager.lastHeaderFooterResult) ? `
+          <div class="header-footer-success-telemetry-card" style="background: rgba(67, 56, 202, 0.05); border: 1.5px solid rgba(67, 56, 202, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #4338ca;">
+                <svg width="18" height="18" fill="none" stroke="#4338ca" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <span>Dynamic Header & Footer Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #4338ca; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastHeaderFooterResult.appliedCount} / ${manager.lastHeaderFooterResult.totalPages} Pages Stamped
+              </span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; color: var(--text-muted);">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(67, 56, 202, 0.15); border-radius: 8px; padding: 10px;">
+                <div style="font-weight: 700; color: #1e1b4b; margin-bottom: 4px; font-size: 11px; text-transform: uppercase;">Headers</div>
+                <div style="font-size: 11px; display: flex; flex-direction: column; gap: 2px;">
+                  <div><b>Left:</b> ${manager.lastHeaderFooterResult.zones?.leftHeader || '<em>None</em>'}</div>
+                  <div><b>Center:</b> ${manager.lastHeaderFooterResult.zones?.centerHeader || '<em>None</em>'}</div>
+                  <div><b>Right:</b> ${manager.lastHeaderFooterResult.zones?.rightHeader || '<em>None</em>'}</div>
+                </div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(67, 56, 202, 0.15); border-radius: 8px; padding: 10px;">
+                <div style="font-weight: 700; color: #1e1b4b; margin-bottom: 4px; font-size: 11px; text-transform: uppercase;">Footers</div>
+                <div style="font-size: 11px; display: flex; flex-direction: column; gap: 2px;">
+                  <div><b>Left:</b> ${manager.lastHeaderFooterResult.zones?.leftFooter || '<em>None</em>'}</div>
+                  <div><b>Center:</b> ${manager.lastHeaderFooterResult.zones?.centerFooter || '<em>None</em>'}</div>
+                  <div><b>Right:</b> ${manager.lastHeaderFooterResult.zones?.rightFooter || '<em>None</em>'}</div>
+                </div>
+              </div>
+            </div>
           </div>
         ` : ''}
 

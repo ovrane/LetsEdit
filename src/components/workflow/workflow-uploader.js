@@ -177,6 +177,9 @@ export function bindUploadEvents(manager) {
       } else if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleOutlinesPdf();
         sampleName = 'Sample_Bookmarked_Document.pdf';
+      } else if (['header-footer', 'header_footer', 'add-header-footer'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleHeaderFooterPdf();
+        sampleName = 'Sample_Header_Footer_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

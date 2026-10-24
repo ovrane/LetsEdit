@@ -17,8 +17,9 @@ import { MetadataOps } from './operations/metadata-ops.js';
 import { PageLabelsOps } from './operations/pagelabels-ops.js';
 import { SanitizeOps } from './operations/sanitize-ops.js';
 import { OutlineOps } from './operations/outline-ops.js';
+import { HeaderFooterOps } from './operations/header-footer-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -98,5 +99,11 @@ export class PageOperations {
   static removeOutlines(...args) { return OutlineOps.removeOutlines(...args); }
   static exportToMarkdownTOC(...args) { return OutlineOps.exportToMarkdownTOC(...args); }
   static createSampleOutlinesPdf(...args) { return OutlineOps.createSampleOutlinesPdf(...args); }
+
+  // Multi-Zone Dynamic Header & Footer Engine
+  static applyHeaderFooter(...args) { return HeaderFooterOps.applyHeaderFooter(...args); }
+  static interpolateMacros(...args) { return HeaderFooterOps.interpolateMacros(...args); }
+  static isPageIncluded(...args) { return HeaderFooterOps.isPageIncluded(...args); }
+  static createSampleHeaderFooterPdf(...args) { return HeaderFooterOps.createSampleHeaderFooterPdf(...args); }
 }
 

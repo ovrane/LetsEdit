@@ -60,6 +60,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'pagelabels') return 'Apply Multi-Section Page Labels';
   if (['sanitize', 'sanitize-pdf'].includes(id)) return `${batchPrefix}Sanitize & Remove Hidden Data`;
   if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(id)) return 'Apply Bookmarks & Outline Tree';
+  if (['header-footer', 'header_footer', 'add-header-footer'].includes(id)) return `${batchPrefix}Apply Headers & Footers`;
   return `${batchPrefix}Process with ${manager.activeTool.title}`;
 }
 
@@ -442,6 +443,42 @@ export function renderToolWorkspace(manager) {
               <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 <span>ISO 32000-1 /Outlines hierarchy embedded in document catalog</span>
+              </div>
+            </div>
+          ` : ['header-footer', 'header_footer', 'add-header-footer'].includes(t.id) ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Multi-Zone Header & Footer Preview</span>
+                <span style="font-size: 11px; color: #4338ca; background: rgba(99, 102, 241, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">
+                  ${manager.headerFooterConfig?.skipFirst ? 'Cover Page Excluded' : 'All Pages'}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="hf-center-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div style="position: relative; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border-radius: 6px; overflow: hidden; background: white; max-width: 380px; width: 100%;">
+                <!-- Header Stamp Simulation -->
+                <div style="position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; font-size: 9px; color: ${manager.headerFooterConfig?.color || '#334155'}; font-weight: 600; pointer-events: none; border-bottom: ${manager.headerFooterConfig?.hasHeaderDivider ? '0.75px solid #cbd5e1' : 'none'}; padding-bottom: 2px;">
+                  <span>${manager.headerFooterConfig?.leftHeader || ''}</span>
+                  <span>${manager.headerFooterConfig?.centerHeader ? '<<Title>>' : ''}</span>
+                  <span>${manager.headerFooterConfig?.rightHeader ? '<<Date>>' : ''}</span>
+                </div>
+
+                <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: auto; display: block;" />
+
+                <!-- Footer Stamp Simulation -->
+                <div style="position: absolute; bottom: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; font-size: 9px; color: ${manager.headerFooterConfig?.color || '#334155'}; font-weight: 600; pointer-events: none; border-top: ${manager.headerFooterConfig?.hasFooterDivider ? '0.75px solid #cbd5e1' : 'none'}; padding-top: 2px;">
+                  <span>${manager.headerFooterConfig?.leftFooter ? 'document.pdf' : ''}</span>
+                  <span>${manager.headerFooterConfig?.centerFooter ? 'Page 1 of ' + (manager.uploadedFiles[0]?.pageCount || 1) : ''}</span>
+                  <span>${manager.headerFooterConfig?.rightFooter || ''}</span>
+                </div>
+              </div>
+              <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" fill="none" stroke="#4338ca" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Dynamic macros interpolated and stamped directly into page vector content streams</span>
               </div>
             </div>
           ` : t.id === 'pdf-to-text' ? `

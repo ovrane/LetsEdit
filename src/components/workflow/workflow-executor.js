@@ -429,6 +429,19 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([updatedBytes], { type: 'application/pdf' }),
       outlinesResult: inspection
     };
+  } else if (['header-footer', 'header_footer', 'add-header-footer'].includes(id)) {
+    const config = manager.headerFooterConfig || {};
+    const updatedBytes = await PageOperations.applyHeaderFooter(primary.bytes, config, {
+      fileName: primary.name,
+      title: primary.name?.replace(/\.[^/.]+$/, '')
+    });
+    manager.lastHeaderFooterResult = updatedBytes.report;
+    return {
+      name: `HeaderFooter_${primary.name}`,
+      bytes: updatedBytes,
+      blob: new Blob([updatedBytes], { type: 'application/pdf' }),
+      headerFooterReport: updatedBytes.report
+    };
   } else if (id === 'redact') {
     const redactDoc = await PDFDocument.load(primary.bytes);
     const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);

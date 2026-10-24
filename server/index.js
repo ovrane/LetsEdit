@@ -19,6 +19,7 @@ import { handleMetadataRequest } from './routes/metadata-routes.js';
 import { handlePageLabelsRequest } from './routes/pagelabels-routes.js';
 import { handleSanitizeRequest } from './routes/sanitize-routes.js';
 import { handleOutlineRequest } from './routes/outline-routes.js';
+import { handleHeaderFooterRequest } from './routes/header-footer-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -100,6 +101,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Document Outlines & Hierarchical Bookmarks endpoints
   const outlineHandled = await handleOutlineRequest(req, res, pathname, method);
   if (outlineHandled) return true;
+
+  // Dispatch Multi-Zone Header & Footer endpoints
+  const headerFooterHandled = await handleHeaderFooterRequest(req, res, pathname, method);
+  if (headerFooterHandled) return true;
 
   return false;
 }

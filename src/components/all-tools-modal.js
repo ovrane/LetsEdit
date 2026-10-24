@@ -147,7 +147,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'extract-images', title: 'Extract Images', desc: 'Extract images from PDF', icon: 'image', color: '#ec4899', action: 'workflow:extract-images' },
       { id: 'flip', title: 'Flip', desc: 'Mirror pages horizontally or vertically', icon: 'flip', color: '#8b5cf6', action: 'workflow:flip' },
       { id: 'grayscale', title: 'Grayscale', desc: 'Make a PDF text and images grayscale', icon: 'circle-half', color: '#475569', action: 'workflow:grayscale' },
-      { id: 'header-footer', title: 'Header & Footer', desc: 'Apply page numbers or text labels to PDF files', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
+      { id: 'header-footer', title: 'Header & Footer', desc: 'Stamp 6-zone dynamic headers and footers with page numbers, date macros, and custom margins', icon: 'hash', color: '#4338ca', action: 'workflow:header-footer' },
       { id: 'nup', title: 'N-up', desc: 'Print multiple pages per sheet per paper. A5 plan as 4-up on A3 or A4 2-up on A3', icon: 'layout', color: '#475569', action: 'workflow:nup' },
       { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
       { id: 'pagelabels', title: 'Page Labels (Multi-Section)', desc: 'Divide documents into sections with Roman, Arabic, or alphabetic schemes in ISO 32000-1 /PageLabels', icon: 'hash', color: '#6366f1', action: 'workflow:pagelabels' },

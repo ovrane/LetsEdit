@@ -9,6 +9,7 @@ import { renderMetadataOptionsHtml } from './workspace-metadata-options.js';
 import { renderPageLabelsOptionsHtml } from './workspace-pagelabels-options.js';
 import { renderSanitizeOptionsHtml } from './workspace-sanitize-options.js';
 import { renderOutlineOptionsHtml } from './workspace-outline-options.js';
+import { renderHeaderFooterOptionsHtml } from './workspace-header-footer-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -922,6 +923,10 @@ import { renderOutlineOptionsHtml } from './workspace-outline-options.js';
 
     if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(id)) {
       return renderOutlineOptionsHtml(instance);
+    }
+
+    if (['header-footer', 'header_footer', 'add-header-footer'].includes(id)) {
+      return renderHeaderFooterOptionsHtml(instance);
     }
 
     return `

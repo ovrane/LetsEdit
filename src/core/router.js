@@ -347,6 +347,13 @@ export const ROUTE_DEFINITIONS = [
     description: "Create, edit, nest, and color-code interactive navigation bookmark outlines in the ISO 32000-1 /Outlines hierarchy."
   },
   {
+    path: '/header-footer',
+    toolId: 'header-footer',
+    aliases: ['/header_footer', '/add-header-footer', '/add_header_footer', '/header-and-footer', '/header_and_footer', '/headers-and-footers'],
+    title: "Add Header & Footer to PDF — Dynamic Macros & Margins — LetsEdit",
+    description: "Stamp professional 6-zone dynamic headers and footers with page numbers, date macros, custom margins, and divider rules."
+  },
+  {
     path: '/extract_pages_pdf',
     toolId: 'extract-pages',
     aliases: ['/extract-pages', '/extract-pages-pdf', '/extract_pages'],

@@ -538,6 +538,18 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF file',
     dropText: 'or drop PDF here',
     badge: 'ISO 32000-1 /Outlines'
+  },
+  'header-footer': {
+    id: 'header-footer',
+    title: 'Header & Footer',
+    subtitle: 'Stamp professional 6-zone dynamic headers and footers with page numbers, date macros, custom margins, and divider rules.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>`,
+    color: '#4338ca',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF file',
+    dropText: 'or drop PDF here',
+    badge: 'Adobe 6-Zone Macros'
   }
 };
 
@@ -553,6 +565,9 @@ WORKFLOW_TOOLS_CONFIG['remove-hidden-info'] = WORKFLOW_TOOLS_CONFIG.sanitize;
 WORKFLOW_TOOLS_CONFIG.outlines = WORKFLOW_TOOLS_CONFIG.bookmarks;
 WORKFLOW_TOOLS_CONFIG['pdf-bookmarks'] = WORKFLOW_TOOLS_CONFIG.bookmarks;
 WORKFLOW_TOOLS_CONFIG['edit-bookmarks'] = WORKFLOW_TOOLS_CONFIG.bookmarks;
+WORKFLOW_TOOLS_CONFIG.header_footer = WORKFLOW_TOOLS_CONFIG['header-footer'];
+WORKFLOW_TOOLS_CONFIG['add-header-footer'] = WORKFLOW_TOOLS_CONFIG['header-footer'];
+WORKFLOW_TOOLS_CONFIG['headers-and-footers'] = WORKFLOW_TOOLS_CONFIG['header-footer'];
 
 export const CHAIN_TOOLS = [
   {

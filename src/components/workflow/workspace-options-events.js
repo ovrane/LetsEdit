@@ -18,6 +18,7 @@ import { bindMetadataEvents } from './workspace-metadata-options.js';
 import { bindPageLabelsEvents } from './workspace-pagelabels-options.js';
 import { bindSanitizeEvents } from './workspace-sanitize-options.js';
 import { bindOutlineEvents } from './workspace-outline-options.js';
+import { bindHeaderFooterEvents } from './workspace-header-footer-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -667,5 +668,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Document Outlines & Bookmarks listeners
   if (['bookmarks', 'outlines', 'pdf-bookmarks'].includes(manager.activeTool.id)) {
     bindOutlineEvents(manager);
+  }
+
+  // Multi-Zone Header & Footer listeners
+  if (['header-footer', 'header_footer', 'add-header-footer'].includes(manager.activeTool.id)) {
+    bindHeaderFooterEvents(manager);
   }
 }
