@@ -16,6 +16,7 @@ import { bindRepairDiagnosticEvents } from './repair-diagnostic-view.js';
 import { bindSplitMergeEvents } from './workspace-split-merge-options.js';
 import { bindMetadataEvents } from './workspace-metadata-options.js';
 import { bindPageLabelsEvents } from './workspace-pagelabels-options.js';
+import { bindSanitizeEvents } from './workspace-sanitize-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -655,5 +656,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // ISO 32000-1 PageLabels listeners
   if (manager.activeTool.id === 'pagelabels') {
     bindPageLabelsEvents(manager);
+  }
+
+  // Deep Document Sanitization listeners
+  if (['sanitize', 'sanitize-pdf'].includes(manager.activeTool.id)) {
+    bindSanitizeEvents(manager);
   }
 }

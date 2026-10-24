@@ -51,6 +51,10 @@ export function renderSuccessScreen(manager) {
   } else if (t.id === 'pagelabels') {
     const secCount = manager.lastPageLabelsResult?.sections?.length || 1;
     subtitleText = `Multi-section page labeling applied across ${manager.lastPageLabelsResult?.totalPages || 1} pages (${secCount} section${secCount === 1 ? '' : 's'} configured in ISO 32000-1 /PageLabels catalog).`;
+  } else if (['sanitize', 'sanitize-pdf'].includes(t.id)) {
+    const count = manager.lastSanitizeResult?.removedItemsCount ?? 0;
+    const saved = manager.lastSanitizeResult?.bytesSaved ?? 0;
+    subtitleText = `Document sanitized: ${count} sensitive hidden item${count === 1 ? '' : 's'} permanently purged and unreferenced indirect objects eliminated (${formatFileSize(saved)} saved).`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -296,6 +300,35 @@ export function renderSuccessScreen(manager) {
                 </div>
               `).join('')}
             </div>
+          </div>
+        ` : ''}
+
+        ${(['sanitize', 'sanitize-pdf'].includes(t.id) && manager.lastSanitizeResult) ? `
+          <div class="sanitize-success-telemetry-card" style="background: rgba(16, 185, 129, 0.05); border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #065f46;">
+                <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>Sanitization Audit Certificate</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #10b981; color: white; padding: 2px 8px; border-radius: 12px;">
+                Verified Clean & Anti-Forensic
+              </span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+              Document has been scrubbed in compliance with Adobe Acrobat Pro & ISO standards. Unreferenced objects purged via object streams.
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-main); margin-bottom: 12px;">
+              ${(manager.lastSanitizeResult.removedItems || []).map(item => `
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="color: #10b981;">✓</span>
+                  <span>${item}</span>
+                </div>
+              `).join('')}
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" id="btn-success-download-sanitize-audit" style="background: white; color: #065f46; border-color: rgba(16, 185, 129, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+              <span>Download Sanitization Audit (.txt)</span>
+            </button>
           </div>
         ` : ''}
 
@@ -579,6 +612,35 @@ export function bindSuccessEvents(manager) {
       const blob = new Blob([jsonStr], { type: 'application/json' });
       downloadBlob(blob, (manager.processedFilename || 'metadata').replace(/\.[^/.]+$/, '') + '.json');
       Toast.success('Downloaded metadata JSON manifest!');
+    };
+  }
+
+  const downloadSanitizeBtn = manager.container.querySelector('#btn-success-download-sanitize-audit');
+  if (downloadSanitizeBtn && manager.lastSanitizeResult) {
+    downloadSanitizeBtn.onclick = () => {
+      const report = manager.lastSanitizeResult;
+      const text = [
+        '=================================================================',
+        '       DOCUMENT SANITIZATION & ANTI-FORENSICS CERTIFICATE       ',
+        '=================================================================',
+        `Sanitized At: ${report.sanitizedAt}`,
+        `Original Size: ${report.originalSizeBytes} bytes`,
+        `Sanitized Size: ${report.sanitizedSizeBytes} bytes`,
+        `Bytes Saved: ${report.bytesSaved} bytes`,
+        `Items Purged: ${report.removedItemsCount}`,
+        '',
+        'PURGED HIDDEN ITEMS BREAKDOWN:',
+        ...(report.removedItems || []).map((item, idx) => `  ${idx + 1}. ${item}`),
+        '',
+        'ENGINE OPTIMIZATIONS APPLIED:',
+        '  - ISO 32000-1 Cross-Reference Object Streams regenerated',
+        '  - Unreferenced indirect objects and orphaned data blocks purged',
+        '  - Tracking metadata and Adobe XMP packets stripped',
+        '================================================================='
+      ].join('\n');
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      downloadBlob(blob, (manager.processedFilename || 'sanitized_document').replace(/\.[^/.]+$/, '') + '_sanitize_audit.txt');
+      Toast.success('Downloaded sanitization audit certificate!');
     };
   }
 

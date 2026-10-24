@@ -122,7 +122,7 @@ export class SanitizeOps {
 
     // Determine Risk Level
     let riskLevel = 'clean';
-    if (findings.javaScriptActions > 0 || findings.embeddedFiles > 0) {
+    if (findings.javaScriptActions > 0 || findings.embeddedFiles > 0 || findings.openActions) {
       riskLevel = 'high';
     } else if (findings.totalThreats > 0) {
       riskLevel = 'moderate';

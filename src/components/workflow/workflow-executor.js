@@ -396,6 +396,23 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([updatedBytes], { type: 'application/pdf' }),
       pageLabelsResult: inspection
     };
+  } else if (['sanitize', 'sanitize-pdf'].includes(id)) {
+    const options = manager.sanitizeOptions || {
+      purgeMetadata: true,
+      purgeEmbeddedFiles: true,
+      purgeScripts: true,
+      purgeAnnotations: true,
+      purgePrivateData: true,
+      flattenForms: true
+    };
+    const sanitizedBytes = await PageOperations.sanitizeDocument(primary.bytes, options);
+    manager.lastSanitizeResult = sanitizedBytes.report;
+    return {
+      name: `Sanitized_${primary.name}`,
+      bytes: sanitizedBytes,
+      blob: new Blob([sanitizedBytes], { type: 'application/pdf' }),
+      sanitizeReport: sanitizedBytes.report
+    };
   } else if (id === 'redact') {
     const redactDoc = await PDFDocument.load(primary.bytes);
     const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);

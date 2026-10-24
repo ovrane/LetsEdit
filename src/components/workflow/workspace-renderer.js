@@ -58,6 +58,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'ppt-to-pdf') return `${batchPrefix}Convert PowerPoint to PDF`;
   if (id === 'edit-metadata') return 'Apply Metadata & Sync XMP';
   if (id === 'pagelabels') return 'Apply Multi-Section Page Labels';
+  if (['sanitize', 'sanitize-pdf'].includes(id)) return `${batchPrefix}Sanitize & Remove Hidden Data`;
   return `${batchPrefix}Process with ${manager.activeTool.title}`;
 }
 
@@ -390,6 +391,31 @@ export function renderToolWorkspace(manager) {
               <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span>ISO 32000-1 PageLabels number tree embedded in PDF catalog</span>
+              </div>
+            </div>
+          ` : ['sanitize', 'sanitize-pdf'].includes(t.id) ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Document Privacy & Anti-Forensics Preview</span>
+                <span style="font-size: 11px; color: ${manager.sanitizeInspection?.riskLevel === 'high' ? '#ef4444' : manager.sanitizeInspection?.riskLevel === 'moderate' ? '#f59e0b' : '#10b981'}; background: ${manager.sanitizeInspection?.riskLevel === 'high' ? 'rgba(239, 68, 68, 0.1)' : manager.sanitizeInspection?.riskLevel === 'moderate' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid currentColor;">
+                  ${manager.sanitizeInspection?.riskLevel === 'high' ? '🔴 High Risk Hidden Vectors' : manager.sanitizeInspection?.riskLevel === 'moderate' ? '🟡 Moderate Risk' : '🟢 Ready to Sanitize'}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="sanitize-center-workspace-wrap" style="position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div style="position: relative; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border-radius: 6px; overflow: hidden; background: white; max-width: 380px; width: 100%;">
+                <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: auto; display: block;" />
+                <div style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.85); color: #f8fafc; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; gap: 4px;">
+                  <span>🛡️</span> Zero-Trace Sanitization
+                </div>
+              </div>
+              <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span>Full catalog strip: XMP, PieceInfo, OpenActions, and orphaned object stream purge</span>
               </div>
             </div>
           ` : t.id === 'pdf-to-text' ? `

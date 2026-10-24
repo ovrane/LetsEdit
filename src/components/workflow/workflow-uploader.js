@@ -171,6 +171,9 @@ export function bindUploadEvents(manager) {
       } else if (manager.activeTool.id === 'pagelabels') {
         sampleBytes = await PageOperations.createSamplePageLabelsPdf();
         sampleName = 'Sample_PageLabels_Document.pdf';
+      } else if (['sanitize', 'sanitize-pdf'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleExposedPdf();
+        sampleName = 'Sample_Exposed_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }
@@ -349,6 +352,15 @@ export async function handleIncomingFiles(manager, files) {
     } catch (e) {
       console.warn('Auto page labels inspection failed:', e);
       manager.pageLabelsInspection = null;
+    }
+  }
+  if (['sanitize', 'sanitize-pdf'].includes(manager.activeTool.id) && manager.uploadedFiles.length > 0) {
+    try {
+      const inspection = await PageOperations.inspectHiddenData(manager.uploadedFiles[0].bytes);
+      manager.sanitizeInspection = inspection;
+    } catch (e) {
+      console.warn('Auto sanitize inspection failed:', e);
+      manager.sanitizeInspection = null;
     }
   }
   manager.stage = 'workspace';

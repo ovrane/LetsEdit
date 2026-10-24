@@ -514,6 +514,18 @@ export const WORKFLOW_TOOLS_CONFIG = {
     buttonText: 'Select PDF file',
     dropText: 'or drop PDF here',
     badge: 'ISO 32000-1 /PageLabels'
+  },
+  sanitize: {
+    id: 'sanitize',
+    title: 'Sanitize Document',
+    subtitle: 'Remove sensitive hidden information, tracking metadata, embedded files, JavaScript actions, and private app data.',
+    icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+    color: '#059669',
+    accept: '.pdf,application/pdf',
+    multiple: false,
+    buttonText: 'Select PDF to Sanitize',
+    dropText: 'or drop confidential PDF here',
+    badge: 'Adobe Anti-Forensics & Privacy'
   }
 };
 
@@ -523,6 +535,9 @@ WORKFLOW_TOOLS_CONFIG['edit-pdf-metadata'] = WORKFLOW_TOOLS_CONFIG['edit-metadat
 WORKFLOW_TOOLS_CONFIG['pdf-properties'] = WORKFLOW_TOOLS_CONFIG['edit-metadata'];
 WORKFLOW_TOOLS_CONFIG['page-labels'] = WORKFLOW_TOOLS_CONFIG.pagelabels;
 WORKFLOW_TOOLS_CONFIG['pdf-page-labels'] = WORKFLOW_TOOLS_CONFIG.pagelabels;
+WORKFLOW_TOOLS_CONFIG['sanitize-pdf'] = WORKFLOW_TOOLS_CONFIG.sanitize;
+WORKFLOW_TOOLS_CONFIG['clean-pdf'] = WORKFLOW_TOOLS_CONFIG.sanitize;
+WORKFLOW_TOOLS_CONFIG['remove-hidden-info'] = WORKFLOW_TOOLS_CONFIG.sanitize;
 
 export const CHAIN_TOOLS = [
   {

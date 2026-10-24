@@ -333,6 +333,13 @@ export const ROUTE_DEFINITIONS = [
     description: "Divide documents into sections with Roman, Arabic, or alphabetic page numbering schemes in ISO 32000-1 /PageLabels."
   },
   {
+    path: '/sanitize_pdf',
+    toolId: 'sanitize',
+    aliases: ['/sanitize-pdf', '/sanitize', '/clean-pdf', '/clean_pdf', '/remove-hidden-info', '/remove_hidden_info'],
+    title: "Sanitize PDF & Remove Hidden Information — Adobe Acrobat Pro — LetsEdit",
+    description: "Permanently scrub hidden metadata, tracking scripts, embedded files, private application data, and purge unreferenced objects."
+  },
+  {
     path: '/extract_pages_pdf',
     toolId: 'extract-pages',
     aliases: ['/extract-pages', '/extract-pages-pdf', '/extract_pages'],
@@ -342,7 +349,7 @@ export const ROUTE_DEFINITIONS = [
   {
     path: '/redact_pdf',
     toolId: 'redact',
-    aliases: ['/redact', '/redact-pdf', '/whiteout_pdf', '/whiteout-pdf', '/sanitize_pdf'],
+    aliases: ['/redact', '/redact-pdf', '/whiteout_pdf', '/whiteout-pdf'],
     title: "Redact PDF online. Permanently remove sensitive data — LetsEdit",
     description: "Permanently scrub confidential text, words, and coordinates from underlying PDF streams."
   },

@@ -7,6 +7,7 @@ import { renderRepairDiagnosticOptionsHtml } from './repair-diagnostic-view.js';
 import { renderAdvancedMergeOptionsHtml, renderAdvancedSplitOptionsHtml } from './workspace-split-merge-options.js';
 import { renderMetadataOptionsHtml } from './workspace-metadata-options.js';
 import { renderPageLabelsOptionsHtml } from './workspace-pagelabels-options.js';
+import { renderSanitizeOptionsHtml } from './workspace-sanitize-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -912,6 +913,10 @@ import { renderPageLabelsOptionsHtml } from './workspace-pagelabels-options.js';
 
     if (id === 'pagelabels') {
       return renderPageLabelsOptionsHtml(instance);
+    }
+
+    if (id === 'sanitize' || id === 'sanitize-pdf') {
+      return renderSanitizeOptionsHtml(instance);
     }
 
     return `

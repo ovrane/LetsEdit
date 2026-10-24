@@ -102,6 +102,7 @@ export const SEJDA_TOOL_CATEGORIES = [
     tools: [
       { id: 'security', title: 'Protect', desc: 'Protect file with password and permissions', icon: 'lock', color: '#dc2626', action: 'workflow:security' },
       { id: 'unlock', title: 'Unlock', desc: 'Remove restrictions and password from PDF files', icon: 'unlock', color: '#10b981', action: 'workflow:unlock' },
+      { id: 'sanitize', title: 'Sanitize Document', desc: 'Remove hidden metadata, embedded files, JavaScript actions, and private app data (Adobe Acrobat Pro standard)', icon: 'shield', color: '#059669', action: 'workflow:sanitize' },
       { id: 'redact', title: 'Redact', desc: 'Permanently remove sensitive text, words and coordinates from PDF streams', icon: 'shield', color: '#0f172a', action: 'workflow:redact' },
       { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#30050d', action: 'workflow:watermark' },
       { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'workflow:flatten' }
