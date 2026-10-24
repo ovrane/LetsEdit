@@ -7,65 +7,21 @@
 import { PDFDocument, PDFName, PDFArray, StandardFonts, rgb } from 'pdf-lib';
 import { decompressStreamBytes, pdfHexToString } from '../pdf-redactor.js';
 
+import { RepairOps } from './operations/repair-ops.js';
+
 export class RepairCompareOperations {
   /**
    * Reconstructs broken cross-reference tables, fixes missing EOF markers, and sanitizes object streams.
    */
   static async repairPdf(corruptedBytes) {
-    let bytes = corruptedBytes instanceof Uint8Array ? corruptedBytes : new Uint8Array(corruptedBytes);
+    return await RepairOps.repairPdfAdvanced(corruptedBytes);
+  }
 
-    // 1. Ensure %PDF header exists
-    let headerIdx = -1;
-    for (let i = 0; i < Math.min(1024, bytes.length - 5); i++) {
-      if (bytes[i] === 0x25 && bytes[i+1] === 0x50 && bytes[i+2] === 0x44 && bytes[i+3] === 0x46 && bytes[i+4] === 0x2D) {
-        headerIdx = i;
-        break;
-      }
-    }
-    if (headerIdx > 0) {
-      bytes = bytes.slice(headerIdx);
-    } else if (headerIdx === -1) {
-      const prepended = new Uint8Array(bytes.length + 9);
-      prepended.set(new TextEncoder().encode('%PDF-1.7\n'));
-      prepended.set(bytes, 9);
-      bytes = prepended;
-    }
-
-    // 2. Ensure %%EOF trailer marker exists
-    let hasEof = false;
-    const endWindow = Math.min(2048, bytes.length);
-    const endStr = new TextDecoder().decode(bytes.slice(bytes.length - endWindow));
-    if (endStr.includes('%%EOF')) {
-      hasEof = true;
-    }
-    if (!hasEof) {
-      const app = new TextEncoder().encode('\n%%EOF\n');
-      const fixed = new Uint8Array(bytes.length + app.length);
-      fixed.set(bytes);
-      fixed.set(app, bytes.length);
-      bytes = fixed;
-    }
-
-    // 3. Load with recovery options & reconstruct clean document
-    const srcDoc = await PDFDocument.load(bytes, {
-      ignoreEncryption: true,
-      parseSpeed: 1,
-      throwOnInvalidObject: false
-    });
-
-    const repairedDoc = await PDFDocument.create();
-    const pageIndices = srcDoc.getPageIndices();
-    const copiedPages = await repairedDoc.copyPages(srcDoc, pageIndices);
-    copiedPages.forEach(p => repairedDoc.addPage(p));
-
-    const recoveredCount = srcDoc.context.enumerateIndirectObjects().length;
-    const cleanBytes = await repairedDoc.save({ useObjectStreams: false });
-
-    return {
-      pdfBytes: cleanBytes,
-      pageCount: repairedDoc.getPageCount(),
-      recoveredObjects: recoveredCount
-    };
+  /**
+   * Performs structural diagnostic inspection of a PDF file.
+   */
+  static diagnosePdf(corruptedBytes) {
+    return RepairOps.diagnosePdf(corruptedBytes);
   }
 
   /**

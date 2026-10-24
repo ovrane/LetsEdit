@@ -12,20 +12,23 @@ import { ConvertOps } from './operations/convert-ops.js';
 import { StampOps } from './operations/stamp-ops.js';
 import { MultiSignOps } from './operations/multi-sign-ops.js';
 import { FormOps } from './operations/form-ops.js';
+import { RepairOps } from './operations/repair-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps };
 
 export class PageOperations {
   // Merge & Organize
   static appendBlankPage(...args) { return MergeOps.appendBlankPage(...args); }
   static mergeExternalPdf(...args) { return MergeOps.mergeExternalPdf(...args); }
   static mergePdf(...args) { return MergeOps.mergePdf(...args); }
+  static mergePdfAdvanced(...args) { return MergeOps.mergePdfAdvanced(...args); }
   static organizePages(...args) { return MergeOps.organizePages(...args); }
 
   // Split & Extract
   static splitPdf(...args) { return SplitOps.splitPdf(...args); }
   static splitBySize(...args) { return SplitOps.splitBySize(...args); }
   static splitByBookmarks(...args) { return SplitOps.splitByBookmarks(...args); }
+  static splitByText(...args) { return SplitOps.splitByText(...args); }
   static splitEveryN(...args) { return SplitOps.splitEveryN(...args); }
   static splitInHalf(...args) { return SplitOps.splitInHalf(...args); }
   static alternateMix(...args) { return SplitOps.alternateMix(...args); }
@@ -61,4 +64,9 @@ export class PageOperations {
   static exportFormData(...args) { return FormOps.exportFormData(...args); }
   static importFormData(...args) { return FormOps.importFormData(...args); }
   static createSampleFillableFormPdf(...args) { return FormOps.createSampleFillableFormPdf(...args); }
+
+  // PDF Repair & Diagnostic Suite
+  static repairPdfAdvanced(...args) { return RepairOps.repairPdfAdvanced(...args); }
+  static diagnosePdf(...args) { return RepairOps.diagnosePdf(...args); }
+  static createCorruptTestPdf(...args) { return RepairOps.createCorruptTestPdf(...args); }
 }

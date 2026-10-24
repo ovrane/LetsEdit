@@ -3,6 +3,8 @@
  */
 
 import { renderFormFillerOptionsHtml } from './workspace-form-options.js';
+import { renderRepairDiagnosticOptionsHtml } from './repair-diagnostic-view.js';
+import { renderAdvancedMergeOptionsHtml, renderAdvancedSplitOptionsHtml } from './workspace-split-merge-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -60,15 +62,12 @@ import { renderFormFillerOptionsHtml } from './workspace-form-options.js';
       return renderFormFillerOptionsHtml(instance);
     }
 
+    if (id === 'repair') {
+      return renderRepairDiagnosticOptionsHtml(instance);
+    }
+
     if (id === 'merge') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Merge Order</label>
-          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-            Files will be compiled in the sequence shown above. Drag any card to change its position or click the rotation icon to adjust page orientation.
-          </div>
-        </div>
-      `;
+      return renderAdvancedMergeOptionsHtml(instance);
     }
 
     if (id === 'compress') {
@@ -103,60 +102,7 @@ import { renderFormFillerOptionsHtml } from './workspace-form-options.js';
     }
 
     if (id === 'split') {
-      const pageCount = primary.pageCount || 1;
-      return `
-        <div class="workflow-options-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <label class="workflow-options-label" style="margin: 0;">Split Mode</label>
-            <span style="font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(48, 5, 13, 0.08); padding: 2px 8px; border-radius: 12px;">
-              ${pageCount} total pages
-            </span>
-          </div>
-          <div class="split-mode-pills">
-            <button type="button" class="split-mode-pill ${instance.splitMode === 'ranges' ? 'active' : ''}" data-split-mode="ranges">
-              Custom Ranges
-            </button>
-            <button type="button" class="split-mode-pill ${instance.splitMode === 'all' ? 'active' : ''}" data-split-mode="all">
-              Extract All Pages
-            </button>
-            <button type="button" class="split-mode-pill ${instance.splitMode === 'size' ? 'active' : ''}" data-split-mode="size">
-              Split by Size
-            </button>
-            <button type="button" class="split-mode-pill ${instance.splitMode === 'bookmarks' ? 'active' : ''}" data-split-mode="bookmarks">
-              Split by Bookmarks
-            </button>
-          </div>
-
-          ${instance.splitMode === 'ranges' ? `
-            <div style="margin-top: 10px;">
-              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Page Ranges</label>
-              <input type="text" id="split-range-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" value="${instance.splitRange}" placeholder="e.g. 1-2, 3-5" />
-              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">
-                Specify comma-separated ranges. Example: <code>1-${Math.min(2, pageCount)}, ${Math.min(3, pageCount)}-${pageCount}</code>
-              </span>
-            </div>
-          ` : instance.splitMode === 'all' ? `
-            <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 6px;">
-              Every single page of this document will be separated into individual PDF files bundled into a convenient ZIP package.
-            </div>
-          ` : instance.splitMode === 'size' ? `
-            <div style="margin-top: 10px;">
-              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Maximum Target Size (MB)</label>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <input type="number" id="split-size-input" class="input-sm" style="width: 90px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" value="${Math.round(instance.splitMaxBytes / (1024 * 1024)) || 5}" min="1" max="500" />
-                <span style="font-size: 13px; font-weight: 600; color: var(--text-main);">MB per file</span>
-              </div>
-              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 6px;">
-                Subdivides the PDF into parts so that each generated document is below your target file size.
-              </span>
-            </div>
-          ` : `
-            <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); margin-top: 6px;">
-              Detects the PDF's Table of Contents outline bookmarks and automatically extracts chapters/sections into individual PDF files.
-            </div>
-          `}
-        </div>
-      `;
+      return renderAdvancedSplitOptionsHtml(instance);
     }
 
     if (id === 'images-to-pdf') {

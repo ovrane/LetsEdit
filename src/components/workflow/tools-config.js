@@ -551,6 +551,20 @@ export const CHAIN_TOOLS = [
     desc: 'Convert to ISO standard archival format',
     color: '#30050d',
     icon: `<svg width="20" height="20" fill="none" stroke="#30050d" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>`
+  },
+  {
+    id: 'repair',
+    title: 'Repair Corrupt PDF',
+    desc: 'Salvage unreadable documents and restore structure',
+    color: '#ef4444',
+    icon: `<svg width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`
+  },
+  {
+    id: 'fill-forms',
+    title: 'Fill & Sign Forms',
+    desc: 'Fill interactive AcroForm fields & export data',
+    color: '#2563eb',
+    icon: `<svg width="20" height="20" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 11h6"></path><path d="M9 19h4"></path></svg>`
   }
 ];
 

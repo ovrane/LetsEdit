@@ -39,6 +39,10 @@ export function renderSuccessScreen(manager) {
   } else if (t.id === 'fill-forms') {
     const count = manager.formExportData?.fieldCount ?? Object.keys(manager.formFieldValues || {}).length;
     subtitleText = `Form processing complete: ${count} AcroForm field${count === 1 ? '' : 's'} updated and validated.`;
+  } else if (t.id === 'repair') {
+    const pages = manager.lastRepairResult?.pageCount ?? 1;
+    const objs = manager.lastRepairResult?.recoveredObjects ?? 0;
+    subtitleText = `Repair complete: ${pages} page${pages === 1 ? '' : 's'} secured, ${objs} indirect objects rebuilt, and cross-reference index restored.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -202,6 +206,34 @@ export function renderSuccessScreen(manager) {
               </button>
               <button type="button" class="btn btn-sm btn-outline" id="btn-success-copy-json" style="background: white; font-weight: 600; font-size: 11.5px;">
                 <span>📋 Copy JSON</span>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(t.id === 'repair' && manager.lastRepairResult) ? `
+          <div class="repair-success-telemetry-card" style="background: rgba(16, 185, 129, 0.04); border: 1.5px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #065f46;">
+                <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                <span>ISO 32000-1 Structural Repair Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #10b981; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastRepairResult.pageCount || 1} Page${manager.lastRepairResult.pageCount === 1 ? '' : 's'} Secured
+              </span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+              ${(manager.lastRepairResult.anomaliesFixed || []).length > 0 ? (manager.lastRepairResult.anomaliesFixed || []).map(a => `
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 3px;">
+                  <span style="color: #10b981; font-weight: bold;">✔</span>
+                  <span style="color: var(--text-main); font-weight: 500;">${a}</span>
+                </div>
+              `).join('') : '<div style="color: #10b981;">Clean document structure re-indexed successfully.</div>'}
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-success-repair-log" style="background: white; color: #065f46; border-color: rgba(16, 185, 129, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+                <span>Download Repair Audit Log (.txt)</span>
               </button>
             </div>
           </div>
@@ -458,6 +490,16 @@ export function bindSuccessEvents(manager) {
       } catch {
         Toast.info('Copy ready');
       }
+    };
+  }
+
+  const repairLogBtn = manager.container.querySelector('#btn-success-repair-log');
+  if (repairLogBtn && manager.lastRepairResult?.diagnosticLog) {
+    repairLogBtn.onclick = () => {
+      const base = (manager.processedFilename || 'repaired_document').replace(/\.[^/.]+$/, '');
+      const blob = new Blob([manager.lastRepairResult.diagnosticLog], { type: 'text/plain;charset=utf-8' });
+      downloadBlob(blob, `${base}_repair_audit.txt`);
+      Toast.success('Downloaded repair audit log!');
     };
   }
 

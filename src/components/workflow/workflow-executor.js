@@ -124,10 +124,13 @@ export async function processSingleDocument(manager, tool, file) {
     };
   } else if (id === 'repair') {
     const res = await pdfEngine.repairPdf(primary.bytes);
+    manager.lastRepairResult = res;
+    const cleanBytes = res.pdfBytes || res.repairedBytes;
     return {
       name: `Repaired_${primary.name}`,
-      bytes: res.repairedBytes,
-      blob: new Blob([res.repairedBytes], { type: 'application/pdf' })
+      bytes: cleanBytes,
+      blob: new Blob([cleanBytes], { type: 'application/pdf' }),
+      repairResult: res
     };
   } else if (id === 'pdf-to-text') {
     const text = await pdfEngine.extractDocumentText(primary.bytes);
@@ -587,8 +590,15 @@ export async function executeAction(manager) {
         });
       }
 
-      const buffers = manager.uploadedFiles.map(f => f.bytes);
-      const mergedBytes = await PageOperations.mergePdf(buffers, {
+      const fileItems = manager.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
+      const mergedBytes = await PageOperations.mergePdfAdvanced(fileItems, {
+        generateToc: manager.mergeGenerateToc,
+        tocTitle: manager.mergeTocTitle || 'Table of Contents',
+        includeBookmarks: manager.mergeBookmarks !== false,
+        addPageNumbers: manager.mergePageNums,
+        addCoverPage: manager.mergeAddCover,
+        coverTitle: manager.mergeCoverTitle,
+        coverSubtitle: manager.mergeCoverSub,
         onProgress: ({ current, total }) => {
           if (manager.uploadedFiles.length > 1) {
             batchProgressModal.completeFile(current - 1);
@@ -607,7 +617,13 @@ export async function executeAction(manager) {
       manager.processedFilename = 'Merged_Document.pdf';
     } else if (t.id === 'split') {
       let splits = [];
-      if (manager.splitMode === 'size') {
+      if (manager.splitMode === 'text') {
+        splits = await PageOperations.splitByText(primary.bytes, {
+          keyword: manager.splitTextKeyword || 'Invoice',
+          mode: manager.splitTextMode || 'contains',
+          filenamePattern: manager.splitTextPattern || '[text]_[n].pdf'
+        });
+      } else if (manager.splitMode === 'size') {
         splits = await PageOperations.splitBySize(primary.bytes, manager.splitMaxBytes);
       } else if (manager.splitMode === 'bookmarks') {
         splits = await PageOperations.splitByBookmarks(primary.bytes);

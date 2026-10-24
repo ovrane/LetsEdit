@@ -12,6 +12,8 @@ import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
 import { signRequestModal } from './sign-request-modal.js';
 import { bindFormFillerEvents } from './workspace-form-options.js';
+import { bindRepairDiagnosticEvents } from './repair-diagnostic-view.js';
+import { bindSplitMergeEvents } from './workspace-split-merge-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -631,5 +633,15 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Form Filler listeners
   if (manager.activeTool.id === 'fill-forms') {
     bindFormFillerEvents(manager);
+  }
+
+  // Repair & Diagnostic listeners
+  if (manager.activeTool.id === 'repair') {
+    bindRepairDiagnosticEvents(manager);
+  }
+
+  // Advanced Split & Merge listeners
+  if (['merge', 'split'].includes(manager.activeTool.id)) {
+    bindSplitMergeEvents(manager);
   }
 }

@@ -162,6 +162,9 @@ export function bindUploadEvents(manager) {
       if (manager.activeTool.id === 'fill-forms') {
         sampleBytes = await PageOperations.createSampleFillableFormPdf();
         sampleName = 'Sample_Fillable_Form.pdf';
+      } else if (manager.activeTool.id === 'repair') {
+        sampleBytes = await PageOperations.createCorruptTestPdf();
+        sampleName = 'Corrupted_Sample_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

@@ -13,6 +13,8 @@ import { handleMobilePairRequest, PAIRING_SESSIONS } from './routes/mobile-pair-
 import { handleSignRequest, SIGNATURE_REQUESTS } from './routes/sign-request-routes.js';
 import { handleCloudStorageRequest, CLOUD_DRIVE_STORAGE } from './routes/cloud-storage-routes.js';
 import { handleFormRequest } from './routes/form-routes.js';
+import { handleRepairRequest } from './routes/repair-routes.js';
+import { handleSplitMergeRequest } from './routes/split-merge-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -70,6 +72,14 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Form Filler & Data Export/Import endpoints
   const formHandled = await handleFormRequest(req, res, pathname, method);
   if (formHandled) return true;
+
+  // Dispatch PDF Repair & Diagnostic Suite endpoints
+  const repairHandled = await handleRepairRequest(req, res, pathname, method);
+  if (repairHandled) return true;
+
+  // Dispatch Advanced Merge & Split endpoints
+  const splitMergeHandled = await handleSplitMergeRequest(req, res, pathname, method);
+  if (splitMergeHandled) return true;
 
   return false;
 }
