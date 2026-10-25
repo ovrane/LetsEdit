@@ -90,6 +90,11 @@ export function renderSuccessScreen(manager) {
     const end = rep?.endFormatted || start;
     const count = rep?.stampedCount || rep?.appliedCount || 1;
     subtitleText = `Dynamic page numbering complete: Stamped ${count} page${count === 1 ? '' : 's'} (${start} → ${end}).`;
+  } else if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(t.id)) {
+    const rep = manager.lastFlattenResult;
+    const fCount = rep?.fieldsFlattened ?? 0;
+    const aCount = rep?.annotationsFlattened ?? 0;
+    subtitleText = `Document flattened: ${fCount} AcroForm field${fCount === 1 ? '' : 's'} and ${aCount} annotation${aCount === 1 ? '' : 's'} converted into permanent read-only vector graphics.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -354,10 +359,7 @@ export function renderSuccessScreen(manager) {
             </div>
             <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--text-main); margin-bottom: 12px;">
               ${(manager.lastSanitizeResult.removedItems || []).map(item => `
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <span style="color: #10b981;">✓</span>
-                  <span>${item}</span>
-                </div>
+                <div style="display: flex; align-items: center; gap: 6px;"><span style="color: #10b981;">✓</span><span>${item}</span></div>
               `).join('')}
             </div>
             <button type="button" class="btn btn-sm btn-outline" id="btn-success-download-sanitize-audit" style="background: white; color: #065f46; border-color: rgba(16, 185, 129, 0.4); font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
@@ -379,13 +381,8 @@ export function renderSuccessScreen(manager) {
               </span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-              ${(manager.lastOutlinesResult.items || []).slice(0, 5).map((item, idx) => `
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); padding: 4px 8px; border-radius: 4px;">
-                  <span style="color: ${item.color || '#3b82f6'}; font-weight: ${item.bold ? '700' : '400'}; font-style: ${item.italic ? 'italic' : 'normal'};">
-                    📑 ${item.title}
-                  </span>
-                  <span style="color: #6366f1; font-weight: 600;">Page ${item.pageNumber}</span>
-                </div>
+              ${(manager.lastOutlinesResult.items || []).slice(0, 5).map((item) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); padding: 4px 8px; border-radius: 4px;"><span style="color: ${item.color || '#3b82f6'}; font-weight: ${item.bold ? '700' : '400'}; font-style: ${item.italic ? 'italic' : 'normal'};">📑 ${item.title}</span><span style="color: #6366f1; font-weight: 600;">Page ${item.pageNumber}</span></div>
               `).join('')}
               ${(manager.lastOutlinesResult.items?.length || 0) > 5 ? `
                 <div style="font-size: 11px; color: #94a3b8; text-align: center;">+ ${manager.lastOutlinesResult.items.length - 5} more sections</div>
@@ -410,21 +407,13 @@ export function renderSuccessScreen(manager) {
               </span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; color: var(--text-muted);">
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(67, 56, 202, 0.15); border-radius: 8px; padding: 10px;">
-                <div style="font-weight: 700; color: #1e1b4b; margin-bottom: 4px; font-size: 11px; text-transform: uppercase;">Headers</div>
-                <div style="font-size: 11px; display: flex; flex-direction: column; gap: 2px;">
-                  <div><b>Left:</b> ${manager.lastHeaderFooterResult.zones?.leftHeader || '<em>None</em>'}</div>
-                  <div><b>Center:</b> ${manager.lastHeaderFooterResult.zones?.centerHeader || '<em>None</em>'}</div>
-                  <div><b>Right:</b> ${manager.lastHeaderFooterResult.zones?.rightHeader || '<em>None</em>'}</div>
-                </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(67, 56, 202, 0.15); border-radius: 8px; padding: 8px;">
+                <div style="font-weight: 700; color: #1e1b4b; margin-bottom: 2px; font-size: 10px; text-transform: uppercase;">Headers</div>
+                <div style="font-size: 11px;">L: ${manager.lastHeaderFooterResult.zones?.leftHeader || '—'} | C: ${manager.lastHeaderFooterResult.zones?.centerHeader || '—'} | R: ${manager.lastHeaderFooterResult.zones?.rightHeader || '—'}</div>
               </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(67, 56, 202, 0.15); border-radius: 8px; padding: 10px;">
-                <div style="font-weight: 700; color: #1e1b4b; margin-bottom: 4px; font-size: 11px; text-transform: uppercase;">Footers</div>
-                <div style="font-size: 11px; display: flex; flex-direction: column; gap: 2px;">
-                  <div><b>Left:</b> ${manager.lastHeaderFooterResult.zones?.leftFooter || '<em>None</em>'}</div>
-                  <div><b>Center:</b> ${manager.lastHeaderFooterResult.zones?.centerFooter || '<em>None</em>'}</div>
-                  <div><b>Right:</b> ${manager.lastHeaderFooterResult.zones?.rightFooter || '<em>None</em>'}</div>
-                </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(67, 56, 202, 0.15); border-radius: 8px; padding: 8px;">
+                <div style="font-weight: 700; color: #1e1b4b; margin-bottom: 2px; font-size: 10px; text-transform: uppercase;">Footers</div>
+                <div style="font-size: 11px;">L: ${manager.lastHeaderFooterResult.zones?.leftFooter || '—'} | C: ${manager.lastHeaderFooterResult.zones?.centerFooter || '—'} | R: ${manager.lastHeaderFooterResult.zones?.rightFooter || '—'}</div>
               </div>
             </div>
           </div>
@@ -442,18 +431,9 @@ export function renderSuccessScreen(manager) {
               </span>
             </div>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px;">
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Source Pages</div>
-                <div style="font-size: 18px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.appliedCount}</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Output Sheets</div>
-                <div style="font-size: 18px; font-weight: 700; color: #2563eb; margin-top: 2px;">${manager.lastNupResult.outputPageCount}</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Grid Formation</div>
-                <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.cols} × ${manager.lastNupResult.rows}</div>
-              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Source Pages</div><div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.appliedCount}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Output Sheets</div><div style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 2px;">${manager.lastNupResult.outputPageCount}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Formation</div><div style="font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.cols} × ${manager.lastNupResult.rows}</div></div>
             </div>
           </div>
         ` : ''}
@@ -524,6 +504,23 @@ export function renderSuccessScreen(manager) {
               <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(48, 5, 13, 0.12); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Format</div><div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastPageNumbersResult.formatTemplate}</div></div>
               <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(48, 5, 13, 0.12); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Sequence</div><div style="font-size: 12px; font-weight: 700; color: #30050d; font-family: monospace; margin-top: 2px;">${manager.lastPageNumbersResult.startFormatted} → ${manager.lastPageNumbersResult.endFormatted}</div></div>
               <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(48, 5, 13, 0.12); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Stamped</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastPageNumbersResult.stampedCount || manager.lastPageNumbersResult.appliedCount}/${manager.lastPageNumbersResult.totalPages}</div></div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(['flatten', 'flatten-pdf', 'flatten-forms'].includes(t.id) && manager.lastFlattenResult) ? `
+          <div class="flatten-success-telemetry-card" style="background: rgba(13, 148, 136, 0.05); border: 1.5px solid rgba(13, 148, 136, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #0f766e;">
+                <svg width="18" height="18" fill="none" stroke="#0d9488" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <span>Document Flattening & Form Audit</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #0d9488; color: white; padding: 2px 8px; border-radius: 12px;">${manager.lastFlattenResult.mode?.toUpperCase()} • READ-ONLY</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px;">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(13, 148, 136, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Fields Baked</div><div style="font-size: 13px; font-weight: 700; color: #0f766e; margin-top: 2px;">${manager.lastFlattenResult.fieldsFlattened} Form Fields</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(13, 148, 136, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Annotations</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastFlattenResult.annotationsFlattened} Cleared</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(13, 148, 136, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Structure</div><div style="font-size: 13px; font-weight: 700; color: #0d9488; margin-top: 2px;">Vector Static</div></div>
             </div>
           </div>
         ` : ''}

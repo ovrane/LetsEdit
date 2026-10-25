@@ -24,6 +24,7 @@ import { bindResizeEvents } from './workspace-resize-options.js';
 import { bindWatermarkEvents } from './workspace-watermark-options.js';
 import { bindBatesEvents } from './workspace-bates-options.js';
 import { bindPageNumbersEvents } from './workspace-pagenumbers-options.js';
+import { bindFlattenEvents } from './workspace-flatten-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -488,6 +489,11 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Page Numbers Tool Controls
   if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(manager.activeTool?.id)) {
     bindPageNumbersEvents(manager);
+  }
+
+  // Document Flattening Tool Controls
+  if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(manager.activeTool?.id)) {
+    bindFlattenEvents(manager);
   }
 
   // Redaction workspace listeners

@@ -314,7 +314,7 @@ export const ROUTE_DEFINITIONS = [
   {
     path: '/flatten_pdf',
     toolId: 'flatten',
-    aliases: ['/flatten', '/flatten-pdf', '/flatten_forms'],
+    aliases: ['/flatten', '/flatten-pdf', '/flatten_forms', '/flatten-forms'],
     title: "Flatten PDF online — Turn form fields into read-only vectors — LetsEdit",
     description: "Makes fillable forms and annotations permanent vectors to prevent further editing."
   },

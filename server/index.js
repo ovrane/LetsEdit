@@ -25,6 +25,7 @@ import { handleResizeRequest } from './routes/resize-routes.js';
 import { handleWatermarkRequest } from './routes/watermark-routes.js';
 import { handleBatesRequest } from './routes/bates-routes.js';
 import { handlePageNumbersRequest } from './routes/pagenumbers-routes.js';
+import { handleFlattenRequest } from './routes/flatten-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -130,6 +131,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Dynamic Page Numbering endpoints
   const pageNumbersHandled = await handlePageNumbersRequest(req, res, pathname, method);
   if (pageNumbersHandled) return true;
+
+  // Dispatch Document Flattening endpoints
+  const flattenHandled = await handleFlattenRequest(req, res, pathname, method);
+  if (flattenHandled) return true;
 
   return false;
 }

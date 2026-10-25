@@ -300,19 +300,18 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([numberedBytes], { type: 'application/pdf' }),
       pageNumbersReport: numberedBytes.report
     };
-  } else if (id === 'flatten') {
-    const flatDoc = await PDFDocument.load(primary.bytes, { ignoreEncryption: true });
-    try {
-      const form = flatDoc.getForm();
-      form.flatten();
-    } catch (e) {
-      console.warn('Form flattening notice:', e);
-    }
-    const flatBytes = await flatDoc.save();
+  } else if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(id)) {
+    const flatBytes = await PageOperations.flattenPdf(primary.bytes, {
+      mode: manager.flattenMode || 'all',
+      stripXFA: manager.flattenStripXFA !== false,
+      cleanNeedAppearances: manager.flattenCleanNeedAppearances !== false
+    });
+    manager.lastFlattenResult = flatBytes.report;
     return {
       name: `Flattened_${primary.name}`,
       bytes: flatBytes,
-      blob: new Blob([flatBytes], { type: 'application/pdf' })
+      blob: new Blob([flatBytes], { type: 'application/pdf' }),
+      flattenReport: flatBytes.report
     };
   } else if (id === 'fill-forms') {
     const fieldVals = manager.formFieldValues || {};

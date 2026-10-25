@@ -23,8 +23,9 @@ import { ResizeOps } from './operations/resize-ops.js';
 import { WatermarkOps } from './operations/watermark-ops.js';
 import { BatesOps } from './operations/bates-ops.js';
 import { PageNumbersOps } from './operations/pagenumbers-ops.js';
+import { FlattenOps } from './operations/flatten-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -137,5 +138,10 @@ export class PageOperations {
   static addPageNumbers(...args) { return PageNumbersOps.applyPageNumbers(...args); }
   static applyPageNumbers(...args) { return PageNumbersOps.applyPageNumbers(...args); }
   static createSamplePageNumbersPdf(...args) { return PageNumbersOps.createSamplePageNumbersPdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF Document Flattening & Form AcroForm Baker
+  static flattenPdf(...args) { return FlattenOps.flattenPdf(...args); }
+  static inspectFlattenTargets(...args) { return FlattenOps.inspectFlattenTargets(...args); }
+  static createSampleFlattenPdf(...args) { return FlattenOps.createSampleFlattenPdf(...args); }
 }
 

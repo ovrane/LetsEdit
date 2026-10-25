@@ -15,6 +15,7 @@ import { renderResizeOptionsHtml } from './workspace-resize-options.js';
 import { renderWatermarkOptionsHtml } from './workspace-watermark-options.js';
 import { renderBatesOptionsHtml } from './workspace-bates-options.js';
 import { renderPageNumbersOptionsHtml } from './workspace-pagenumbers-options.js';
+import { renderFlattenOptionsHtml } from './workspace-flatten-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -712,6 +713,10 @@ import { renderPageNumbersOptionsHtml } from './workspace-pagenumbers-options.js
 
     if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(id)) {
       return renderPageNumbersOptionsHtml(instance);
+    }
+
+    if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(id)) {
+      return renderFlattenOptionsHtml(instance);
     }
 
     if (id === 'redact') {

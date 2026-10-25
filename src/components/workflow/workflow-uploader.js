@@ -195,6 +195,9 @@ export function bindUploadEvents(manager) {
       } else if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSamplePageNumbersPdf();
         sampleName = 'Sample_Research_Whitepaper.pdf';
+      } else if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleFlattenPdf();
+        sampleName = 'Sample_Corporate_NDA_Form.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }
