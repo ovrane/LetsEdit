@@ -20,6 +20,7 @@ import { bindSanitizeEvents } from './workspace-sanitize-options.js';
 import { bindOutlineEvents } from './workspace-outline-options.js';
 import { bindHeaderFooterEvents } from './workspace-header-footer-options.js';
 import { bindNupEvents } from './workspace-nup-options.js';
+import { bindResizeEvents } from './workspace-resize-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -679,5 +680,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // N-Up Page Imposition listeners
   if (['nup', 'n-up', 'nup-pdf'].includes(manager.activeTool.id)) {
     bindNupEvents(manager);
+  }
+
+  // Page Geometry Resizing & Margins listeners
+  if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(manager.activeTool.id)) {
+    bindResizeEvents(manager);
   }
 }

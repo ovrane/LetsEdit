@@ -21,6 +21,7 @@ import { handleSanitizeRequest } from './routes/sanitize-routes.js';
 import { handleOutlineRequest } from './routes/outline-routes.js';
 import { handleHeaderFooterRequest } from './routes/header-footer-routes.js';
 import { handleNupRequest } from './routes/nup-routes.js';
+import { handleResizeRequest } from './routes/resize-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -110,6 +111,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch N-Up Page Imposition endpoints
   const nupHandled = await handleNupRequest(req, res, pathname, method);
   if (nupHandled) return true;
+
+  // Dispatch Page Geometry Resizing & Margins endpoints
+  const resizeHandled = await handleResizeRequest(req, res, pathname, method);
+  if (resizeHandled) return true;
 
   return false;
 }

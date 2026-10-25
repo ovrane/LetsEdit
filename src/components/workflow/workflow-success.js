@@ -68,6 +68,12 @@ export function renderSuccessScreen(manager) {
     const out = rep?.outputPageCount ?? 1;
     const src = rep?.appliedCount ?? rep?.sourcePages ?? 1;
     subtitleText = `N-Up imposition complete: ${src} source page${src === 1 ? '' : 's'} imposed onto ${out} sheet${out === 1 ? '' : 's'} in ${l}-Up ${rep?.orientation || ''} format.`;
+  } else if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(t.id)) {
+    const rep = manager.lastResizeResult;
+    const sz = (rep?.pageSize || 'original').toUpperCase();
+    const count = rep?.appliedCount || 1;
+    const gut = rep?.bindingGutter ? ` with +${rep.bindingGutter}pt ${rep.mirrorMargins ? 'duplex' : ''} binding gutter` : '';
+    subtitleText = `Page geometry adjusted: ${count} page${count === 1 ? '' : 's'} standardized to ${sz}${gut}.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -431,6 +437,38 @@ export function renderSuccessScreen(manager) {
               <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
                 <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Grid Formation</div>
                 <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.cols} × ${manager.lastNupResult.rows}</div>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(t.id) && manager.lastResizeResult) ? `
+          <div class="resize-success-telemetry-card" style="background: rgba(99, 102, 241, 0.05); border: 1.5px solid rgba(99, 102, 241, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #4f46e5;">
+                <svg width="18" height="18" fill="none" stroke="#4f46e5" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                <span>Page Geometry & Margins Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #4f46e5; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastResizeResult.pageSize?.toUpperCase()} Standard
+              </span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 12px;">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Top / Bottom</div>
+                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">+${manager.lastResizeResult.marginTop} / +${manager.lastResizeResult.marginBottom} pt</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Left / Right</div>
+                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">+${manager.lastResizeResult.marginLeft} / +${manager.lastResizeResult.marginRight} pt</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Binding Gutter</div>
+                <div style="font-size: 14px; font-weight: 700; color: #4f46e5; margin-top: 2px;">+${manager.lastResizeResult.bindingGutter} pt</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Pages Adjusted</div>
+                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastResizeResult.appliedCount} / ${manager.lastResizeResult.totalPages}</div>
               </div>
             </div>
           </div>

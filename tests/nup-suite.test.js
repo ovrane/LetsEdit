@@ -162,7 +162,7 @@ test('GET /api/nup/sample returns sample base64 PDF', async () => {
   const res = createMockRes();
 
   const handled = await handleNupRequest(req, res, '/api/nup/sample', 'GET');
-  assert.strictEqual(handled, undefined);
+  assert(Boolean(handled));
   assert.strictEqual(res.statusCode, 200);
 
   const parsed = JSON.parse(res.body);

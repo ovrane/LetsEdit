@@ -154,7 +154,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'bookmarks', title: 'Bookmarks & Outline', desc: 'Create, nest, color-code, and manage PDF navigation bookmarks in ISO 32000-1 /Outlines', icon: 'bookmark', color: '#6366f1', action: 'workflow:bookmarks' },
       { id: 'rename', title: 'Rename', desc: 'Change document filename based on text from the PDF pages', icon: 'edit', color: '#059669', action: 'workflow:rename' },
       { id: 'repair', title: 'Repair', desc: 'Recover data from a corrupted or damaged PDF document', icon: 'tool', color: '#ef4444', action: 'workflow:repair' },
-      { id: 'resize', title: 'Resize', desc: 'Add page margins and padding, Change PDF page size', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },
+      { id: 'resize', title: 'Resize Margins & Pages', desc: 'Add page margins, spiral/binder gutters with duplex mirroring, and standardize sheet dimensions (A4/Letter)', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },
       { id: 'rotate', title: 'Rotate', desc: 'Rotate and save PDF pages permanently', icon: 'rotate', color: '#f59e0b', action: 'workflow:rotate' },
       { id: 'remove-annotations', title: 'Remove annotations', desc: 'Batch remove highlights, strikeouts or any other annotations from a PDF document', icon: 'trash-2', color: '#dc2626', action: 'workflow:remove-annotations' },
       { id: 'pdfa', title: 'PDF to PDF/A', desc: 'Convert PDF documents to PDF/A for ISO 19005-1 long-term archiving', icon: 'shield', color: '#059669', action: 'workflow:pdfa' }

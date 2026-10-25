@@ -27,7 +27,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'security') return `${batchPrefix}Encrypt & Protect PDF`;
   if (id === 'rotate') return `${batchPrefix}Rotate PDF Pages`;
   if (id === 'crop') return `${batchPrefix}Apply Crop`;
-  if (id === 'resize') return `${batchPrefix}Resize Margins`;
+  if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(id)) return `${batchPrefix}Apply Page Margins & Resize`;
   if (id === 'grayscale') return `${batchPrefix}Convert to Grayscale`;
   if (id === 'flip') return `${batchPrefix}Mirror / Flip Pages`;
   if (id === 'repair') return `${batchPrefix}Repair PDF`;
@@ -210,6 +210,29 @@ export function renderToolWorkspace(manager) {
                 </div>
               </div>
             </div>
+          ` : ['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(t.id) ? `
+            <div class="workflow-cards-toolbar">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 600; font-size: 14px;">Page Margins & Bounds Preview</span>
+                <span style="font-size: 11px; color: #6366f1; background: rgba(99, 102, 241, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.25);">
+                  ${(manager.resizeConfig?.pageSize || 'original').toUpperCase()} Standard
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                ${manager.uploadedFiles[0]?.name || ''}
+              </div>
+            </div>
+
+            <div class="resize-workspace-wrap" style="position: relative; display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 24px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
+              <div id="resize-outer-sheet" style="position: relative; width: 300px; height: 420px; background: ${manager.resizeConfig?.backgroundColor || '#ffffff'}; border: 2px solid var(--border-strong); border-radius: 4px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); display: flex; align-items: center; justify-content: center;">
+                <div id="resize-inner-page" style="position: absolute; top: ${(manager.resizeConfig?.marginTop || 0) * 0.35}px; bottom: ${(manager.resizeConfig?.marginBottom || 0) * 0.35}px; left: ${((manager.resizeConfig?.marginLeft || 0) + (manager.resizeConfig?.bindingGutter || 0)) * 0.35}px; right: ${(manager.resizeConfig?.marginRight || 0) * 0.35}px; background: rgba(99, 102, 241, 0.08); border: 1.5px dashed #6366f1; border-radius: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;">
+                  <img src="${manager.uploadedFiles[0]?.thumbnailUrl || ''}" style="width: 100%; height: 100%; object-fit: contain; opacity: 0.85;" />
+                  <div style="position: absolute; bottom: 8px; font-size: 10px; color: #6366f1; background: rgba(255,255,255,0.9); padding: 2px 6px; border-radius: 4px; font-weight: 600;">
+                    Printable Content
+                  </div>
+                </div>
+              </div>
+            </div>
           ` : t.id === 'bates' ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">
@@ -231,19 +254,12 @@ export function renderToolWorkspace(manager) {
                 </div>
               </div>
             </div>
-          ` : ['nup', 'n-up', 'nup-pdf'].includes(t.id) ? (() => {
-            const cfg = manager.nupConfig || {};
-            const layout = Number(cfg.layout || manager.nupCount || 2);
-            const orient = cfg.orientation === 'landscape' || (cfg.orientation !== 'portrait' && layout === 2) ? 'landscape' : 'portrait';
-            const cols = (layout === 2 && orient === 'landscape') ? 2 : (layout === 6 && orient === 'landscape') ? 3 : (layout === 8 && orient === 'landscape') ? 4 : 2;
-            const rows = Math.ceil(layout / cols);
-            const isLandscape = orient === 'landscape';
-            return `
+          ` : ['nup', 'n-up', 'nup-pdf'].includes(t.id) ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-weight: 600; font-size: 14px;">Imposition Layout Preview</span>
                 <span style="font-size: 11px; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.25);">
-                  ${layout}-Up ${orient === 'landscape' ? 'Landscape' : 'Portrait'} (${cols}×${rows})
+                  ${manager.nupConfig?.layout || manager.nupCount || 2}-Up Layout
                 </span>
               </div>
               <div style="font-size: 12px; color: var(--text-muted);">
@@ -252,16 +268,15 @@ export function renderToolWorkspace(manager) {
             </div>
 
             <div class="nup-workspace-wrap" style="display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
-              <div style="background: ${cfg.backgroundColor || '#ffffff'}; border: 2px solid var(--border-strong); box-shadow: 0 12px 28px rgba(0,0,0,0.2); border-radius: 6px; padding: 16px; ${isLandscape ? 'width: 420px; height: 297px;' : 'width: 297px; height: 420px;'} display: grid; grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr); gap: ${cfg.gutter ? Math.min(cfg.gutter, 12) : 8}px;">
-                ${Array.from({ length: layout }).map((_, i) => `
-                  <div style="border: ${cfg.showBorder ? `1px solid ${cfg.borderColor || '#94a3b8'}` : '1px dashed #64748b'}; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; color: #475569; font-size: 11px; font-weight: 600;">
+              <div style="background: ${manager.nupConfig?.backgroundColor || '#ffffff'}; border: 2px solid var(--border-strong); box-shadow: 0 12px 28px rgba(0,0,0,0.2); border-radius: 6px; padding: 16px; ${(manager.nupConfig?.orientation === 'landscape' || (!manager.nupConfig?.orientation && (manager.nupConfig?.layout || manager.nupCount || 2) === 2)) ? 'width: 420px; height: 297px;' : 'width: 297px; height: 420px;'} display: grid; grid-template-columns: repeat(${(manager.nupConfig?.layout || manager.nupCount || 2) === 2 && (manager.nupConfig?.orientation === 'landscape' || !manager.nupConfig?.orientation) ? 2 : (manager.nupConfig?.layout || 2) === 6 && manager.nupConfig?.orientation === 'landscape' ? 3 : (manager.nupConfig?.layout || 2) === 8 && manager.nupConfig?.orientation === 'landscape' ? 4 : 2}, 1fr); gap: 10px;">
+                ${Array.from({ length: manager.nupConfig?.layout || manager.nupCount || 2 }).map((_, i) => `
+                  <div style="border: ${manager.nupConfig?.showBorder ? `1px solid ${manager.nupConfig?.borderColor || '#94a3b8'}` : '1px dashed #64748b'}; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; color: #475569; font-size: 11px; font-weight: 600; min-height: 50px;">
                     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     <span style="margin-top: 2px;">Page ${i + 1}</span>
                   </div>
                 `).join('')}
               </div>
             </div>
-          `; })()
           ` : t.id === 'split-half' ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">

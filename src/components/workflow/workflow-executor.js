@@ -172,17 +172,15 @@ export async function processSingleDocument(manager, tool, file) {
       bytes: croppedBytes,
       blob: new Blob([croppedBytes], { type: 'application/pdf' })
     };
-  } else if (id === 'resize') {
-    const resizedBytes = await pdfEngine.resizePdfMargins(primary.bytes, {
-      marginTop: 20,
-      marginRight: 20,
-      marginBottom: 20,
-      marginLeft: 20
-    });
+  } else if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(id)) {
+    const config = manager.resizeConfig || { marginTop: 20, marginRight: 20, marginBottom: 20, marginLeft: 20 };
+    const resizedBytes = await PageOperations.resizePdf(primary.bytes, config);
+    manager.lastResizeResult = resizedBytes.report;
     return {
       name: `Resized_${primary.name}`,
       bytes: resizedBytes,
-      blob: new Blob([resizedBytes], { type: 'application/pdf' })
+      blob: new Blob([resizedBytes], { type: 'application/pdf' }),
+      resizeReport: resizedBytes.report
     };
   } else if (id === 'bates') {
     const batesBytes = await PageOperations.batesNumberPdf(primary.bytes, {

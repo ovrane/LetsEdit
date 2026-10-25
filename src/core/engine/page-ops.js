@@ -19,8 +19,9 @@ import { SanitizeOps } from './operations/sanitize-ops.js';
 import { OutlineOps } from './operations/outline-ops.js';
 import { HeaderFooterOps } from './operations/header-footer-ops.js';
 import { NupOps } from './operations/nup-ops.js';
+import { ResizeOps } from './operations/resize-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -110,5 +111,9 @@ export class PageOperations {
   // Adobe Acrobat Pro & iLovePDF N-Up Page Imposition Engine
   static applyNup(...args) { return NupOps.applyNup(...args); }
   static createSampleNupPdf(...args) { return NupOps.createSampleNupPdf(...args); }
+
+  // Adobe Acrobat Pro & Sejda Page Geometry Resizing & Margins Engine
+  static resizePdf(...args) { return ResizeOps.resizePdf(...args); }
+  static createSampleResizePdf(...args) { return ResizeOps.createSampleResizePdf(...args); }
 }
 

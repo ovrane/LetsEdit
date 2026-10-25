@@ -11,6 +11,7 @@ import { renderSanitizeOptionsHtml } from './workspace-sanitize-options.js';
 import { renderOutlineOptionsHtml } from './workspace-outline-options.js';
 import { renderHeaderFooterOptionsHtml } from './workspace-header-footer-options.js';
 import { renderNupOptionsHtml } from './workspace-nup-options.js';
+import { renderResizeOptionsHtml } from './workspace-resize-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -467,6 +468,10 @@ import { renderNupOptionsHtml } from './workspace-nup-options.js';
 
     if (['nup', 'n-up', 'nup-pdf'].includes(id)) {
       return renderNupOptionsHtml(instance);
+    }
+
+    if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(id)) {
+      return renderResizeOptionsHtml(instance);
     }
 
     if (id === 'split-half') {

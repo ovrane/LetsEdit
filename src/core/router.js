@@ -279,9 +279,9 @@ export const ROUTE_DEFINITIONS = [
   {
     path: '/resize_pdf',
     toolId: 'resize',
-    aliases: ['/resize', '/resize-pdf', '/page_margins'],
-    title: "Resize PDF Margins & Page — LetsEdit",
-    description: "Add binding margins or fit pages to standard A4/Letter sheet bounds."
+    aliases: ['/resize', '/resize-pdf', '/page_margins', '/resize-margins', '/page-margins'],
+    title: "Adobe Acrobat & Sejda Resize PDF Margins & Page — LetsEdit",
+    description: "Expand page margins, add spiral/ring binding gutters with duplex mirroring, or fit pages to standard paper formats."
   },
   {
     path: '/deskew_pdf',

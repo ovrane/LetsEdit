@@ -183,6 +183,9 @@ export function bindUploadEvents(manager) {
       } else if (['nup', 'n-up', 'nup-pdf'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleNupPdf();
         sampleName = 'Sample_Imposition_Document.pdf';
+      } else if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleResizePdf();
+        sampleName = 'Sample_Resize_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }
