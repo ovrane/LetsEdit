@@ -307,7 +307,7 @@ export class LandingPage {
       };
     });
 
-    // Footer multi-column links
+    // Footer multi-column links (both data-tool and data-action)
     this.container.querySelectorAll('.footer-links a[data-tool], .footer-col a[data-tool]').forEach(link => {
       link.onclick = (e) => {
         e.preventDefault();
@@ -323,6 +323,35 @@ export class LandingPage {
         }
       };
     });
+
+    this.container.querySelectorAll('.footer-col a[data-action], .footer-badge-item[data-action]').forEach(link => {
+      link.onclick = (e) => {
+        e.preventDefault();
+        const action = link.getAttribute('data-action');
+        if (action?.startsWith('app:')) {
+          Toast.success('LetsEdit is an offline-capable Desktop PWA! Install via your browser address bar icon or pin to your taskbar.');
+        } else if (action) {
+          this.handleToolAction(action);
+        }
+      };
+    });
+
+    // Windows & Web App Showcase Buttons
+    const installDesktopBtn = this.container.querySelector('#btn-install-desktop-app');
+    if (installDesktopBtn) {
+      installDesktopBtn.onclick = (e) => {
+        e.preventDefault();
+        Toast.success('LetsEdit Desktop App: Install via your browser address bar (Install App icon) or use 100% offline.');
+      };
+    }
+
+    const openWebAppBtn = this.container.querySelector('#btn-open-web-app');
+    if (openWebAppBtn) {
+      openWebAppBtn.onclick = (e) => {
+        e.preventDefault();
+        router.navigate('/edit_pdf');
+      };
+    }
   }
 
   async loadSelectedFile(file) {

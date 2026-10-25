@@ -2633,87 +2633,388 @@ body.show-tool-workflow .tool-workflow-container {
   flex: 1;
 }
 
-/* Features Trust Section */
-.landing-features-section {
-  padding: 60px 20px;
+/* ==========================================================================
+   Why Choose LetsEdit (Executive Value Props)
+   ========================================================================== */
+
+.landing-why-choose-section {
+  padding: 80px 24px;
   background-color: var(--bg-surface);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.features-inner {
-  max-width: 1100px;
+.why-choose-container {
+  max-width: 1240px;
   margin: 0 auto;
+}
+
+.section-badge-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 52px;
+}
+
+.section-tag-pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: rgba(48, 5, 13, 0.07);
+  padding: 4px 14px;
+  border-radius: 9999px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(48, 5, 13, 0.14);
+}
+
+.section-main-heading {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  margin: 0 0 12px 0;
+}
+
+.section-sub-heading {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.why-choose-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 36px;
+  gap: 24px;
 }
 
-.feature-item {
-  text-align: center;
+@media (max-width: 1024px) {
+  .why-choose-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.feature-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  margin: 0 auto 16px;
+@media (max-width: 640px) {
+  .why-choose-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.why-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.why-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(48, 5, 13, 0.25);
+  box-shadow: 0 16px 36px -12px rgba(15, 23, 42, 0.12);
+}
+
+.why-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.why-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.feature-item h3 {
-  font-size: 16px;
+.why-pill-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.why-card-title {
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+  margin: 0 0 10px 0;
 }
 
-.feature-item p {
+.why-card-desc {
   font-size: 13.5px;
   line-height: 1.6;
   color: var(--text-muted);
+  margin: 0;
+  flex: 1;
 }
 
-/* SEO FAQ Accordion */
+/* ==========================================================================
+   Windows, Mac & Mobile Apps Showcase Section
+   ========================================================================== */
+
+.landing-apps-section {
+  padding: 72px 24px;
+  background: linear-gradient(180deg, var(--bg-app) 0%, var(--bg-surface) 100%);
+}
+
+.apps-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.apps-banner {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: center;
+  box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+}
+
+@media (max-width: 960px) {
+  .apps-banner {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+  }
+}
+
+.apps-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.apps-pill {
+  margin-bottom: 12px;
+  width: fit-content;
+}
+
+.apps-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  margin: 0 0 14px 0;
+}
+
+.apps-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 24px 0;
+}
+
+.apps-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.apps-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-main);
+}
+
+.apps-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.apps-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.apps-preview-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.apps-device-frame {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.device-window-header {
+  background: var(--bg-app);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.device-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.device-dot.red { background: #ef4444; }
+.device-dot.yellow { background: #f59e0b; }
+.device-dot.green { background: #10b981; }
+
+.device-window-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.device-window-body {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.device-sample-tool {
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.device-tool-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #10b981;
+  letter-spacing: 0.05em;
+}
+
+.device-tool-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.device-tool-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.device-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.device-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Executive FAQ Accordion (Adobe & Smallpdf Style)
+   ========================================================================== */
+
 .landing-faq-section {
-  padding: 60px 20px;
-  max-width: 820px;
+  padding: 80px 24px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.faq-container {
+  max-width: 860px;
   margin: 0 auto;
 }
 
 .faq-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 8px;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
+  margin: 0 0 10px 0;
 }
 
 .faq-subtitle {
-  font-size: 15px;
+  font-size: 15.5px;
   color: var(--text-muted);
   text-align: center;
-  margin-bottom: 36px;
+  margin: 0 0 44px 0;
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .faq-item {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  margin-bottom: 12px;
+  border-radius: 14px;
   overflow: hidden;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.faq-item:hover {
+  border-color: var(--border-strong);
+}
+
+.faq-item[open] {
+  border-color: rgba(48, 5, 13, 0.28);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .faq-question {
   font-size: 15px;
   font-weight: 600;
-  padding: 16px 20px;
+  padding: 18px 22px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: var(--text-main);
+  gap: 16px;
+  user-select: none;
 }
 
 .faq-question::-webkit-details-marker {
@@ -2721,19 +3022,22 @@ body.show-tool-workflow .tool-workflow-container {
 }
 
 .faq-chevron {
-  transition: transform 0.2s ease;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .faq-item[open] .faq-chevron {
   transform: rotate(180deg);
+  color: var(--primary);
 }
 
 .faq-answer {
-  padding: 0 20px 18px;
+  padding: 0 22px 20px;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-muted);
+  border-top: 1px solid transparent;
 }
 
 /* Landing Footer */
@@ -5829,6 +6133,23 @@ body.show-tool-workflow .editor-paging-bar {
   color: var(--text-muted);
   margin: 0 0 16px 0;
   line-height: 1.5;
+}
+
+.footer-trust-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.footer-trust-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
 }
 
 .footer-social-links {

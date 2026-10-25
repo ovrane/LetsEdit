@@ -497,96 +497,242 @@ export function getLandingTemplateHtml() {
         </div>
       </section>
 
-      <!-- Feature Trust Badges Section -->
-      <section class="landing-features-section">
-        <div class="features-inner">
-          <div class="feature-item">
-            <div class="feature-icon" style="background: rgba(48,5,13,0.08); color: #30050d;">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            </div>
-            <h3>100% Private & Confidential</h3>
-            <p>Your documents never leave your browser. Processing runs in client-side WebAssembly with zero telemetry or third-party servers.</p>
+      <!-- Why Choose LetsEdit (Executive Adobe & Smallpdf Style Value Props) -->
+      <section class="landing-why-choose-section">
+        <div class="why-choose-container">
+          <div class="section-badge-header">
+            <span class="section-tag-pill">WHY CHOOSE LETSEDIT</span>
+            <h2 class="section-main-heading">The Safe, Fast, and Uncompromising PDF Suite</h2>
+            <p class="section-sub-heading">Built for legal professionals, enterprises, and everyday creators who demand 100% private in-browser speed with zero server uploads.</p>
           </div>
 
-          <div class="feature-item">
-            <div class="feature-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+          <div class="why-choose-grid">
+            <div class="why-card">
+              <div class="why-card-top">
+                <div class="why-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <span class="why-pill-badge" style="background: rgba(16, 185, 129, 0.12); color: #059669;">100% Client-Side</span>
+              </div>
+              <h3 class="why-card-title">Zero Cloud Uploads & Maximum Privacy</h3>
+              <p class="why-card-desc">Your confidential contracts, financials, and medical records never leave your machine. Processing runs inside client-side WebAssembly with zero server telemetry.</p>
             </div>
-            <h3>Sub-Second Speed</h3>
-            <p>Instant loading with PDF.js and PDF-Lib vector compilation. No slow upload delays, file size throttling, or server queues.</p>
-          </div>
 
-          <div class="feature-item">
-            <div class="feature-icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <div class="why-card">
+              <div class="why-card-top">
+                <div class="why-icon-box" style="background: rgba(48, 5, 13, 0.1); color: #30050d;">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <span class="why-pill-badge" style="background: rgba(48, 5, 13, 0.08); color: #30050d;">Sub-Second Speed</span>
+              </div>
+              <h3 class="why-card-title">Blazing Fast WebAssembly Performance</h3>
+              <p class="why-card-desc">Zero bandwidth lag, zero upload waiting, and no server timeouts. Split 500-page discovery files or compress multi-gigabyte scans directly on your local hardware.</p>
             </div>
-            <h3>No Paywalls or Hourly Limits</h3>
-            <p>Unlimited document sizes, unlimited pages, and unlimited daily tasks. Enterprise-grade tools completely free for everyone.</p>
+
+            <div class="why-card">
+              <div class="why-card-top">
+                <div class="why-icon-box" style="background: rgba(139, 92, 246, 0.12); color: #7c3aed;">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </div>
+                <span class="why-pill-badge" style="background: rgba(139, 92, 246, 0.12); color: #7c3aed;">Direct Editing</span>
+              </div>
+              <h3 class="why-card-title">True Text Editing In Your Browser</h3>
+              <p class="why-card-desc">Correct typos and rewrite original paragraphs directly in your PDF. Our text engine matches font families, glyph weights, font sizes, and baseline alignments automatically.</p>
+            </div>
+
+            <div class="why-card">
+              <div class="why-card-top">
+                <div class="why-icon-box" style="background: rgba(225, 29, 72, 0.12); color: #e11d48;">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+                </div>
+                <span class="why-pill-badge" style="background: rgba(225, 29, 72, 0.12); color: #be123c;">Legal Grade</span>
+              </div>
+              <h3 class="why-card-title">Permanent Vector Redaction</h3>
+              <p class="why-card-desc">True forensic sanitization: parses content streams and permanently deletes glyph tokens and underlying text matrices. Opaque redaction masks cannot be reversed.</p>
+            </div>
+
+            <div class="why-card">
+              <div class="why-card-top">
+                <div class="why-icon-box" style="background: rgba(14, 165, 233, 0.12); color: #0284c7;">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <span class="why-pill-badge" style="background: rgba(14, 165, 233, 0.12); color: #0369a1;">Bates & Flattening</span>
+              </div>
+              <h3 class="why-card-title">Bates Numbering & Form Flattening</h3>
+              <p class="why-card-desc">Conform to legal discovery protocols with 8-digit zero-padded Bates sequencing, 6-zone layout alignment, and AcroForm vector flattening to lock finalized contracts.</p>
+            </div>
+
+            <div class="why-card">
+              <div class="why-card-top">
+                <div class="why-icon-box" style="background: rgba(234, 88, 12, 0.12); color: #ea580c;">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+                </div>
+                <span class="why-pill-badge" style="background: rgba(234, 88, 12, 0.12); color: #c2410c;">Audit Ready</span>
+              </div>
+              <h3 class="why-card-title">Digital Signatures with Audit Trails</h3>
+              <p class="why-card-desc">Sign documents electronically with tamper-evident SHA-256 cryptographic verification, unique transaction UUIDs, timestamp certificates, and audit trails.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- SEO FAQ Accordion Section -->
+      <!-- Windows, Mac & Mobile Apps Showcase (Smallpdf & Adobe Style) -->
+      <section class="landing-apps-section">
+        <div class="apps-container">
+          <div class="apps-banner">
+            <div class="apps-content">
+              <span class="section-tag-pill apps-pill">WINDOWS, MAC & MOBILE</span>
+              <h2 class="apps-title">Work With PDFs Anywhere — Even Offline</h2>
+              <p class="apps-desc">Install LetsEdit as a lightweight desktop application on Windows, macOS, or Linux, or use our mobile touch interface on iPhone and Android. Zero dependencies, 100% offline capability.</p>
+
+              <div class="apps-feature-list">
+                <div class="apps-feature-item">
+                  <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span><strong>1-Click Desktop App</strong> (Run native PWA with zero admin rights required)</span>
+                </div>
+                <div class="apps-feature-item">
+                  <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span><strong>100% Offline Mode</strong> (Edit, compress, merge, and sign without internet)</span>
+                </div>
+                <div class="apps-feature-item">
+                  <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span><strong>Mobile Touch Ready</strong> (Smooth signing, forms, and page organizing on mobile)</span>
+                </div>
+              </div>
+
+              <div class="apps-actions">
+                <button class="btn btn-primary apps-cta-btn" id="btn-install-desktop-app" title="Launch Windows desktop app">
+                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                  <span>Windows Desktop App</span>
+                </button>
+                <button class="btn btn-outline apps-cta-btn" id="btn-open-web-app" title="Open Web Studio">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  <span>Launch Web Studio</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="apps-preview-box">
+              <div class="apps-device-frame">
+                <div class="device-window-header">
+                  <span class="device-dot red"></span>
+                  <span class="device-dot yellow"></span>
+                  <span class="device-dot green"></span>
+                  <span class="device-window-title">LetsEdit Studio — Windows & Offline</span>
+                </div>
+                <div class="device-window-body">
+                  <div class="device-sample-tool">
+                    <span class="device-tool-badge">OFFLINE READY</span>
+                    <span class="device-tool-title">High-Performance Vector Engine</span>
+                    <p class="device-tool-desc">Processed 4,200+ pages locally with 0-byte network footprint.</p>
+                  </div>
+                  <div class="device-badges-row">
+                    <span class="device-chip">Windows 11 / 10</span>
+                    <span class="device-chip">macOS Sonoma</span>
+                    <span class="device-chip">Linux</span>
+                    <span class="device-chip">iOS & Android</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEO FAQ Accordion Section (Executive Adobe & Smallpdf Style) -->
       <section class="landing-faq-section">
         <div class="faq-container">
-          <h2 class="faq-title">Frequently Asked Questions</h2>
-          <p class="faq-subtitle">Everything you need to know about our browser-native PDF suite</p>
+          <div class="section-badge-header">
+            <span class="section-tag-pill">HELP & KNOWLEDGE BASE</span>
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            <p class="faq-subtitle">Everything you need to know about our browser-native WebAssembly PDF suite</p>
+          </div>
 
           <div class="faq-accordion">
             <details class="faq-item" open>
               <summary class="faq-question">
-                <span>Is LetsEdit really free to use?</span>
+                <span>Is LetsEdit really 100% free with no hidden fees or daily limits?</span>
                 <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </summary>
               <div class="faq-answer">
-                Yes, LetsEdit is 100% free with no hidden subscriptions, credit card requirements, or artificial hourly caps. You can edit, merge, compress, split, redact, and sign as many PDFs as you need.
+                Yes, LetsEdit is completely free. We do not impose artificial 2-task hourly limits, file size throttles, or premium paywalls. All 43+ tools—including advanced capabilities like permanent redaction, Bates numbering, and digital signatures—are fully accessible without requiring a credit card or mandatory subscription.
               </div>
             </details>
 
             <details class="faq-item">
               <summary class="faq-question">
-                <span>Are my files and sensitive data safe?</span>
+                <span>How does 100% client-side WebAssembly protect my confidential files?</span>
                 <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </summary>
               <div class="faq-answer">
-                Absolutely. Unlike traditional PDF web apps that upload your confidential files to remote cloud servers, LetsEdit executes 100% locally on your machine using client-side WebAssembly. Your files never touch any external server.
+                Standard online PDF editors upload your sensitive files to remote cloud servers to process them, creating security and compliance risks. LetsEdit compiles enterprise PDF engines (PDF.js, PDF-Lib, and WebAssembly) to run directly inside your browser sandbox. Your PDF data, text, and images never leave your local machine.
               </div>
             </details>
 
             <details class="faq-item">
               <summary class="faq-question">
-                <span>Is Permanent Redaction truly permanent and safe?</span>
+                <span>How is Permanent Vector Redaction different from drawing black rectangles?</span>
                 <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </summary>
               <div class="faq-answer">
-                Yes. Our Permanent Redaction engine decompresses the raw content streams and removes the text tokens, glyph matrices, and metadata permanently before drawing an opaque masking box. Unlike cosmetic black boxes in simple editors, the underlying text cannot be recovered via text selection, copy-paste, or forensic stream decompilation.
+                In basic editors, drawing a black box simply places a cosmetic layer over the text—meaning anyone can still select, copy, search, or forensically extract the underlying confidential words. LetsEdit's permanent redaction parses the raw PDF content streams, completely removes the underlying font tokens and glyph matrices, and burns an opaque mask into the page vector stream, guaranteeing irreversible data removal.
               </div>
             </details>
 
             <details class="faq-item">
               <summary class="faq-question">
-                <span>Can I use Bates Numbering for legal discovery?</span>
+                <span>Can I use LetsEdit offline without an internet connection?</span>
                 <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </summary>
               <div class="faq-answer">
-                Yes! Our Bates Numbering tool conforms to legal discovery standards. It supports custom prefixes (e.g. 'PLAINTIFF-CONFIDENTIAL'), variable zero-padding (up to 8 digits), start numbers, and precise 6-zone header/footer placement with custom margins.
+                Yes! Because LetsEdit executes entirely in client-side WebAssembly, once the page or Progressive Web App (PWA) is loaded, you can disconnect from the internet or work on flights. You can install LetsEdit as a native desktop application on Windows, Mac, or Linux with a single click.
               </div>
             </details>
 
             <details class="faq-item">
               <summary class="faq-question">
-                <span>What does Document Flattening do?</span>
+                <span>Does LetsEdit support legal discovery and Bates Numbering standards?</span>
                 <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
               </summary>
               <div class="faq-answer">
-                Document flattening converts interactive form elements (text fields, radio buttons, dropdowns, and digital signature widgets) into permanent, read-only vector artwork embedded directly into the page stream. This locks the document and prevents subsequent form editing.
+                Absolutely. Our Bates Numbering suite complies with legal e-discovery requirements. You can customize alphanumeric prefixes (e.g., EXHIBIT-A-), set zero-padded sequential counters up to 8 digits (e.g., 00000001), define custom suffixes, and align numbers across 6 distinct header and footer zones with margin controls.
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary class="faq-question">
+                <span>Are digital signatures created on LetsEdit legally binding?</span>
+                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+              </summary>
+              <div class="faq-answer">
+                Yes. Signatures generated with LetsEdit include cryptographic SHA-256 document hashing, timestamp tokens, signer metadata, and can append a standalone Multi-Party Legal Audit Certificate with verifiable transaction IDs, meeting ESIGN and UETA legal framework criteria.
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary class="faq-question">
+                <span>Can I edit original PDF text directly instead of just adding text over it?</span>
+                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+              </summary>
+              <div class="faq-answer">
+                Yes! Our PDF Studio Editor includes an intelligent text clustering and replacement engine. It detects the original font family, size, line baseline, and color so you can edit, correct typos, or replace existing text paragraphs seamlessly.
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary class="faq-question">
+                <span>What file formats does LetsEdit support for conversion?</span>
+                <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+              </summary>
+              <div class="faq-answer">
+                LetsEdit supports bidirectional conversion across all standard formats: PDF to Word (DOCX), Excel (XLSX), PowerPoint (PPTX), JPG, PNG, and Text, as well as converting images, Office documents, OpenOffice (ODT, ODS, ODP), HTML, TXT, EPUB, and CSV into standard PDF and archival PDF/A documents.
               </div>
             </details>
           </div>
         </div>
       </section>
 
-      <!-- Comprehensive Smallpdf-Style Footer -->
+      <!-- Comprehensive Smallpdf & Adobe Style Informative Footer -->
       <footer class="landing-footer">
         <div class="footer-container">
           <div class="footer-grid-wrapper">
@@ -602,101 +748,108 @@ export function getLandingTemplateHtml() {
                 </div>
                 <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
               </div>
-              <p class="footer-brand-tagline">We make PDF easy, fast & 100% private.</p>
+              <p class="footer-brand-tagline">Making PDF fast, private, and effortless. 100% in-browser WebAssembly processing with zero cloud uploads.</p>
+
+              <!-- Trust Certifications Badges -->
+              <div class="footer-trust-chips">
+                <span class="footer-trust-chip">🛡 100% Client-Side</span>
+                <span class="footer-trust-chip">🔒 Zero Server Logs</span>
+                <span class="footer-trust-chip">⚖ ISO 32000-1</span>
+                <span class="footer-trust-chip">⚡ WebAssembly 60fps</span>
+              </div>
 
               <!-- Social Links -->
               <div class="footer-social-links">
                 <a href="https://linkedin.com" target="_blank" rel="noopener" class="footer-social-icon" title="LinkedIn">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                 </a>
-                <a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-icon" title="Facebook">
-                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
-                </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener" class="footer-social-icon" title="YouTube">
-                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                </a>
                 <a href="https://x.com" target="_blank" rel="noopener" class="footer-social-icon" title="X (Twitter)">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://github.com" target="_blank" rel="noopener" class="footer-social-icon" title="GitHub">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 </a>
               </div>
 
               <!-- Store Badges -->
               <div class="footer-store-badges">
-                <a class="footer-badge-item" title="Download for Windows" href="#" onclick="event.preventDefault()">
+                <a class="footer-badge-item" title="Download for Windows" href="#" data-action="app:windows">
                   <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
                   <div>
-                    <span class="badge-sub">Download for</span>
-                    <strong class="badge-main">Windows</strong>
+                    <span class="badge-sub">Install App for</span>
+                    <strong class="badge-main">Windows & PC</strong>
                   </div>
                 </a>
-                <a class="footer-badge-item" title="Get it on Google Play" href="#" onclick="event.preventDefault()">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5.3 0 .58.09.81.25l13.5 8.5c.67.42.67 1.08 0 1.5l-13.5 8.5c-.23.16-.51.25-.81.25-.83 0-1.5-.67-1.5-1.5z"/></svg>
-                  <div>
-                    <span class="badge-sub">GET IT ON</span>
-                    <strong class="badge-main">Google Play</strong>
-                  </div>
-                </a>
-                <a class="footer-badge-item" title="Download on the App Store" href="#" onclick="event.preventDefault()">
+                <a class="footer-badge-item" title="Open Web PWA" href="#" data-action="app:mobile">
                   <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.78 1.06-1.87.94-2.96-.92.04-2.02.61-2.67 1.38-.58.67-1.09 1.76-.95 2.83 1.02.08 2.05-.47 2.68-1.25z"/></svg>
                   <div>
-                    <span class="badge-sub">Download on the</span>
-                    <strong class="badge-main">App Store</strong>
+                    <span class="badge-sub">Optimized for</span>
+                    <strong class="badge-main">macOS & iOS</strong>
                   </div>
                 </a>
               </div>
             </div>
 
-            <!-- Solutions Column -->
+            <!-- Column 1: Popular PDF Tools -->
             <div class="footer-col">
-              <h4>Solutions</h4>
-              <a href="#" data-tool="edit">Sales Teams</a>
-              <a href="#" data-tool="bates">Legal & Compliance</a>
-              <a href="#" data-tool="sign">Finance & Contracts</a>
-              <a href="#" data-tool="merge">Real Estate</a>
-              <a href="#" data-tool="flatten">Education & Research</a>
-              <a href="#" data-tool="sanitize">Healthcare Records</a>
+              <h4>Popular Tools</h4>
+              <a href="#" data-action="workflow:edit">Edit PDF Directly</a>
+              <a href="#" data-action="workflow:compress">Compress PDF</a>
+              <a href="#" data-action="workflow:merge">Merge PDF</a>
+              <a href="#" data-action="workflow:split">Split PDF</a>
+              <a href="#" data-action="workflow:pdf-to-word">PDF to Word</a>
+              <a href="#" data-action="workflow:word-to-pdf">Word to PDF</a>
+              <a href="#" data-action="workflow:sign">Fill & Sign Forms</a>
+              <a href="#" data-action="workflow:redact">Permanent Redaction</a>
             </div>
 
-            <!-- Company Column -->
+            <!-- Column 2: Organize & Legal -->
             <div class="footer-col">
-              <h4>Company</h4>
-              <a href="#" data-tool="edit">About Us</a>
-              <a href="#" data-tool="security">Zero-Cloud Security</a>
-              <a href="#" data-tool="compress">Client WASM Engine</a>
-              <a href="#" data-tool="pdfa">ISO Compliance</a>
-              <a href="#" data-tool="edit">Help Center</a>
-              <a href="#" data-tool="edit">PDF Statistics</a>
+              <h4>Organize & Legal</h4>
+              <a href="#" data-action="workflow:organize">Organize Pages</a>
+              <a href="#" data-action="workflow:rotate">Rotate PDF Pages</a>
+              <a href="#" data-action="workflow:extract-pages">Extract Pages</a>
+              <a href="#" data-action="workflow:bates">Bates Numbering</a>
+              <a href="#" data-action="workflow:flatten">Document Flattening</a>
+              <a href="#" data-action="workflow:sanitize">Deep Sanitization</a>
+              <a href="#" data-action="workflow:pagenumbers">Page Numbers</a>
+              <a href="#" data-action="workflow:crop">Crop PDF Pages</a>
             </div>
 
-            <!-- Product Column -->
+            <!-- Column 3: Convert & OCR -->
             <div class="footer-col">
-              <h4>Product</h4>
-              <a href="#" data-tool="edit">43+ Free Tools</a>
-              <a href="#" data-tool="edit">Studio Editor</a>
-              <a href="#" data-tool="sign">Digital Signatures</a>
-              <a href="#" data-tool="bates">Bates Numbering</a>
-              <a href="#" data-tool="redact">Permanent Redaction</a>
-              <a href="#" data-tool="compare">Compare PDF</a>
+              <h4>Convert & OCR</h4>
+              <a href="#" data-action="workflow:ocr-pdf">PDF OCR Recognition</a>
+              <a href="#" data-action="workflow:pdf-to-excel">PDF to Excel</a>
+              <a href="#" data-action="workflow:pdf-to-ppt">PDF to PowerPoint</a>
+              <a href="#" data-action="workflow:to-image">PDF to JPG / PNG</a>
+              <a href="#" data-action="workflow:images-to-pdf">JPG / PNG to PDF</a>
+              <a href="#" data-action="workflow:html-to-pdf">HTML to PDF</a>
+              <a href="#" data-action="workflow:pdfa">PDF to PDF/A</a>
+              <a href="#" data-action="workflow:compare">Compare PDF Diffs</a>
             </div>
 
-            <!-- Apps Column -->
+            <!-- Column 4: Solutions & Trust -->
             <div class="footer-col">
-              <h4>Apps</h4>
-              <a href="#" data-tool="edit">Web Browser App</a>
-              <a href="#" data-tool="scan">PDF Scanner</a>
-              <a href="#" data-tool="sign">Mobile Signer</a>
-              <a href="#" data-tool="edit">Windows Desktop App</a>
-              <a href="#" data-tool="edit">Chrome Extension</a>
+              <h4>Solutions & Trust</h4>
+              <a href="#" data-action="workflow:bates">Legal E-Discovery</a>
+              <a href="#" data-action="workflow:sign">Finance & Contracts</a>
+              <a href="#" data-action="workflow:redact">Healthcare & HIPAA</a>
+              <a href="#" data-action="workflow:flatten">Academic & Research</a>
+              <a href="#" data-action="workflow:security">Zero-Cloud Security</a>
+              <a href="#" data-action="workflow:pdfa">ISO 32000 Compliance</a>
+              <a href="#" data-action="workflow:edit">Enterprise Whitepaper</a>
+              <a href="#" data-action="workflow:edit">System Architecture</a>
             </div>
           </div>
         </div>
 
         <div class="footer-bottom">
           <div class="footer-bottom-inner">
-            <span class="footer-copy">© 2026 LetsEdit. 100% Client-Side WebAssembly. Zero Cloud Uploads.</span>
+            <span class="footer-copy">© 2026 LetsEdit. 100% Client-Side WebAssembly. Zero Cloud Uploads. Confidential & Private.</span>
             <div class="footer-status-pill">
               <span class="status-dot-green"></span>
-              <span>All Services Operational &bull; 0 Byte Server Telemetry</span>
+              <span>All Services Operational &bull; 0 Byte Cloud Telemetry &bull; Client WASM v2.4</span>
             </div>
           </div>
         </div>
