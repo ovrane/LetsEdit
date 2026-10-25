@@ -300,7 +300,7 @@ export const ROUTE_DEFINITIONS = [
   {
     path: '/pagenumber_pdf',
     toolId: 'pagenumbers',
-    aliases: ['/pagenumbers', '/page-numbers', '/pagenumber-pdf', '/pagenumbers_pdf', '/add_page_numbers', '/page_numbers', '/add_pdf_page_number'],
+    aliases: ['/pagenumbers', '/page-numbers', '/pagenumbers-pdf', '/pagenumber-pdf', '/pagenumbers_pdf', '/add-page-numbers', '/add_page_numbers', '/page_numbers', '/add_pdf_page_number'],
     title: "Page Numbers in PDF — Free Online Tool — LetsEdit",
     description: "Add page numbers to your PDF document in headers or footers with customizable formatting."
   },

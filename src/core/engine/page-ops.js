@@ -21,8 +21,10 @@ import { HeaderFooterOps } from './operations/header-footer-ops.js';
 import { NupOps } from './operations/nup-ops.js';
 import { ResizeOps } from './operations/resize-ops.js';
 import { WatermarkOps } from './operations/watermark-ops.js';
+import { BatesOps } from './operations/bates-ops.js';
+import { PageNumbersOps } from './operations/pagenumbers-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -57,8 +59,12 @@ export class PageOperations {
   static pptToPdf(...args) { return ConvertOps.pptToPdf(...args); }
 
   // Stamping & Numbering
-  static batesNumberPdf(...args) { return StampOps.batesNumberPdf(...args); }
-  static addPageNumbers(...args) { return StampOps.addPageNumbers(...args); }
+  static batesNumberPdf(...args) { return BatesOps.applyBatesNumbering(...args); }
+  static applyBatesNumbering(...args) { return BatesOps.applyBatesNumbering(...args); }
+  static sequenceBatesBatch(...args) { return BatesOps.sequenceBatch(...args); }
+  static addPageNumbers(...args) { return PageNumbersOps.applyPageNumbers(...args); }
+  static applyPageNumbers(...args) { return PageNumbersOps.applyPageNumbers(...args); }
+  static createSamplePageNumbersPdf(...args) { return PageNumbersOps.createSamplePageNumbersPdf(...args); }
   static signPdf(...args) { return StampOps.signPdf(...args); }
   static generateAuditCertificate(...args) { return StampOps.generateAuditCertificate(...args); }
 
@@ -120,5 +126,16 @@ export class PageOperations {
   // Adobe Acrobat Pro & iLovePDF Dynamic Watermark & Stamp Engine
   static applyWatermark(...args) { return WatermarkOps.applyWatermark(...args); }
   static createSampleWatermarkPdf(...args) { return WatermarkOps.createSampleWatermarkPdf(...args); }
+
+  // Legal Production Bates Numbering Engine
+  static batesNumberPdf(...args) { return BatesOps.applyBatesNumbering(...args); }
+  static applyBatesNumbering(...args) { return BatesOps.applyBatesNumbering(...args); }
+  static sequenceBatesBatch(...args) { return BatesOps.sequenceBatch(...args); }
+  static createSampleBatesPdf(...args) { return BatesOps.createSampleBatesPdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF Dynamic Page Numbering Engine
+  static addPageNumbers(...args) { return PageNumbersOps.applyPageNumbers(...args); }
+  static applyPageNumbers(...args) { return PageNumbersOps.applyPageNumbers(...args); }
+  static createSamplePageNumbersPdf(...args) { return PageNumbersOps.createSamplePageNumbersPdf(...args); }
 }
 

@@ -13,6 +13,8 @@ import { renderHeaderFooterOptionsHtml } from './workspace-header-footer-options
 import { renderNupOptionsHtml } from './workspace-nup-options.js';
 import { renderResizeOptionsHtml } from './workspace-resize-options.js';
 import { renderWatermarkOptionsHtml } from './workspace-watermark-options.js';
+import { renderBatesOptionsHtml } from './workspace-bates-options.js';
+import { renderPageNumbersOptionsHtml } from './workspace-pagenumbers-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -399,50 +401,8 @@ import { renderWatermarkOptionsHtml } from './workspace-watermark-options.js';
       `;
     }
 
-    if (id === 'bates') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Bates Stamp Format</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-            <div>
-              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Prefix:</span>
-              <input type="text" id="workflow-bates-prefix" class="input-sm" value="${instance.batesPrefix}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: monospace;" />
-            </div>
-            <div>
-              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Suffix:</span>
-              <input type="text" id="workflow-bates-suffix" class="input-sm" value="${instance.batesSuffix}" placeholder="e.g. -CONF" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-family: monospace;" />
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
-            <div>
-              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Start Number:</span>
-              <input type="number" id="workflow-bates-start" class="input-sm" min="1" value="${instance.batesStart}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
-            </div>
-            <div>
-              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Digits Padding:</span>
-              <select id="workflow-bates-digits" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
-                ${[3, 4, 5, 6, 7, 8].map(d => `<option value="${d}" ${instance.batesDigits === d ? 'selected' : ''}>${d} digits (e.g. ${'1'.padStart(d, '0')})</option>`).join('')}
-              </select>
-            </div>
-          </div>
-
-          <label class="workflow-options-label">Stamp Position</label>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
-            ${['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'].map(pos => `
-              <button type="button" class="btn btn-sm ${instance.batesPos === pos ? 'btn-primary' : 'btn-outline'} btn-bates-pos" data-pos="${pos}" style="font-size: 11px; padding: 6px 4px; justify-content: center;">
-                ${pos.replace('-', ' ')}
-              </button>
-            `).join('')}
-          </div>
-
-          <label class="workflow-options-label">Stamp Color</label>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="color" id="workflow-bates-color" value="${instance.batesColor}" style="width: 36px; height: 32px; border: none; cursor: pointer; border-radius: 4px;" />
-            <span id="workflow-bates-color-label" style="font-size: 12px; color: var(--text-muted); font-family: monospace;">${instance.batesColor}</span>
-          </div>
-        </div>
-      `;
+    if (['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(id)) {
+      return renderBatesOptionsHtml(instance);
     }
 
     if (['nup', 'n-up', 'nup-pdf'].includes(id)) {
@@ -750,55 +710,8 @@ import { renderWatermarkOptionsHtml } from './workspace-watermark-options.js';
       `;
     }
 
-    if (id === 'pagenumbers') {
-      const pageCount = primary.pageCount || 1;
-      return `
-        <div class="workflow-options-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label class="workflow-options-label" style="margin: 0;">Numbering Format</label>
-            <span style="font-size: 11px; font-weight: 600; color: #30050d; background: rgba(48, 5, 13, 0.08); padding: 2px 8px; border-radius: 12px;">
-              ${pageCount} pages total
-            </span>
-          </div>
-
-          <input type="text" id="workflow-pn-format" class="input-sm" value="${instance.pnFormat}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-weight: 600; margin-bottom: 6px;" />
-          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 8px;">
-            Tokens: <code>{n}</code> = Page number, <code>{total}</code> = Total pages
-          </span>
-
-          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;">
-            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="Page {n} of {total}">Page {n} of {total}</button>
-            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="{n} / {total}">{n} / {total}</button>
-            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="Page {n}">Page {n}</button>
-            <button type="button" class="btn btn-xs btn-outline btn-pn-preset" data-fmt="- {n} -">- {n} -</button>
-          </div>
-
-          <label class="workflow-options-label">Position On Page</label>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px;">
-            ${['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'].map(pos => `
-              <button type="button" class="btn btn-xs ${instance.pnPos === pos ? 'btn-primary' : 'btn-outline'} btn-pn-pos" data-pos="${pos}" style="font-size: 11px; padding: 6px 4px; text-transform: capitalize;">
-                ${pos.replace('-', ' ')}
-              </button>
-            `).join('')}
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div>
-              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">First Number</label>
-              <input type="number" id="workflow-pn-start" class="input-sm" min="1" value="${instance.pnStartPage}" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" />
-            </div>
-            <div>
-              <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Font Size</label>
-              <select id="workflow-pn-size" class="input-sm" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
-                <option value="8" ${instance.pnFontSize === 8 ? 'selected' : ''}>8 pt (Small)</option>
-                <option value="10" ${instance.pnFontSize === 10 ? 'selected' : ''}>10 pt (Standard)</option>
-                <option value="12" ${instance.pnFontSize === 12 ? 'selected' : ''}>12 pt (Medium)</option>
-                <option value="14" ${instance.pnFontSize === 14 ? 'selected' : ''}>14 pt (Large)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      `;
+    if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(id)) {
+      return renderPageNumbersOptionsHtml(instance);
     }
 
     if (id === 'redact') {

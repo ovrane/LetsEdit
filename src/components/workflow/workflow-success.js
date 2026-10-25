@@ -25,8 +25,6 @@ export function renderSuccessScreen(manager) {
     subtitleText = 'Your document was extracted into individual PDF files.';
   } else if (t.id === 'security' || t.id === 'protect') {
     subtitleText = 'Your PDF is now encrypted with standard ISO 32000-1 AES-256 password protection.';
-  } else if (t.id === 'watermark') {
-    subtitleText = 'Custom text watermark was embedded across all pages.';
   } else if (t.id === 'sign') {
     subtitleText = 'Signature and verified timestamp have been applied.';
   } else if (t.id === 'compare') {
@@ -80,6 +78,18 @@ export function renderSuccessScreen(manager) {
     const count = rep?.appliedCount || 1;
     const layout = rep?.layout === 'mosaic' ? 'tiled repeat grid' : `${rep?.rotation || 45}° angled stamp`;
     subtitleText = `Watermark applied: ${mode} stamped across ${count} page${count === 1 ? '' : 's'} (${layout}).`;
+  } else if (['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(t.id)) {
+    const rep = manager.lastBatesResult;
+    const start = rep?.startBates || '000001';
+    const end = rep?.endBates || start;
+    const count = rep?.stampedCount || rep?.appliedCount || 1;
+    subtitleText = `Legal Bates numbering applied: Stamped ${count} page${count === 1 ? '' : 's'} (${start} → ${end}).`;
+  } else if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(t.id)) {
+    const rep = manager.lastPageNumbersResult;
+    const start = rep?.startFormatted || 'Page 1';
+    const end = rep?.endFormatted || start;
+    const count = rep?.stampedCount || rep?.appliedCount || 1;
+    subtitleText = `Dynamic page numbering complete: Stamped ${count} page${count === 1 ? '' : 's'} (${start} → ${end}).`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -455,27 +465,13 @@ export function renderSuccessScreen(manager) {
                 <svg width="18" height="18" fill="none" stroke="#4f46e5" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
                 <span>Page Geometry & Margins Telemetry</span>
               </div>
-              <span style="font-size: 11px; font-weight: 700; background: #4f46e5; color: white; padding: 2px 8px; border-radius: 12px;">
-                ${manager.lastResizeResult.pageSize?.toUpperCase()} Standard
-              </span>
+              <span style="font-size: 11px; font-weight: 700; background: #4f46e5; color: white; padding: 2px 8px; border-radius: 12px;">${manager.lastResizeResult.pageSize?.toUpperCase()} Standard</span>
             </div>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 12px;">
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Top / Bottom</div>
-                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">+${manager.lastResizeResult.marginTop} / +${manager.lastResizeResult.marginBottom} pt</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Left / Right</div>
-                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">+${manager.lastResizeResult.marginLeft} / +${manager.lastResizeResult.marginRight} pt</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Binding Gutter</div>
-                <div style="font-size: 14px; font-weight: 700; color: #4f46e5; margin-top: 2px;">+${manager.lastResizeResult.bindingGutter} pt</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Pages Adjusted</div>
-                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastResizeResult.appliedCount} / ${manager.lastResizeResult.totalPages}</div>
-              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Top/Bottom</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">+${manager.lastResizeResult.marginTop}/+${manager.lastResizeResult.marginBottom}pt</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Left/Right</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">+${manager.lastResizeResult.marginLeft}/+${manager.lastResizeResult.marginRight}pt</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Gutter</div><div style="font-size: 13px; font-weight: 700; color: #4f46e5; margin-top: 2px;">+${manager.lastResizeResult.bindingGutter}pt</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Adjusted</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastResizeResult.appliedCount}/${manager.lastResizeResult.totalPages}</div></div>
             </div>
           </div>
         ` : ''}
@@ -487,27 +483,47 @@ export function renderSuccessScreen(manager) {
                 <svg width="18" height="18" fill="none" stroke="#0284c7" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24"></path></svg>
                 <span>Watermark & Stamp Engine Telemetry</span>
               </div>
-              <span style="font-size: 11px; font-weight: 700; background: #0284c7; color: white; padding: 2px 8px; border-radius: 12px;">
-                ${manager.lastWatermarkResult.mode?.toUpperCase()} • ${manager.lastWatermarkResult.layer?.toUpperCase()}
-              </span>
+              <span style="font-size: 11px; font-weight: 700; background: #0284c7; color: white; padding: 2px 8px; border-radius: 12px;">${manager.lastWatermarkResult.mode?.toUpperCase()} • ${manager.lastWatermarkResult.layer?.toUpperCase()}</span>
             </div>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 12px;">
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Layout Mode</div>
-                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.layout === 'mosaic' ? 'Mosaic Repeat' : 'Single Anchor'}</div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Layout</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.layout === 'mosaic' ? 'Mosaic' : 'Single'}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Angle/Opacity</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.rotation}° / ${Math.round((manager.lastWatermarkResult.opacity || 0.3) * 100)}%</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Layer</div><div style="font-size: 13px; font-weight: 700; color: #0284c7; margin-top: 2px;">${manager.lastWatermarkResult.layer === 'under' ? 'Under' : 'Over'}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Stamped</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.appliedCount}/${manager.lastWatermarkResult.totalPages}</div></div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(t.id) && manager.lastBatesResult) ? `
+          <div class="bates-success-telemetry-card" style="background: rgba(30, 41, 59, 0.05); border: 1.5px solid rgba(30, 41, 59, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #1e293b;">
+                <svg width="18" height="18" fill="none" stroke="#1e293b" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>Legal Bates Production Audit</span>
               </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Rotation / Opacity</div>
-                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.rotation}° / ${Math.round((manager.lastWatermarkResult.opacity || 0.3) * 100)}%</div>
+              <span style="font-size: 11px; font-weight: 700; background: #1e293b; color: white; padding: 2px 8px; border-radius: 12px;">${manager.lastBatesResult.digits} Digits • ${manager.lastBatesResult.position?.toUpperCase()}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px;">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(30, 41, 59, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Start Bates</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; font-family: monospace; margin-top: 2px;">${manager.lastBatesResult.startBates}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(30, 41, 59, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">End Bates</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; font-family: monospace; margin-top: 2px;">${manager.lastBatesResult.endBates}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(30, 41, 59, 0.15); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Stamped</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastBatesResult.stampedCount || manager.lastBatesResult.appliedCount}/${manager.lastBatesResult.totalPages}</div></div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(t.id) && manager.lastPageNumbersResult) ? `
+          <div class="pagenumbers-success-telemetry-card" style="background: rgba(48, 5, 13, 0.04); border: 1.5px solid rgba(48, 5, 13, 0.18); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #30050d;">
+                <svg width="18" height="18" fill="none" stroke="#30050d" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Dynamic Page Numbering Summary</span>
               </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Layering</div>
-                <div style="font-size: 14px; font-weight: 700; color: #0284c7; margin-top: 2px;">${manager.lastWatermarkResult.layer === 'under' ? 'Background Under' : 'Foreground Over'}</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Pages Stamped</div>
-                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.appliedCount} / ${manager.lastWatermarkResult.totalPages}</div>
-              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #30050d; color: white; padding: 2px 8px; border-radius: 12px;">${manager.lastPageNumbersResult.style?.toUpperCase()} • ${manager.lastPageNumbersResult.position?.toUpperCase()}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px;">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(48, 5, 13, 0.12); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Format</div><div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastPageNumbersResult.formatTemplate}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(48, 5, 13, 0.12); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Sequence</div><div style="font-size: 12px; font-weight: 700; color: #30050d; font-family: monospace; margin-top: 2px;">${manager.lastPageNumbersResult.startFormatted} → ${manager.lastPageNumbersResult.endFormatted}</div></div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(48, 5, 13, 0.12); border-radius: 8px; padding: 8px; text-align: center;"><div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Stamped</div><div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastPageNumbersResult.stampedCount || manager.lastPageNumbersResult.appliedCount}/${manager.lastPageNumbersResult.totalPages}</div></div>
             </div>
           </div>
         ` : ''}

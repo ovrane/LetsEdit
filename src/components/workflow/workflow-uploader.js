@@ -189,6 +189,12 @@ export function bindUploadEvents(manager) {
       } else if (['watermark', 'watermark-pdf', 'add-watermark'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleWatermarkPdf();
         sampleName = 'Sample_Watermark_Document.pdf';
+      } else if (['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleBatesPdf();
+        sampleName = 'Sample_Legal_Brief_Discovery.pdf';
+      } else if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSamplePageNumbersPdf();
+        sampleName = 'Sample_Research_Whitepaper.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

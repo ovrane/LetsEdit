@@ -37,7 +37,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'pdf-to-text') return `${batchPrefix}Extract Text`;
   if (id === 'deskew') return `${batchPrefix}Straighten & Save PDF`;
   if (id === 'organize') return `Save Organized PDF (${manager.organizePages.length} pages)`;
-  if (id === 'bates') return `${batchPrefix}Apply Bates Numbering`;
+  if (['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(id)) return `${batchPrefix}Apply Bates Numbering`;
   if (['nup', 'n-up', 'nup-pdf'].includes(id)) return `${batchPrefix}Apply ${manager.nupConfig?.layout || manager.nupCount || 2}-Up Imposition`;
   if (id === 'split-half') return `${batchPrefix}Split in Half (${manager.splitHalfDirection})`;
   if (id === 'alternate-mix') return 'Mix & Interleave Documents';
@@ -50,7 +50,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'remove-annotations') return `${batchPrefix}Clean Annotations`;
   if (id === 'rename') return `${batchPrefix}Save Renamed PDF`;
   if (id === 'sign') return 'Sign Document & Finish';
-  if (id === 'pagenumbers') return `${batchPrefix}Apply Page Numbers`;
+  if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(id)) return `${batchPrefix}Apply Page Numbers`;
   if (id === 'flatten') return `${batchPrefix}Flatten PDF Forms`;
   if (id === 'redact') return `${batchPrefix}Permanently Redact PDF`;
   if (id === 'scan') return 'Compile Scanned PDF';
@@ -233,7 +233,7 @@ export function renderToolWorkspace(manager) {
                 </div>
               </div>
             </div>
-          ` : t.id === 'bates' ? `
+          ` : ['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(t.id) ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-weight: 600; font-size: 14px;">Bates Numbering Preview</span>
@@ -583,7 +583,7 @@ export function renderToolWorkspace(manager) {
                 </div>
               </div>
             </div>
-          ` : t.id === 'pagenumbers' ? `
+          ` : ['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(t.id) ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-weight: 600; font-size: 14px;">Page Numbering Preview</span>

@@ -22,6 +22,8 @@ import { bindHeaderFooterEvents } from './workspace-header-footer-options.js';
 import { bindNupEvents } from './workspace-nup-options.js';
 import { bindResizeEvents } from './workspace-resize-options.js';
 import { bindWatermarkEvents } from './workspace-watermark-options.js';
+import { bindBatesEvents } from './workspace-bates-options.js';
+import { bindPageNumbersEvents } from './workspace-pagenumbers-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -211,67 +213,9 @@ export function bindWorkspaceOptionsEvents(manager) {
   }
 
   // Bates controls
-  const batesPrefixInp = manager.container.querySelector('#workflow-bates-prefix');
-  const batesSuffixInp = manager.container.querySelector('#workflow-bates-suffix');
-  const batesStartInp = manager.container.querySelector('#workflow-bates-start');
-  const batesDigitsSel = manager.container.querySelector('#workflow-bates-digits');
-  const batesColorInp = manager.container.querySelector('#workflow-bates-color');
-  const batesColorLabel = manager.container.querySelector('#workflow-bates-color-label');
-  const batesPosBtns = manager.container.querySelectorAll('.btn-bates-pos');
-  const batesBadge = manager.container.querySelector('#bates-preview-badge');
-  const batesStamp = manager.container.querySelector('#bates-overlay-stamp');
-
-  const updateBatesPreview = () => {
-    const formatted = `${manager.batesPrefix}${String(manager.batesStart).padStart(manager.batesDigits, '0')}${manager.batesSuffix}`;
-    if (batesBadge) batesBadge.textContent = formatted;
-    if (batesStamp) {
-      batesStamp.textContent = formatted;
-      batesStamp.style.color = manager.batesColor;
-      batesStamp.style.borderColor = manager.batesColor;
-      batesStamp.style.cssText = `position: absolute; ${manager.getBatesPositionCss()}; background: rgba(255, 255, 255, 0.9); padding: 4px 8px; border-radius: 4px; border: 1px dashed ${manager.batesColor}; font-family: monospace; font-size: 11px; font-weight: 700; color: ${manager.batesColor}; pointer-events: none; transition: all 0.2s ease;`;
-    }
-  };
-
-  if (batesPrefixInp) {
-    batesPrefixInp.oninput = (e) => {
-      manager.batesPrefix = e.target.value;
-      updateBatesPreview();
-    };
+  if (['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(manager.activeTool?.id)) {
+    bindBatesEvents(manager);
   }
-  if (batesSuffixInp) {
-    batesSuffixInp.oninput = (e) => {
-      manager.batesSuffix = e.target.value;
-      updateBatesPreview();
-    };
-  }
-  if (batesStartInp) {
-    batesStartInp.oninput = (e) => {
-      manager.batesStart = parseInt(e.target.value, 10) || 1;
-      updateBatesPreview();
-    };
-  }
-  if (batesDigitsSel) {
-    batesDigitsSel.onchange = (e) => {
-      manager.batesDigits = parseInt(e.target.value, 10) || 6;
-      updateBatesPreview();
-    };
-  }
-  if (batesColorInp) {
-    batesColorInp.oninput = (e) => {
-      manager.batesColor = e.target.value;
-      if (batesColorLabel) batesColorLabel.textContent = manager.batesColor;
-      updateBatesPreview();
-    };
-  }
-  batesPosBtns.forEach(btn => {
-    btn.onclick = () => {
-      manager.batesPos = btn.getAttribute('data-pos') || 'bottom-right';
-      batesPosBtns.forEach(b => {
-        b.className = b === btn ? 'btn btn-sm btn-primary btn-bates-pos' : 'btn btn-sm btn-outline btn-bates-pos';
-      });
-      updateBatesPreview();
-    };
-  });
 
   // N-Up controls
   const nupBtns = manager.container.querySelectorAll('.btn-nup-toggle');
@@ -542,56 +486,8 @@ export function bindWorkspaceOptionsEvents(manager) {
   }
 
   // Page Numbers Tool Controls
-  const pnFmtInp = manager.container.querySelector('#workflow-pn-format');
-  const pnFmtPresets = manager.container.querySelectorAll('.btn-pn-preset');
-  const pnPosBtns = manager.container.querySelectorAll('.btn-pn-pos');
-  const pnStartInp = manager.container.querySelector('#workflow-pn-start');
-  const pnSizeSel = manager.container.querySelector('#workflow-pn-size');
-  const pnBadge = manager.container.querySelector('#pn-preview-badge-overlay');
-
-  const updatePnPreview = () => {
-    if (pnBadge) {
-      const total = manager.uploadedFiles[0]?.pageCount || 5;
-      pnBadge.textContent = (manager.pnFormat || 'Page {n} of {total}')
-        .replace('{n}', String(manager.pnStartPage || 1))
-        .replace('{total}', String(total));
-      pnBadge.style.cssText = `position: absolute; ${manager.getPnPositionCss()}; background: rgba(255, 255, 255, 0.92); padding: 3px 8px; border-radius: 4px; border: 1px dashed #30050d; font-size: ${manager.pnFontSize}px; font-weight: 600; color: #1e293b; pointer-events: none; transition: all 0.2s ease;`;
-    }
-  };
-
-  if (pnFmtInp) {
-    pnFmtInp.oninput = (e) => {
-      manager.pnFormat = e.target.value;
-      updatePnPreview();
-    };
-  }
-  pnFmtPresets.forEach(btn => {
-    btn.onclick = () => {
-      manager.pnFormat = btn.getAttribute('data-fmt');
-      if (pnFmtInp) pnFmtInp.value = manager.pnFormat;
-      updatePnPreview();
-    };
-  });
-  pnPosBtns.forEach(btn => {
-    btn.onclick = () => {
-      manager.pnPos = btn.getAttribute('data-pos') || 'bottom-center';
-      pnPosBtns.forEach(b => {
-        b.className = b === btn ? 'btn btn-xs btn-primary btn-pn-pos' : 'btn btn-xs btn-outline btn-pn-pos';
-      });
-      updatePnPreview();
-    };
-  });
-  if (pnStartInp) {
-    pnStartInp.oninput = (e) => {
-      manager.pnStartPage = parseInt(e.target.value, 10) || 1;
-      updatePnPreview();
-    };
-  }
-  if (pnSizeSel) {
-    pnSizeSel.onchange = (e) => {
-      manager.pnFontSize = parseInt(e.target.value, 10) || 10;
-      updatePnPreview();
-    };
+  if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(manager.activeTool?.id)) {
+    bindPageNumbersEvents(manager);
   }
 
   // Redaction workspace listeners

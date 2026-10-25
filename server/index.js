@@ -23,6 +23,8 @@ import { handleHeaderFooterRequest } from './routes/header-footer-routes.js';
 import { handleNupRequest } from './routes/nup-routes.js';
 import { handleResizeRequest } from './routes/resize-routes.js';
 import { handleWatermarkRequest } from './routes/watermark-routes.js';
+import { handleBatesRequest } from './routes/bates-routes.js';
+import { handlePageNumbersRequest } from './routes/pagenumbers-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -120,6 +122,14 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Dynamic Watermark & Stamp endpoints
   const watermarkHandled = await handleWatermarkRequest(req, res, pathname, method);
   if (watermarkHandled) return true;
+
+  // Dispatch Legal Bates Numbering endpoints
+  const batesHandled = await handleBatesRequest(req, res, pathname, method);
+  if (batesHandled) return true;
+
+  // Dispatch Dynamic Page Numbering endpoints
+  const pageNumbersHandled = await handlePageNumbersRequest(req, res, pathname, method);
+  if (pageNumbersHandled) return true;
 
   return false;
 }

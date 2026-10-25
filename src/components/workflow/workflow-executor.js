@@ -178,19 +178,28 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([resizedBytes], { type: 'application/pdf' }),
       resizeReport: resizedBytes.report
     };
-  } else if (id === 'bates') {
-    const batesBytes = await PageOperations.batesNumberPdf(primary.bytes, {
+  } else if (['bates', 'bates-numbering', 'bates-numbering-pdf', 'bates-pdf'].includes(id)) {
+    const batesBytes = await PageOperations.applyBatesNumbering(primary.bytes, {
       prefix: manager.batesPrefix,
       suffix: manager.batesSuffix,
       startNumber: manager.batesStart,
       digits: manager.batesDigits,
       position: manager.batesPos,
-      color: manager.batesColor
-    });
+      fontFamily: manager.batesFont,
+      fontSize: manager.batesFontSize,
+      color: manager.batesColor,
+      rangeRule: manager.batesRangeRule,
+      marginTop: manager.batesMarginTop,
+      marginBottom: manager.batesMarginBottom,
+      marginLeft: manager.batesMarginLeft,
+      marginRight: manager.batesMarginRight
+    }, { fileName: primary.name });
+    manager.lastBatesResult = batesBytes.report;
     return {
       name: `Bates_${primary.name}`,
       bytes: batesBytes,
-      blob: new Blob([batesBytes], { type: 'application/pdf' })
+      blob: new Blob([batesBytes], { type: 'application/pdf' }),
+      batesReport: batesBytes.report
     };
   } else if (['nup', 'n-up', 'nup-pdf'].includes(id)) {
     const config = manager.nupConfig || { layout: manager.nupCount || 2 };
@@ -271,18 +280,25 @@ export async function processSingleDocument(manager, tool, file) {
       bytes: cleanBytes,
       blob: new Blob([cleanBytes], { type: 'application/pdf' })
     };
-  } else if (id === 'pagenumbers') {
-    const numberedBytes = await PageOperations.addPageNumbers(primary.bytes, {
-      format: manager.pnFormat,
-      position: manager.pnPos,
-      startNumber: manager.pnStartPage,
-      startPage: 1,
-      fontSize: manager.pnFontSize
-    });
+  } else if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(id)) {
+    const config = {
+      format: manager.pnFormat || 'Page {n} of {total}',
+      style: manager.pnStyle || 'arabic',
+      position: manager.pnPos || 'bottom-center',
+      startNumber: manager.pnStartPage || 1,
+      startPage: manager.pnFirstPage || 1,
+      fontSize: manager.pnFontSize || 10,
+      fontFamily: manager.pnFont || 'Helvetica',
+      color: manager.pnColor || '#475569',
+      rangeRule: manager.pnRangeRule || 'all'
+    };
+    const numberedBytes = await PageOperations.applyPageNumbers(primary.bytes, config, { fileName: primary.name });
+    manager.lastPageNumbersResult = numberedBytes.report;
     return {
       name: `Numbered_${primary.name}`,
       bytes: numberedBytes,
-      blob: new Blob([numberedBytes], { type: 'application/pdf' })
+      blob: new Blob([numberedBytes], { type: 'application/pdf' }),
+      pageNumbersReport: numberedBytes.report
     };
   } else if (id === 'flatten') {
     const flatDoc = await PDFDocument.load(primary.bytes, { ignoreEncryption: true });
