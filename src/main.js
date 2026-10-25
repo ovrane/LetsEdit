@@ -269,9 +269,53 @@ class App {
       store.setScale(cur - 0.15);
     };
 
+    // Page Navigation (Adobe Acrobat Style)
+    const curPageNum = document.getElementById('current-page-num');
+    const totalPageNum = document.getElementById('total-page-num');
+    const pagePrevBtn = document.getElementById('btn-page-prev');
+    if (pagePrevBtn) {
+      pagePrevBtn.onclick = () => {
+        const cur = store.getState().currentPage || 1;
+        if (cur > 1) store.setCurrentPage(cur - 1);
+      };
+    }
+    const pageNextBtn = document.getElementById('btn-page-next');
+    if (pageNextBtn) {
+      pageNextBtn.onclick = () => {
+        const cur = store.getState().currentPage || 1;
+        const total = store.getState().pageCount || 1;
+        if (cur < total) store.setCurrentPage(cur + 1);
+      };
+    }
+
+    // Fit to Width & Fit Entire Page
+    const fitWidthBtn = document.getElementById('btn-fit-width');
+    if (fitWidthBtn) {
+      fitWidthBtn.onclick = () => {
+        const viewport = document.getElementById('viewport');
+        if (viewport) {
+          const availableW = viewport.clientWidth - 80;
+          store.setScale(Math.max(0.4, Math.min(2.5, availableW / 612)));
+        }
+      };
+    }
+    const fitPageBtn = document.getElementById('btn-fit-page');
+    if (fitPageBtn) {
+      fitPageBtn.onclick = () => {
+        const viewport = document.getElementById('viewport');
+        if (viewport) {
+          const availableH = viewport.clientHeight - 80;
+          store.setScale(Math.max(0.4, Math.min(2.0, availableH / 792)));
+        }
+      };
+    }
+
     store.subscribe((event, state) => {
       if (event === 'scale-changed') {
-        zoomText.textContent = `${Math.round(state.scale * 100)}%`;
+        if (zoomText) zoomText.textContent = `${Math.round(state.scale * 100)}%`;
+      } else if (event === 'page-changed' || event === 'document-loaded' || event === 'document-set') {
+        if (curPageNum) curPageNum.textContent = state.currentPage || 1;
+        if (totalPageNum) totalPageNum.textContent = state.pageCount || 1;
       } else if (event === 'user-changed') {
         this.authModal.updateAllUserWidgets(state.user);
       }
@@ -305,8 +349,14 @@ class App {
       }
     };
 
-    // Initialize theme
+    // Initialize & Wire theme toggle
     applyTheme(getPreferredTheme());
+    const themeBtn = document.getElementById('btn-theme-toggle');
+    if (themeBtn) {
+      themeBtn.onclick = () => {
+        toggleTheme();
+      };
+    }
 
     // All Tools Hub modal
     const allToolsBtn = document.getElementById('btn-open-all-tools');
@@ -314,19 +364,20 @@ class App {
 
     // Inline rename document title
     const filenameEl = document.getElementById('current-filename');
-    if (filenameEl) {
-      filenameEl.onclick = () => {
-        const current = store.getState().filename || 'Sample_Document.pdf';
-        const newName = prompt('Rename document:', current);
-        if (newName && newName.trim() !== '') {
-          const finalName = newName.trim().endsWith('.pdf') ? newName.trim() : `${newName.trim()}.pdf`;
-          store.getState().filename = finalName;
-          store.getState().documentName = finalName;
-          filenameEl.textContent = finalName;
-          Toast.success(`Renamed document to ${finalName}`);
-        }
-      };
-    }
+    const filenamePill = document.getElementById('current-filename-pill');
+    const triggerRename = () => {
+      const current = store.getState().filename || 'Sample_Document.pdf';
+      const newName = prompt('Rename document:', current);
+      if (newName && newName.trim() !== '') {
+        const finalName = newName.trim().endsWith('.pdf') ? newName.trim() : `${newName.trim()}.pdf`;
+        store.getState().filename = finalName;
+        store.getState().documentName = finalName;
+        if (filenameEl) filenameEl.textContent = finalName;
+        Toast.success(`Renamed document to ${finalName}`);
+      }
+    };
+    if (filenamePill) filenamePill.onclick = triggerRename;
+    else if (filenameEl) filenameEl.onclick = triggerRename;
   }
 
   bindToolbarEvents() {
@@ -390,6 +441,12 @@ class App {
 
     const ocrBtn = document.getElementById('btn-open-ocr');
     if (ocrBtn) ocrBtn.onclick = () => ocrModal.show();
+
+    const sanitizeBtn = document.getElementById('btn-open-sanitize');
+    if (sanitizeBtn) sanitizeBtn.onclick = () => toolWorkflow.openTool('sanitize');
+
+    const flattenBtn = document.getElementById('btn-open-flatten');
+    if (flattenBtn) flattenBtn.onclick = () => toolWorkflow.openTool('flatten');
 
     // Convert dropdown quick actions
     const quickImgToPdf = document.getElementById('btn-quick-images-to-pdf');

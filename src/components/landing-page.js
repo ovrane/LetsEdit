@@ -12,7 +12,7 @@ import { pdfEngine } from '../core/pdf-engine.js';
 import { TOOLS_CATALOG, allToolsModal } from './all-tools-modal.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
-import { applyTheme, getPreferredTheme } from '../utils/theme.js';
+import { applyTheme, getPreferredTheme, toggleTheme } from '../utils/theme.js';
 import { WORKFLOW_TOOLS_CONFIG } from './workflow/tools-config.js';
 import { authModal } from './auth-modal.js';
 import { router } from '../core/router.js';
@@ -146,7 +146,16 @@ export class LandingPage {
       };
     });
 
-    const enterStudioBtn = this.container.querySelector('#btn-enter-studio');
+    // Executive What's New showcase cards
+    this.container.querySelectorAll('.whats-new-card').forEach(card => {
+      card.onclick = (e) => {
+        e.preventDefault();
+        const action = card.getAttribute('data-action');
+        if (action) this.handleToolAction(action);
+      };
+    });
+
+    const enterStudioBtn = this.container.querySelector('#btn-landing-studio-cta');
     if (enterStudioBtn) {
       enterStudioBtn.onclick = () => {
         router.navigate('/edit_pdf');
@@ -188,6 +197,14 @@ export class LandingPage {
       };
     }
 
+    // Theme Toggle on Landing Header
+    const landingThemeBtn = this.container.querySelector('#btn-landing-theme');
+    if (landingThemeBtn) {
+      landingThemeBtn.onclick = () => {
+        toggleTheme();
+      };
+    }
+
     applyTheme(getPreferredTheme());
 
     // User auth button & popover on landing header
@@ -213,33 +230,49 @@ export class LandingPage {
     }
     authModal.updateAllUserWidgets(store.getState().user);
 
-    // Convert dropdown toggle on click / tap
-    const convertBtn = this.container.querySelector('#btn-convert-dropdown');
-    const convertDropdown = convertBtn?.closest('.landing-dropdown');
-    if (convertBtn && convertDropdown) {
-      convertBtn.onclick = (e) => {
-        e.stopPropagation();
-        convertDropdown.classList.toggle('open');
-      };
-    }
+    // Dropdown toggles (Convert, Edit, Security, Mega Menu)
+    const dropdownTriggers = [
+      { btnId: '#btn-convert-dropdown', menuClass: '.landing-dropdown' },
+      { btnId: '#btn-edit-dropdown', menuClass: '.landing-dropdown' },
+      { btnId: '#btn-security-dropdown', menuClass: '.landing-dropdown' },
+      { btnId: '#btn-landing-mega-menu', menuClass: '.mega-dropdown' }
+    ];
 
-    // Mega menu dropdown toggle on click / tap
-    const megaBtn = this.container.querySelector('#btn-landing-mega-menu');
-    const megaDropdown = megaBtn?.closest('.mega-dropdown');
-    if (megaBtn && megaDropdown) {
-      megaBtn.onclick = (e) => {
-        e.stopPropagation();
-        megaDropdown.classList.toggle('open');
-      };
-    }
+    const activeDropdowns = [];
+    dropdownTriggers.forEach(({ btnId, menuClass }) => {
+      const btn = this.container.querySelector(btnId);
+      const dropdown = btn?.closest(menuClass);
+      if (btn && dropdown) {
+        activeDropdowns.push(dropdown);
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          // Close other open dropdowns
+          activeDropdowns.forEach(d => {
+            if (d !== dropdown) d.classList.remove('open');
+          });
+          dropdown.classList.toggle('open');
+        };
+      }
+    });
 
     // Close any open navigation dropdowns when clicking outside
     document.addEventListener('click', (e) => {
-      if (convertDropdown && !convertDropdown.contains(e.target)) {
-        convertDropdown.classList.remove('open');
-      }
-      if (megaDropdown && !megaDropdown.contains(e.target)) {
-        megaDropdown.classList.remove('open');
+      activeDropdowns.forEach(dropdown => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('open');
+        }
+      });
+    });
+
+    // Global keyboard shortcut ⌘K / Ctrl+K
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        const heroInput = this.container.querySelector('#hero-quick-search-input');
+        if (heroInput && document.body.classList.contains('show-landing')) {
+          e.preventDefault();
+          heroInput.focus();
+          heroInput.select();
+        }
       }
     });
 
@@ -264,21 +297,24 @@ export class LandingPage {
       };
     });
 
-    // Mega menu dropdown action items
-    this.container.querySelectorAll('.mega-item, .landing-dropdown-item').forEach(item => {
+    // Mega menu dropdown action items (Smallpdf style & standard dropdowns)
+    this.container.querySelectorAll('.mega-item, .landing-dropdown-item, .smallpdf-tool-link').forEach(item => {
       item.onclick = (e) => {
         e.stopPropagation();
+        activeDropdowns.forEach(d => d.classList.remove('open'));
         const action = item.getAttribute('data-action');
         if (action) this.handleToolAction(action);
       };
     });
 
-    // Footer links
-    this.container.querySelectorAll('.footer-links a[data-tool]').forEach(link => {
+    // Footer multi-column links
+    this.container.querySelectorAll('.footer-links a[data-tool], .footer-col a[data-tool]').forEach(link => {
       link.onclick = (e) => {
         e.preventDefault();
         const tool = link.getAttribute('data-tool');
-        if (WORKFLOW_TOOLS_CONFIG[tool]) {
+        if (tool === 'edit') {
+          router.navigate('/edit_pdf');
+        } else if (WORKFLOW_TOOLS_CONFIG[tool]) {
           router.navigate(router.getCanonicalPath(tool));
         } else {
           const match = TOOLS_CATALOG.find(t => t.id === tool);

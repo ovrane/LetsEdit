@@ -17,42 +17,52 @@ export class CanvasEmptyState {
     emptyWrap.className = 'editor-upload-card';
     emptyWrap.id = 'editor-empty-dropzone';
     emptyWrap.innerHTML = `
-      <div class="editor-upload-icon-circle">
-        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <path d="M12 18v-6m-3 3l3-3 3 3"></path>
-        </svg>
+      <div class="editor-upload-badge-wrapper">
+        <div class="editor-upload-badge-glow"></div>
+        <div class="editor-upload-icon-circle">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <path d="M12 18v-6m-3 3l3-3 3 3" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
       </div>
+
       <h2 class="editor-upload-title">Upload PDF to Start Editing</h2>
       <p class="editor-upload-subtitle">
-        Edit existing text, fill & sign forms, add shapes, whiteout sensitive data, and annotate directly in your browser.
+        Edit existing text, fill & sign forms, or organize pages — 100% private in your browser.
       </p>
 
       <div class="editor-upload-actions">
         <input type="file" id="editor-empty-file-input" accept="application/pdf" style="display:none;" />
-        <button class="btn btn-primary btn-lg" id="btn-editor-upload-pdf">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+        <button class="btn editor-upload-btn-primary" id="btn-editor-upload-pdf">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
           <span>Choose PDF Document</span>
         </button>
-        <button class="btn btn-outline btn-lg" id="btn-editor-blank-doc">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line></svg>
+        <button class="btn editor-upload-btn-secondary" id="btn-editor-blank-doc">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
           <span>Start with Blank Page</span>
         </button>
       </div>
 
       <div class="editor-upload-drop-hint">
-        or drag and drop your PDF anywhere in this window
+        or drag and drop your file here
       </div>
 
-      <div class="editor-upload-sample-link">
-        Want to test all features first? <button class="btn-link" id="btn-editor-load-sample">Load a sample contract</button>
+      <div class="editor-upload-sample-row">
+        <span>Want to test first?</span>
+        <button class="btn-sample-link" id="btn-editor-load-sample">Load sample contract</button>
       </div>
 
       <div class="editor-upload-features">
-        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> 100% Private (No Cloud Uploads)</div>
-        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Edit Original Text</div>
-        <div class="feature-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Sub-Second WASM Engine</div>
+        <div class="feature-pill pill-private">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>100% Private (No Cloud Uploads)</span>
+        </div>
+        <div class="feature-pill pill-vector">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <span>Edit Original Text</span>
+        </div>
       </div>
     `;
 
@@ -62,6 +72,7 @@ export class CanvasEmptyState {
     const uploadBtn = emptyWrap.querySelector('#btn-editor-upload-pdf');
     const blankBtn = emptyWrap.querySelector('#btn-editor-blank-doc');
     const sampleBtn = emptyWrap.querySelector('#btn-editor-load-sample');
+    const sampleMultiBtn = emptyWrap.querySelector('#btn-editor-load-sample-multipage');
 
     if (uploadBtn && fileInp) {
       uploadBtn.onclick = () => fileInp.click();
@@ -114,6 +125,23 @@ export class CanvasEmptyState {
         } catch (err) {
           console.error(err);
           Toast.error('Failed to load sample document');
+        }
+      };
+    }
+
+    if (sampleMultiBtn) {
+      sampleMultiBtn.onclick = async () => {
+        try {
+          Toast.info('Loading 4-page sample report...');
+          const sampleBytes = await pdfEngine.createSampleWatermarkPdf();
+          const info = await pdfEngine.loadPdf(sampleBytes);
+          store.setDocument(sampleBytes, 'Sample_4Page_Report.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Sample_4Page_Report.pdf';
+          Toast.success('4-page report loaded! Ready for multi-page editing.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to load multi-page sample');
         }
       };
     }

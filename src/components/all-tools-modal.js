@@ -25,6 +25,7 @@ import { toolWorkflow, WORKFLOW_TOOLS_CONFIG } from './tool-workflow.js';
 import { downloadBlob } from '../utils/helpers.js';
 import { router } from '../core/router.js';
 import { Toast } from './toast.js';
+import { getTwoToneIconSvg } from './landing/landing-icons.js';
 
 export const SEJDA_TOOL_CATEGORIES = [
   {
@@ -90,8 +91,8 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'compress', title: 'Compress', desc: 'Reduce the size of your PDF', icon: 'compress', color: '#059669', action: 'workflow:compress' },
       { id: 'scan', title: 'Scan to PDF', desc: 'Capture documents using camera or mobile scanner into clean PDF', icon: 'camera', color: '#30050d', action: 'workflow:scan' },
       { id: 'deskew', title: 'Deskew', desc: 'Automatically straighten and deskew scanned PDF pages', icon: 'rotate', color: '#0891b2', action: 'workflow:deskew' },
-      { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', action: 'workflow:ocr-pdf' },
-      { id: 'compare', title: 'Compare PDF', desc: 'Find differences and visually compare two PDF documents side by side', icon: 'git-pull-request', color: '#8b5cf6', action: 'workflow:compare' }
+      { id: 'ocr-pdf', title: 'OCR', desc: 'Convert PDF scans to searchable text and PDFs. Extract text from scans', icon: 'file-text', color: '#6366f1', badge: 'PRO', action: 'workflow:ocr-pdf' },
+      { id: 'compare', title: 'Compare PDF', desc: 'Find differences and visually compare two PDF documents side by side', icon: 'git-pull-request', color: '#8b5cf6', badge: 'POPULAR', action: 'workflow:compare' }
     ]
   },
   {
@@ -102,10 +103,10 @@ export const SEJDA_TOOL_CATEGORIES = [
     tools: [
       { id: 'security', title: 'Protect', desc: 'Protect file with password and permissions', icon: 'lock', color: '#dc2626', action: 'workflow:security' },
       { id: 'unlock', title: 'Unlock', desc: 'Remove restrictions and password from PDF files', icon: 'unlock', color: '#10b981', action: 'workflow:unlock' },
-      { id: 'sanitize', title: 'Sanitize Document', desc: 'Remove hidden metadata, embedded files, JavaScript actions, and private app data (Adobe Acrobat Pro standard)', icon: 'shield', color: '#059669', action: 'workflow:sanitize' },
-      { id: 'redact', title: 'Redact', desc: 'Permanently remove sensitive text, words and coordinates from PDF streams', icon: 'shield', color: '#0f172a', action: 'workflow:redact' },
+      { id: 'sanitize', title: 'Sanitize Document', desc: 'Remove hidden metadata, embedded files, JavaScript actions, and private app data (Adobe Acrobat Pro standard)', icon: 'shield', color: '#059669', badge: 'PRO', action: 'workflow:sanitize' },
+      { id: 'redact', title: 'Redact', desc: 'Permanently remove sensitive text, words and coordinates from PDF streams', icon: 'shield', color: '#0f172a', badge: 'PRO', action: 'workflow:redact' },
       { id: 'watermark', title: 'Watermark', desc: 'Add image or text watermark to PDF documents', icon: 'droplet', color: '#30050d', action: 'workflow:watermark' },
-      { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', action: 'workflow:flatten' }
+      { id: 'flatten', title: 'Flatten', desc: 'Makes fillable PDFs read-only. Print & scan in one step', icon: 'layers', color: '#0d9488', badge: 'NEW', action: 'workflow:flatten' }
     ]
   },
   {
@@ -140,24 +141,192 @@ export const SEJDA_TOOL_CATEGORIES = [
     desc: 'Bates numbering, margins, n-up imposition, metadata, and repair',
     icon: 'more-horizontal',
     tools: [
-      { id: 'bates', title: 'Bates Numbering', desc: 'Bates stamp multiple files at once', icon: 'shield', color: '#1e293b', action: 'workflow:bates' },
+      { id: 'bates', title: 'Bates Numbering', desc: 'Bates stamp multiple files at once for legal indexing', icon: 'shield', color: '#1e293b', badge: 'LEGAL', action: 'workflow:bates' },
       { id: 'create-bookmarks', title: 'Create Bookmarks', desc: 'Create PDF Bookmarks', icon: 'bookmark', color: '#7c3aed', action: 'modal:metadata' },
       { id: 'crop', title: 'Crop', desc: 'Trim PDF margins, change PDF page size', icon: 'crop', color: '#0d9488', action: 'workflow:crop' },
       { id: 'metadata', title: 'Edit Metadata & XMP', desc: 'Change PDF Author, Title, Keywords, Subject and synchronize Adobe XMP schemas', icon: 'file-text', color: '#6366f1', action: 'workflow:edit-metadata' },
       { id: 'extract-images', title: 'Extract Images', desc: 'Extract images from PDF', icon: 'image', color: '#ec4899', action: 'workflow:extract-images' },
       { id: 'flip', title: 'Flip', desc: 'Mirror pages horizontally or vertically', icon: 'flip', color: '#8b5cf6', action: 'workflow:flip' },
       { id: 'grayscale', title: 'Grayscale', desc: 'Make a PDF text and images grayscale', icon: 'circle-half', color: '#475569', action: 'workflow:grayscale' },
-      { id: 'header-footer', title: 'Header & Footer', desc: 'Stamp 6-zone dynamic headers and footers with page numbers, date macros, and custom margins', icon: 'hash', color: '#4338ca', action: 'workflow:header-footer' },
-      { id: 'nup', title: 'N-up Imposition', desc: 'Impose multiple pages per sheet (2-up, 4-up, 6-up, 8-up) with custom margins, gutters & page borders', icon: 'layout', color: '#3b82f6', action: 'workflow:nup' },
+      { id: 'header-footer', title: 'Header & Footer', desc: 'Stamp 6-zone dynamic headers and footers with page numbers, date macros, and custom margins', icon: 'hash', color: '#4338ca', badge: 'PRO', action: 'workflow:header-footer' },
+      { id: 'nup', title: 'N-up Imposition', desc: 'Impose multiple pages per sheet (2-up, 4-up, 6-up, 8-up) with custom margins, gutters & page borders', icon: 'layout', color: '#3b82f6', badge: 'NEW', action: 'workflow:nup' },
       { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
-      { id: 'pagelabels', title: 'Page Labels (Multi-Section)', desc: 'Divide documents into sections with Roman, Arabic, or alphabetic schemes in ISO 32000-1 /PageLabels', icon: 'hash', color: '#6366f1', action: 'workflow:pagelabels' },
-      { id: 'bookmarks', title: 'Bookmarks & Outline', desc: 'Create, nest, color-code, and manage PDF navigation bookmarks in ISO 32000-1 /Outlines', icon: 'bookmark', color: '#6366f1', action: 'workflow:bookmarks' },
+      { id: 'pagelabels', title: 'Page Labels (Multi-Section)', desc: 'Divide documents into sections with Roman, Arabic, or alphabetic schemes in ISO 32000-1 /PageLabels', icon: 'hash', color: '#6366f1', badge: 'ISO', action: 'workflow:pagelabels' },
+      { id: 'bookmarks', title: 'Bookmarks & Outline', desc: 'Create, nest, color-code, and manage PDF navigation bookmarks in ISO 32000-1 /Outlines', icon: 'bookmark', color: '#6366f1', badge: 'NEW', action: 'workflow:bookmarks' },
       { id: 'rename', title: 'Rename', desc: 'Change document filename based on text from the PDF pages', icon: 'edit', color: '#059669', action: 'workflow:rename' },
       { id: 'repair', title: 'Repair', desc: 'Recover data from a corrupted or damaged PDF document', icon: 'tool', color: '#ef4444', action: 'workflow:repair' },
-      { id: 'resize', title: 'Resize Margins & Pages', desc: 'Add page margins, spiral/binder gutters with duplex mirroring, and standardize sheet dimensions (A4/Letter)', icon: 'maximize', color: '#6366f1', action: 'workflow:resize' },
+      { id: 'resize', title: 'Resize Margins & Pages', desc: 'Add page margins, spiral/binder gutters with duplex mirroring, and standardize sheet dimensions (A4/Letter)', icon: 'maximize', color: '#6366f1', badge: 'PRO', action: 'workflow:resize' },
       { id: 'rotate', title: 'Rotate', desc: 'Rotate and save PDF pages permanently', icon: 'rotate', color: '#f59e0b', action: 'workflow:rotate' },
       { id: 'remove-annotations', title: 'Remove annotations', desc: 'Batch remove highlights, strikeouts or any other annotations from a PDF document', icon: 'trash-2', color: '#dc2626', action: 'workflow:remove-annotations' },
-      { id: 'pdfa', title: 'PDF to PDF/A', desc: 'Convert PDF documents to PDF/A for ISO 19005-1 long-term archiving', icon: 'shield', color: '#059669', action: 'workflow:pdfa' }
+      { id: 'pdfa', title: 'PDF to PDF/A', desc: 'Convert PDF documents to PDF/A for ISO 19005-1 long-term archiving', icon: 'shield', color: '#059669', badge: 'ISO ARCHIVAL', action: 'workflow:pdfa' }
+    ]
+  }
+];
+
+export const SMALLPDF_DIRECTORIES = [
+  {
+    col: 1,
+    sections: [
+      {
+        title: 'Compress',
+        tools: [
+          { id: 'compress', title: 'Compress PDF', icon: 'compress', color: '#ef4444', action: 'workflow:compress' }
+        ]
+      },
+      {
+        title: 'Convert',
+        tools: [
+          { id: 'pdf-to-word', title: 'PDF Converter', icon: 'file-text', color: '#ef4444', action: 'workflow:pdf-to-word' },
+          { id: 'ocr-pdf', title: 'PDF OCR', icon: 'ocr', color: '#ef4444', action: 'workflow:ocr-pdf' },
+          { id: 'pdfa', title: 'PDF to PDF/A', icon: 'pdfa', color: '#ef4444', action: 'workflow:pdfa' }
+        ]
+      },
+      {
+        title: 'PDF to Image',
+        tools: [
+          { id: 'to-image', title: 'PDF to JPG', icon: 'image', color: '#f59e0b', action: 'workflow:to-image' },
+          { id: 'to-png', title: 'PDF to PNG', icon: 'image', color: '#f59e0b', action: 'workflow:to-image' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 2,
+    sections: [
+      {
+        title: 'Image to PDF',
+        tools: [
+          { id: 'images-to-pdf', title: 'JPG to PDF', icon: 'images', color: '#f59e0b', action: 'workflow:images-to-pdf' }
+        ]
+      },
+      {
+        title: 'PDF to Office',
+        tools: [
+          { id: 'pdf-to-word', title: 'PDF to Word', tag: 'W', color: '#2563eb', action: 'workflow:pdf-to-word' },
+          { id: 'pdf-to-excel', title: 'PDF to Excel', tag: 'X', color: '#16a34a', action: 'workflow:pdf-to-excel' },
+          { id: 'pdf-to-ppt', title: 'PDF to PPT', tag: 'P', color: '#ea580c', action: 'workflow:pdf-to-ppt' }
+        ]
+      },
+      {
+        title: 'Office to PDF',
+        tools: [
+          { id: 'word-to-pdf', title: 'Word to PDF', tag: 'W', color: '#2563eb', action: 'workflow:word-to-pdf' },
+          { id: 'excel-to-pdf', title: 'Excel to PDF', tag: 'X', color: '#16a34a', action: 'workflow:excel-to-pdf' },
+          { id: 'ppt-to-pdf', title: 'PPT to PDF', tag: 'P', color: '#ea580c', action: 'workflow:ppt-to-pdf' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 3,
+    sections: [
+      {
+        title: 'OpenOffice to PDF',
+        tools: [
+          { id: 'odt-to-pdf', title: 'ODT to PDF', tag: 'ODT', color: '#2563eb', action: 'workflow:word-to-pdf' },
+          { id: 'ods-to-pdf', title: 'ODS to PDF', tag: 'ODS', color: '#16a34a', action: 'workflow:excel-to-pdf' },
+          { id: 'odp-to-pdf', title: 'ODP to PDF', tag: 'ODP', color: '#ea580c', action: 'workflow:ppt-to-pdf' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 4,
+    sections: [
+      {
+        title: 'Convert to PDF',
+        tools: [
+          { id: 'txt-to-pdf', title: 'TXT to PDF', tag: 'TXT', color: '#2563eb', action: 'workflow:pdf-to-text' },
+          { id: 'rtf-to-pdf', title: 'RTF to PDF', tag: 'RTF', color: '#2563eb', action: 'workflow:word-to-pdf' },
+          { id: 'hwp-to-pdf', title: 'HWP to PDF', tag: 'HWP', color: '#2563eb', action: 'workflow:word-to-pdf' },
+          { id: 'html-to-pdf', title: 'HTML to PDF', tag: 'HTML', color: '#2563eb', action: 'workflow:html-to-pdf' },
+          { id: 'epub-to-pdf', title: 'EPUB to PDF', tag: 'EPUB', color: '#2563eb', action: 'workflow:word-to-pdf' },
+          { id: 'zip-to-pdf', title: 'ZIP to PDF', tag: 'ZIP', color: '#2563eb', action: 'workflow:images-to-pdf' },
+          { id: 'csv-to-pdf', title: 'CSV to PDF', tag: 'CSV', color: '#16a34a', action: 'workflow:excel-to-pdf' }
+        ]
+      },
+      {
+        title: 'iWork to PDF',
+        tools: [
+          { id: 'pages-to-pdf', title: 'Pages to PDF', icon: 'file-text', color: '#2563eb', action: 'workflow:word-to-pdf' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 5,
+    sections: [
+      {
+        title: 'Organize',
+        tools: [
+          { id: 'merge', title: 'Merge PDF', icon: 'merge', color: '#7c3aed', action: 'workflow:merge' },
+          { id: 'split', title: 'Split PDF', icon: 'split', color: '#7c3aed', action: 'workflow:split' },
+          { id: 'rotate', title: 'Rotate PDF', icon: 'rotate', color: '#7c3aed', action: 'workflow:rotate' },
+          { id: 'delete', title: 'Delete PDF Pages', icon: 'trash', color: '#7c3aed', action: 'sidebar:delete' },
+          { id: 'extract-pages', title: 'Extract PDF Pages', icon: 'extract', color: '#7c3aed', action: 'workflow:extract-pages' },
+          { id: 'organize', title: 'Organize PDF', icon: 'grid', color: '#7c3aed', action: 'workflow:organize' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 6,
+    sections: [
+      {
+        title: 'Edit',
+        tools: [
+          { id: 'edit', title: 'Edit PDF', icon: 'edit', color: '#0d9488', action: 'tool:select' },
+          { id: 'annotator', title: 'PDF Annotator', icon: 'edit', color: '#0d9488', action: 'tool:text' },
+          { id: 'reader', title: 'PDF Reader', icon: 'book', color: '#0d9488', action: 'tool:select' },
+          { id: 'pagenumbers', title: 'Number Pages', icon: 'hash', color: '#0d9488', action: 'workflow:pagenumbers' },
+          { id: 'crop', title: 'Crop PDF', icon: 'crop', color: '#0d9488', action: 'workflow:crop' },
+          { id: 'redact', title: 'Redact PDF', icon: 'shield', color: '#0d9488', action: 'workflow:redact' },
+          { id: 'watermark', title: 'Watermark PDF', icon: 'droplet', color: '#0d9488', action: 'workflow:watermark' },
+          { id: 'forms', title: 'PDF Form Filler', icon: 'forms', color: '#0d9488', action: 'tool:form' },
+          { id: 'share', title: 'Share PDF', icon: 'share', color: '#0d9488', action: 'tool:select' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 7,
+    sections: [
+      {
+        title: 'Fill & Sign',
+        tools: [
+          { id: 'sign', title: 'Sign PDF', icon: 'sign', color: '#db2777', action: 'workflow:sign' },
+          { id: 'sign-request', title: 'Request Signatures (Sign.com)', icon: 'sign', color: '#ca8a04', action: 'workflow:sign-request' }
+        ]
+      },
+      {
+        title: 'Protect',
+        tools: [
+          { id: 'unlock', title: 'Unlock PDF', icon: 'unlock', color: '#ef4444', action: 'workflow:unlock' },
+          { id: 'security', title: 'Protect PDF', icon: 'lock', color: '#ef4444', action: 'workflow:security' },
+          { id: 'flatten', title: 'Flatten PDF', icon: 'flatten', color: '#ef4444', action: 'workflow:flatten' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 8,
+    sections: [
+      {
+        title: 'AI PDF',
+        tools: [
+          { id: 'ai-assistant', title: 'AI PDF Assistant', tag: 'AI', color: '#2563eb', action: 'workflow:ocr-pdf' },
+          { id: 'chat-pdf', title: 'Chat with PDF', icon: 'message', color: '#2563eb', action: 'workflow:ocr-pdf' },
+          { id: 'ai-summarizer', title: 'AI PDF Summarizer', icon: 'file-text', color: '#2563eb', action: 'workflow:pdf-to-text' },
+          { id: 'translate-pdf', title: 'Translate PDF', icon: 'globe', color: '#2563eb', action: 'workflow:ocr-pdf' },
+          { id: 'ai-questions', title: 'AI Question Generator', icon: 'help', color: '#2563eb', action: 'workflow:ocr-pdf' }
+        ]
+      },
+      {
+        title: 'Scan',
+        tools: [
+          { id: 'scan', title: 'PDF Scanner', icon: 'camera', color: '#2563eb', action: 'workflow:scan' }
+        ]
+      }
     ]
   }
 ];
@@ -173,6 +342,68 @@ SEJDA_TOOL_CATEGORIES.forEach(cat => {
     }
   });
 });
+SMALLPDF_DIRECTORIES.forEach(col => {
+  col.sections.forEach(sec => {
+    sec.tools.forEach(t => {
+      if (!seen.has(t.id)) {
+        seen.add(t.id);
+        TOOLS_CATALOG.push(t);
+      }
+    });
+  });
+});
+
+export function getMiniIconSvg(icon) {
+  const icons = {
+    compress: '<path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"/>',
+    'file-text': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    ocr: '<path d="M4 7V4h16v3M9 20h6M12 4v16"/>',
+    pdfa: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+    images: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+    merge: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    split: '<path d="M16 3h5v5M8 3H3v5M12 22V2"/>',
+    rotate: '<path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>',
+    trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>',
+    extract: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>',
+    grid: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+    edit: '<path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+    book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    hash: '<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+    crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    droplet: '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+    forms: '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+    share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
+    sign: '<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+    unlock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+    lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    flatten: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>',
+    message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+    help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>'
+  };
+  return `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">${icons[icon] || icons['file-text']}</svg>`;
+}
+
+export function getSmallpdfIconHtml(tool) {
+  if (tool.tag) {
+    const isLong = tool.tag.length > 2;
+    return `<span class="tools-dir-icon-box ${isLong ? 'tag-long' : ''}" style="background: ${tool.color}; color: #ffffff;">${tool.tag}</span>`;
+  }
+  const svg = getMiniIconSvg(tool.icon || 'file-text');
+  return `<span class="tools-dir-icon-box" style="background: ${tool.color}; color: #ffffff;">${svg}</span>`;
+}
+
+export function renderDirectoryItemHtml(tool) {
+  return `
+    <button class="tools-dir-item" data-action="${tool.action}" data-tool-id="${tool.id}" title="${tool.title}">
+      ${getSmallpdfIconHtml(tool)}
+      <span class="tools-dir-title">${tool.title}</span>
+    </button>
+  `;
+}
 
 export class AllToolsModal {
   constructor() {
@@ -191,49 +422,59 @@ export class AllToolsModal {
     this.modal.style.display = 'none';
 
     this.modal.innerHTML = `
-      <div class="modal-dialog" style="max-width: 920px; max-height: 88vh; display: flex; flex-direction: column;">
-        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle);">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #30050d, #5e0b1a); display: flex; align-items: center; justify-content: center; color: white;">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-            </div>
+      <div class="modal-dialog tools-hub-dialog">
+        <div class="modal-header tools-hub-header">
+          <div class="tools-hub-brand">
             <div>
-              <h3 style="margin: 0; font-size: 17px; font-weight: 700;">PDF Studio Tools Hub</h3>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Quickly find and launch any PDF editing, organization, or conversion tool</p>
+              <div class="tools-hub-title-row">
+                <h3 class="tools-hub-title">PDF Studio Tools Hub</h3>
+              </div>
+              <p class="tools-hub-subtitle">Quickly find, filter, and launch any PDF editing, organization, or conversion tool</p>
             </div>
           </div>
-          <button class="modal-close-btn" style="font-size: 24px;">&times;</button>
+          <button class="modal-close-icon-btn modal-close-btn" aria-label="Close modal">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+          </button>
         </div>
 
-        <!-- Search & Filter Rail (Sejda Categorized Style) -->
-        <div style="padding: 14px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 10px;">
-          <div style="position: relative;">
-            <svg style="position: absolute; left: 12px; top: 11px; color: var(--text-muted);" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
-            <input type="text" id="all-tools-search" placeholder="Search 35+ PDF tools (e.g. compress, split, crop, sign, word, bates)..." style="width: 100%; padding: 9px 12px 9px 36px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-app); color: var(--text-main);" />
+        <!-- Search & Filter Rail -->
+        <div class="tools-hub-controls">
+          <div class="modal-search-wrapper">
+            <svg class="modal-search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+            <input type="text" id="all-tools-search" class="modal-search-input" placeholder="Search 35+ PDF tools (e.g. compress, split, crop, sign, word, bates, redact)..." autocomplete="off" />
+            <div class="modal-search-meta">
+              <button id="all-tools-search-clear" class="modal-search-clear" style="display: none;" title="Clear search" aria-label="Clear">&times;</button>
+              <span class="modal-shortcut-badge"><kbd>ESC</kbd></span>
+            </div>
           </div>
 
-          <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;" id="all-tools-filter-chips">
-            <button class="tool-filter-chip active" data-filter="all">All Tools</button>
+          <div class="modal-filter-rail" id="all-tools-filter-chips">
+            <button class="tool-filter-chip active" data-filter="all"><span class="chip-dot"></span>All Tools</button>
             <button class="tool-filter-chip" data-filter="popular">⭐ Most Popular</button>
-            <button class="tool-filter-chip" data-filter="merge">🔗 Merge</button>
-            <button class="tool-filter-chip" data-filter="split">✂ Split</button>
+            <button class="tool-filter-chip" data-filter="merge">🔗 Merge & Combine</button>
+            <button class="tool-filter-chip" data-filter="split">✂ Split & Extract</button>
             <button class="tool-filter-chip" data-filter="edit-sign">✏ Edit & Sign</button>
-            <button class="tool-filter-chip" data-filter="compress-scans">🗜 Compress & Scans</button>
-            <button class="tool-filter-chip" data-filter="security">🔒 Security</button>
+            <button class="tool-filter-chip" data-filter="compress-scans">🗜 Compress & OCR</button>
+            <button class="tool-filter-chip" data-filter="security">🔒 Security & Redact</button>
             <button class="tool-filter-chip" data-filter="convert-from">📤 Convert from PDF</button>
             <button class="tool-filter-chip" data-filter="convert-to">📥 Convert to PDF</button>
-            <button class="tool-filter-chip" data-filter="others">⚡ Others</button>
+            <button class="tool-filter-chip" data-filter="others">⚡ Page Operations</button>
           </div>
         </div>
 
         <!-- Cards Grid Container -->
-        <div class="modal-body" style="padding: 18px 20px; overflow-y: auto; flex: 1;">
+        <div class="modal-body tools-hub-body">
           <div id="all-tools-grid"></div>
         </div>
 
-        <div class="modal-footer" style="padding: 12px 20px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 11px; color: var(--text-muted);">Press <kbd style="background: var(--bg-app); padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border-subtle); font-size: 10px;">Esc</kbd> to close</span>
-          <button class="btn btn-outline btn-sm modal-close-btn">Close</button>
+        <div class="modal-footer tools-hub-footer">
+          <div class="tools-hub-footer-hint">
+            <kbd class="tools-hub-kbd">ESC</kbd>
+            <span>to close</span>
+            <span class="tools-hub-divider">•</span>
+            <span class="tools-hub-sec-hint">Select any card to launch immediately</span>
+          </div>
+          <button class="btn btn-outline btn-sm modal-close-btn tools-hub-close-cta">Close Hub</button>
         </div>
       </div>
     `;
@@ -300,10 +541,25 @@ export class AllToolsModal {
     });
 
     const searchInput = this.modal.querySelector('#all-tools-search');
-    searchInput.oninput = (e) => {
-      this.searchQuery = e.target.value.toLowerCase().trim();
-      this.renderGrid();
-    };
+    const clearBtn = this.modal.querySelector('#all-tools-search-clear');
+
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        this.searchQuery = e.target.value.toLowerCase().trim();
+        if (clearBtn) clearBtn.style.display = e.target.value ? 'flex' : 'none';
+        this.renderGrid();
+      };
+    }
+
+    if (clearBtn && searchInput) {
+      clearBtn.onclick = () => {
+        searchInput.value = '';
+        this.searchQuery = '';
+        clearBtn.style.display = 'none';
+        searchInput.focus();
+        this.renderGrid();
+      };
+    }
 
     const chips = this.modal.querySelectorAll('.tool-filter-chip');
     chips.forEach(chip => {
@@ -323,26 +579,38 @@ export class AllToolsModal {
     // 1. If searching, flat filter across all tools
     if (this.searchQuery) {
       const q = this.searchQuery;
-      const filtered = TOOLS_CATALOG.filter(t =>
+      const allTools = [];
+      const seen = new Set();
+      SMALLPDF_DIRECTORIES.forEach(col => {
+        col.sections.forEach(sec => {
+          sec.tools.forEach(t => {
+            if (!seen.has(t.title.toLowerCase())) {
+              seen.add(t.title.toLowerCase());
+              allTools.push(t);
+            }
+          });
+        });
+      });
+
+      const filtered = allTools.filter(t =>
         t.title.toLowerCase().includes(q) ||
-        t.desc.toLowerCase().includes(q) ||
         t.id.toLowerCase().includes(q)
       );
 
       if (filtered.length === 0) {
         grid.innerHTML = `
-          <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 8px; opacity: 0.5;"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
-            <div style="font-size: 14px; font-weight: 600;">No tools found matching "${this.searchQuery}"</div>
-            <p style="font-size: 12px; margin-top: 4px;">Try searching for "compress", "split", "word", or "sign"</p>
+          <div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+            <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom: 10px; opacity: 0.5;"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+            <div style="font-size: 15px; font-weight: 700; color: var(--text-main);">No tools found matching "${this.searchQuery}"</div>
+            <p style="font-size: 13px; margin-top: 6px; color: var(--text-muted);">Try searching for "compress", "split", "word", "sign", or "redact"</p>
           </div>
         `;
         return;
       }
 
       grid.innerHTML = `
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
-          ${filtered.map(tool => this.renderToolCardHtml(tool)).join('')}
+        <div class="tools-dir-search-grid">
+          ${filtered.map(tool => renderDirectoryItemHtml(tool)).join('')}
         </div>
       `;
       this.attachCardEvents(grid);
@@ -351,15 +619,40 @@ export class AllToolsModal {
 
     // 2. If a specific category filter is chosen
     if (this.activeFilter !== 'all') {
-      const cat = SEJDA_TOOL_CATEGORIES.find(c => c.id === this.activeFilter);
-      if (cat) {
+      const target = this.activeFilter.toLowerCase();
+      const matchedCols = [];
+
+      SMALLPDF_DIRECTORIES.forEach(col => {
+        const matchedSections = col.sections.filter(sec => {
+          if (target === 'popular') return sec.title === 'Compress' || sec.title === 'Organize' || sec.title === 'Edit' || sec.title === 'Fill & Sign';
+          if (target === 'merge') return sec.title === 'Organize';
+          if (target === 'split') return sec.title === 'Organize';
+          if (target === 'edit-sign') return sec.title === 'Edit' || sec.title === 'Fill & Sign';
+          if (target === 'compress-scans') return sec.title === 'Compress' || sec.title === 'Scan';
+          if (target === 'security') return sec.title === 'Protect';
+          if (target === 'convert-from') return sec.title === 'Convert' || sec.title === 'PDF to Image' || sec.title === 'PDF to Office';
+          if (target === 'convert-to') return sec.title === 'Image to PDF' || sec.title === 'Office to PDF' || sec.title === 'OpenOffice to PDF' || sec.title === 'Convert to PDF' || sec.title === 'iWork to PDF';
+          return sec.title.toLowerCase().includes(target);
+        });
+
+        if (matchedSections.length > 0) {
+          matchedCols.push({ col: col.col, sections: matchedSections });
+        }
+      });
+
+      if (matchedCols.length > 0) {
         grid.innerHTML = `
-          <div style="margin-bottom: 12px;">
-            <div style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">${cat.name}</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">${cat.desc}</div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
-              ${cat.tools.map(tool => this.renderToolCardHtml(tool)).join('')}
-            </div>
+          <div class="tools-dir-grid" style="grid-template-columns: repeat(${Math.min(matchedCols.length, 6)}, minmax(130px, 1fr));">
+            ${matchedCols.map(col => `
+              <div class="tools-dir-col">
+                ${col.sections.map(sec => `
+                  <div class="tools-dir-section">
+                    <div class="tools-dir-sec-title">${sec.title}</div>
+                    ${sec.tools.map(tool => renderDirectoryItemHtml(tool)).join('')}
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
           </div>
         `;
         this.attachCardEvents(grid);
@@ -367,69 +660,31 @@ export class AllToolsModal {
       }
     }
 
-    // 3. Default: Render ALL Sejda categories as beautiful distinct sections!
-    grid.innerHTML = SEJDA_TOOL_CATEGORIES.map(cat => `
-      <div class="modal-category-section" style="margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 15px; font-weight: 700; color: var(--text-main);">${cat.name}</span>
-            <span style="font-size: 11px; color: var(--text-muted);">${cat.desc}</span>
+    // 3. Default: Render EXACT 8-COLUMN DIRECTORY from user screenshot!
+    grid.innerHTML = `
+      <div class="tools-dir-grid">
+        ${SMALLPDF_DIRECTORIES.map(col => `
+          <div class="tools-dir-col">
+            ${col.sections.map(sec => `
+              <div class="tools-dir-section">
+                <div class="tools-dir-sec-title">${sec.title}</div>
+                ${sec.tools.map(tool => renderDirectoryItemHtml(tool)).join('')}
+              </div>
+            `).join('')}
           </div>
-          <span style="font-size: 11px; color: var(--primary); background: rgba(37,99,235,0.08); padding: 2px 7px; border-radius: 10px; font-weight: 600;">${cat.tools.length} tools</span>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
-          ${cat.tools.map(tool => this.renderToolCardHtml(tool)).join('')}
-        </div>
+        `).join('')}
       </div>
-    `).join('');
+    `;
 
     this.attachCardEvents(grid);
   }
 
-  renderToolCardHtml(tool) {
-    return `
-      <div class="tool-card-item" data-action="${tool.action}" data-tool-id="${tool.id}" style="
-        background: var(--bg-surface);
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
-        padding: 14px;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        position: relative;
-      ">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <div style="width: 34px; height: 34px; border-radius: 8px; background: ${tool.color}18; color: ${tool.color}; display: flex; align-items: center; justify-content: center;">
-            ${this.getToolIconSvg(tool.icon)}
-          </div>
-          ${tool.popular ? '<span style="font-size: 10px; font-weight: 700; color: #059669; background: #ecfdf5; padding: 2px 6px; border-radius: 10px;">POPULAR</span>' : ''}
-        </div>
-        <div>
-          <strong style="font-size: 13.5px; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 3px;">${tool.title}</strong>
-          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 0;">${tool.desc}</p>
-        </div>
-      </div>
-    `;
-  }
-
   attachCardEvents(container) {
-    container.querySelectorAll('.tool-card-item').forEach(card => {
+    container.querySelectorAll('.tools-dir-item, .landing-tool-card, .tool-card-item').forEach(card => {
       card.onclick = () => {
         const action = card.getAttribute('data-action');
         const toolId = card.getAttribute('data-tool-id');
         this.dispatchToolAction(action, toolId);
-      };
-      card.onmouseenter = () => {
-        card.style.borderColor = 'var(--primary)';
-        card.style.transform = 'translateY(-2px)';
-        card.style.boxShadow = '0 6px 16px rgba(0,0,0,0.06)';
-      };
-      card.onmouseleave = () => {
-        card.style.borderColor = 'var(--border-subtle)';
-        card.style.transform = 'none';
-        card.style.boxShadow = 'none';
       };
     });
   }
@@ -554,9 +809,11 @@ export class AllToolsModal {
     if (this.modal) {
       this.modal.style.display = 'flex';
       const search = this.modal.querySelector('#all-tools-search');
+      const clearBtn = this.modal.querySelector('#all-tools-search-clear');
       if (search) {
         search.value = '';
         this.searchQuery = '';
+        if (clearBtn) clearBtn.style.display = 'none';
         setTimeout(() => search.focus(), 50);
       }
       this.renderGrid();
