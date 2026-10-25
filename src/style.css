@@ -4166,7 +4166,6 @@ body.show-tool-workflow .tool-options-sidebar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 24px 60px -15px rgba(15, 23, 42, 0.08), 0 8px 24px -6px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
   transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   position: relative;
   overflow: hidden;
@@ -4180,7 +4179,6 @@ body.show-tool-workflow .tool-options-sidebar {
 .editor-upload-card.drag-over {
   border-color: var(--primary);
   background-color: rgba(48, 5, 13, 0.03);
-  box-shadow: 0 0 0 4px rgba(48, 5, 13, 0.14), 0 24px 60px -10px rgba(48, 5, 13, 0.18);
   transform: scale(1.01);
 }
 
@@ -6277,4 +6275,47 @@ body.show-tool-workflow .editor-paging-bar {
   background: #10b981;
   box-shadow: 0 0 6px #10b981;
 }
+
+/* ==========================================================================
+   PWA Offline Floating HUD Badge
+   ========================================================================== */
+
+.pwa-offline-badge {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: pwaSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pwa-offline-badge .offline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: pwaPulse 2s infinite;
+}
+
+@keyframes pwaPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes pwaSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 

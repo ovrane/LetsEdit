@@ -19,6 +19,7 @@ import { router } from '../core/router.js';
 import { getLandingTemplateHtml } from './landing/landing-html.js';
 import { LandingCardsRenderer } from './landing/landing-cards.js';
 import { getTwoToneIconSvg } from './landing/landing-icons.js';
+import { pwaManager } from '../core/pwa-manager.js';
 
 export class LandingPage {
   constructor() {
@@ -329,7 +330,7 @@ export class LandingPage {
         e.preventDefault();
         const action = link.getAttribute('data-action');
         if (action?.startsWith('app:')) {
-          Toast.success('LetsEdit is an offline-capable Desktop PWA! Install via your browser address bar icon or pin to your taskbar.');
+          pwaManager.installPwa();
         } else if (action) {
           this.handleToolAction(action);
         }
@@ -341,7 +342,7 @@ export class LandingPage {
     if (installDesktopBtn) {
       installDesktopBtn.onclick = (e) => {
         e.preventDefault();
-        Toast.success('LetsEdit Desktop App: Install via your browser address bar (Install App icon) or use 100% offline.');
+        pwaManager.installPwa();
       };
     }
 
