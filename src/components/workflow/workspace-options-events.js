@@ -21,6 +21,7 @@ import { bindOutlineEvents } from './workspace-outline-options.js';
 import { bindHeaderFooterEvents } from './workspace-header-footer-options.js';
 import { bindNupEvents } from './workspace-nup-options.js';
 import { bindResizeEvents } from './workspace-resize-options.js';
+import { bindWatermarkEvents } from './workspace-watermark-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -685,5 +686,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Page Geometry Resizing & Margins listeners
   if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(manager.activeTool.id)) {
     bindResizeEvents(manager);
+  }
+
+  // Watermark & Stamp Engine listeners
+  if (['watermark', 'watermark-pdf', 'add-watermark'].includes(manager.activeTool.id)) {
+    bindWatermarkEvents(manager);
   }
 }

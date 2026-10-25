@@ -33,36 +33,32 @@ export async function processSingleDocument(manager, tool, file) {
         savingsPercent: res.savingsPercent
       }
     };
-  } else if (id === 'watermark') {
-    const srcDoc = await PDFDocument.load(primary.bytes);
-    const font = await srcDoc.embedFont(StandardFonts.HelveticaBold);
-    const totalPages = srcDoc.getPageCount();
-    const text = manager.watermarkText || 'CONFIDENTIAL';
-    const opacity = parseFloat(manager.watermarkOpacity) || 0.3;
-    const rotDeg = parseInt(manager.watermarkRotation, 10) || 45;
-    const { r, g, b } = hexToRgb(manager.watermarkColor || '#94a3b8');
-
-    for (let i = 0; i < totalPages; i++) {
-      const page = srcDoc.getPage(i);
-      const { width, height } = page.getSize();
-      const fontSize = Math.min(width, height) / 8;
-      const textW = font.widthOfTextAtSize(text, fontSize);
-
-      page.drawText(text, {
-        x: (width - textW * Math.cos((rotDeg * Math.PI) / 180)) / 2,
-        y: (height - textW * Math.sin((rotDeg * Math.PI) / 180)) / 2,
-        size: fontSize,
-        font,
-        color: rgb(r / 255, g / 255, b / 255),
-        opacity,
-        rotate: degrees(rotDeg)
-      });
-    }
-    const wmBytes = await srcDoc.save();
+  } else if (['watermark', 'watermark-pdf', 'add-watermark'].includes(id)) {
+    const config = manager.watermarkConfig || {
+      mode: manager.watermarkMode || 'text',
+      text: manager.watermarkText || 'CONFIDENTIAL',
+      fontFamily: manager.watermarkFont || 'HelveticaBold',
+      fontSize: manager.watermarkFontSize,
+      color: manager.watermarkColor || '#94a3b8',
+      opacity: manager.watermarkOpacity !== undefined ? manager.watermarkOpacity : 0.3,
+      rotation: manager.watermarkRotation !== undefined ? manager.watermarkRotation : 45,
+      layer: manager.watermarkLayer || 'over',
+      layout: manager.watermarkLayout || 'single',
+      position: manager.watermarkPosition || 'center',
+      offsetX: manager.watermarkOffsetX || 0,
+      offsetY: manager.watermarkOffsetY || 0,
+      pages: manager.watermarkPages || 'all',
+      imageBytes: manager.watermarkImageBytes,
+      imageFormat: manager.watermarkImageFormat || 'png',
+      imageScale: manager.watermarkImageScale || 0.4
+    };
+    const wmBytes = await PageOperations.applyWatermark(primary.bytes, config, { fileName: primary.name });
+    manager.lastWatermarkResult = wmBytes.report;
     return {
       name: `Watermarked_${primary.name}`,
       bytes: wmBytes,
-      blob: new Blob([wmBytes], { type: 'application/pdf' })
+      blob: new Blob([wmBytes], { type: 'application/pdf' }),
+      watermarkReport: wmBytes.report
     };
   } else if (id === 'security') {
     const srcDoc = await PDFDocument.load(primary.bytes);

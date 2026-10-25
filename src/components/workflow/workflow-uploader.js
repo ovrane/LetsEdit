@@ -186,6 +186,9 @@ export function bindUploadEvents(manager) {
       } else if (['resize', 'resize-pdf', 'resize-margins', 'page-margins'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleResizePdf();
         sampleName = 'Sample_Resize_Document.pdf';
+      } else if (['watermark', 'watermark-pdf', 'add-watermark'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleWatermarkPdf();
+        sampleName = 'Sample_Watermark_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

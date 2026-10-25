@@ -22,6 +22,7 @@ import { handleOutlineRequest } from './routes/outline-routes.js';
 import { handleHeaderFooterRequest } from './routes/header-footer-routes.js';
 import { handleNupRequest } from './routes/nup-routes.js';
 import { handleResizeRequest } from './routes/resize-routes.js';
+import { handleWatermarkRequest } from './routes/watermark-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -115,6 +116,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Page Geometry Resizing & Margins endpoints
   const resizeHandled = await handleResizeRequest(req, res, pathname, method);
   if (resizeHandled) return true;
+
+  // Dispatch Dynamic Watermark & Stamp endpoints
+  const watermarkHandled = await handleWatermarkRequest(req, res, pathname, method);
+  if (watermarkHandled) return true;
 
   return false;
 }

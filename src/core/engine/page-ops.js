@@ -20,8 +20,9 @@ import { OutlineOps } from './operations/outline-ops.js';
 import { HeaderFooterOps } from './operations/header-footer-ops.js';
 import { NupOps } from './operations/nup-ops.js';
 import { ResizeOps } from './operations/resize-ops.js';
+import { WatermarkOps } from './operations/watermark-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -115,5 +116,9 @@ export class PageOperations {
   // Adobe Acrobat Pro & Sejda Page Geometry Resizing & Margins Engine
   static resizePdf(...args) { return ResizeOps.resizePdf(...args); }
   static createSampleResizePdf(...args) { return ResizeOps.createSampleResizePdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF Dynamic Watermark & Stamp Engine
+  static applyWatermark(...args) { return WatermarkOps.applyWatermark(...args); }
+  static createSampleWatermarkPdf(...args) { return WatermarkOps.createSampleWatermarkPdf(...args); }
 }
 

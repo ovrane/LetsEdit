@@ -139,7 +139,7 @@ export const ROUTE_DEFINITIONS = [
   {
     path: '/watermark_pdf',
     toolId: 'watermark',
-    aliases: ['/watermark', '/watermark-pdf', '/add_watermark'],
+    aliases: ['/watermark', '/watermark-pdf', '/add_watermark', '/add-watermark'],
     title: "Add watermark to PDF. Stamp text or images over PDF — LetsEdit",
     description: "Stamp text or an image across all pages with custom rotation and opacity."
   },

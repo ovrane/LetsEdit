@@ -12,6 +12,7 @@ import { renderOutlineOptionsHtml } from './workspace-outline-options.js';
 import { renderHeaderFooterOptionsHtml } from './workspace-header-footer-options.js';
 import { renderNupOptionsHtml } from './workspace-nup-options.js';
 import { renderResizeOptionsHtml } from './workspace-resize-options.js';
+import { renderWatermarkOptionsHtml } from './workspace-watermark-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -164,30 +165,8 @@ import { renderResizeOptionsHtml } from './workspace-resize-options.js';
       `;
     }
 
-    if (id === 'watermark') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Watermark Text</label>
-          <input type="text" id="wm-text-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);" value="${instance.watermarkText}" placeholder="e.g. CONFIDENTIAL" />
-
-          <div style="margin-top: 12px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">
-              <span>Opacity</span>
-              <span id="wm-opacity-val">${Math.round(instance.watermarkOpacity * 100)}%</span>
-            </div>
-            <input type="range" id="wm-opacity-range" min="0.1" max="0.9" step="0.05" value="${instance.watermarkOpacity}" style="width: 100%; cursor: pointer;" />
-          </div>
-
-          <div style="margin-top: 12px;">
-            <label class="workflow-options-label">Angle</label>
-            <div class="tool-segmented-control">
-              <button type="button" class="tool-seg-btn ${instance.watermarkRotation === 45 ? 'active' : ''}" data-wm-rot="45">45° Diagonal</button>
-              <button type="button" class="tool-seg-btn ${instance.watermarkRotation === 0 ? 'active' : ''}" data-wm-rot="0">0° Horizontal</button>
-              <button type="button" class="tool-seg-btn ${instance.watermarkRotation === 90 ? 'active' : ''}" data-wm-rot="90">90° Vertical</button>
-            </div>
-          </div>
-        </div>
-      `;
+    if (['watermark', 'watermark-pdf', 'add-watermark'].includes(id)) {
+      return renderWatermarkOptionsHtml(instance);
     }
 
     if (id === 'security') {

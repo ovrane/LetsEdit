@@ -74,6 +74,12 @@ export function renderSuccessScreen(manager) {
     const count = rep?.appliedCount || 1;
     const gut = rep?.bindingGutter ? ` with +${rep.bindingGutter}pt ${rep.mirrorMargins ? 'duplex' : ''} binding gutter` : '';
     subtitleText = `Page geometry adjusted: ${count} page${count === 1 ? '' : 's'} standardized to ${sz}${gut}.`;
+  } else if (['watermark', 'watermark-pdf', 'add-watermark'].includes(t.id)) {
+    const rep = manager.lastWatermarkResult;
+    const mode = rep?.mode === 'image' ? 'Image stamp' : `"${rep?.text || 'CONFIDENTIAL'}" text`;
+    const count = rep?.appliedCount || 1;
+    const layout = rep?.layout === 'mosaic' ? 'tiled repeat grid' : `${rep?.rotation || 45}° angled stamp`;
+    subtitleText = `Watermark applied: ${mode} stamped across ${count} page${count === 1 ? '' : 's'} (${layout}).`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -469,6 +475,38 @@ export function renderSuccessScreen(manager) {
               <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
                 <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Pages Adjusted</div>
                 <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastResizeResult.appliedCount} / ${manager.lastResizeResult.totalPages}</div>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(['watermark', 'watermark-pdf', 'add-watermark'].includes(t.id) && manager.lastWatermarkResult) ? `
+          <div class="watermark-success-telemetry-card" style="background: rgba(14, 165, 233, 0.05); border: 1.5px solid rgba(14, 165, 233, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #0284c7;">
+                <svg width="18" height="18" fill="none" stroke="#0284c7" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24"></path></svg>
+                <span>Watermark & Stamp Engine Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #0284c7; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastWatermarkResult.mode?.toUpperCase()} • ${manager.lastWatermarkResult.layer?.toUpperCase()}
+              </span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 12px;">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Layout Mode</div>
+                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.layout === 'mosaic' ? 'Mosaic Repeat' : 'Single Anchor'}</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Rotation / Opacity</div>
+                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.rotation}° / ${Math.round((manager.lastWatermarkResult.opacity || 0.3) * 100)}%</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Layering</div>
+                <div style="font-size: 14px; font-weight: 700; color: #0284c7; margin-top: 2px;">${manager.lastWatermarkResult.layer === 'under' ? 'Background Under' : 'Foreground Over'}</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600;">Pages Stamped</div>
+                <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastWatermarkResult.appliedCount} / ${manager.lastWatermarkResult.totalPages}</div>
               </div>
             </div>
           </div>

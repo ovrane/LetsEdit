@@ -23,7 +23,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'images-to-pdf') return 'Convert to PDF';
   if (id === 'to-image') return `${batchPrefix}Convert to ${manager.imageFormat === 'image/jpeg' ? 'JPG' : 'PNG'}`;
   if (id === 'ocr-pdf') return `${batchPrefix}Run OCR`;
-  if (id === 'watermark') return `${batchPrefix}Apply Watermark`;
+  if (['watermark', 'watermark-pdf', 'add-watermark'].includes(id)) return `${batchPrefix}Apply Watermark & Stamp`;
   if (id === 'security') return `${batchPrefix}Encrypt & Protect PDF`;
   if (id === 'rotate') return `${batchPrefix}Rotate PDF Pages`;
   if (id === 'crop') return `${batchPrefix}Apply Crop`;
