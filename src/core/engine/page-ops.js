@@ -24,8 +24,9 @@ import { WatermarkOps } from './operations/watermark-ops.js';
 import { BatesOps } from './operations/bates-ops.js';
 import { PageNumbersOps } from './operations/pagenumbers-ops.js';
 import { FlattenOps } from './operations/flatten-ops.js';
+import { RedactOps } from './operations/redact-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -143,5 +144,10 @@ export class PageOperations {
   static flattenPdf(...args) { return FlattenOps.flattenPdf(...args); }
   static inspectFlattenTargets(...args) { return FlattenOps.inspectFlattenTargets(...args); }
   static createSampleFlattenPdf(...args) { return FlattenOps.createSampleFlattenPdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF Permanent Vector Redaction Suite
+  static applyRedaction(...args) { return RedactOps.applyRedaction(...args); }
+  static searchSensitiveData(...args) { return RedactOps.searchSensitiveData(...args); }
+  static createSampleRedactPdf(...args) { return RedactOps.createSampleRedactPdf(...args); }
 }
 

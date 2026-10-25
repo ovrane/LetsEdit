@@ -52,7 +52,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'sign') return 'Sign Document & Finish';
   if (['pagenumbers', 'page-numbers', 'pagenumbers-pdf', 'add-page-numbers'].includes(id)) return `${batchPrefix}Apply Page Numbers`;
   if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(id)) return `${batchPrefix}Flatten PDF (${manager.flattenMode === 'forms' ? 'Forms Only' : manager.flattenMode === 'annotations' ? 'Annotations Only' : 'All Elements'})`;
-  if (id === 'redact') return `${batchPrefix}Permanently Redact PDF`;
+  if (['redact', 'redact-pdf'].includes(id)) return `${batchPrefix}Permanently Redact PDF`;
   if (id === 'scan') return 'Compile Scanned PDF';
   if (id === 'excel-to-pdf') return `${batchPrefix}Convert Excel to PDF`;
   if (id === 'ppt-to-pdf') return `${batchPrefix}Convert PowerPoint to PDF`;

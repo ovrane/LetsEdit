@@ -198,6 +198,9 @@ export function bindUploadEvents(manager) {
       } else if (['flatten', 'flatten-pdf', 'flatten-forms'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleFlattenPdf();
         sampleName = 'Sample_Corporate_NDA_Form.pdf';
+      } else if (['redact', 'redact-pdf'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleRedactPdf();
+        sampleName = 'Sample_PII_Discovery_Record.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

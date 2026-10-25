@@ -454,21 +454,20 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([updatedBytes], { type: 'application/pdf' }),
       headerFooterReport: updatedBytes.report
     };
-  } else if (id === 'redact') {
-    const redactDoc = await PDFDocument.load(primary.bytes);
-    const keywords = (manager.redactKeywords || '').split(',').map(k => k.trim()).filter(Boolean);
-    const pCount = redactDoc.getPageCount();
-    for (let i = 0; i < pCount; i++) {
-      const page = redactDoc.getPage(i);
-      if (keywords.length > 0) {
-        await redactPageContentStreams(redactDoc, page, [], keywords);
-      }
-    }
-    const redactedBytes = await redactDoc.save();
+  } else if (['redact', 'redact-pdf'].includes(id)) {
+    const kwList = (manager.redactKeywords || '').split(/[,;\n]+/).map(k => k.trim()).filter(Boolean);
+    const redactedBytes = await PageOperations.applyRedaction(primary.bytes, {
+      keywords: kwList,
+      patterns: manager.redactPatterns || ['ssn', 'credit_card'],
+      appearance: manager.redactColor || '#000000',
+      overlayText: manager.redactOverlayText !== undefined ? manager.redactOverlayText : '[REDACTED]'
+    });
+    manager.lastRedactResult = redactedBytes.report;
     return {
       name: `Redacted_${primary.name}`,
       bytes: redactedBytes,
-      blob: new Blob([redactedBytes], { type: 'application/pdf' })
+      blob: new Blob([redactedBytes], { type: 'application/pdf' }),
+      redactionReport: redactedBytes.report
     };
   } else if (id === 'excel-to-pdf') {
     const title = manager.excelTitle || primary.name.replace(/\.[^/.]+$/, '');

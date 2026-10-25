@@ -26,6 +26,7 @@ import { handleWatermarkRequest } from './routes/watermark-routes.js';
 import { handleBatesRequest } from './routes/bates-routes.js';
 import { handlePageNumbersRequest } from './routes/pagenumbers-routes.js';
 import { handleFlattenRequest } from './routes/flatten-routes.js';
+import { handleRedactRequest } from './routes/redact-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -135,6 +136,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Document Flattening endpoints
   const flattenHandled = await handleFlattenRequest(req, res, pathname, method);
   if (flattenHandled) return true;
+
+  // Dispatch Permanent Redaction endpoints
+  const redactHandled = await handleRedactRequest(req, res, pathname, method);
+  if (redactHandled) return true;
 
   return false;
 }

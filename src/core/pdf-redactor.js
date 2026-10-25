@@ -75,6 +75,10 @@ export function sanitizeContentStream(contentString, redactionBoxes, textTargets
     // C. Inside TJ array: [(...) ...] TJ
     const arrayLiteralRegex = new RegExp(`\\(${escapedTarget}\\)`, 'gi');
     result = result.replace(arrayLiteralRegex, '()');
+
+    // D. Purge substring occurrences in any hex or literal text tokens
+    result = result.replace(new RegExp(hexTarget, 'gi'), '');
+    result = result.replace(new RegExp(escapedTarget, 'g'), '');
   }
 
   // 2. Scrub by bounding box coordinates

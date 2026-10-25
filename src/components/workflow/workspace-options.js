@@ -16,6 +16,7 @@ import { renderWatermarkOptionsHtml } from './workspace-watermark-options.js';
 import { renderBatesOptionsHtml } from './workspace-bates-options.js';
 import { renderPageNumbersOptionsHtml } from './workspace-pagenumbers-options.js';
 import { renderFlattenOptionsHtml } from './workspace-flatten-options.js';
+import { renderRedactOptionsHtml } from './workspace-redact-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -719,27 +720,8 @@ import { renderFlattenOptionsHtml } from './workspace-flatten-options.js';
       return renderFlattenOptionsHtml(instance);
     }
 
-    if (id === 'redact') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Sensitive Words or Phrases to Redact</label>
-          <textarea id="workflow-redact-keywords" class="input-sm" placeholder="Enter keywords to redact (e.g. John Doe, Confidential, 123-45-6789), separated by commas..." style="width: 100%; height: 75px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); font-size: 13px; line-height: 1.4; resize: vertical; margin-bottom: 12px;">${instance.redactKeywords || ''}</textarea>
-
-          <label class="workflow-options-label">Redaction Appearance</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
-            <button type="button" class="btn btn-xs ${instance.redactColor === '#000000' ? 'btn-primary' : 'btn-outline'} btn-redact-color" data-color="#000000" style="padding: 8px; font-weight: 600;">
-              Blackout Box
-            </button>
-            <button type="button" class="btn btn-xs ${instance.redactColor === '#ffffff' ? 'btn-primary' : 'btn-outline'} btn-redact-color" data-color="#ffffff" style="padding: 8px; font-weight: 600;">
-              Whiteout Box
-            </button>
-          </div>
-
-          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #ef4444; line-height: 1.5;">
-            <strong>Permanent Vector Redaction:</strong> The underlying text stream operators are permanently scrubbed from the PDF binary so sensitive information cannot be copied or retrieved.
-          </div>
-        </div>
-      `;
+    if (['redact', 'redact-pdf'].includes(id)) {
+      return renderRedactOptionsHtml(instance);
     }
 
     if (id === 'scan') {

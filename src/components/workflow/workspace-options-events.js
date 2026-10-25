@@ -25,6 +25,7 @@ import { bindWatermarkEvents } from './workspace-watermark-options.js';
 import { bindBatesEvents } from './workspace-bates-options.js';
 import { bindPageNumbersEvents } from './workspace-pagenumbers-options.js';
 import { bindFlattenEvents } from './workspace-flatten-options.js';
+import { bindRedactEvents } from './workspace-redact-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -497,18 +498,9 @@ export function bindWorkspaceOptionsEvents(manager) {
   }
 
   // Redaction workspace listeners
-  const redactInp = manager.container.querySelector('#workflow-redact-keywords');
-  if (redactInp) {
-    redactInp.oninput = (e) => {
-      manager.redactKeywords = e.target.value;
-    };
+  if (['redact', 'redact-pdf'].includes(manager.activeTool?.id)) {
+    bindRedactEvents(manager);
   }
-  manager.container.querySelectorAll('.btn-redact-color').forEach(btn => {
-    btn.onclick = () => {
-      manager.redactColor = btn.getAttribute('data-color') || '#000000';
-      manager.render();
-    };
-  });
 
   // Scanner workspace listeners
   manager.container.querySelectorAll('.btn-scan-margin').forEach(btn => {
