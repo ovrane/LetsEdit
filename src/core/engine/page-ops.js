@@ -18,8 +18,9 @@ import { PageLabelsOps } from './operations/pagelabels-ops.js';
 import { SanitizeOps } from './operations/sanitize-ops.js';
 import { OutlineOps } from './operations/outline-ops.js';
 import { HeaderFooterOps } from './operations/header-footer-ops.js';
+import { NupOps } from './operations/nup-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -105,5 +106,9 @@ export class PageOperations {
   static interpolateMacros(...args) { return HeaderFooterOps.interpolateMacros(...args); }
   static isPageIncluded(...args) { return HeaderFooterOps.isPageIncluded(...args); }
   static createSampleHeaderFooterPdf(...args) { return HeaderFooterOps.createSampleHeaderFooterPdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF N-Up Page Imposition Engine
+  static applyNup(...args) { return NupOps.applyNup(...args); }
+  static createSampleNupPdf(...args) { return NupOps.createSampleNupPdf(...args); }
 }
 

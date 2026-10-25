@@ -20,6 +20,7 @@ import { handlePageLabelsRequest } from './routes/pagelabels-routes.js';
 import { handleSanitizeRequest } from './routes/sanitize-routes.js';
 import { handleOutlineRequest } from './routes/outline-routes.js';
 import { handleHeaderFooterRequest } from './routes/header-footer-routes.js';
+import { handleNupRequest } from './routes/nup-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -105,6 +106,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Multi-Zone Header & Footer endpoints
   const headerFooterHandled = await handleHeaderFooterRequest(req, res, pathname, method);
   if (headerFooterHandled) return true;
+
+  // Dispatch N-Up Page Imposition endpoints
+  const nupHandled = await handleNupRequest(req, res, pathname, method);
+  if (nupHandled) return true;
 
   return false;
 }

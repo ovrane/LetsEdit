@@ -253,15 +253,15 @@ export const WORKFLOW_TOOLS_CONFIG = {
   },
   nup: {
     id: 'nup',
-    title: 'N-Up Imposition PDF Printing',
-    subtitle: 'Impose 2 or 4 pages per sheet side-by-side or in a 2×2 grid layout.',
+    title: 'Adobe Acrobat & iLovePDF N-Up Imposition',
+    subtitle: 'Impose multiple pages per sheet (2-Up, 4-Up, 6-Up, 8-Up) with custom margins, borders, and orientation.',
     icon: `<svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>`,
-    color: '#475569',
+    color: '#3b82f6',
     accept: '.pdf,application/pdf',
     multiple: false,
     buttonText: 'Select PDF file',
     dropText: 'or drop PDF here',
-    badge: '2-Up & 4-Up'
+    badge: '2/4/6/8-Up Imposition'
   },
   'split-half': {
     id: 'split-half',
@@ -568,6 +568,9 @@ WORKFLOW_TOOLS_CONFIG['edit-bookmarks'] = WORKFLOW_TOOLS_CONFIG.bookmarks;
 WORKFLOW_TOOLS_CONFIG.header_footer = WORKFLOW_TOOLS_CONFIG['header-footer'];
 WORKFLOW_TOOLS_CONFIG['add-header-footer'] = WORKFLOW_TOOLS_CONFIG['header-footer'];
 WORKFLOW_TOOLS_CONFIG['headers-and-footers'] = WORKFLOW_TOOLS_CONFIG['header-footer'];
+WORKFLOW_TOOLS_CONFIG['n-up'] = WORKFLOW_TOOLS_CONFIG.nup;
+WORKFLOW_TOOLS_CONFIG['nup-pdf'] = WORKFLOW_TOOLS_CONFIG.nup;
+WORKFLOW_TOOLS_CONFIG['n-up-pdf'] = WORKFLOW_TOOLS_CONFIG.nup;
 
 export const CHAIN_TOOLS = [
   {

@@ -38,7 +38,7 @@ export function getExecuteButtonLabel(manager) {
   if (id === 'deskew') return `${batchPrefix}Straighten & Save PDF`;
   if (id === 'organize') return `Save Organized PDF (${manager.organizePages.length} pages)`;
   if (id === 'bates') return `${batchPrefix}Apply Bates Numbering`;
-  if (id === 'nup') return `${batchPrefix}Create ${manager.nupCount}-Up PDF`;
+  if (['nup', 'n-up', 'nup-pdf'].includes(id)) return `${batchPrefix}Apply ${manager.nupConfig?.layout || manager.nupCount || 2}-Up Imposition`;
   if (id === 'split-half') return `${batchPrefix}Split in Half (${manager.splitHalfDirection})`;
   if (id === 'alternate-mix') return 'Mix & Interleave Documents';
   if (id === 'html-to-pdf') return `${batchPrefix}Convert HTML to PDF`;
@@ -231,12 +231,19 @@ export function renderToolWorkspace(manager) {
                 </div>
               </div>
             </div>
-          ` : t.id === 'nup' ? `
+          ` : ['nup', 'n-up', 'nup-pdf'].includes(t.id) ? (() => {
+            const cfg = manager.nupConfig || {};
+            const layout = Number(cfg.layout || manager.nupCount || 2);
+            const orient = cfg.orientation === 'landscape' || (cfg.orientation !== 'portrait' && layout === 2) ? 'landscape' : 'portrait';
+            const cols = (layout === 2 && orient === 'landscape') ? 2 : (layout === 6 && orient === 'landscape') ? 3 : (layout === 8 && orient === 'landscape') ? 4 : 2;
+            const rows = Math.ceil(layout / cols);
+            const isLandscape = orient === 'landscape';
+            return `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-weight: 600; font-size: 14px;">Imposition Layout Preview</span>
-                <span style="font-size: 11px; color: #475569; background: rgba(71, 85, 105, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(71, 85, 105, 0.25);">
-                  ${manager.nupCount === 2 ? '2-Up Landscape Sheet' : '4-Up Portrait Sheet'}
+                <span style="font-size: 11px; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.25);">
+                  ${layout}-Up ${orient === 'landscape' ? 'Landscape' : 'Portrait'} (${cols}×${rows})
                 </span>
               </div>
               <div style="font-size: 12px; color: var(--text-muted);">
@@ -245,15 +252,16 @@ export function renderToolWorkspace(manager) {
             </div>
 
             <div class="nup-workspace-wrap" style="display: flex; justify-content: center; align-items: center; background: var(--bg-surface); padding: 30px; border-radius: 12px; border: 1px solid var(--border-subtle); min-height: 440px;">
-              <div style="background: white; border: 2px solid var(--border-strong); box-shadow: 0 12px 28px rgba(0,0,0,0.2); border-radius: 6px; padding: 16px; ${manager.nupCount === 2 ? 'width: 420px; height: 297px;' : 'width: 297px; height: 420px;'} display: grid; ${manager.nupCount === 2 ? 'grid-template-columns: 1fr 1fr; gap: 14px;' : 'grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px;'}">
-                ${Array.from({ length: manager.nupCount }).map((_, i) => `
-                  <div style="border: 1px dashed #64748b; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; color: #475569; font-size: 12px; font-weight: 600;">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                    <span style="margin-top: 4px;">Page ${i + 1}</span>
+              <div style="background: ${cfg.backgroundColor || '#ffffff'}; border: 2px solid var(--border-strong); box-shadow: 0 12px 28px rgba(0,0,0,0.2); border-radius: 6px; padding: 16px; ${isLandscape ? 'width: 420px; height: 297px;' : 'width: 297px; height: 420px;'} display: grid; grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr); gap: ${cfg.gutter ? Math.min(cfg.gutter, 12) : 8}px;">
+                ${Array.from({ length: layout }).map((_, i) => `
+                  <div style="border: ${cfg.showBorder ? `1px solid ${cfg.borderColor || '#94a3b8'}` : '1px dashed #64748b'}; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; color: #475569; font-size: 11px; font-weight: 600;">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span style="margin-top: 2px;">Page ${i + 1}</span>
                   </div>
                 `).join('')}
               </div>
             </div>
+          `; })()
           ` : t.id === 'split-half' ? `
             <div class="workflow-cards-toolbar">
               <div style="display: flex; align-items: center; gap: 8px;">

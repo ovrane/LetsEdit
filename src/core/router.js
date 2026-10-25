@@ -223,9 +223,9 @@ export const ROUTE_DEFINITIONS = [
   {
     path: '/nup_pdf',
     toolId: 'nup',
-    aliases: ['/nup', '/nup-pdf', '/n-up', '/n-up-pdf'],
-    title: "N-Up Imposition PDF Printing. 2-Up & 4-Up sheets — LetsEdit",
-    description: "Impose 2 or 4 pages per sheet side-by-side or in a 2x2 grid layout."
+    aliases: ['/nup', '/nup-pdf', '/n-up', '/n-up-pdf', '/multiple-pages'],
+    title: "Adobe Acrobat & iLovePDF N-Up Imposition PDF Printing — LetsEdit",
+    description: "Impose multiple pages per sheet (2-Up, 4-Up, 6-Up, 8-Up) with custom margins, borders, and orientation."
   },
   {
     path: '/split_half_pdf',

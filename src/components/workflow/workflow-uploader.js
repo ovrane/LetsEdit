@@ -180,6 +180,9 @@ export function bindUploadEvents(manager) {
       } else if (['header-footer', 'header_footer', 'add-header-footer'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleHeaderFooterPdf();
         sampleName = 'Sample_Header_Footer_Document.pdf';
+      } else if (['nup', 'n-up', 'nup-pdf'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleNupPdf();
+        sampleName = 'Sample_Imposition_Document.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

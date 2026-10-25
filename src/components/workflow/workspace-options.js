@@ -10,6 +10,7 @@ import { renderPageLabelsOptionsHtml } from './workspace-pagelabels-options.js';
 import { renderSanitizeOptionsHtml } from './workspace-sanitize-options.js';
 import { renderOutlineOptionsHtml } from './workspace-outline-options.js';
 import { renderHeaderFooterOptionsHtml } from './workspace-header-footer-options.js';
+import { renderNupOptionsHtml } from './workspace-nup-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -464,25 +465,8 @@ import { renderHeaderFooterOptionsHtml } from './workspace-header-footer-options
       `;
     }
 
-    if (id === 'nup') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Imposition Layout</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
-            <button type="button" class="btn ${instance.nupCount === 2 ? 'btn-primary' : 'btn-outline'} btn-nup-toggle" data-count="2" style="flex-direction: column; padding: 12px 8px; text-align: center; gap: 4px;">
-              <span style="font-weight: 700; font-size: 14px;">2-Up</span>
-              <span style="font-size: 11px; opacity: 0.85;">Side-by-side Landscape</span>
-            </button>
-            <button type="button" class="btn ${instance.nupCount === 4 ? 'btn-primary' : 'btn-outline'} btn-nup-toggle" data-count="4" style="flex-direction: column; padding: 12px 8px; text-align: center; gap: 4px;">
-              <span style="font-weight: 700; font-size: 14px;">4-Up</span>
-              <span style="font-size: 11px; opacity: 0.85;">2×2 Grid Portrait</span>
-            </button>
-          </div>
-          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
-            Preserves vector fidelity and auto-scales page margins for standard A4 printing.
-          </div>
-        </div>
-      `;
+    if (['nup', 'n-up', 'nup-pdf'].includes(id)) {
+      return renderNupOptionsHtml(instance);
     }
 
     if (id === 'split-half') {

@@ -198,12 +198,15 @@ export async function processSingleDocument(manager, tool, file) {
       bytes: batesBytes,
       blob: new Blob([batesBytes], { type: 'application/pdf' })
     };
-  } else if (id === 'nup') {
-    const nupBytes = await PageOperations.nUpPdf(primary.bytes, manager.nupCount);
+  } else if (['nup', 'n-up', 'nup-pdf'].includes(id)) {
+    const config = manager.nupConfig || { layout: manager.nupCount || 2 };
+    const nupBytes = await PageOperations.applyNup(primary.bytes, config);
+    manager.lastNupResult = nupBytes.report;
     return {
-      name: `${manager.nupCount}Up_${primary.name}`,
+      name: `${nupBytes.layout || manager.nupCount || 2}Up_${primary.name}`,
       bytes: nupBytes,
-      blob: new Blob([nupBytes], { type: 'application/pdf' })
+      blob: new Blob([nupBytes], { type: 'application/pdf' }),
+      nupReport: nupBytes.report
     };
   } else if (id === 'split-half') {
     const halvedBytes = await PageOperations.splitInHalf(primary.bytes, manager.splitHalfDirection);

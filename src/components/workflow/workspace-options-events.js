@@ -19,6 +19,7 @@ import { bindPageLabelsEvents } from './workspace-pagelabels-options.js';
 import { bindSanitizeEvents } from './workspace-sanitize-options.js';
 import { bindOutlineEvents } from './workspace-outline-options.js';
 import { bindHeaderFooterEvents } from './workspace-header-footer-options.js';
+import { bindNupEvents } from './workspace-nup-options.js';
 
 export function bindWorkspaceOptionsEvents(manager) {
   // Organize controls
@@ -673,5 +674,10 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Multi-Zone Header & Footer listeners
   if (['header-footer', 'header_footer', 'add-header-footer'].includes(manager.activeTool.id)) {
     bindHeaderFooterEvents(manager);
+  }
+
+  // N-Up Page Imposition listeners
+  if (['nup', 'n-up', 'nup-pdf'].includes(manager.activeTool.id)) {
+    bindNupEvents(manager);
   }
 }

@@ -148,7 +148,7 @@ export const SEJDA_TOOL_CATEGORIES = [
       { id: 'flip', title: 'Flip', desc: 'Mirror pages horizontally or vertically', icon: 'flip', color: '#8b5cf6', action: 'workflow:flip' },
       { id: 'grayscale', title: 'Grayscale', desc: 'Make a PDF text and images grayscale', icon: 'circle-half', color: '#475569', action: 'workflow:grayscale' },
       { id: 'header-footer', title: 'Header & Footer', desc: 'Stamp 6-zone dynamic headers and footers with page numbers, date macros, and custom margins', icon: 'hash', color: '#4338ca', action: 'workflow:header-footer' },
-      { id: 'nup', title: 'N-up', desc: 'Print multiple pages per sheet per paper. A5 plan as 4-up on A3 or A4 2-up on A3', icon: 'layout', color: '#475569', action: 'workflow:nup' },
+      { id: 'nup', title: 'N-up Imposition', desc: 'Impose multiple pages per sheet (2-up, 4-up, 6-up, 8-up) with custom margins, gutters & page borders', icon: 'layout', color: '#3b82f6', action: 'workflow:nup' },
       { id: 'pagenumbers', title: 'Page Numbers', desc: 'Add PDF page numbers', icon: 'hash', color: '#4b5563', action: 'workflow:pagenumbers' },
       { id: 'pagelabels', title: 'Page Labels (Multi-Section)', desc: 'Divide documents into sections with Roman, Arabic, or alphabetic schemes in ISO 32000-1 /PageLabels', icon: 'hash', color: '#6366f1', action: 'workflow:pagelabels' },
       { id: 'bookmarks', title: 'Bookmarks & Outline', desc: 'Create, nest, color-code, and manage PDF navigation bookmarks in ISO 32000-1 /Outlines', icon: 'bookmark', color: '#6366f1', action: 'workflow:bookmarks' },

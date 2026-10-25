@@ -62,6 +62,12 @@ export function renderSuccessScreen(manager) {
     const stamped = manager.lastHeaderFooterResult?.appliedCount ?? 0;
     const total = manager.lastHeaderFooterResult?.totalPages ?? 0;
     subtitleText = `Multi-zone headers & footers stamped across ${stamped} of ${total} pages with ISO 32000-1 dynamic macro variable interpolation.`;
+  } else if (['nup', 'n-up', 'nup-pdf'].includes(t.id)) {
+    const rep = manager.lastNupResult;
+    const l = rep?.layout ?? manager.nupCount ?? 2;
+    const out = rep?.outputPageCount ?? 1;
+    const src = rep?.appliedCount ?? rep?.sourcePages ?? 1;
+    subtitleText = `N-Up imposition complete: ${src} source page${src === 1 ? '' : 's'} imposed onto ${out} sheet${out === 1 ? '' : 's'} in ${l}-Up ${rep?.orientation || ''} format.`;
   }
 
   // Filter chaining tools to prioritize complementary tools
@@ -397,6 +403,34 @@ export function renderSuccessScreen(manager) {
                   <div><b>Center:</b> ${manager.lastHeaderFooterResult.zones?.centerFooter || '<em>None</em>'}</div>
                   <div><b>Right:</b> ${manager.lastHeaderFooterResult.zones?.rightFooter || '<em>None</em>'}</div>
                 </div>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${(['nup', 'n-up', 'nup-pdf'].includes(t.id) && manager.lastNupResult) ? `
+          <div class="nup-success-telemetry-card" style="background: rgba(59, 130, 246, 0.05); border: 1.5px solid rgba(59, 130, 246, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: #2563eb;">
+                <svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>N-Up Page Imposition Telemetry</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; background: #2563eb; color: white; padding: 2px 8px; border-radius: 12px;">
+                ${manager.lastNupResult.layout}-Up Layout • ${manager.lastNupResult.orientation?.toUpperCase()}
+              </span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px;">
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Source Pages</div>
+                <div style="font-size: 18px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.appliedCount}</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Output Sheets</div>
+                <div style="font-size: 18px; font-weight: 700; color: #2563eb; margin-top: 2px;">${manager.lastNupResult.outputPageCount}</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.7); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px; text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600;">Grid Formation</div>
+                <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 2px;">${manager.lastNupResult.cols} × ${manager.lastNupResult.rows}</div>
               </div>
             </div>
           </div>
