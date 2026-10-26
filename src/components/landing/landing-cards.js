@@ -49,11 +49,8 @@ export class LandingCardsRenderer {
         const resetBtn = grid.querySelector('#btn-reset-tool-filter');
         if (resetBtn) {
           resetBtn.onclick = () => {
-            landing.searchQuery = '';
-            const searchInput = landing.container.querySelector('#landing-tool-search');
+            const searchInput = landing.container.querySelector('#landing-header-search-input');
             if (searchInput) searchInput.value = '';
-            const clearBtn = landing.container.querySelector('#landing-search-clear');
-            if (clearBtn) clearBtn.style.display = 'none';
             landing.activeFilter = 'all';
             const chips = landing.container.querySelectorAll('.landing-filter-chip');
             chips.forEach(c => c.classList.toggle('active', c.getAttribute('data-filter') === 'all'));

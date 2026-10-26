@@ -9,7 +9,7 @@
 
 import { store } from '../core/state-store.js';
 import { pdfEngine } from '../core/pdf-engine.js';
-import { TOOLS_CATALOG, allToolsModal } from './all-tools-modal.js';
+import { TOOLS_CATALOG, SEJDA_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, getPreferredTheme, toggleTheme } from '../utils/theme.js';
@@ -282,29 +282,8 @@ export class LandingPage {
       };
     });
 
-    // Tool Search Input
-    const searchInput = this.container.querySelector('#landing-tool-search');
-    const searchClear = this.container.querySelector('#landing-search-clear');
-    if (searchInput) {
-      searchInput.oninput = (e) => {
-        this.searchQuery = e.target.value;
-        if (searchClear) {
-          searchClear.style.display = this.searchQuery ? 'block' : 'none';
-        }
-        this.renderCards();
-      };
-    }
-    if (searchClear) {
-      searchClear.onclick = () => {
-        if (searchInput) {
-          searchInput.value = '';
-          this.searchQuery = '';
-          searchClear.style.display = 'none';
-          this.renderCards();
-          searchInput.focus();
-        }
-      };
-    }
+    // Header Quick Tool Search Modal (Spotlight style)
+    this.setupHeaderQuickSearch();
 
     // Theme Toggle on Landing Header
     const landingThemeBtn = this.container.querySelector('#btn-landing-theme');
@@ -504,6 +483,127 @@ export class LandingPage {
     if (this.onOpenStudioCallback) {
       this.onOpenStudioCallback();
     }
+  }
+
+  setupHeaderQuickSearch() {
+    const searchBtn = this.container.querySelector('#btn-landing-search');
+    const searchModal = this.container.querySelector('#landing-search-modal');
+    const searchInput = this.container.querySelector('#landing-header-search-input');
+    const closeBtn = this.container.querySelector('#btn-close-search-modal');
+    const backdrop = this.container.querySelector('#landing-search-backdrop');
+    const resultsContainer = this.container.querySelector('#landing-search-results');
+
+    if (!searchBtn || !searchModal || !searchInput) return;
+
+    // Collect all tools across categories
+    const allTools = [];
+    const seen = new Set();
+    SEJDA_TOOL_CATEGORIES.forEach(cat => {
+      cat.tools?.forEach(tool => {
+        if (!seen.has(tool.id)) {
+          seen.add(tool.id);
+          allTools.push({ ...tool, categoryName: cat.name });
+        }
+      });
+    });
+
+    const openSearch = () => {
+      searchModal.style.display = 'flex';
+      searchModal.setAttribute('aria-hidden', 'false');
+      renderResults(searchInput.value || '');
+      setTimeout(() => {
+        searchInput.focus();
+        searchInput.select();
+      }, 50);
+    };
+
+    const closeSearch = () => {
+      searchModal.style.display = 'none';
+      searchModal.setAttribute('aria-hidden', 'true');
+    };
+
+    const renderResults = (query) => {
+      const q = (query || '').trim().toLowerCase();
+      const filtered = q
+        ? allTools.filter(t => t.title.toLowerCase().includes(q) || (t.desc && t.desc.toLowerCase().includes(q)) || t.id.toLowerCase().includes(q))
+        : allTools.slice(0, 8);
+
+      if (filtered.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="landing-search-empty">
+            <p>No tools found matching "<strong>${query}</strong>"</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultsContainer.innerHTML = filtered.map(tool => `
+        <button class="landing-search-item" data-action="${tool.action || ''}" data-tool="${tool.id}">
+          <span class="landing-search-item-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </span>
+          <div class="landing-search-item-info">
+            <div class="landing-search-item-title">
+              <span>${tool.title}</span>
+              ${tool.popular ? '<span class="landing-search-item-tag">POPULAR</span>' : ''}
+            </div>
+            <div class="landing-search-item-desc">${tool.desc || 'Launch tool'}</div>
+          </div>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-muted);"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      `).join('');
+
+      resultsContainer.querySelectorAll('.landing-search-item').forEach(item => {
+        item.onclick = () => {
+          closeSearch();
+          const action = item.getAttribute('data-action');
+          const toolId = item.getAttribute('data-tool');
+          if (action) {
+            this.handleToolAction(action, toolId);
+          } else if (toolId) {
+            router.navigate(router.getCanonicalPath(toolId));
+          }
+        };
+      });
+    };
+
+    searchBtn.onclick = (e) => {
+      e.stopPropagation();
+      openSearch();
+    };
+
+    if (closeBtn) closeBtn.onclick = closeSearch;
+    if (backdrop) backdrop.onclick = closeSearch;
+
+    searchInput.oninput = (e) => {
+      renderResults(e.target.value);
+    };
+
+    searchInput.onkeydown = (e) => {
+      if (e.key === 'Escape') {
+        closeSearch();
+      } else if (e.key === 'Enter') {
+        const firstItem = resultsContainer.querySelector('.landing-search-item');
+        if (firstItem) {
+          firstItem.click();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        if (document.body.classList.contains('show-landing')) {
+          e.preventDefault();
+          if (searchModal.style.display === 'flex') {
+            closeSearch();
+          } else {
+            openSearch();
+          }
+        }
+      } else if (e.key === 'Escape' && searchModal.style.display === 'flex') {
+        closeSearch();
+      }
+    });
   }
 
   switchToLanding({ updateUrl = true } = {}) {

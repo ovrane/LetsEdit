@@ -271,8 +271,15 @@ export function getLandingTemplateHtml() {
           <button class="landing-nav-link" data-tool="security">Protect</button>
         </nav>
 
-        <!-- Right Header CTAs: Theme, Log In, Open Studio -->
+        <!-- Right Header CTAs: Search, Theme, Log In, Open Studio -->
         <div class="landing-header-right">
+          <button class="icon-btn" id="btn-landing-search" title="Search tools (Ctrl+K)" aria-label="Search all PDF tools">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+
           <button class="icon-btn" id="btn-landing-theme" title="Toggle Theme (Dark / Light)">
             <svg class="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="5"></circle>
@@ -502,17 +509,19 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
       <section class="landing-showcase-section">
         <div class="landing-showcase-container">
           <div class="showcase-header">
-            <span class="showcase-tag">ADVANCED CAPABILITIES</span>
+            <span class="showcase-tag">ENTERPRISE CAPABILITIES</span>
             <h2 class="showcase-title">Enterprise Document Operations In Your Browser</h2>
-            <p class="showcase-subtitle">Industry-standard PDF manipulations previously exclusive to desktop suites like Adobe Acrobat Pro.</p>
+            <p class="showcase-subtitle">Industry-standard PDF manipulations engineered for legal, financial, and compliance workflows with zero cloud exposure.</p>
           </div>
 
           <div class="landing-whats-new-grid">
             <!-- Card 1: Permanent Redaction -->
             <div class="whats-new-card" data-action="workflow:redact">
-              <div class="whats-new-badge badge-pro">PRO FEATURE</div>
-              <div class="whats-new-icon" style="background: rgba(15, 23, 42, 0.08); color: #0f172a;">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+              <div class="whats-new-card-top">
+                <div class="whats-new-icon">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+                </div>
+                <span class="whats-new-badge">Redaction</span>
               </div>
               <h3 class="whats-new-card-title">Permanent Vector Redaction</h3>
               <p class="whats-new-card-desc">Forensically sanitizes glyph streams, content stream tokens, and text matrices. Purged words cannot be extracted or uncovered.</p>
@@ -523,9 +532,11 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <!-- Card 2: Form Flattening -->
             <div class="whats-new-card" data-action="workflow:flatten">
-              <div class="whats-new-badge badge-new">NEW</div>
-              <div class="whats-new-icon" style="background: rgba(13, 148, 136, 0.1); color: #0d9488;">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              <div class="whats-new-card-top">
+                <div class="whats-new-icon">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </div>
+                <span class="whats-new-badge">AcroForm</span>
               </div>
               <h3 class="whats-new-card-title">Document Flattening</h3>
               <p class="whats-new-card-desc">Bakes interactive form fields, checkboxes, and signatures into static document vector art. Prevents subsequent alteration or tampering.</p>
@@ -536,9 +547,11 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <!-- Card 3: Legal Bates Numbering -->
             <div class="whats-new-card" data-action="workflow:bates">
-              <div class="whats-new-badge badge-legal">LEGAL</div>
-              <div class="whats-new-icon" style="background: rgba(30, 41, 59, 0.1); color: #1e293b;">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <div class="whats-new-card-top">
+                <div class="whats-new-icon">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <span class="whats-new-badge">Discovery</span>
               </div>
               <h3 class="whats-new-card-title">Bates Numbering Suite</h3>
               <p class="whats-new-card-desc">Standardized legal discovery sequence indexing. Custom prefixes, suffixes, zero-padding (e.g. ABC-000001), and 6-zone dynamic page alignment.</p>
@@ -549,9 +562,11 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <!-- Card 4: Deep Sanitization -->
             <div class="whats-new-card" data-action="workflow:sanitize">
-              <div class="whats-new-badge badge-pro">PRO FEATURE</div>
-              <div class="whats-new-icon" style="background: rgba(5, 150, 105, 0.1); color: #059669;">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <div class="whats-new-card-top">
+                <div class="whats-new-icon">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <span class="whats-new-badge">Compliance</span>
               </div>
               <h3 class="whats-new-card-title">Deep Document Sanitization</h3>
               <p class="whats-new-card-desc">Strips hidden object metadata, embedded file attachments, automated JavaScript actions, thumbnail streams, and private vendor application data.</p>
@@ -562,9 +577,11 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <!-- Card 5: Page Labels & Outlines -->
             <div class="whats-new-card" data-action="workflow:pagelabels">
-              <div class="whats-new-badge badge-iso">ISO 32000-1</div>
-              <div class="whats-new-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+              <div class="whats-new-card-top">
+                <div class="whats-new-icon">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <span class="whats-new-badge">ISO 32000-1</span>
               </div>
               <h3 class="whats-new-card-title">Page Labels & Bookmarks</h3>
               <p class="whats-new-card-desc">ISO 32000-1 /PageLabels supporting Roman, Arabic, and alphabetic sections alongside a tree navigation outline editor.</p>
@@ -576,18 +593,13 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
         </div>
       </section>
 
-      <!-- Tool Filter Rail & Live Search Directory -->
-      <section class="landing-tools-section">
+      <!-- Tool Filter Rail Directory (Search moved to header) -->
+      <section class="landing-tools-section" id="landing-tools-section">
         <div class="landing-tools-container">
           <div class="landing-tools-header">
             <div class="landing-tools-heading-wrap">
               <h2 class="landing-tools-heading">Explore All PDF Tools</h2>
               <p class="landing-tools-subheading">Choose a tool to launch immediately or open inside the interactive studio.</p>
-            </div>
-            <div class="landing-search-wrapper">
-              <svg class="landing-search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" id="landing-tool-search" class="landing-search-input" placeholder="Quick find any tool (redact, flatten, bates, merge, split, OCR, sign)..." autocomplete="off" />
-              <button id="landing-search-clear" class="landing-search-clear" style="display:none;" title="Clear search">&times;</button>
             </div>
           </div>
 
@@ -609,11 +621,11 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
         </div>
       </section>
 
-      <!-- Why Choose LetsEdit (Executive Adobe & Smallpdf Style Value Props) -->
+      <!-- Why Choose LetsEdit (Clean Executive Value Props) -->
       <section class="landing-why-choose-section">
         <div class="why-choose-container">
           <div class="section-badge-header">
-            <span class="section-tag-pill">WHY CHOOSE LETSEDIT</span>
+            <span class="section-tag-pill">SECURITY & PERFORMANCE</span>
             <h2 class="section-main-heading">The Safe, Fast, and Uncompromising PDF Suite</h2>
             <p class="section-sub-heading">Built for legal professionals, enterprises, and everyday creators who demand 100% private in-browser speed with zero server uploads.</p>
           </div>
@@ -621,10 +633,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
           <div class="why-choose-grid">
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div class="why-icon-box">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(16, 185, 129, 0.12); color: #059669;">100% Client-Side</span>
+                <span class="why-pill-badge">100% Client-Side</span>
               </div>
               <h3 class="why-card-title">Zero Cloud Uploads & Maximum Privacy</h3>
               <p class="why-card-desc">Your confidential contracts, financials, and medical records never leave your machine. Processing runs inside client-side WebAssembly with zero server telemetry.</p>
@@ -632,10 +644,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(48, 5, 13, 0.1); color: #bf6c07ff;">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <div class="why-icon-box">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(48, 5, 13, 0.08); color: #e76b0fff;">Sub-Second Speed</span>
+                <span class="why-pill-badge">Sub-Second Speed</span>
               </div>
               <h3 class="why-card-title">Blazing Fast WebAssembly Performance</h3>
               <p class="why-card-desc">Zero bandwidth lag, zero upload waiting, and no server timeouts. Split 500-page discovery files or compress multi-gigabyte scans directly on your local hardware.</p>
@@ -643,10 +655,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(139, 92, 246, 0.12); color: #7c3aed;">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <div class="why-icon-box">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(139, 92, 246, 0.12); color: #7c3aed;">Direct Editing</span>
+                <span class="why-pill-badge">Direct Editing</span>
               </div>
               <h3 class="why-card-title">True Text Editing In Your Browser</h3>
               <p class="why-card-desc">Correct typos and rewrite original paragraphs directly in your PDF. Our text engine matches font families, glyph weights, font sizes, and baseline alignments automatically.</p>
@@ -654,10 +666,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(225, 29, 72, 0.12); color: #e11d48;">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+                <div class="why-icon-box">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(225, 29, 72, 0.12); color: #be123c;">Legal Grade</span>
+                <span class="why-pill-badge">Legal Grade</span>
               </div>
               <h3 class="why-card-title">Permanent Vector Redaction</h3>
               <p class="why-card-desc">True forensic sanitization: parses content streams and permanently deletes glyph tokens and underlying text matrices. Opaque redaction masks cannot be reversed.</p>
@@ -665,10 +677,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(14, 165, 233, 0.12); color: #0284c7;">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <div class="why-icon-box">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(14, 165, 233, 0.12); color: #0369a1;">Bates & Flattening</span>
+                <span class="why-pill-badge">Bates & Flattening</span>
               </div>
               <h3 class="why-card-title">Bates Numbering & Form Flattening</h3>
               <p class="why-card-desc">Conform to legal discovery protocols with 8-digit zero-padded Bates sequencing, 6-zone layout alignment, and AcroForm vector flattening to lock finalized contracts.</p>
@@ -676,10 +688,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(234, 88, 12, 0.12); color: #ea580c;">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+                <div class="why-icon-box">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(234, 88, 12, 0.12); color: #c2410c;">Audit Ready</span>
+                <span class="why-pill-badge">Audit Ready</span>
               </div>
               <h3 class="why-card-title">Digital Signatures with Audit Trails</h3>
               <p class="why-card-desc">Sign documents electronically with tamper-evident SHA-256 cryptographic verification, unique transaction UUIDs, timestamp certificates, and audit trails.</p>
@@ -950,5 +962,23 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
         </div>
       </footer>
     </main>
+
+    <!-- Quick Search Tools Modal (Triggered by Header Search Icon / Ctrl+K) -->
+    <div class="landing-search-overlay" id="landing-search-modal" style="display: none;" aria-hidden="true">
+      <div class="landing-search-backdrop" id="landing-search-backdrop"></div>
+      <div class="landing-search-dialog">
+        <div class="landing-search-box">
+          <svg class="landing-search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="landing-header-search-input" class="landing-header-search-input" placeholder="Search 43+ tools (e.g., merge, redact, sign, ocr, split)..." autocomplete="off" />
+          <button class="landing-search-close-btn" id="btn-close-search-modal" title="Close search">&times;</button>
+        </div>
+        <div class="landing-search-results-list" id="landing-search-results">
+          <!-- Live tool search results rendered here -->
+        </div>
+      </div>
+    </div>
   `;
 }
