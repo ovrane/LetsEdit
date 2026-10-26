@@ -1,4 +1,4 @@
-# LetsEdit — Enterprise In-Browser PDF Suite & Vector Document Engine
+# LetsEdit: Enterprise In-Browser PDF Suite & Vector Document Engine
 
 [![CI Pipeline](https://github.com/codxbrexx/Lets_Edit/actions/workflows/ci.yml/badge.svg)](https://github.com/codxbrexx/Lets_Edit/actions/workflows/ci.yml)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
@@ -11,7 +11,7 @@
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 1. [Zero-Cloud Architectural Philosophy](#-zero-cloud-architectural-philosophy)
 2. [System Architecture Diagram](#-system-architecture-diagram)
 3. [Document Processing Lifecycle Flowchart](#-document-processing-lifecycle-flowchart)
@@ -32,7 +32,7 @@
 
 ---
 
-## 🛡️ Zero-Cloud Architectural Philosophy
+## Zero-Cloud Architectural Philosophy
 
 Legacy online PDF editing platforms rely on remote server-side document processing queues. In those models, user files are transmitted over HTTP to remote workers, converted into raster caches, edited via server-side libraries, and re-downloaded. This introduces:
 - **Severe Data Privacy Vulnerabilities:** Sensitive contracts, medical records, tax filings, and legal discoveries are exposed to third-party cloud disks and transit breaches.
@@ -51,7 +51,7 @@ LetsEdit Architecture:     [Browser Memory Sandbox (PDF.js + WASM + pdf-lib + We
 
 ---
 
-## 🏗️ System Architecture Diagram
+## System Architecture Diagram
 
 ```mermaid
 graph TB
@@ -127,7 +127,7 @@ graph TB
 
 ---
 
-## 🔄 Document Processing Lifecycle Flowchart
+## Document Processing Lifecycle Flowchart
 
 The following flowchart outlines the path of a document through LetsEdit from initial drag-and-drop ingestion to immutable vector export:
 
@@ -171,7 +171,7 @@ flowchart TD
 
 ---
 
-## 🎨 Multi-Layer Canvas Compositing Stack
+## Multi-Layer Canvas Compositing Stack
 
 To deliver 60 FPS viewport rendering while supporting pixel-precise click-to-edit text operations, freehand ink drawing, and interactive form fields, LetsEdit utilizes a decoupled **4-layer compositing stack**:
 
@@ -201,7 +201,7 @@ To deliver 60 FPS viewport rendering while supporting pixel-precise click-to-edi
 
 ---
 
-## 🔍 Real-Time Text Clustering & Inline Typography Engine
+## Real-Time Text Clustering & Inline Typography Engine
 
 Traditional web PDF viewers render text as fragmented glyph spans (often splitting single words across multiple `<span>` tags due to kerning vectors). LetsEdit's **Text Clustering Engine** (`src/core/canvas/text-clustering.js`) mathematically reconstructs cohesive phrases and paragraphs in real time:
 
@@ -230,7 +230,7 @@ const FONT_MAP = {
 
 ---
 
-## ✍️ Multi-Party E-Signature & Cryptographic Audit Trail
+## Multi-Party E-Signature & Cryptographic Audit Trail
 
 LetsEdit provides a legally binding, tamper-evident electronic signature workflow compliant with the **U.S. ESIGN Act**, **UETA**, and **EU eIDAS (SES/AES)** regulations.
 
@@ -268,7 +268,7 @@ sequenceDiagram
 
 ---
 
-## ⚡ Multi-Threaded Worker Pool & Batch Pipeline
+## Multi-Threaded Worker Pool & Batch Pipeline
 
 To prevent user interface freezing during intensive computational tasks, LetsEdit implements a **Hardware-Scalable Web Worker Pool** (`src/core/worker-pool.js`):
 
@@ -294,7 +294,7 @@ graph TD
 
 ---
 
-## 🛡️ Enterprise Security, Compliance & Deep Forensics
+## Enterprise Security, Compliance & Deep Forensics
 
 LetsEdit includes advanced security and forensics capabilities designed for legal, governmental, and enterprise discovery workflows:
 
@@ -324,7 +324,7 @@ flowchart TD
 
 ---
 
-## 🔒 Edge Security: Cloudflare Turnstile & Firebase Auth
+## Edge Security: Cloudflare Turnstile & Firebase Auth
 
 LetsEdit combines modern bot protection with enterprise identity management:
 
@@ -356,7 +356,7 @@ flowchart LR
 
 ---
 
-## 🧰 Comprehensive Feature Matrix (43+ Tools)
+## Comprehensive Feature Matrix (43+ Tools)
 
 | Suite | Tool | Description | Execution Context |
 | :--- | :--- | :--- | :--- |
@@ -391,7 +391,7 @@ flowchart LR
 
 ---
 
-## 📏 Strict 1,000-Line Modular Architecture Standard
+## Strict 1,000-Line Modular Architecture Standard
 
 To prevent codebase rot and monolithic files, LetsEdit enforces a strict architectural rule verified on every Git commit and CI run:
 
@@ -403,7 +403,7 @@ If any source file reaches or exceeds 1,000 lines, the build fails automatically
 
 ---
 
-## 📁 Repository Directory Structure
+## Repository Directory Structure
 
 ```
 Pdf-Editor/
@@ -458,7 +458,7 @@ Pdf-Editor/
 
 ---
 
-## 🛠️ Getting Started & Local Setup
+## Getting Started & Local Setup
 
 ### Prerequisites
 * **Node.js:** `>= 20.0.0` (Node.js 22 LTS recommended)
@@ -484,7 +484,7 @@ npm run server
 
 ---
 
-## ⚙️ Configuration & Environment Variables
+## Configuration & Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -505,7 +505,7 @@ CLOUDFLARE_TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 
 ---
 
-## 🧪 Automated Testing & Quality Gates
+## Automated Testing & Quality Gates
 
 The codebase maintains a 100% test pass rate across unit, integration, and browser end-to-end layers:
 
@@ -522,7 +522,7 @@ npm run build
 
 ---
 
-## 🚀 CI/CD Pipeline & Deployment
+## CI/CD Pipeline & Deployment
 
 Every push and pull request executes the automated GitHub Actions CI pipeline:
 1. **Dependency Installation:** Runs `npm ci` with strict lockfile verification.
@@ -533,5 +533,5 @@ Every push and pull request executes the automated GitHub Actions CI pipeline:
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
