@@ -302,91 +302,189 @@ export function getLandingTemplateHtml() {
 
     <!-- Main Landing Content (Scrollable) -->
     <main class="landing-main-content">
-      <!-- Hero Section (Elevated, High-Converting Hero - NO DROPZONE) -->
+      <!-- Hero Section (Clean Smallpdf-Style 2-Column Hero) -->
       <section class="landing-hero-section">
         <div class="landing-hero-container">
-          <div class="hero-chip-badge">
-            <span class="hero-chip-dot"></span>
-            <span>Client-Side WebAssembly &bull; Zero Cloud Uploads</span>
-          </div>
+          <div class="landing-hero-grid">
+            <!-- Left Column: Copy & Actions -->
+            <div class="landing-hero-left">
+              <h1 class="landing-hero-title">Work on your <span style="color: var(--primary);">PDF</span><br>With Ease</h1>
+              <p class="landing-hero-subtitle">
+                All the tools you'll need to be more productive and work smarter with documents.
+              </p>
 
-          <h1 class="landing-hero-title">
-            The Professional PDF Suite Built for <span class="hero-title-accent">Speed, Precision & Total Privacy</span>.
-          </h1>
-          <p class="landing-hero-subtitle">
-            Edit existing typography, permanently redact sensitive data, imprint Bates numbers, flatten forms, sign, and convert documents locally in your browser. Pure vector mathematics with zero telemetry.
-          </p>
+              <div class="landing-hero-actions">
+                <input type="file" id="landing-hero-file-input" accept="application/pdf" style="display:none;" />
+                <button class="btn landing-hero-btn-primary" id="btn-landing-upload-pdf">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <polyline points="9 15 12 12 15 15"></polyline>
+                  </svg>
+                  <span>Upload PDF</span>
+                </button>
+                <button class="btn landing-hero-btn-outline" id="btn-landing-explore-tools">
+                  Explore All PDF Tools
+                </button>
+              </div>
 
-          <!-- Hero Clean Upload PDF Card (Replaces Search Bar) -->
-          <div class="editor-upload-card hero-upload-card" id="landing-hero-dropzone">
-            <div class="editor-upload-badge-wrapper">
-              <div class="editor-upload-badge-glow"></div>
-              <div class="editor-upload-icon-circle">
-                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <path d="M12 18v-6m-3 3l3-3 3 3" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
+              <div class="landing-hero-trust-row">
+                <span class="hero-trust-item">
+                  <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Free &amp; No installation
+                </span>
+                <span class="hero-trust-item">
+                  <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  100% In-Browser Privacy
+                </span>
               </div>
             </div>
 
-            <h2 class="editor-upload-title">Upload PDF to Start Editing</h2>
-            <p class="editor-upload-subtitle">
-              Edit text directly, fill &amp; sign forms, add annotations, organize pages, and redact sensitive data — 100% private in your browser.
-            </p>
+            <!-- Right Column: Interactive Mockup Illustration with Floating Tool Badges & Confetti -->
+            <div class="landing-hero-right" id="landing-hero-dropzone" title="Drop PDF here or click to choose file">
+              <div class="hero-illustration-wrapper">
+                <!-- Floating Decorative Accents (confetti matching screenshot) -->
+                <div class="hero-accent-item accent-plus-orange">+</div>
+                <div class="hero-accent-item accent-cross-cyan">&times;</div>
+                <div class="hero-accent-item accent-circle-red"></div>
+                <div class="hero-accent-item accent-plus-yellow">+</div>
+                <div class="hero-accent-item accent-cross-coral">&times;</div>
+                <div class="hero-accent-item accent-circle-teal"></div>
 
-            <div class="editor-upload-actions">
-              <input type="file" id="landing-hero-file-input" accept="application/pdf" style="display:none;" />
-              <button class="btn editor-upload-btn-primary" id="btn-landing-upload-pdf">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
-                <span>Choose PDF Document</span>
-              </button>
-              <button class="btn editor-upload-btn-secondary" id="btn-landing-blank-doc">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                <span>Start with Blank Page</span>
-              </button>
-            </div>
+                <!-- Background Tilted Pastel Sheets -->
+                <div class="hero-backdrop-sheet sheet-back"></div>
+                <div class="hero-backdrop-sheet sheet-mid"></div>
 
-            <div class="editor-upload-drop-hint">
-              or drag and drop your PDF anywhere in this window
-            </div>
+                <!-- Main Application Window Mockup -->
+                <div class="hero-mockup-window">
+                  <!-- Window Header Bar -->
+                  <div class="mockup-window-header">
+                    <div class="mockup-brand">
+                      <div class="mockup-logo-icon">
+                        <span></span><span></span><span></span><span></span>
+                      </div>
+                      <span class="mockup-brand-text">LetsEdit</span>
+                    </div>
+                    <div class="mockup-toolbar">
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7 17 3-7 7-3L3 3z"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+                      <span class="mockup-tool-icon active"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></span>
+                    </div>
+                    <div class="mockup-window-dots">
+                      <span></span><span></span>
+                    </div>
+                  </div>
 
-            <div class="editor-upload-sample-row">
-              <span>Want to test features first?</span>
-              <button class="btn-sample-link" id="btn-landing-load-sample">Sample Contract</button>
-              <span class="sample-dot">•</span>
-              <button class="btn-sample-link" id="btn-landing-load-sample-multipage">Sample 4-Page Report</button>
-            </div>
+                  <!-- Mockup Canvas / Document Sheet -->
+                  <div class="mockup-window-body">
+                    <div class="mockup-doc-sheet">
+                      <!-- Skeleton Text Lines -->
+                      <div class="mockup-line line-long"></div>
+                      <div class="mockup-line line-med"></div>
+                      <div class="mockup-line line-short"></div>
 
-            <div class="editor-upload-features">
-              <div class="feature-pill pill-private">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>100% Private (No Cloud Uploads)</span>
+                      <!-- Selected Text Box ("Hello!") with 8 Blue Drag Handles -->
+                      <div class="mockup-selected-text">
+                        <div class="mockup-box-handle handle-tl"></div>
+                        <div class="mockup-box-handle handle-tc"></div>
+                        <div class="mockup-box-handle handle-tr"></div>
+                        <div class="mockup-box-handle handle-ml"></div>
+                        <div class="mockup-box-handle handle-mr"></div>
+                        <div class="mockup-box-handle handle-bl"></div>
+                        <div class="mockup-box-handle handle-bc"></div>
+                        <div class="mockup-box-handle handle-br"></div>
+                        <span class="mockup-selected-label">Hello!</span>
+                      </div>
+
+                      <!-- Selected Vector Circle with 8 Drag Handles -->
+                      <div class="mockup-selected-circle">
+                        <div class="mockup-box-handle handle-tl"></div>
+                        <div class="mockup-box-handle handle-tc"></div>
+                        <div class="mockup-box-handle handle-tr"></div>
+                        <div class="mockup-box-handle handle-ml"></div>
+                        <div class="mockup-box-handle handle-mr"></div>
+                        <div class="mockup-box-handle handle-bl"></div>
+                        <div class="mockup-box-handle handle-bc"></div>
+                        <div class="mockup-box-handle handle-br"></div>
+                        <div class="mockup-circle-shape"></div>
+                      </div>
+
+                      <!-- Middle lines -->
+                      <div class="mockup-line line-full"></div>
+                      <div class="mockup-line line-long"></div>
+                      <div class="mockup-line line-med"></div>
+
+                      <!-- Selected Red Signature Doodle with Mouse Cursor -->
+                      <div class="mockup-selected-signature">
+                        <div class="mockup-box-handle handle-tl"></div>
+                        <div class="mockup-box-handle handle-tr"></div>
+                        <div class="mockup-box-handle handle-bl"></div>
+                        <div class="mockup-box-handle handle-br"></div>
+                        <svg class="mockup-signature-path" viewBox="0 0 100 36" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M8 24c8-14 16-16 20-8s-4 16 6 12 18-22 24-10-8 18 10 12 18-20 22-8"></path>
+                        </svg>
+                        <!-- Black Mouse Pointer Cursor pointing at signature -->
+                        <div class="mockup-cursor-pointer">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="#111827" stroke="#ffffff" stroke-width="1.5">
+                            <path d="M3 3l7.5 18 3.5-7.5 7.5-3.5L3 3z"/>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <!-- Bottom lines -->
+                      <div class="mockup-line line-full"></div>
+                      <div class="mockup-line line-long"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Floating Colorful Tool Badges Orbiting the Window -->
+                <!-- Top Cyan: Edit -->
+                <div class="hero-float-badge badge-top-cyan" data-tool="workflow:edit" title="Edit PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </div>
+                <!-- Top Right Purple: Merge / Combine -->
+                <div class="hero-float-badge badge-top-purple" data-tool="workflow:merge" title="Merge PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/>
+                  </svg>
+                </div>
+                <!-- Left Magenta: Sign / Fountain Pen -->
+                <div class="hero-float-badge badge-left-magenta" data-tool="workflow:sign" title="Sign PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="2"/>
+                  </svg>
+                </div>
+                <!-- Bottom Right Yellow: Image / JPG -->
+                <div class="hero-float-badge badge-right-yellow" data-tool="workflow:pdf-to-jpg" title="PDF to Image">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <!-- Bottom Right Blue: Word (W) -->
+                <div class="hero-float-badge badge-right-blue" data-tool="workflow:pdf-to-word" title="PDF to Word">
+                  <span class="badge-word-w">W</span>
+                </div>
+                <!-- Bottom Red: Crop / Compress -->
+                <div class="hero-float-badge badge-bottom-red" data-tool="workflow:compress" title="Compress PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <rect x="5" y="5" width="14" height="14" rx="2" stroke-dasharray="3 3"/>
+                    <path d="M9 9h6v6H9z"/>
+                  </svg>
+                </div>
+
+                <!-- Drop Overlay on Illustration when dragging file -->
+                <div class="hero-mockup-drop-overlay">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                  <span>Drop PDF to Edit Instantly</span>
+                </div>
               </div>
-              <div class="feature-pill pill-vector">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                <span>Edit Original Text</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Hero Value & Trust Bar -->
-          <div class="hero-trust-bar">
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#10b981" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              <span><strong>100% Client-Side</strong> &bull; Zero Server Uploads</span>
-            </div>
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#30050d" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-              <span><strong>Sub-Second Speed</strong> &bull; Client-Side WASM</span>
-            </div>
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#8b5cf6" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-              <span><strong>43+ Pro Tools</strong> &bull; Edit, Redact, Bates & Sign</span>
-            </div>
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-              <span><strong>ISO Compliant</strong> &bull; PDF/A & PDF 1.7 Standards</span>
             </div>
           </div>
         </div>

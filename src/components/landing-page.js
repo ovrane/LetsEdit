@@ -223,6 +223,28 @@ export class LandingPage {
           Toast.error('Please drop a valid PDF document');
         }
       };
+
+      heroDropzone.onclick = (e) => {
+        const floatBadge = e.target.closest('.hero-float-badge');
+        if (floatBadge && floatBadge.getAttribute('data-tool')) {
+          e.stopPropagation();
+          this.handleToolAction(floatBadge.getAttribute('data-tool'));
+          return;
+        }
+        if (heroFileInput) heroFileInput.click();
+      };
+    }
+
+    const heroExploreBtn = this.container.querySelector('#btn-landing-explore-tools');
+    if (heroExploreBtn) {
+      heroExploreBtn.onclick = () => {
+        const toolsSec = this.container.querySelector('.landing-tools-section');
+        if (toolsSec) {
+          toolsSec.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          router.navigate('/edit_pdf');
+        }
+      };
     }
 
     // Executive What's New showcase cards
