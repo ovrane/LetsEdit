@@ -40,6 +40,7 @@ import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 import { pwaManager } from './core/pwa-manager.js';
+import { legalModal } from './components/legal-modal.js';
 
 class App {
   constructor() {
@@ -112,6 +113,8 @@ class App {
         accountPage.showLogin({ updateUrl: false });
       } else if (route.isRegister) {
         accountPage.showRegister({ updateUrl: false });
+      } else if (route.isLegal) {
+        legalModal.open(route.legalTab || 'privacy');
       } else if (route.toolId === 'mobile-pair') {
         const landingView = document.getElementById('landing-view');
         const studioView = document.getElementById('studio-view');

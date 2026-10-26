@@ -396,6 +396,33 @@ export const ROUTE_DEFINITIONS = [
     aliases: ['/sign-document', '/sign-doc', '/sign_recipient'],
     title: "Sign Document — LetsEdit Secure e-Sign Portal",
     description: "Review and securely sign requested document fields with cryptographic verification."
+  },
+  {
+    path: '/privacy',
+    toolId: null,
+    isLegal: true,
+    legalTab: 'privacy',
+    aliases: ['/privacy-policy', '/privacy_policy'],
+    title: "Privacy Policy — Zero-Cloud Document Privacy — LetsEdit",
+    description: "Read our strict zero-cloud privacy policy. Your documents never touch our servers."
+  },
+  {
+    path: '/terms',
+    toolId: null,
+    isLegal: true,
+    legalTab: 'terms',
+    aliases: ['/terms-of-service', '/tos', '/terms_of_service', '/terms-of-use'],
+    title: "Terms of Service & E-Sign Compliance — LetsEdit",
+    description: "Terms governing use of LetsEdit and legal e-signature compliance (eIDAS & ESIGN)."
+  },
+  {
+    path: '/security-whitepaper',
+    toolId: null,
+    isLegal: true,
+    legalTab: 'security',
+    aliases: ['/security-policy', '/compliance', '/security_whitepaper', '/security_policy'],
+    title: "Security & Cryptographic Compliance Whitepaper — LetsEdit",
+    description: "Technical details of our client-side WebAssembly execution, SHA-256 verification, and permanent vector redaction."
   }
 ];
 

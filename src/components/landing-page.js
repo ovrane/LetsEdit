@@ -20,6 +20,7 @@ import { getLandingTemplateHtml } from './landing/landing-html.js';
 import { LandingCardsRenderer } from './landing/landing-cards.js';
 import { getTwoToneIconSvg } from './landing/landing-icons.js';
 import { pwaManager } from '../core/pwa-manager.js';
+import { legalModal } from './legal-modal.js';
 
 export class LandingPage {
   constructor() {
@@ -434,6 +435,15 @@ export class LandingPage {
         } else if (action) {
           this.handleToolAction(action);
         }
+      };
+    });
+
+    // Legal & Policies Dialog Triggers
+    this.container.querySelectorAll('[data-legal]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const tab = btn.getAttribute('data-legal') || 'privacy';
+        legalModal.open(tab);
       };
     });
 

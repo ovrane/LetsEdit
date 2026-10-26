@@ -919,14 +919,14 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
             <!-- Column 4: Solutions & Trust -->
             <div class="footer-col">
               <h4>Solutions & Trust</h4>
+              <a href="#" data-legal="security">Zero-Cloud Security</a>
+              <a href="#" data-legal="privacy">Privacy & GDPR</a>
+              <a href="#" data-legal="terms">Terms & E-Sign</a>
               <a href="#" data-action="workflow:bates">Legal E-Discovery</a>
               <a href="#" data-action="workflow:sign">Finance & Contracts</a>
               <a href="#" data-action="workflow:redact">Healthcare & HIPAA</a>
-              <a href="#" data-action="workflow:flatten">Academic & Research</a>
-              <a href="#" data-action="workflow:security">Zero-Cloud Security</a>
               <a href="#" data-action="workflow:pdfa">ISO 32000 Compliance</a>
-              <a href="#" data-action="workflow:edit">Enterprise Whitepaper</a>
-              <a href="#" data-action="workflow:edit">System Architecture</a>
+              <a href="#" data-legal="security">Security Whitepaper</a>
             </div>
           </div>
         </div>
@@ -934,8 +934,15 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
         <div class="footer-bottom">
           <div class="footer-bottom-inner">
             <span class="footer-copy">© 2026 LetsEdit. 100% Client-Side WebAssembly. Zero Cloud Uploads. Confidential & Private.</span>
+            <div class="footer-legal-nav">
+              <button class="footer-legal-btn" data-legal="privacy">Privacy Policy</button>
+              <span class="footer-dot">&bull;</span>
+              <button class="footer-legal-btn" data-legal="terms">Terms of Service</button>
+              <span class="footer-dot">&bull;</span>
+              <button class="footer-legal-btn" data-legal="security">Security Whitepaper</button>
+            </div>
             <div class="footer-status-pill">
-              <span>All Services Operational &bull; 0 Byte Cloud Telemetry &bull; Client WASM v2.4</span>
+              <span>All Systems Operational &bull; 0 Byte Cloud Telemetry &bull; Client WASM v2.4</span>
             </div>
           </div>
         </div>
