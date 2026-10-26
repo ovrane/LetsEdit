@@ -23,13 +23,13 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
   };
 
   return (
-    <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 flex items-center justify-between z-30 transition-colors">
+    <header className="h-14 border-b border-slate-200 dark:border-[#383838] bg-white/95 dark:bg-[#232323]/95 backdrop-blur-md px-4 flex items-center justify-between z-30 transition-colors">
       {/* Brand & Left Actions */}
       <div className="flex items-center gap-3">
         {isStudioMode && (
           <button
             onClick={onToggleMode}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-200 dark:border-[#383838] hover:bg-slate-100 dark:hover:bg-[#2e2e2e] text-slate-700 dark:text-slate-200 transition shadow-sm"
             title="Back to All Tools Home"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -50,17 +50,17 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
         </div>
 
         {isStudioMode && (
-          <div className="hidden sm:flex items-center gap-2 ml-2 pl-3 border-l border-slate-200 dark:border-slate-800">
+          <div className="hidden sm:flex items-center gap-2 ml-2 pl-3 border-l border-slate-200 dark:border-[#383838]">
             <input
               type="text"
               value={docTitle}
               onChange={handleTitleChange}
-              className="text-xs font-medium bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-[#30050d] rounded px-1.5 py-1 text-slate-800 dark:text-slate-200 outline-none max-w-[180px] truncate"
+              className="text-xs font-medium bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-[#383838] focus:border-[#30050d] rounded px-1.5 py-1 text-slate-800 dark:text-slate-200 outline-none max-w-[180px] truncate"
               title="Click to rename document"
             />
             <button
               onClick={onOpenPdf}
-              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border border-slate-200 dark:border-[#383838] hover:bg-slate-100 dark:hover:bg-[#2e2e2e] text-slate-700 dark:text-slate-300 transition"
             >
               <FolderOpen className="w-3.5 h-3.5 text-[#30050d] dark:text-[#d46374]" />
               <span>Open</span>
@@ -71,25 +71,25 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
 
       {/* Center Studio Controls (Undo, Redo, Zoom) */}
       {isStudioMode && (
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#282828] p-1 rounded-xl border border-slate-200/80 dark:border-[#383838] shadow-sm">
           <button
             onClick={() => store.undo()}
-            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#383838] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
             title="Undo (Ctrl+Z)"
           >
             <Undo2 className="w-4 h-4" />
           </button>
           <button
             onClick={() => store.redo()}
-            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#383838] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
             title="Redo (Ctrl+Y)"
           >
             <Redo2 className="w-4 h-4" />
           </button>
-          <div className="w-[1px] h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
+          <div className="w-[1px] h-4 bg-slate-300 dark:bg-[#383838] mx-1"></div>
           <button
             onClick={() => store.setZoom(Math.max(0.5, (zoomLevel - 15) / 100))}
-            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#383838] text-slate-600 dark:text-slate-300 transition"
             title="Zoom Out"
           >
             <ZoomOut className="w-3.5 h-3.5" />
@@ -99,7 +99,7 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
           </span>
           <button
             onClick={() => store.setZoom(Math.min(2.5, (zoomLevel + 15) / 100))}
-            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition"
+            className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#383838] text-slate-600 dark:text-slate-300 transition"
             title="Zoom In"
           >
             <ZoomIn className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
       <div className="flex items-center gap-2">
         <button
           onClick={() => allToolsModal.show()}
-          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
+          className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#2e2e2e] dark:hover:bg-[#383838] text-slate-700 dark:text-slate-200 transition"
         >
           <Grid className="w-3.5 h-3.5 text-[#30050d] dark:text-[#d46374]" />
           <span>All 43+ Tools</span>
@@ -119,7 +119,7 @@ export function Navbar({ onOpenPdf, onExportPdf, isStudioMode, onToggleMode }) {
 
         <a
           href="/account"
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-[#383838] hover:bg-slate-100 dark:hover:bg-[#2e2e2e] text-slate-700 dark:text-slate-300 transition"
         >
           <span>Account & API</span>
         </a>

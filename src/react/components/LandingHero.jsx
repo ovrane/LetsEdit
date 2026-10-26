@@ -97,7 +97,7 @@ export function LandingHero({ onDocumentLoaded }) {
 
         {/* Hero Fast Search & Popular Shortcuts Hub */}
         <div className="w-full max-w-2xl flex flex-col items-center gap-4 mb-4">
-          <div className="w-full flex items-center bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-full px-5 py-3 shadow-lg shadow-slate-200/50 dark:shadow-black/40 focus-within:border-[#30050d] focus-within:ring-2 focus-within:ring-[#30050d]/20 transition">
+          <div className="w-full flex items-center bg-white dark:bg-[#282828] border-2 border-slate-200 dark:border-[#383838] rounded-full px-5 py-3 shadow-lg shadow-slate-200/50 dark:shadow-black/40 focus-within:border-[#30050d] focus-within:ring-2 focus-within:ring-[#30050d]/20 transition">
             <Search className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
             <input
               type="text"
@@ -129,7 +129,7 @@ export function LandingHero({ onDocumentLoaded }) {
               <button
                 key={pill.id}
                 onClick={() => handleToolClick(pill)}
-                className="px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#30050d] text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-sm hover:shadow transition flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-full bg-white dark:bg-[#2e2e2e] border border-slate-200 dark:border-[#383838] hover:border-[#30050d] text-slate-800 dark:text-white text-xs font-semibold shadow-sm hover:shadow transition flex items-center gap-1.5"
               >
                 <span>{pill.title}</span>
               </button>
@@ -157,7 +157,7 @@ export function LandingHero({ onDocumentLoaded }) {
       {/* Directory & Cards Hub */}
       <section className="w-full max-w-6xl px-4 py-8">
         {/* Search & Filter Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-[#383838]">
           {/* Categories */}
           <div className="flex flex-wrap items-center gap-2">
             {CATEGORIES.map(cat => (
@@ -167,7 +167,7 @@ export function LandingHero({ onDocumentLoaded }) {
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                   activeFilter === cat.id
                     ? 'bg-[#30050d] text-white shadow-sm'
-                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#2e2e2e] dark:hover:bg-[#383838] text-slate-700 dark:text-white'
                 }`}
               >
                 {cat.label}
@@ -183,7 +183,7 @@ export function LandingHero({ onDocumentLoaded }) {
               placeholder="Find any tool..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:border-[#30050d]"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-[#383838] bg-white dark:bg-[#282828] text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:border-[#30050d]"
             />
           </div>
         </div>
@@ -194,7 +194,7 @@ export function LandingHero({ onDocumentLoaded }) {
             <div
               key={tool.id}
               onClick={() => handleToolClick(tool)}
-              className="group p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-[#30050d] dark:hover:border-[#801426] hover:shadow-xl hover:shadow-[#30050d]/10 cursor-pointer transition-all duration-200 flex flex-col justify-between"
+              className="group p-5 rounded-2xl bg-white dark:bg-[#282828] border border-slate-200/90 dark:border-[#383838] hover:border-[#30050d] dark:hover:border-[#801426] hover:shadow-xl hover:shadow-[#30050d]/10 cursor-pointer transition-all duration-200 flex flex-col justify-between"
             >
               <div>
                 <div
