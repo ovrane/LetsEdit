@@ -33,3 +33,6 @@ todo.md
 rea.md
 plan.md
 bug.md
+
+# Local environment files with secrets
+.env.bak
