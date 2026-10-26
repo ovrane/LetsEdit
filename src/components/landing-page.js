@@ -19,6 +19,8 @@ import { router } from '../core/router.js';
 import { getLandingTemplateHtml } from './landing/landing-html.js';
 import { LandingCardsRenderer } from './landing/landing-cards.js';
 import { getTwoToneIconSvg } from './landing/landing-icons.js';
+import { pwaManager } from '../core/pwa-manager.js';
+import { legalModal } from './legal-modal.js';
 
 export class LandingPage {
   constructor() {
@@ -108,43 +110,150 @@ export class LandingPage {
   }
 
   bindEvents() {
-    // Hero quick search & clear
-    const heroSearchInput = this.container.querySelector('#hero-quick-search-input');
-    const heroSearchClear = this.container.querySelector('#hero-search-clear-btn');
-    const toolSearchInput = this.container.querySelector('#landing-tool-search');
+    // Hero Upload PDF Card actions
+    const heroUploadBtn = this.container.querySelector('#btn-landing-upload-pdf');
+    const heroFileInput = this.container.querySelector('#landing-hero-file-input');
+    const heroBlankBtn = this.container.querySelector('#btn-landing-blank-doc');
+    const heroSampleBtn = this.container.querySelector('#btn-landing-load-sample');
+    const heroSampleMultiBtn = this.container.querySelector('#btn-landing-load-sample-multipage');
+    const heroDropzone = this.container.querySelector('#landing-hero-dropzone');
 
-    if (heroSearchInput) {
-      heroSearchInput.oninput = (e) => {
-        this.searchQuery = e.target.value;
-        if (heroSearchClear) {
-          heroSearchClear.style.display = this.searchQuery ? 'block' : 'none';
+    if (heroUploadBtn && heroFileInput) {
+      heroUploadBtn.onclick = () => heroFileInput.click();
+      heroFileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file && file.type === 'application/pdf') {
+          try {
+            Toast.info('Loading PDF into Studio...');
+            const ab = await readFileAsArrayBuffer(file);
+            const info = await pdfEngine.loadPdf(ab);
+            store.setDocument(ab, file.name, info.numPages);
+            const filenameEl = document.getElementById('current-filename');
+            if (filenameEl) filenameEl.textContent = file.name;
+            router.navigate('/edit_pdf');
+            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
+          } catch (err) {
+            console.error(err);
+            Toast.error('Could not load PDF');
+          }
         }
-        if (toolSearchInput) {
-          toolSearchInput.value = this.searchQuery;
-        }
-        this.renderCards();
       };
     }
 
-    if (heroSearchClear && heroSearchInput) {
-      heroSearchClear.onclick = () => {
-        heroSearchInput.value = '';
-        this.searchQuery = '';
-        heroSearchClear.style.display = 'none';
-        if (toolSearchInput) toolSearchInput.value = '';
-        this.renderCards();
-        heroSearchInput.focus();
+    if (heroBlankBtn) {
+      heroBlankBtn.onclick = async () => {
+        try {
+          Toast.info('Creating clean blank page...');
+          const blankBytes = await pdfEngine.createBlankPdf();
+          const info = await pdfEngine.loadPdf(blankBytes);
+          store.setDocument(blankBytes, 'Blank_Document.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Blank_Document.pdf';
+          router.navigate('/edit_pdf');
+          Toast.success('Blank document ready! Add text, shapes, or signatures.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to create blank page');
+        }
       };
     }
 
-    // Hero popular tool pill shortcuts
-    this.container.querySelectorAll('.hero-popular-pill').forEach(btn => {
-      btn.onclick = (e) => {
+    if (heroSampleBtn) {
+      heroSampleBtn.onclick = async () => {
+        try {
+          Toast.info('Loading sample agreement...');
+          const sampleBytes = await pdfEngine.createSamplePdf();
+          const info = await pdfEngine.loadPdf(sampleBytes);
+          store.setDocument(sampleBytes, 'Sample_Agreement.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Sample_Agreement.pdf';
+          router.navigate('/edit_pdf');
+          Toast.success('Sample document loaded! Ready to edit.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to load sample document');
+        }
+      };
+    }
+
+    if (heroSampleMultiBtn) {
+      heroSampleMultiBtn.onclick = async () => {
+        try {
+          Toast.info('Loading 4-page sample report...');
+          const sampleBytes = await pdfEngine.createSampleWatermarkPdf();
+          const info = await pdfEngine.loadPdf(sampleBytes);
+          store.setDocument(sampleBytes, 'Sample_4Page_Report.pdf', info.numPages);
+          const filenameEl = document.getElementById('current-filename');
+          if (filenameEl) filenameEl.textContent = 'Sample_4Page_Report.pdf';
+          router.navigate('/edit_pdf');
+          Toast.success('4-page report loaded! Ready for multi-page editing.');
+        } catch (err) {
+          console.error(err);
+          Toast.error('Failed to load multi-page sample');
+        }
+      };
+    }
+
+    if (heroDropzone) {
+      heroDropzone.ondragover = (e) => {
         e.preventDefault();
-        const action = btn.getAttribute('data-action');
-        if (action) this.handleToolAction(action);
+        heroDropzone.classList.add('drag-over');
       };
-    });
+      heroDropzone.ondragleave = () => {
+        heroDropzone.classList.remove('drag-over');
+      };
+      heroDropzone.ondrop = async (e) => {
+        e.preventDefault();
+        heroDropzone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type === 'application/pdf') {
+          try {
+            Toast.info('Loading PDF into Studio...');
+            const ab = await readFileAsArrayBuffer(file);
+            const info = await pdfEngine.loadPdf(ab);
+            store.setDocument(ab, file.name, info.numPages);
+            const filenameEl = document.getElementById('current-filename');
+            if (filenameEl) filenameEl.textContent = file.name;
+            router.navigate('/edit_pdf');
+            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
+          } catch (err) {
+            console.error(err);
+            Toast.error('Could not load PDF');
+          }
+        } else {
+          Toast.error('Please drop a valid PDF document');
+        }
+      };
+
+      heroDropzone.onclick = (e) => {
+        const floatBadge = e.target.closest('.hero-float-badge');
+        if (floatBadge && floatBadge.getAttribute('data-tool')) {
+          e.stopPropagation();
+          this.handleToolAction(floatBadge.getAttribute('data-tool'));
+          return;
+        }
+        if (heroFileInput) heroFileInput.click();
+      };
+    }
+
+    const scrollToTools = () => {
+      const toolsSec = this.container.querySelector('.landing-tools-section');
+      if (toolsSec) {
+        toolsSec.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        router.navigate('/edit_pdf');
+      }
+    };
+
+    const heroExploreBtn = this.container.querySelector('#btn-landing-explore-tools');
+    if (heroExploreBtn) {
+      heroExploreBtn.onclick = scrollToTools;
+    }
+
+    const heroScrollCue = this.container.querySelector('#btn-landing-scroll-cue');
+    if (heroScrollCue) {
+      heroScrollCue.onclick = scrollToTools;
+    }
 
     // Executive What's New showcase cards
     this.container.querySelectorAll('.whats-new-card').forEach(card => {
@@ -216,7 +325,7 @@ export class LandingPage {
         if (user) {
           authModal.toggleAccountMenu(landingAuthBtn);
         } else {
-          router.navigate('/login');
+          authModal.open('login');
         }
       };
     }
@@ -329,10 +438,19 @@ export class LandingPage {
         e.preventDefault();
         const action = link.getAttribute('data-action');
         if (action?.startsWith('app:')) {
-          Toast.success('LetsEdit is an offline-capable Desktop PWA! Install via your browser address bar icon or pin to your taskbar.');
+          pwaManager.installPwa();
         } else if (action) {
           this.handleToolAction(action);
         }
+      };
+    });
+
+    // Legal & Policies Dialog Triggers
+    this.container.querySelectorAll('[data-legal]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const tab = btn.getAttribute('data-legal') || 'privacy';
+        legalModal.open(tab);
       };
     });
 
@@ -341,7 +459,7 @@ export class LandingPage {
     if (installDesktopBtn) {
       installDesktopBtn.onclick = (e) => {
         e.preventDefault();
-        Toast.success('LetsEdit Desktop App: Install via your browser address bar (Install App icon) or use 100% offline.');
+        pwaManager.installPwa();
       };
     }
 

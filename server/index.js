@@ -27,6 +27,7 @@ import { handleBatesRequest } from './routes/bates-routes.js';
 import { handlePageNumbersRequest } from './routes/pagenumbers-routes.js';
 import { handleFlattenRequest } from './routes/flatten-routes.js';
 import { handleRedactRequest } from './routes/redact-routes.js';
+import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
 export { USERS, SESSIONS, SSO_DOMAINS, parseJsonBody, sendJson, generateToken } from './db.js';
@@ -140,6 +141,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Permanent Redaction endpoints
   const redactHandled = await handleRedactRequest(req, res, pathname, method);
   if (redactHandled) return true;
+
+  // Dispatch System Capabilities & Worker Status endpoints
+  const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);
+  if (workerHandled) return true;
 
   return false;
 }

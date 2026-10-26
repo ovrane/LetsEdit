@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://letsedit-pdf.web.app/sitemap.xml

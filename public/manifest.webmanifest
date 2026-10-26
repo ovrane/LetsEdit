@@ -1,0 +1,59 @@
+{
+  "name": "LetsEdit — Private Online & Offline PDF Suite",
+  "short_name": "LetsEdit",
+  "description": "100% private in-browser WebAssembly PDF suite. Edit, merge, split, compress, fill and sign PDFs offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#30050d",
+  "background_color": "#ffffff",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Edit PDF",
+      "short_name": "Edit",
+      "description": "Open PDF Studio Editor",
+      "url": "/edit_pdf",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Compress PDF",
+      "short_name": "Compress",
+      "description": "Reduce PDF file size offline",
+      "url": "/compress_pdf",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Merge PDF",
+      "short_name": "Merge",
+      "description": "Combine multiple PDF documents",
+      "url": "/merge_pdf",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Fill & Sign",
+      "short_name": "Sign",
+      "description": "Sign PDF contracts & documents",
+      "url": "/sign_pdf",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/edit_pdf",
+      "name": "PDF Document",
+      "accept": {
+        "application/pdf": [".pdf"]
+      }
+    }
+  ]
+}

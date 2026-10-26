@@ -14,6 +14,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { router } from '../core/router.js';
 import { firebaseAuth } from '../core/firebase-auth.js';
+import { turnstileManager } from '../core/turnstile.js';
 
 export class AuthModal {
   constructor() {
@@ -21,6 +22,8 @@ export class AuthModal {
     this.mode = 'login'; // 'login' | 'register'
     this.ssoDomains = ['@acme.com', '@enterprise.org', '@company.com', '@corp.net', '@google.com', '@microsoft.com'];
     this.activePopover = null;
+    this.turnstileToken = null;
+    this.turnstileWidgetId = null;
 
     if (typeof document !== 'undefined') {
       this.init();
@@ -65,10 +68,11 @@ export class AuthModal {
         <div class="modal-header" style="padding-bottom: 12px;">
           <div class="lets-logo" style="cursor: default;">
             <div class="lets-logo-badge">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <path d="M10.5 13.5l3.5-3.5 2 2-3.5 3.5-2.5.5.5-2.5z"></path>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
+                <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8"/>
+                <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE"/>
+                <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500"/>
               </svg>
             </div>
             <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
@@ -129,17 +133,9 @@ export class AuthModal {
               </p>
             </div>
 
-            <!-- Interactive Cloudflare Turnstile Bot Protection -->
-            <div class="turnstile-box">
-              <label class="turnstile-check-label">
-                <input type="checkbox" id="auth-turnstile-check" checked />
-                <span class="turnstile-custom-box"></span>
-                <span class="turnstile-text">Verify you are human</span>
-              </label>
-              <div class="turnstile-badge">
-                <span>Cloudflare</span>
-                <small>Turnstile</small>
-              </div>
+            <!-- Cloudflare Turnstile Human Bot Protection -->
+            <div class="turnstile-container-wrap">
+              <div id="modal-turnstile-container" class="cf-turnstile-target"></div>
             </div>
 
             <!-- Standard Submit Button -->
@@ -162,14 +158,10 @@ export class AuthModal {
             <span>or continue with</span>
           </div>
 
-          <div class="social-login-grid">
-            <button class="btn btn-social" id="btn-google-login" type="button">
+          <div class="social-login-grid" style="display: flex; flex-direction: column;">
+            <button class="btn btn-social btn-social-google" id="btn-google-login" type="button" style="width: 100%; justify-content: center; gap: 10px; font-weight: 600; padding: 11px 16px;">
               <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.83.86-3.04.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.71A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.29-1.71V4.96H.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.59C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.96l3.01 2.33c.71-2.13 2.69-3.71 5.03-3.71z"/></svg>
-              <span>Google Account</span>
-            </button>
-            <button class="btn btn-social" id="btn-msft-login" type="button">
-              <svg width="18" height="18" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
-              <span>Microsoft Account</span>
+              <span>Continue with Google</span>
             </button>
           </div>
         </div>
@@ -184,11 +176,26 @@ export class AuthModal {
     const pwdInput = this.modal.querySelector('#auth-password');
     const form = this.modal.querySelector('#auth-login-form');
     const alertBox = this.modal.querySelector('.auth-alert');
-    const turnstileCheck = this.modal.querySelector('#auth-turnstile-check');
     const pwdFields = this.modal.querySelectorAll('.pwd-field-group');
     const ssoFields = this.modal.querySelectorAll('.sso-field-group');
     const codeGroup = this.modal.querySelector('.verification-code-group');
     const closeBtn = this.modal.querySelector('.modal-close-btn');
+
+    // Mount official Cloudflare Turnstile widget
+    const turnstileContainer = this.modal.querySelector('#modal-turnstile-container');
+    if (turnstileContainer) {
+      turnstileManager.render(turnstileContainer, {
+        action: this.mode === 'register' ? 'register' : 'login',
+        onVerify: (token) => {
+          this.turnstileToken = token;
+        },
+        onExpire: () => {
+          this.turnstileToken = null;
+        }
+      }).then(widgetId => {
+        this.turnstileWidgetId = widgetId;
+      });
+    }
 
     // Tab switcher (Sign In vs Create Account)
     this.modal.querySelectorAll('[data-auth-tab]').forEach(btn => {
@@ -355,20 +362,6 @@ export class AuthModal {
         }
       };
     }
-
-    // Microsoft OAuth Sign-in via Firebase
-    const msftBtn = this.modal.querySelector('#btn-msft-login');
-    if (msftBtn) {
-      msftBtn.onclick = async () => {
-        try {
-          Toast.info('Connecting to Microsoft Account...');
-          const user = await firebaseAuth.signInWithMicrosoft();
-          this.handleSuccessfulAuth(user);
-        } catch (err) {
-          Toast.error('Microsoft Sign-in failed: ' + err.message);
-        }
-      };
-    }
   }
 
   handleSuccessfulAuth(user) {
@@ -393,6 +386,9 @@ export class AuthModal {
 
   close() {
     this.modal.style.display = 'none';
+    if (this.turnstileWidgetId) {
+      turnstileManager.reset(this.turnstileWidgetId);
+    }
   }
 
   // --- GLOBAL USER ACCOUNT POPOVER MENU ---

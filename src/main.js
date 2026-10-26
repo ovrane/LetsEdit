@@ -39,6 +39,8 @@ import { router } from './core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
+import { pwaManager } from './core/pwa-manager.js';
+import { legalModal } from './components/legal-modal.js';
 
 class App {
   constructor() {
@@ -76,6 +78,21 @@ class App {
     this.bindKeyboardShortcuts();
     this.setupAutosave();
 
+    // On mobile / small screens, start with clean full canvas view
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      document.body.classList.remove('sidebar-open', 'tool-sidebar-open');
+    }
+
+    if (viewport) {
+      viewport.addEventListener('click', (e) => {
+        if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+          if (!e.target.closest('#app-sidebar') && !e.target.closest('#tool-options-sidebar')) {
+            document.body.classList.remove('sidebar-open', 'tool-sidebar-open');
+          }
+        }
+      });
+    }
+
     // Check for autosave / recovery
     const recovered = this.tryRestoreAutosave();
     if (!recovered) {
@@ -96,6 +113,8 @@ class App {
         accountPage.showLogin({ updateUrl: false });
       } else if (route.isRegister) {
         accountPage.showRegister({ updateUrl: false });
+      } else if (route.isLegal) {
+        legalModal.open(route.legalTab || 'privacy');
       } else if (route.toolId === 'mobile-pair') {
         const landingView = document.getElementById('landing-view');
         const studioView = document.getElementById('studio-view');
@@ -128,6 +147,9 @@ class App {
     });
 
     router.init();
+
+    // Register PWA Service Worker for offline execution
+    pwaManager.registerServiceWorker();
   }
 
   setupAutosave() {
@@ -232,9 +254,25 @@ class App {
       document.body.classList.toggle('sidebar-open');
     };
 
-    // Open PDF file
+    // Open PDF file (Try Native File System Access API first, fallback to input file)
     const fileInput = document.getElementById('upload-pdf-input');
-    document.getElementById('btn-open-pdf').onclick = () => fileInput.click();
+    document.getElementById('btn-open-pdf').onclick = async () => {
+      const fsResult = await pwaManager.openLocalPdfWithFsApi();
+      if (fsResult && fsResult.file) {
+        try {
+          Toast.info('Loading PDF document...');
+          const arrayBuffer = await readFileAsArrayBuffer(fsResult.file);
+          const info = await pdfEngine.loadPdf(arrayBuffer);
+          store.setDocument(arrayBuffer, fsResult.file.name, info.numPages);
+          document.getElementById('current-filename').textContent = fsResult.file.name;
+          Toast.success(`Loaded ${fsResult.file.name} (${info.numPages} pages)`);
+          return;
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      fileInput.click();
+    };
 
     fileInput.onchange = async (e) => {
       const file = e.target.files[0];
@@ -333,14 +371,21 @@ class App {
       };
     }
 
-    // Export & Download
+    // Export & Download (Try direct Native File System Save first, fallback to blob download)
     document.getElementById('btn-save-pdf').onclick = async () => {
       try {
         Toast.info('Compiling & generating vector PDF...');
         const state = store.getState();
         const pdfBytes = await pdfEngine.exportPdf(state);
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const name = (state.filename || 'document').replace('.pdf', '') + '_edited.pdf';
+
+        const fsResult = await pwaManager.saveLocalPdfWithFsApi(pdfBytes, name);
+        if (fsResult && fsResult.success) {
+          Toast.success(`Directly saved ${fsResult.name} to disk!`);
+          return;
+        }
+
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         downloadBlob(blob, name);
         Toast.success('PDF successfully exported!');
       } catch (err) {

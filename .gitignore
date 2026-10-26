@@ -1,10 +1,12 @@
 # Dependencies
 node_modules/
 reference/
+test-results/
 # Environment variables and secrets
 .env
-.env.*
-.env.example
+.env.local
+.env.*.local
+!.env.example
 
 # Build output
 dist/
@@ -19,6 +21,7 @@ npm-debug.log*
 # IDE and editor
 .vscode/
 .idea/
+.firebase/
 
 # Operating system
 .DS_Store
@@ -29,3 +32,7 @@ todo.md
 *.swp
 rea.md
 plan.md
+bug.md
+
+# Local environment files with secrets
+.env.bak

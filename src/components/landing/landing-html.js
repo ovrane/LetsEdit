@@ -13,10 +13,11 @@ export function getLandingTemplateHtml() {
       <div class="landing-nav-inner">
         <div class="lets-logo" id="landing-brand-logo" title="LetsEdit — Home">
           <div class="lets-logo-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <path d="M10.5 13.5l3.5-3.5 2 2-3.5 3.5-2.5.5.5-2.5z"></path>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
+              <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8"/>
+              <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE"/>
+              <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500"/>
             </svg>
           </div>
           <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
@@ -302,88 +303,199 @@ export function getLandingTemplateHtml() {
 
     <!-- Main Landing Content (Scrollable) -->
     <main class="landing-main-content">
-      <!-- Hero Section (Elevated, High-Converting Hero - NO DROPZONE) -->
+      <!-- Hero Section (Clean Smallpdf-Style 2-Column Hero) -->
       <section class="landing-hero-section">
         <div class="landing-hero-container">
-          <div class="hero-chip-badge">
-            <span class="hero-chip-dot"></span>
-            <span>Client-Side WebAssembly &bull; Zero Cloud Uploads</span>
-          </div>
+          <div class="landing-hero-grid">
+            <!-- Left Column: Copy & Actions -->
+            <div class="landing-hero-left">
+              <h1 class="landing-hero-title">Work on your <span style="color: var(--primary);">PDF</span><br>With Ease</h1>
+              <p class="landing-hero-subtitle">
+Powerful PDF tools to simplify your workflow, streamline document management, and get more done.              </p>
 
-          <h1 class="landing-hero-title">
-            The Professional PDF Suite Built for <span class="hero-title-accent">Speed, Precision & Total Privacy</span>.
-          </h1>
-          <p class="landing-hero-subtitle">
-            Edit existing typography, permanently redact sensitive data, imprint Bates numbers, flatten forms, sign, and convert documents locally in your browser. Pure vector mathematics with zero telemetry.
-          </p>
-
-          <!-- Hero Fast Search & Popular Tools Launch Hub -->
-          <div class="hero-actions-hub">
-            <div class="hero-search-bar-wrap">
-              <div class="hero-search-icon">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
+              <div class="landing-hero-actions">
+                <input type="file" id="landing-hero-file-input" accept="application/pdf" style="display:none;" />
+                <button class="btn landing-hero-btn-primary" id="btn-landing-upload-pdf">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <polyline points="9 15 12 12 15 15"></polyline>
+                  </svg>
+                  <span>Upload PDF</span>
+                </button>
+                <button class="btn landing-hero-btn-outline" id="btn-landing-explore-tools">
+                  Explore All PDF Tools
+                </button>
               </div>
-              <input type="text" id="hero-quick-search-input" class="hero-search-input" placeholder="Search 43+ tools (e.g. Redact, Flatten, Bates, Merge, Split, OCR, Sign)..." autocomplete="off" />
-              <div class="hero-search-kbd" title="Search shortcut">⌘K</div>
-              <button id="hero-search-clear-btn" class="hero-search-clear" style="display:none;" title="Clear search">&times;</button>
+
+              <div class="landing-hero-trust-row">
+                <span class="hero-trust-item">
+                  <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Free &amp; No installation
+                </span>
+                <span class="hero-trust-item">
+                  <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  100% In-Browser Privacy
+                </span>
+              </div>
             </div>
 
-            <div class="hero-popular-pills">
-              <span class="hero-popular-label">Popular:</span>
-              <button class="hero-popular-pill" data-action="workflow:edit">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                <span>Edit PDF</span>
-              </button>
-              <button class="hero-popular-pill" data-action="workflow:merge">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>
-                <span>Merge</span>
-              </button>
-              <button class="hero-popular-pill" data-action="workflow:compress">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"></path></svg>
-                <span>Compress</span>
-              </button>
-              <button class="hero-popular-pill" data-action="workflow:split">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 3h5v5M8 3H3v5M12 22V2"></path></svg>
-                <span>Split</span>
-              </button>
-              <button class="hero-popular-pill" data-action="workflow:redact">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
-                <span>Redact</span>
-              </button>
-              <button class="hero-popular-pill" data-action="workflow:bates">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                <span>Bates Number</span>
-              </button>
-              <button class="hero-popular-pill" data-action="workflow:sign">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
-                <span>Fill & Sign</span>
-              </button>
-            </div>
-          </div>
+            <!-- Right Column: Interactive Mockup Illustration with Floating Tool Badges & Confetti -->
+            <div class="landing-hero-right" id="landing-hero-dropzone" title="Drop PDF here or click to choose file">
+              <div class="hero-illustration-wrapper">
+                <!-- Floating Decorative Accents (confetti matching screenshot) -->
+                <div class="hero-accent-item accent-plus-orange">+</div>
+                <div class="hero-accent-item accent-cross-cyan">&times;</div>
+                <div class="hero-accent-item accent-circle-red"></div>
+                <div class="hero-accent-item accent-plus-yellow">+</div>
+                <div class="hero-accent-item accent-cross-coral">&times;</div>
+                <div class="hero-accent-item accent-circle-teal"></div>
 
-          <!-- Hero Value & Trust Bar -->
-          <div class="hero-trust-bar">
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#10b981" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              <span><strong>100% Client-Side</strong> &bull; Zero Server Uploads</span>
-            </div>
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#30050d" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-              <span><strong>Sub-Second Speed</strong> &bull; Client-Side WASM</span>
-            </div>
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#8b5cf6" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-              <span><strong>43+ Pro Tools</strong> &bull; Edit, Redact, Bates & Sign</span>
-            </div>
-            <div class="trust-pill">
-              <svg width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-              <span><strong>ISO Compliant</strong> &bull; PDF/A & PDF 1.7 Standards</span>
+                <!-- Background Tilted Pastel Sheets -->
+                <div class="hero-backdrop-sheet sheet-back"></div>
+                <div class="hero-backdrop-sheet sheet-mid"></div>
+
+                <!-- Main Application Window Mockup -->
+                <div class="hero-mockup-window">
+                  <!-- Window Header Bar -->
+                  <div class="mockup-window-header">
+                    <div class="mockup-brand">
+                      <div class="mockup-logo-icon">
+                        <span></span><span></span><span></span><span></span>
+                      </div>
+                      <span class="mockup-brand-text">LetsEdit</span>
+                    </div>
+                    <div class="mockup-toolbar">
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7 17 3-7 7-3L3 3z"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+                      <span class="mockup-tool-icon active"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></span>
+                      <span class="mockup-tool-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></span>
+                    </div>
+                    <div class="mockup-window-dots">
+                      <span></span><span></span>
+                    </div>
+                  </div>
+
+                  <!-- Mockup Canvas / Document Sheet -->
+                  <div class="mockup-window-body">
+                    <div class="mockup-doc-sheet">
+                      <!-- Skeleton Text Lines -->
+                      <div class="mockup-line line-long"></div>
+                      <div class="mockup-line line-med"></div>
+                      <div class="mockup-line line-short"></div>
+
+                      <!-- Selected Text Box ("Hello!") with 8 Blue Drag Handles -->
+                      <div class="mockup-selected-text">
+                        <div class="mockup-box-handle handle-tl"></div>
+                        <div class="mockup-box-handle handle-tc"></div>
+                        <div class="mockup-box-handle handle-tr"></div>
+                        <div class="mockup-box-handle handle-ml"></div>
+                        <div class="mockup-box-handle handle-mr"></div>
+                        <div class="mockup-box-handle handle-bl"></div>
+                        <div class="mockup-box-handle handle-bc"></div>
+                        <div class="mockup-box-handle handle-br"></div>
+                        <span class="mockup-selected-label">Hello!</span>
+                      </div>
+
+                      <!-- Selected Vector Circle with 8 Drag Handles -->
+                      <div class="mockup-selected-circle">
+                        <div class="mockup-box-handle handle-tl"></div>
+                        <div class="mockup-box-handle handle-tc"></div>
+                        <div class="mockup-box-handle handle-tr"></div>
+                        <div class="mockup-box-handle handle-ml"></div>
+                        <div class="mockup-box-handle handle-mr"></div>
+                        <div class="mockup-box-handle handle-bl"></div>
+                        <div class="mockup-box-handle handle-bc"></div>
+                        <div class="mockup-box-handle handle-br"></div>
+                        <div class="mockup-circle-shape"></div>
+                      </div>
+
+                      <!-- Middle lines -->
+                      <div class="mockup-line line-full"></div>
+                      <div class="mockup-line line-long"></div>
+                      <div class="mockup-line line-med"></div>
+
+                      <!-- Selected Red Signature Doodle with Mouse Cursor -->
+                      <div class="mockup-selected-signature">
+                        <div class="mockup-box-handle handle-tl"></div>
+                        <div class="mockup-box-handle handle-tr"></div>
+                        <div class="mockup-box-handle handle-bl"></div>
+                        <div class="mockup-box-handle handle-br"></div>
+                        <svg class="mockup-signature-path" viewBox="0 0 100 36" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M8 24c8-14 16-16 20-8s-4 16 6 12 18-22 24-10-8 18 10 12 18-20 22-8"></path>
+                        </svg>
+                        <!-- Black Mouse Pointer Cursor pointing at signature -->
+                        <div class="mockup-cursor-pointer">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="#111827" stroke="#ffffff" stroke-width="1.5">
+                            <path d="M3 3l7.5 18 3.5-7.5 7.5-3.5L3 3z"/>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <!-- Bottom lines -->
+                      <div class="mockup-line line-full"></div>
+                      <div class="mockup-line line-long"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Floating Colorful Tool Badges Orbiting the Window -->
+                <!-- Top Cyan: Edit -->
+                <div class="hero-float-badge badge-top-cyan" data-tool="workflow:edit" title="Edit PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </div>
+                <!-- Top Right Purple: Merge / Combine -->
+                <div class="hero-float-badge badge-top-purple" data-tool="workflow:merge" title="Merge PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/>
+                  </svg>
+                </div>
+                <!-- Left Magenta: Sign / Fountain Pen -->
+                <div class="hero-float-badge badge-left-magenta" data-tool="workflow:sign" title="Sign PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="2"/>
+                  </svg>
+                </div>
+                <!-- Bottom Right Yellow: Image / JPG -->
+                <div class="hero-float-badge badge-right-yellow" data-tool="workflow:pdf-to-jpg" title="PDF to Image">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <!-- Bottom Right Blue: Word (W) -->
+                <div class="hero-float-badge badge-right-blue" data-tool="workflow:pdf-to-word" title="PDF to Word">
+                  <span class="badge-word-w">W</span>
+                </div>
+                <!-- Bottom Red: Crop / Compress -->
+                <div class="hero-float-badge badge-bottom-red" data-tool="workflow:compress" title="Compress PDF">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <rect x="5" y="5" width="14" height="14" rx="2" stroke-dasharray="3 3"/>
+                    <path d="M9 9h6v6H9z"/>
+                  </svg>
+                </div>
+
+                <!-- Drop Overlay on Illustration when dragging file -->
+                <div class="hero-mockup-drop-overlay">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                  <span>Drop PDF to Edit Instantly</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Clean Scroll Indicator Cue -->
+        <button class="landing-hero-scroll-cue" id="btn-landing-scroll-cue" aria-label="Scroll to explore 43+ tools">
+          <span>Explore 43+ PDF Tools</span>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
       </section>
 
       <!-- Executive Feature Showcase: What's New in LetsEdit -->
@@ -520,10 +632,10 @@ export function getLandingTemplateHtml() {
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(48, 5, 13, 0.1); color: #30050d;">
+                <div class="why-icon-box" style="background: rgba(48, 5, 13, 0.1); color: #bf6c07ff;">
                   <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(48, 5, 13, 0.08); color: #30050d;">Sub-Second Speed</span>
+                <span class="why-pill-badge" style="background: rgba(48, 5, 13, 0.08); color: #e76b0fff;">Sub-Second Speed</span>
               </div>
               <h3 class="why-card-title">Blazing Fast WebAssembly Performance</h3>
               <p class="why-card-desc">Zero bandwidth lag, zero upload waiting, and no server timeouts. Split 500-page discovery files or compress multi-gigabyte scans directly on your local hardware.</p>
@@ -740,23 +852,18 @@ export function getLandingTemplateHtml() {
             <div class="footer-brand-column">
               <div class="lets-logo" style="margin-bottom: 12px;">
                 <div class="lets-logo-badge">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <path d="M10.5 13.5l3.5-3.5 2 2-3.5 3.5-2.5.5.5-2.5z"></path>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
+                    <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8"/>
+                    <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE"/>
+                    <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500"/>
                   </svg>
                 </div>
                 <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
               </div>
               <p class="footer-brand-tagline">Making PDF fast, private, and effortless. 100% in-browser WebAssembly processing with zero cloud uploads.</p>
 
-              <!-- Trust Certifications Badges -->
-              <div class="footer-trust-chips">
-                <span class="footer-trust-chip">🛡 100% Client-Side</span>
-                <span class="footer-trust-chip">🔒 Zero Server Logs</span>
-                <span class="footer-trust-chip">⚖ ISO 32000-1</span>
-                <span class="footer-trust-chip">⚡ WebAssembly 60fps</span>
-              </div>
+
 
               <!-- Social Links -->
               <div class="footer-social-links">
@@ -768,24 +875,6 @@ export function getLandingTemplateHtml() {
                 </a>
                 <a href="https://github.com" target="_blank" rel="noopener" class="footer-social-icon" title="GitHub">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                </a>
-              </div>
-
-              <!-- Store Badges -->
-              <div class="footer-store-badges">
-                <a class="footer-badge-item" title="Download for Windows" href="#" data-action="app:windows">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-                  <div>
-                    <span class="badge-sub">Install App for</span>
-                    <strong class="badge-main">Windows & PC</strong>
-                  </div>
-                </a>
-                <a class="footer-badge-item" title="Open Web PWA" href="#" data-action="app:mobile">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.78 1.06-1.87.94-2.96-.92.04-2.02.61-2.67 1.38-.58.67-1.09 1.76-.95 2.83 1.02.08 2.05-.47 2.68-1.25z"/></svg>
-                  <div>
-                    <span class="badge-sub">Optimized for</span>
-                    <strong class="badge-main">macOS & iOS</strong>
-                  </div>
                 </a>
               </div>
             </div>
@@ -832,14 +921,14 @@ export function getLandingTemplateHtml() {
             <!-- Column 4: Solutions & Trust -->
             <div class="footer-col">
               <h4>Solutions & Trust</h4>
+              <a href="#" data-legal="security">Zero-Cloud Security</a>
+              <a href="#" data-legal="privacy">Privacy & GDPR</a>
+              <a href="#" data-legal="terms">Terms & E-Sign</a>
               <a href="#" data-action="workflow:bates">Legal E-Discovery</a>
               <a href="#" data-action="workflow:sign">Finance & Contracts</a>
               <a href="#" data-action="workflow:redact">Healthcare & HIPAA</a>
-              <a href="#" data-action="workflow:flatten">Academic & Research</a>
-              <a href="#" data-action="workflow:security">Zero-Cloud Security</a>
               <a href="#" data-action="workflow:pdfa">ISO 32000 Compliance</a>
-              <a href="#" data-action="workflow:edit">Enterprise Whitepaper</a>
-              <a href="#" data-action="workflow:edit">System Architecture</a>
+              <a href="#" data-legal="security">Security Whitepaper</a>
             </div>
           </div>
         </div>
@@ -847,9 +936,15 @@ export function getLandingTemplateHtml() {
         <div class="footer-bottom">
           <div class="footer-bottom-inner">
             <span class="footer-copy">© 2026 LetsEdit. 100% Client-Side WebAssembly. Zero Cloud Uploads. Confidential & Private.</span>
+            <div class="footer-legal-nav">
+              <button class="footer-legal-btn" data-legal="privacy">Privacy Policy</button>
+              <span class="footer-dot">&bull;</span>
+              <button class="footer-legal-btn" data-legal="terms">Terms of Service</button>
+              <span class="footer-dot">&bull;</span>
+              <button class="footer-legal-btn" data-legal="security">Security Whitepaper</button>
+            </div>
             <div class="footer-status-pill">
-              <span class="status-dot-green"></span>
-              <span>All Services Operational &bull; 0 Byte Cloud Telemetry &bull; Client WASM v2.4</span>
+              <span>All Systems Operational &bull; 0 Byte Cloud Telemetry &bull; Client WASM v2.4</span>
             </div>
           </div>
         </div>
