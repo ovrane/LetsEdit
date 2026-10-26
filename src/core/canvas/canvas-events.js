@@ -16,8 +16,10 @@ export class CanvasEventsHandler {
 
     const getPos = (e) => {
       const rect = wrap.getBoundingClientRect();
-      const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-      const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+      const clientX = e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+      const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
       return {
         px: x,
         py: y,
@@ -26,37 +28,47 @@ export class CanvasEventsHandler {
       };
     };
 
-    wrap.addEventListener('mousedown', (e) => {
+    const handlePointerDown = (e) => {
       if (e.target.closest('.annot-item') || e.target.closest('.inline-text-editor')) return;
 
       const state = store.getState();
       const pos = getPos(e);
 
       if (state.activeTool === 'eraser') {
+        if (e.cancelable) e.preventDefault();
         manager.isErasing = true;
         EraserHandler.eraseAtPosition(pageNum, pos, wrap);
         return;
       } else if (state.activeTool === 'draw' || state.activeTool === 'highlight') {
+        if (e.cancelable) e.preventDefault();
         manager.isDrawing = true;
         drawingPoints = [{ x: pos.normX, y: pos.normY }];
       } else if (state.activeTool === 'whiteout') {
+        if (e.cancelable) e.preventDefault();
         CanvasEventsHandler.startBoxDrawing(pageNum, 'whiteout', pos, wrap);
       } else if (state.activeTool === 'shape') {
+        if (e.cancelable) e.preventDefault();
         CanvasEventsHandler.startBoxDrawing(pageNum, 'shape', pos, wrap);
       } else if (state.activeTool === 'link') {
+        if (e.cancelable) e.preventDefault();
         CanvasEventsHandler.startBoxDrawing(pageNum, 'link', pos, wrap);
       } else if (state.activeTool === 'text') {
         CanvasEventsHandler.promptNewText(pageNum, pos, wrap);
       }
-    });
+    };
 
-    wrap.addEventListener('mousemove', (e) => {
+    wrap.addEventListener('mousedown', handlePointerDown);
+    wrap.addEventListener('touchstart', handlePointerDown, { passive: false });
+
+    const handlePointerMove = (e) => {
       const pos = getPos(e);
       if (manager.isErasing) {
+        if (e.cancelable) e.preventDefault();
         EraserHandler.eraseAtPosition(pageNum, pos, wrap);
         return;
       }
       if (!manager.isDrawing) return;
+      if (e.cancelable) e.preventDefault();
       drawingPoints.push({ x: pos.normX, y: pos.normY });
 
       // Live sketch on annotCanvas
@@ -78,7 +90,10 @@ export class CanvasEventsHandler {
         ctx.stroke();
       }
       ctx.restore();
-    });
+    };
+
+    wrap.addEventListener('mousemove', handlePointerMove);
+    wrap.addEventListener('touchmove', handlePointerMove, { passive: false });
 
     const stopAction = () => {
       manager.isErasing = false;
@@ -100,6 +115,8 @@ export class CanvasEventsHandler {
 
     wrap.addEventListener('mouseup', stopAction);
     wrap.addEventListener('mouseleave', stopAction);
+    wrap.addEventListener('touchend', stopAction);
+    wrap.addEventListener('touchcancel', stopAction);
   }
 
   static promptNewText(pageNum, pos, wrap) {
@@ -158,8 +175,10 @@ export class CanvasEventsHandler {
 
     const onMove = (e) => {
       const rect = wrap.getBoundingClientRect();
-      const curX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-      const curY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+      const clientX = e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+      const curX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const curY = Math.max(0, Math.min(rect.height, clientY - rect.top));
 
       const left = Math.min(startPos.px, curX);
       const top = Math.min(startPos.py, curY);
@@ -175,6 +194,9 @@ export class CanvasEventsHandler {
     const onUp = () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+      window.removeEventListener('touchcancel', onUp);
 
       const left = parseFloat(box.style.left) || 0;
       const top = parseFloat(box.style.top) || 0;
@@ -231,6 +253,9 @@ export class CanvasEventsHandler {
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+    window.addEventListener('touchcancel', onUp);
   }
 
   static makeExistingTextEditable(manager, span, pageNum, cluster) {

@@ -77,6 +77,21 @@ class App {
     this.bindKeyboardShortcuts();
     this.setupAutosave();
 
+    // On mobile / small screens, start with clean full canvas view
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      document.body.classList.remove('sidebar-open', 'tool-sidebar-open');
+    }
+
+    if (viewport) {
+      viewport.addEventListener('click', (e) => {
+        if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+          if (!e.target.closest('#app-sidebar') && !e.target.closest('#tool-options-sidebar')) {
+            document.body.classList.remove('sidebar-open', 'tool-sidebar-open');
+          }
+        }
+      });
+    }
+
     // Check for autosave / recovery
     const recovered = this.tryRestoreAutosave();
     if (!recovered) {
