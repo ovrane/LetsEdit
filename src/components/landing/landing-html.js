@@ -863,13 +863,7 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
               </div>
               <p class="footer-brand-tagline">Making PDF fast, private, and effortless. 100% in-browser WebAssembly processing with zero cloud uploads.</p>
 
-              <!-- Trust Certifications Badges -->
-              <div class="footer-trust-chips">
-                <span class="footer-trust-chip">🛡 100% Client-Side</span>
-                <span class="footer-trust-chip">🔒 Zero Server Logs</span>
-                <span class="footer-trust-chip">⚖ ISO 32000-1</span>
-                <span class="footer-trust-chip">⚡ WebAssembly 60fps</span>
-              </div>
+
 
               <!-- Social Links -->
               <div class="footer-social-links">
