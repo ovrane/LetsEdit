@@ -624,10 +624,10 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
 
             <div class="why-card">
               <div class="why-card-top">
-                <div class="why-icon-box" style="background: rgba(48, 5, 13, 0.1); color: #30050d;">
+                <div class="why-icon-box" style="background: rgba(48, 5, 13, 0.1); color: #bf6c07ff;">
                   <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
-                <span class="why-pill-badge" style="background: rgba(48, 5, 13, 0.08); color: #30050d;">Sub-Second Speed</span>
+                <span class="why-pill-badge" style="background: rgba(48, 5, 13, 0.08); color: #e76b0fff;">Sub-Second Speed</span>
               </div>
               <h3 class="why-card-title">Blazing Fast WebAssembly Performance</h3>
               <p class="why-card-desc">Zero bandwidth lag, zero upload waiting, and no server timeouts. Split 500-page discovery files or compress multi-gigabyte scans directly on your local hardware.</p>
