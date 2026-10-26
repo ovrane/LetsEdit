@@ -1,6 +1,6 @@
 /**
  * PDF Studio & LetsEdit Fullstack Backend Server Entry Point
- * Conforms to SEJDA_AUTH_SPECIFICATION.md & SEJDA_FULL_SUITE_REVERSE_ENGINEERING.md
+ * Conforms to LETSEDIT_AUTH_SPECIFICATION.md & LETSEDIT_CORE_EDITOR_SPECIFICATION.md
  * Modular architecture dispatching to db, auth-routes, pdf-routes, and static.
  */
 

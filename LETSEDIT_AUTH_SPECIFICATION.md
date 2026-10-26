@@ -1,4 +1,4 @@
-# Sejda.com Authentication Architecture & Specification
+# LetsEdit Authentication Architecture & Specification
 
 > **Notice on Scope & Accessibility:**
 > This document details the reverse-engineered client authentication system of [Sejda.com](https://www.sejda.com/) obtained via browser runtime inspection (CDP & REA). Sejda's backend application server (Java/JVM infrastructure) is closed-source and runs server-side, so its private backend repository cannot be downloaded. However, the complete client-side code, network contracts, API endpoints, state management, and integration patterns have been captured, decoded, and documented below.

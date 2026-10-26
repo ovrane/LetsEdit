@@ -1,7 +1,6 @@
 /**
  * Account & Developer API Management Hub
- * Implements the full-page /account and /login views as specified in SEJDA_AUTH_SPECIFICATION.md
- * and iLovePDF account management architectures.
+ * Implements the full-page /account and /login views as specified in LETSEDIT_AUTH_SPECIFICATION.md
  * Decomposed into modular sub-modules in ./account/:
  * - full-auth.js: Full-page authentication, SSO, Turnstile, and OAuth
  * - account-tabs.js: Profile, telemetry, Pro plan, API tokens, and 2FA

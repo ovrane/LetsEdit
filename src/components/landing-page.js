@@ -9,7 +9,7 @@
 
 import { store } from '../core/state-store.js';
 import { pdfEngine } from '../core/pdf-engine.js';
-import { TOOLS_CATALOG, SEJDA_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
+import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, getPreferredTheme, toggleTheme } from '../utils/theme.js';
@@ -498,7 +498,7 @@ export class LandingPage {
     // Collect all tools across categories
     const allTools = [];
     const seen = new Set();
-    SEJDA_TOOL_CATEGORIES.forEach(cat => {
+    LETSEDIT_TOOL_CATEGORIES.forEach(cat => {
       cat.tools?.forEach(tool => {
         if (!seen.has(tool.id)) {
           seen.add(tool.id);

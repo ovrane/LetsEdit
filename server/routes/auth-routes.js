@@ -1,5 +1,5 @@
 /**
- * Auth & User Management Routes (SEJDA_AUTH_SPECIFICATION.md)
+ * Auth & User Management Routes (LETSEDIT_AUTH_SPECIFICATION.md)
  * Handles login, registration, SSO domain lookup, SAML URL, Google/Microsoft OAuth,
  * session verification (/users/me), profile updating, developer API keys, logout, and password recovery.
  */

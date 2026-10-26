@@ -1,6 +1,6 @@
 /**
- * Sejda & iLovePDF Reverse-Engineered Authentication & SSO System
- * Implements the full client-side authentication architecture from SEJDA_AUTH_SPECIFICATION.md:
+ * LetsEdit Authentication & Enterprise SSO System
+ * Implements the full client-side authentication architecture from LETSEDIT_AUTH_SPECIFICATION.md:
  * - Dual mode: Sign In vs Create Account
  * - Enterprise SSO domain detection (debounced email lookup)
  * - Cloudflare Turnstile human bot verification

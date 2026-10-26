@@ -4,7 +4,7 @@
  * and card click dispatching.
  */
 
-import { TOOLS_CATALOG, SEJDA_TOOL_CATEGORIES, SMALLPDF_DIRECTORIES, renderDirectoryItemHtml } from '../all-tools-modal.js';
+import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, SMALLPDF_DIRECTORIES, renderDirectoryItemHtml } from '../all-tools-modal.js';
 import { getTwoToneIconSvg } from './landing-icons.js';
 
 export class LandingCardsRenderer {

@@ -1,4 +1,4 @@
-# Sejda.com Core PDF Editor Engine Architecture & Technical Specification
+# LetsEdit Core PDF Editor Engine Architecture & Technical Specification
 
 > **Source:** Reverse-engineered from live production runtime bundle `https://www.sejda.com/js/pages/pdf-editor.min.obfuscated.js?v=523` and DOM templates via REA (Reverse-Engineer-Anything).
 
@@ -131,4 +131,4 @@ Sejda provides four distinct signature creation methods:
 | :--- | :--- |
 | [`reference/sejda-editor-toolbar.html`](file:///home/codxbrexx/Pdf-Editor/reference/sejda-editor-toolbar.html) | Extracted HTML structure of Sejda's editor toolbar, menu items, and thumbnails drawer. |
 | [`/tmp/sejda_decoded_strings.json`](file:///tmp/sejda_decoded_strings.json) | Complete dictionary of all 2,070 decoded strings extracted from Sejda's core editor engine. |
-| [`SEJDA_AUTH_SPECIFICATION.md`](file:///home/codxbrexx/Pdf-Editor/SEJDA_AUTH_SPECIFICATION.md) | The authentication and login specification created in the previous step. |
+| [`LETSEDIT_AUTH_SPECIFICATION.md`](file:///home/codxbrexx/Pdf-Editor/LETSEDIT_AUTH_SPECIFICATION.md) | The authentication and login specification created in the previous step. |

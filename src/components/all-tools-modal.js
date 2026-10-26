@@ -27,7 +27,7 @@ import { router } from '../core/router.js';
 import { Toast } from './toast.js';
 import { getTwoToneIconSvg } from './landing/landing-icons.js';
 
-export const SEJDA_TOOL_CATEGORIES = [
+export const LETSEDIT_TOOL_CATEGORIES = [
   {
     id: 'popular',
     name: 'Most popular',
@@ -330,11 +330,12 @@ export const SMALLPDF_DIRECTORIES = [
     ]
   }
 ];
+export const SEJDA_TOOL_CATEGORIES = LETSEDIT_TOOL_CATEGORIES;
 
 // Deduplicated flat catalog
 const seen = new Set();
 export const TOOLS_CATALOG = [];
-SEJDA_TOOL_CATEGORIES.forEach(cat => {
+LETSEDIT_TOOL_CATEGORIES.forEach(cat => {
   cat.tools.forEach(t => {
     if (!seen.has(t.id)) {
       seen.add(t.id);
