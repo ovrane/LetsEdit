@@ -8,6 +8,7 @@
 import { store } from '../../core/state-store.js';
 import { Toast } from '../toast.js';
 import { uid } from '../../utils/helpers.js';
+import { generateFontOptionsHtml } from '../../core/font-registry.js';
 
 export class SelectedAnnotationInspector {
   static render(panel) {
@@ -19,18 +20,53 @@ export class SelectedAnnotationInspector {
     let specificControls = '';
 
     if (type === 'text') {
+      const curFont = ann.fontId || ann.fontFamily || 'Helvetica';
       specificControls = `
         <div class="opt-group">
           <label class="opt-label">Edit Text</label>
           <textarea class="textarea-sm w-full" id="opt-selected-text" rows="2">${ann.text || ''}</textarea>
         </div>
         <div class="opt-group">
+          <label class="opt-label">Font Family</label>
+          <select class="select-sm w-full" id="opt-selected-font">
+            ${generateFontOptionsHtml(curFont)}
+          </select>
+        </div>
+        <div class="opt-group">
+          <label class="opt-label">Text Style</label>
+          <div class="flex items-center gap-1">
+            <button class="btn btn-sm ${ann.bold ? 'btn-primary' : 'btn-outline'} flex-1 font-bold" id="opt-text-bold" title="Bold">B</button>
+            <button class="btn btn-sm ${ann.italic ? 'btn-primary' : 'btn-outline'} flex-1 italic" id="opt-text-italic" title="Italic">I</button>
+            <button class="btn btn-sm ${ann.underline ? 'btn-primary' : 'btn-outline'} flex-1 underline" id="opt-text-underline" title="Underline">U</button>
+            <button class="btn btn-sm ${ann.strikethrough ? 'btn-primary' : 'btn-outline'} flex-1 line-through" id="opt-text-strike" title="Strikethrough">S</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <label class="opt-label">Text Alignment</label>
+          <div class="flex items-center gap-1">
+            <button class="btn btn-sm ${ann.align === 'left' || !ann.align ? 'btn-primary' : 'btn-outline'} flex-1" id="opt-text-align-left">Left</button>
+            <button class="btn btn-sm ${ann.align === 'center' ? 'btn-primary' : 'btn-outline'} flex-1" id="opt-text-align-center">Center</button>
+            <button class="btn btn-sm ${ann.align === 'right' ? 'btn-primary' : 'btn-outline'} flex-1" id="opt-text-align-right">Right</button>
+          </div>
+        </div>
+        <div class="opt-group">
           <label class="opt-label">Font Size</label>
           <input type="number" class="input-sm w-full" id="opt-selected-size" value="${ann.fontSize || 16}" min="8" max="72" />
         </div>
-        <div class="opt-group">
-          <label class="opt-label">Text Color</label>
+        <div class="opt-group flex items-center justify-between">
+          <label class="opt-label mb-0">Text Color</label>
           <input type="color" class="color-input-badge" id="opt-selected-color" value="${ann.color || '#000000'}" />
+        </div>
+        <div class="opt-group flex items-center justify-between">
+          <label class="opt-label mb-0">Highlight Fill</label>
+          <input type="color" class="color-input-badge" id="opt-selected-highlight" value="${ann.bgColor && ann.bgColor !== 'transparent' ? ann.bgColor : '#ffffff'}" />
+        </div>
+        <div class="opt-group">
+          <div class="flex justify-between items-center mb-1">
+            <label class="opt-label mb-0">Opacity</label>
+            <span class="text-xs text-slate-400" id="opt-selected-opacity-val">${Math.round((ann.opacity !== undefined ? ann.opacity : 1) * 100)}%</span>
+          </div>
+          <input type="range" class="w-full range-sm" id="opt-selected-opacity" min="0.1" max="1" step="0.05" value="${ann.opacity !== undefined ? ann.opacity : 1}" />
         </div>
       `;
     } else if (type === 'shape') {
@@ -93,6 +129,81 @@ export class SelectedAnnotationInspector {
       };
     }
 
+    const fontInp = panel.bodyEl.querySelector('#opt-selected-font');
+    if (fontInp) {
+      fontInp.onchange = (e) => {
+        const val = e.target.value;
+        store.updateAnnotation(pageNum, ann.id, { fontId: val, fontFamily: val });
+      };
+    }
+
+    const boldBtn = panel.bodyEl.querySelector('#opt-text-bold');
+    if (boldBtn) {
+      boldBtn.onclick = () => {
+        const next = !ann.bold;
+        ann.bold = next;
+        store.updateAnnotation(pageNum, ann.id, { bold: next });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
+    const italicBtn = panel.bodyEl.querySelector('#opt-text-italic');
+    if (italicBtn) {
+      italicBtn.onclick = () => {
+        const next = !ann.italic;
+        ann.italic = next;
+        store.updateAnnotation(pageNum, ann.id, { italic: next });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
+    const underlineBtn = panel.bodyEl.querySelector('#opt-text-underline');
+    if (underlineBtn) {
+      underlineBtn.onclick = () => {
+        const next = !ann.underline;
+        ann.underline = next;
+        store.updateAnnotation(pageNum, ann.id, { underline: next });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
+    const strikeBtn = panel.bodyEl.querySelector('#opt-text-strike');
+    if (strikeBtn) {
+      strikeBtn.onclick = () => {
+        const next = !ann.strikethrough;
+        ann.strikethrough = next;
+        store.updateAnnotation(pageNum, ann.id, { strikethrough: next });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
+    const alignLeftBtn = panel.bodyEl.querySelector('#opt-text-align-left');
+    if (alignLeftBtn) {
+      alignLeftBtn.onclick = () => {
+        ann.align = 'left';
+        store.updateAnnotation(pageNum, ann.id, { align: 'left' });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
+    const alignCenterBtn = panel.bodyEl.querySelector('#opt-text-align-center');
+    if (alignCenterBtn) {
+      alignCenterBtn.onclick = () => {
+        ann.align = 'center';
+        store.updateAnnotation(pageNum, ann.id, { align: 'center' });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
+    const alignRightBtn = panel.bodyEl.querySelector('#opt-text-align-right');
+    if (alignRightBtn) {
+      alignRightBtn.onclick = () => {
+        ann.align = 'right';
+        store.updateAnnotation(pageNum, ann.id, { align: 'right' });
+        SelectedAnnotationInspector.render(panel);
+      };
+    }
+
     const sizeInp = panel.bodyEl.querySelector('#opt-selected-size');
     if (sizeInp) {
       sizeInp.onchange = (e) => {
@@ -104,6 +215,23 @@ export class SelectedAnnotationInspector {
     if (colorInp) {
       colorInp.oninput = (e) => {
         store.updateAnnotation(pageNum, ann.id, { color: e.target.value });
+      };
+    }
+
+    const highlightInp = panel.bodyEl.querySelector('#opt-selected-highlight');
+    if (highlightInp) {
+      highlightInp.oninput = (e) => {
+        store.updateAnnotation(pageNum, ann.id, { bgColor: e.target.value });
+      };
+    }
+
+    const opacityInp = panel.bodyEl.querySelector('#opt-selected-opacity');
+    const opacityVal = panel.bodyEl.querySelector('#opt-selected-opacity-val');
+    if (opacityInp) {
+      opacityInp.oninput = (e) => {
+        const val = parseFloat(e.target.value);
+        if (opacityVal) opacityVal.textContent = `${Math.round(val * 100)}%`;
+        store.updateAnnotation(pageNum, ann.id, { opacity: val });
       };
     }
 

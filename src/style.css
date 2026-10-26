@@ -633,6 +633,48 @@ body {
   font-weight: 500;
 }
 
+.btn-icon-toggle {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-icon-toggle:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-main);
+}
+
+.btn-icon-toggle.active {
+  background: #3b82f6;
+  color: #ffffff !important;
+  border-color: #2563eb;
+  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .btn-icon-toggle:hover,
+body.dark-mode .btn-icon-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .btn-icon-toggle.active,
+body.dark-mode .btn-icon-toggle.active {
+  background: #2563eb;
+  color: #ffffff !important;
+  border-color: #3b82f6;
+}
+
 .select-sm, .input-sm {
   padding: 4px 8px;
   font-size: 13px;
@@ -974,6 +1016,164 @@ body:not(.sidebar-open) .app-sidebar {
 
 .annot-link-badge:hover {
   background: #30050d;
+}
+
+/* Adobe Acrobat & Smallpdf Style Sticky Note & Comments */
+.annot-note-container {
+  overflow: visible !important;
+  cursor: grab;
+  z-index: 14;
+}
+
+.note-pin-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px 8px 8px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.note-pin-badge:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.note-floating-card {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  width: 240px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  padding: 10px;
+  z-index: 30;
+}
+
+[data-theme="dark"] .note-floating-card {
+  background: #222222;
+  border-color: #383838;
+  color: #f1f5f9;
+}
+
+.note-floating-card.open {
+  display: flex;
+  animation: noteCardPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes noteCardPop {
+  0% { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.note-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 3px solid #f59e0b;
+  padding-left: 8px;
+  margin-bottom: 8px;
+}
+
+.note-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.note-author-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+[data-theme="dark"] .note-author-name {
+  color: #f8fafc;
+}
+
+.note-timestamp {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.note-card-close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.note-card-close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1e293b;
+}
+
+[data-theme="dark"] .note-card-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 68px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease;
+}
+
+[data-theme="dark"] .note-textarea {
+  background: #181818;
+  border-color: #333333;
+  color: #e2e8f0;
+}
+
+.note-textarea:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
+.note-palette {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.note-palette-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.note-palette-dot:hover {
+  transform: scale(1.2);
+}
+
+.note-palette-dot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1.5px #1e293b;
 }
 
 .form-field-select {
@@ -5672,6 +5872,13 @@ body.show-tool-workflow .editor-paging-bar {
   color: #ffffff;
 }
 
+.bubble-btn.active {
+  background: #3b82f6;
+  color: #ffffff;
+  font-weight: bold;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
 .bubble-btn-step {
   font-size: 13px;
   font-weight: 700;
@@ -5698,6 +5905,25 @@ body.show-tool-workflow .editor-paging-bar {
   cursor: pointer;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s ease;
+}
+
+.bubble-font-select {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  max-width: 110px;
+  outline: none;
+  cursor: pointer;
+}
+
+.bubble-font-select option,
+.bubble-font-select optgroup {
+  background: #1e293b;
+  color: #f8fafc;
 }
 
 .bubble-color-dot:hover {

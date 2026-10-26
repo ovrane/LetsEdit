@@ -15,15 +15,25 @@ import {
   Wrench,
   RefreshCw,
   Search,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  StickyNote
 } from 'lucide-react';
 import { store } from '../../core/state-store.js';
 import { allToolsModal } from '../../components/all-tools-modal.js';
 import { extractImagesModal } from '../../components/extract-images-modal.js';
+import { FONT_CATALOG, getCssFontFamily } from '../../core/font-registry.js';
 
 const PRIMARY_TOOLS = [
   { id: 'select', label: 'Select', icon: MousePointer },
   { id: 'text', label: 'Text', icon: Type },
+  { id: 'note', label: 'Note', icon: StickyNote },
   { id: 'link', label: 'Link', icon: LinkIcon },
   { id: 'draw', label: 'Draw', icon: PenLine },
   { id: 'highlight', label: 'Highlight', icon: Highlighter },
@@ -38,18 +48,155 @@ const PRIMARY_TOOLS = [
 export function CanvaToolbar({ onAction }) {
   const [activeTool, setActiveTool] = useState('select');
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [fontFamily, setFontFamily] = useState('Helvetica');
+  const [fontSize, setFontSize] = useState(16);
+  const [color, setColor] = useState('#000000');
+  const [bold, setBold] = useState(false);
+  const [italic, setItalic] = useState(false);
+  const [underline, setUnderline] = useState(false);
+  const [strikethrough, setStrikethrough] = useState(false);
+  const [align, setAlign] = useState('left');
+  const [bgColor, setBgColor] = useState('transparent');
 
   useEffect(() => {
     const unsub = store.subscribe((state) => {
       if (state.activeTool) setActiveTool(state.activeTool);
+      if (state.activeFontFamily) setFontFamily(state.activeFontFamily);
+      if (state.activeFontSize) setFontSize(state.activeFontSize);
+      if (state.activeColor) setColor(state.activeColor);
+      if (state.activeBold !== undefined) setBold(state.activeBold);
+      if (state.activeItalic !== undefined) setItalic(state.activeItalic);
+      if (state.activeUnderline !== undefined) setUnderline(state.activeUnderline);
+      if (state.activeStrikethrough !== undefined) setStrikethrough(state.activeStrikethrough);
+      if (state.activeTextAlign) setAlign(state.activeTextAlign);
+      if (state.activeTextBgColor) setBgColor(state.activeTextBgColor);
     });
-    return () => unsub();
+
+    const onAnnotSelected = (e) => {
+      const { ann } = e.detail || {};
+      if (ann && ann.type === 'text') {
+        if (ann.fontId || ann.fontFamily) setFontFamily(ann.fontId || ann.fontFamily);
+        if (ann.fontSize) setFontSize(ann.fontSize);
+        if (ann.color) setColor(ann.color);
+        setBold(!!ann.bold);
+        setItalic(!!ann.italic);
+        setUnderline(!!ann.underline);
+        setStrikethrough(!!ann.strikethrough);
+        if (ann.align) setAlign(ann.align);
+        if (ann.bgColor) setBgColor(ann.bgColor);
+      }
+    };
+    window.addEventListener('letsedit:annotation-selected', onAnnotSelected);
+
+    return () => {
+      unsub();
+      window.removeEventListener('letsedit:annotation-selected', onAnnotSelected);
+    };
   }, []);
 
   const handleSelectTool = (toolId) => {
+    if (toolId === 'signature') {
+      allToolsModal.dispatchToolAction('tool:sign');
+      return;
+    }
+    if (toolId === 'stamp') {
+      allToolsModal.dispatchToolAction('tool:image');
+      return;
+    }
+    const internalTool = toolId === 'redact' ? 'whiteout' : toolId;
     setActiveTool(toolId);
-    store.setActiveTool(toolId);
+    store.setActiveTool(internalTool);
     setOpenDropdown(null);
+  };
+
+  const handleFontChange = (e) => {
+    const val = e.target.value;
+    setFontFamily(val);
+    store.getState().activeFontFamily = val;
+    store.getState().activeFontId = val;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { fontId: val, fontFamily: val });
+    }
+  };
+
+  const handleSizeChange = (e) => {
+    const val = parseInt(e.target.value, 10);
+    setFontSize(val);
+    store.getState().activeFontSize = val;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { fontSize: val });
+    }
+  };
+
+  const handleColorChange = (e) => {
+    const val = e.target.value;
+    setColor(val);
+    store.getState().activeColor = val;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { color: val });
+    }
+  };
+
+  const handleToggleBold = () => {
+    const next = !bold;
+    setBold(next);
+    store.getState().activeBold = next;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { bold: next });
+    }
+  };
+
+  const handleToggleItalic = () => {
+    const next = !italic;
+    setItalic(next);
+    store.getState().activeItalic = next;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { italic: next });
+    }
+  };
+
+  const handleToggleUnderline = () => {
+    const next = !underline;
+    setUnderline(next);
+    store.getState().activeUnderline = next;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { underline: next });
+    }
+  };
+
+  const handleToggleStrikethrough = () => {
+    const next = !strikethrough;
+    setStrikethrough(next);
+    store.getState().activeStrikethrough = next;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { strikethrough: next });
+    }
+  };
+
+  const handleSetAlign = (val) => {
+    setAlign(val);
+    store.getState().activeTextAlign = val;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { align: val });
+    }
+  };
+
+  const handleBgColorChange = (e) => {
+    const val = e.target.value;
+    setBgColor(val);
+    store.getState().activeTextBgColor = val;
+    const selected = store.getState().selectedAnnotation;
+    if (selected && selected.ann && selected.ann.type === 'text') {
+      store.updateAnnotation(selected.pageNum, selected.ann.id, { bgColor: val });
+    }
   };
 
   const toggleDropdown = (name) => {
@@ -84,6 +231,117 @@ export function CanvaToolbar({ onAction }) {
           </button>
         ))}
       </div>
+
+      {/* Dynamic Font & Text Properties Bar */}
+      {activeTool === 'text' && (
+        <div className="flex items-center flex-wrap gap-1.5 px-2 py-1 bg-slate-50 dark:bg-[#1a1a1a] rounded-lg border border-slate-200 dark:border-neutral-800 text-xs">
+          <label className="text-slate-500 font-medium">Font:</label>
+          <select
+            value={fontFamily}
+            onChange={handleFontChange}
+            className="bg-white dark:bg-[#282828] border border-slate-300 dark:border-neutral-700 rounded px-2 py-1 text-xs font-medium max-w-[130px] truncate"
+            title="Choose from 150+ fonts"
+          >
+            {FONT_CATALOG.map(f => (
+              <option key={f.id} value={f.id} style={{ fontFamily: getCssFontFamily(f.id) }}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+
+          <label className="text-slate-500 font-medium ml-1">Size:</label>
+          <select
+            value={fontSize}
+            onChange={handleSizeChange}
+            className="bg-white dark:bg-[#282828] border border-slate-300 dark:border-neutral-700 rounded px-1.5 py-1 text-xs font-medium"
+          >
+            {[10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64].map(s => (
+              <option key={s} value={s}>{s} px</option>
+            ))}
+          </select>
+
+          <div className="h-4 w-px bg-slate-200 dark:bg-neutral-700 mx-1"></div>
+
+          {/* Bold, Italic, Underline, Strikethrough Buttons */}
+          <div className="flex items-center gap-0.5 bg-slate-200/60 dark:bg-[#262626] p-0.5 rounded">
+            <button
+              onClick={handleToggleBold}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs font-bold transition ${bold ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Bold (Ctrl+B)"
+            >
+              <Bold className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleToggleItalic}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs italic transition ${italic ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Italic (Ctrl+I)"
+            >
+              <Italic className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleToggleUnderline}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs underline transition ${underline ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Underline (Ctrl+U)"
+            >
+              <Underline className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleToggleStrikethrough}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs line-through transition ${strikethrough ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Strikethrough"
+            >
+              <Strikethrough className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="h-4 w-px bg-slate-200 dark:bg-neutral-700 mx-1"></div>
+
+          {/* Text Alignment */}
+          <div className="flex items-center gap-0.5 bg-slate-200/60 dark:bg-[#262626] p-0.5 rounded">
+            <button
+              onClick={() => handleSetAlign('left')}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs transition ${align === 'left' ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Align Left"
+            >
+              <AlignLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => handleSetAlign('center')}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs transition ${align === 'center' ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Align Center"
+            >
+              <AlignCenter className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => handleSetAlign('right')}
+              className={`w-6 h-6 flex items-center justify-center rounded text-xs transition ${align === 'right' ? 'bg-[#30050d] text-white shadow-xs' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/60 dark:hover:bg-[#333]'}`}
+              title="Align Right"
+            >
+              <AlignRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="h-4 w-px bg-slate-200 dark:bg-neutral-700 mx-1"></div>
+
+          <label className="text-slate-500 font-medium ml-1">Color:</label>
+          <input
+            type="color"
+            value={color}
+            onChange={handleColorChange}
+            className="w-5 h-5 rounded cursor-pointer border-0 p-0"
+            title="Text Color"
+          />
+
+          <label className="text-slate-500 font-medium ml-1">Highlight:</label>
+          <input
+            type="color"
+            value={bgColor === 'transparent' ? '#ffffff' : bgColor}
+            onChange={handleBgColorChange}
+            className="w-5 h-5 rounded cursor-pointer border-0 p-0"
+            title="Highlight / Background Color"
+          />
+        </div>
+      )}
 
       {/* Category Dropdowns */}
       <div className="flex items-center gap-1.5">

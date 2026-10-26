@@ -9,6 +9,7 @@ import { uid } from '../../utils/helpers.js';
 import { Toast } from '../../components/toast.js';
 import { EraserHandler } from './eraser.js';
 import { TextClustering } from './text-clustering.js';
+import { getCssFontFamily, detectFontIdFromPdf } from '../font-registry.js';
 
 export class CanvasEventsHandler {
   static bindPageEvents(manager, pageNum, wrap, annotCanvas) {
@@ -43,7 +44,7 @@ export class CanvasEventsHandler {
         if (e.cancelable) e.preventDefault();
         manager.isDrawing = true;
         drawingPoints = [{ x: pos.normX, y: pos.normY }];
-      } else if (state.activeTool === 'whiteout') {
+      } else if (state.activeTool === 'whiteout' || state.activeTool === 'redact') {
         if (e.cancelable) e.preventDefault();
         CanvasEventsHandler.startBoxDrawing(pageNum, 'whiteout', pos, wrap);
       } else if (state.activeTool === 'shape') {
@@ -54,6 +55,8 @@ export class CanvasEventsHandler {
         CanvasEventsHandler.startBoxDrawing(pageNum, 'link', pos, wrap);
       } else if (state.activeTool === 'text') {
         CanvasEventsHandler.promptNewText(pageNum, pos, wrap);
+      } else if (state.activeTool === 'note' || state.activeTool === 'comment') {
+        CanvasEventsHandler.addStickyNote(pageNum, pos, wrap);
       }
     };
 
@@ -128,11 +131,28 @@ export class CanvasEventsHandler {
     input.type = 'text';
     input.className = 'inline-text-editor new-text-editor';
     input.placeholder = 'Type text here...';
+    const activeFontId = state.activeFontId || state.activeFontFamily || 'Helvetica';
+    const isBold = !!(state.activeBold || state.activeFontBold);
+    const isItalic = !!(state.activeFontItalic || state.activeItalic);
+    const isUnderline = !!state.activeUnderline;
+    const isStrike = !!state.activeStrikethrough;
+    const textAlign = state.activeTextAlign || 'left';
+    const textBg = state.activeTextBgColor || 'transparent';
+    const opacity = state.activeOpacity !== undefined ? state.activeOpacity : 1;
+
     input.style.left = `${pos.px}px`;
     input.style.top = `${pos.py}px`;
     input.style.fontSize = `${state.activeFontSize || 16}px`;
     input.style.color = state.activeColor || '#000000';
-    input.style.fontFamily = state.activeFontFamily || 'Helvetica';
+    input.style.fontFamily = getCssFontFamily(activeFontId);
+    input.style.fontWeight = isBold ? 'bold' : 'normal';
+    input.style.fontStyle = isItalic ? 'italic' : 'normal';
+    if (isUnderline && isStrike) input.style.textDecoration = 'underline line-through';
+    else if (isUnderline) input.style.textDecoration = 'underline';
+    else if (isStrike) input.style.textDecoration = 'line-through';
+    input.style.textAlign = textAlign;
+    if (textBg && textBg !== 'transparent') input.style.backgroundColor = textBg;
+    input.style.opacity = opacity;
 
     const commit = () => {
       const text = input.value.trim();
@@ -147,8 +167,16 @@ export class CanvasEventsHandler {
           width: Math.min(0.4, (text.length * 10) / w),
           height: 30 / h,
           fontSize: state.activeFontSize || 16,
-          fontFamily: state.activeFontFamily || 'Helvetica',
+          fontId: activeFontId,
+          fontFamily: activeFontId,
           color: state.activeColor || '#000000',
+          bold: isBold,
+          italic: isItalic,
+          underline: isUnderline,
+          strikethrough: isStrike,
+          align: textAlign,
+          bgColor: textBg,
+          opacity: opacity,
           hasUnderlay: false
         });
       }
@@ -162,6 +190,27 @@ export class CanvasEventsHandler {
 
     wrap.querySelector('.pdf-dom-layer').appendChild(input);
     input.focus();
+  }
+
+  static addStickyNote(pageNum, pos, wrap) {
+    const state = store.getState();
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
+    const noteId = uid('note');
+    const noteAnn = {
+      id: noteId,
+      type: 'note',
+      text: 'Write your comment here...',
+      author: 'User',
+      date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      x: pos.normX,
+      y: pos.normY,
+      width: Math.max(0.04, 30 / w),
+      height: Math.max(0.035, 30 / h),
+      color: state.activeColor && state.activeColor !== '#000000' ? state.activeColor : '#f59e0b',
+      isOpen: true
+    };
+    store.addAnnotation(pageNum, noteAnn);
   }
 
   static startBoxDrawing(pageNum, toolType, startPos, wrap) {
@@ -267,6 +316,10 @@ export class CanvasEventsHandler {
     const wrapW = refs.wrap.clientWidth;
     const wrapH = refs.wrap.clientHeight;
 
+    // Use the fontId resolved from FontRegistry during text clustering
+    const clusterFontId = cluster.fontId || detectFontIdFromPdf(cluster.fontName);
+    const cssFontFamily = getCssFontFamily(clusterFontId);
+
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'inline-text-editor';
@@ -276,7 +329,8 @@ export class CanvasEventsHandler {
     input.style.width = `${Math.max(cluster.width + 16, 90)}px`;
     input.style.height = `${cluster.height + 6}px`;
     input.style.fontSize = `${cluster.fontSize}px`;
-    input.style.fontFamily = TextClustering.getCssFontFamily(cluster.fontName);
+    // Show the Google Font (or closest match) for pixel-perfect editing fidelity
+    input.style.fontFamily = cssFontFamily;
     if (cluster.isBold) input.style.fontWeight = 'bold';
 
     const updateInputWidth = () => {
@@ -306,10 +360,13 @@ export class CanvasEventsHandler {
           width: (finalW + 14) / wrapW,
           height: (cluster.height + 6) / wrapH,
           fontSize: cluster.fontSize,
-          fontFamily: TextClustering.detectFontFamily(cluster.fontName),
+          // Preserve both fontId (for export) and fontFamily (legacy compat)
+          fontId: clusterFontId,
+          fontFamily: clusterFontId,
           bold: cluster.isBold,
           color: '#000000',
-          hasUnderlay: true
+          hasUnderlay: true,
+          replacedText: cluster.str
         });
       } else {
         span.style.visibility = 'visible';
@@ -324,6 +381,69 @@ export class CanvasEventsHandler {
         isCommitted = true;
         input.remove();
         span.style.visibility = 'visible';
+      }
+    });
+
+    refs.domLayer.appendChild(input);
+    input.focus();
+    input.select();
+  }
+
+  /**
+   * Turns an existing text annotation back into an active inline editor on double click.
+   */
+  static makeExistingAnnotationEditable(manager, pageNum, ann, el) {
+    const refs = manager.pageElements.get(pageNum);
+    if (!refs) return;
+
+    el.style.visibility = 'hidden';
+
+    const fontId = ann.fontId || ann.fontFamily || 'Helvetica';
+    const cssFont = getCssFontFamily(fontId);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'inline-text-editor';
+    input.value = ann.text || '';
+    input.style.left = `${el.offsetLeft}px`;
+    input.style.top = `${el.offsetTop}px`;
+    input.style.width = `${Math.max(el.offsetWidth + 16, 90)}px`;
+    input.style.height = `${Math.max(el.offsetHeight + 4, 26)}px`;
+    input.style.fontSize = `${ann.fontSize || 16}px`;
+    input.style.fontFamily = cssFont;
+    if (ann.bold) input.style.fontWeight = 'bold';
+    if (ann.italic) input.style.fontStyle = 'italic';
+    input.style.color = ann.color || '#000000';
+
+    const updateWidth = () => {
+      const charW = (ann.fontSize || 16) * 0.62;
+      input.style.width = `${Math.max(el.offsetWidth + 16, (input.value.length * charW) + 28)}px`;
+    };
+    input.addEventListener('input', updateWidth);
+
+    let committed = false;
+    const commit = () => {
+      if (committed) return;
+      committed = true;
+      const newText = input.value;
+      input.remove();
+      if (newText && newText !== ann.text) {
+        const charW = (ann.fontSize || 16) * 0.62;
+        const newW = Math.max(el.offsetWidth, newText.length * charW) / (refs.wrap.clientWidth || 1);
+        store.updateAnnotation(pageNum, ann.id, { text: newText, width: newW });
+      } else {
+        el.style.visibility = 'visible';
+      }
+    };
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        input.blur();
+      } else if (e.key === 'Escape') {
+        committed = true;
+        input.remove();
+        el.style.visibility = 'visible';
       }
     });
 

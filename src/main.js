@@ -41,6 +41,7 @@ import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 import { pwaManager } from './core/pwa-manager.js';
 import { legalModal } from './components/legal-modal.js';
+import { populateFontSelect, loadAllEditorFonts } from './core/font-registry.js';
 
 class App {
   constructor() {
@@ -530,10 +531,42 @@ class App {
       };
     }
 
+    // Initialize 150+ font catalog and preload Google Fonts
+    const fontFamilySel = document.getElementById('prop-font-family');
+    if (fontFamilySel) populateFontSelect(fontFamilySel, 'Helvetica');
+    loadAllEditorFonts();
+
+    const formatWrap = document.getElementById('prop-format-wrap');
+    const highlightWrap = document.getElementById('prop-highlight-wrap');
+    const btnBold = document.getElementById('prop-btn-bold');
+    const btnItalic = document.getElementById('prop-btn-italic');
+    const btnUnderline = document.getElementById('prop-btn-underline');
+    const btnStrike = document.getElementById('prop-btn-strike');
+    const btnAlignLeft = document.getElementById('prop-btn-align-left');
+    const btnAlignCenter = document.getElementById('prop-btn-align-center');
+    const btnAlignRight = document.getElementById('prop-btn-align-right');
+    const highlightInp = document.getElementById('prop-highlight-color');
+
+    // Adjust properties bar based on tool
+    const syncToolbarProperties = (tool) => {
+      colorWrap.style.display = ['text', 'draw', 'highlight', 'shape', 'note'].includes(tool) ? 'flex' : 'none';
+      fontSizeWrap.style.display = tool === 'text' ? 'flex' : 'none';
+      fontFamilyWrap.style.display = tool === 'text' ? 'flex' : 'none';
+      if (formatWrap) formatWrap.style.display = tool === 'text' ? 'flex' : 'none';
+      if (highlightWrap) highlightWrap.style.display = tool === 'text' ? 'flex' : 'none';
+      strokeWidthWrap.style.display = ['draw', 'highlight', 'shape'].includes(tool) ? 'flex' : 'none';
+      shapeTypeWrap.style.display = tool === 'shape' ? 'flex' : 'none';
+      formTypeWrap.style.display = tool === 'form' ? 'flex' : 'none';
+      replaceWrap.style.display = tool === 'replace' ? 'flex' : 'none';
+    };
+
     toolBtns.forEach(btn => {
       btn.onclick = () => {
-        const tool = btn.dataset.tool;
+        let tool = btn.dataset.tool;
         if (!tool) return;
+        if (tool === 'redact') tool = 'whiteout';
+        if (tool === 'signature') tool = 'sign';
+        if (tool === 'stamp') tool = 'image';
 
         if (tool === 'sign') {
           this.signatureTool.open();
@@ -553,42 +586,185 @@ class App {
         toolOptionsPanel.render();
         toolOptionsPanel.toggle(true);
 
-        // Adjust properties bar based on tool
-        colorWrap.style.display = ['text', 'draw', 'highlight', 'shape'].includes(tool) ? 'flex' : 'none';
-        fontSizeWrap.style.display = tool === 'text' ? 'flex' : 'none';
-        fontFamilyWrap.style.display = tool === 'text' ? 'flex' : 'none';
-        strokeWidthWrap.style.display = ['draw', 'highlight', 'shape'].includes(tool) ? 'flex' : 'none';
-        shapeTypeWrap.style.display = tool === 'shape' ? 'flex' : 'none';
-        formTypeWrap.style.display = tool === 'form' ? 'flex' : 'none';
-        replaceWrap.style.display = tool === 'replace' ? 'flex' : 'none';
+        syncToolbarProperties(tool);
       };
     });
 
-    // Inspector inputs
-    const colorInp = document.getElementById('prop-color');
-    colorInp.oninput = (e) => {
-      store.getState().activeColor = e.target.value;
+    // Format buttons (Bold, Italic, Underline, Strike, Align, Highlight)
+    if (btnBold) {
+      btnBold.onclick = () => {
+        const next = !store.getState().activeBold;
+        store.getState().activeBold = next;
+        btnBold.classList.toggle('active', next);
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { bold: next });
+        }
+      };
+    }
+
+    if (btnItalic) {
+      btnItalic.onclick = () => {
+        const next = !store.getState().activeItalic;
+        store.getState().activeItalic = next;
+        btnItalic.classList.toggle('active', next);
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { italic: next });
+        }
+      };
+    }
+
+    if (btnUnderline) {
+      btnUnderline.onclick = () => {
+        const next = !store.getState().activeUnderline;
+        store.getState().activeUnderline = next;
+        btnUnderline.classList.toggle('active', next);
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { underline: next });
+        }
+      };
+    }
+
+    if (btnStrike) {
+      btnStrike.onclick = () => {
+        const next = !store.getState().activeStrikethrough;
+        store.getState().activeStrikethrough = next;
+        btnStrike.classList.toggle('active', next);
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { strikethrough: next });
+        }
+      };
+    }
+
+    const setAlignment = (align) => {
+      store.getState().activeTextAlign = align;
+      if (btnAlignLeft) btnAlignLeft.classList.toggle('active', align === 'left');
+      if (btnAlignCenter) btnAlignCenter.classList.toggle('active', align === 'center');
+      if (btnAlignRight) btnAlignRight.classList.toggle('active', align === 'right');
+      if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+        const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+        if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { align });
+      }
     };
+
+    if (btnAlignLeft) btnAlignLeft.onclick = () => setAlignment('left');
+    if (btnAlignCenter) btnAlignCenter.onclick = () => setAlignment('center');
+    if (btnAlignRight) btnAlignRight.onclick = () => setAlignment('right');
+
+    if (highlightInp) {
+      highlightInp.oninput = (e) => {
+        const val = e.target.value;
+        store.getState().activeTextBgColor = val;
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { bgColor: val });
+        }
+      };
+    }
+
+    // Keyboard Shortcuts (Ctrl+B / Ctrl+I / Ctrl+U)
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+        const key = e.key.toLowerCase();
+        if (key === 'b') {
+          e.preventDefault();
+          if (btnBold) btnBold.click();
+        } else if (key === 'i') {
+          e.preventDefault();
+          if (btnItalic) btnItalic.click();
+        } else if (key === 'u') {
+          e.preventDefault();
+          if (btnUnderline) btnUnderline.click();
+        }
+      }
+    });
+
+    // Inspector inputs & bidirectional sync with selected annotations
+    const colorInp = document.getElementById('prop-color');
+    if (colorInp) {
+      colorInp.oninput = (e) => {
+        const val = e.target.value;
+        store.getState().activeColor = val;
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { color: val });
+          else if (ann.type === 'shape') store.updateAnnotation(pageNum, ann.id, { strokeColor: val });
+        }
+      };
+    }
 
     const fontSizeSel = document.getElementById('prop-font-size');
-    fontSizeSel.onchange = (e) => {
-      store.getState().activeFontSize = parseInt(e.target.value, 10);
-    };
+    if (fontSizeSel) {
+      fontSizeSel.onchange = (e) => {
+        const val = parseInt(e.target.value, 10);
+        store.getState().activeFontSize = val;
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { fontSize: val });
+        }
+      };
+    }
 
-    const fontFamilySel = document.getElementById('prop-font-family');
-    fontFamilySel.onchange = (e) => {
-      store.getState().activeFontFamily = e.target.value;
-    };
+    if (fontFamilySel) {
+      fontFamilySel.onchange = (e) => {
+        const val = e.target.value;
+        store.getState().activeFontFamily = val;
+        store.getState().activeFontId = val;
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'text') store.updateAnnotation(pageNum, ann.id, { fontId: val, fontFamily: val });
+        }
+      };
+    }
 
     const strokeWidthSel = document.getElementById('prop-stroke-width');
-    strokeWidthSel.onchange = (e) => {
-      store.getState().activeStrokeWidth = parseInt(e.target.value, 10);
-    };
+    if (strokeWidthSel) {
+      strokeWidthSel.onchange = (e) => {
+        const val = parseInt(e.target.value, 10);
+        store.getState().activeStrokeWidth = val;
+        if (this.canvasManager && this.canvasManager.selectedAnnotation) {
+          const { pageNum, ann } = this.canvasManager.selectedAnnotation;
+          if (ann.type === 'shape') store.updateAnnotation(pageNum, ann.id, { strokeWidth: val });
+        }
+      };
+    }
 
     const shapeTypeSel = document.getElementById('prop-shape-type');
-    shapeTypeSel.onchange = (e) => {
-      store.getState().subTool = e.target.value;
-    };
+    if (shapeTypeSel) {
+      shapeTypeSel.onchange = (e) => {
+        store.getState().subTool = e.target.value;
+      };
+    }
+
+    // Bidirectional event listeners for selection in workspace
+    window.addEventListener('letsedit:annotation-selected', (e) => {
+      const { ann } = e.detail || {};
+      if (!ann) return;
+      if (ann.type === 'text') {
+        colorWrap.style.display = 'flex';
+        fontSizeWrap.style.display = 'flex';
+        fontFamilyWrap.style.display = 'flex';
+        if (fontFamilySel) fontFamilySel.value = ann.fontId || ann.fontFamily || 'Helvetica';
+        if (fontSizeSel) fontSizeSel.value = String(ann.fontSize || 16);
+        if (colorInp) colorInp.value = ann.color || '#000000';
+      } else if (ann.type === 'shape') {
+        colorWrap.style.display = 'flex';
+        strokeWidthWrap.style.display = 'flex';
+        if (colorInp) colorInp.value = ann.strokeColor || '#000000';
+        if (strokeWidthSel) strokeWidthSel.value = String(ann.strokeWidth || 2);
+      }
+    });
+
+    window.addEventListener('letsedit:annotation-deselected', () => {
+      const curTool = store.getState().activeTool || 'select';
+      colorWrap.style.display = ['text', 'draw', 'highlight', 'shape'].includes(curTool) ? 'flex' : 'none';
+      fontSizeWrap.style.display = curTool === 'text' ? 'flex' : 'none';
+      fontFamilyWrap.style.display = curTool === 'text' ? 'flex' : 'none';
+      strokeWidthWrap.style.display = ['draw', 'highlight', 'shape'].includes(curTool) ? 'flex' : 'none';
+    });
 
     // Form button triggers
     document.getElementById('btn-add-form-text').onclick = () => FormTool.addField('text');

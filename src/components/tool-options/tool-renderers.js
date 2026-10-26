@@ -9,6 +9,7 @@ import { Toast } from '../toast.js';
 import { uid } from '../../utils/helpers.js';
 import { searchReplace } from '../../tools/search-replace.js';
 import { FormTool } from '../../tools/form-tool.js';
+import { generateFontOptionsHtml } from '../../core/font-registry.js';
 
 export class ToolRenderers {
   static renderTool(panel, tool) {
@@ -21,12 +22,7 @@ export class ToolRenderers {
           <div class="opt-group">
             <label class="opt-label">Font Family</label>
             <select class="select-sm w-full" id="opt-text-font">
-              <option value="Helvetica" ${state.activeFontFamily === 'Helvetica' ? 'selected' : ''}>Helvetica / Arial</option>
-              <option value="TimesRoman" ${state.activeFontFamily === 'TimesRoman' ? 'selected' : ''}>Times New Roman</option>
-              <option value="Courier" ${state.activeFontFamily === 'Courier' ? 'selected' : ''}>Courier Monospace</option>
-              <option value="Roboto" ${state.activeFontFamily === 'Roboto' ? 'selected' : ''}>Roboto</option>
-              <option value="Montserrat" ${state.activeFontFamily === 'Montserrat' ? 'selected' : ''}>Montserrat</option>
-              <option value="Caveat" ${state.activeFontFamily === 'Caveat' ? 'selected' : ''}>Caveat (Signature)</option>
+              ${generateFontOptionsHtml(state.activeFontFamily || state.activeFontId || 'Helvetica')}
             </select>
           </div>
 
@@ -466,6 +462,7 @@ export class ToolRenderers {
     if (fontSel) {
       fontSel.onchange = (e) => {
         store.getState().activeFontFamily = e.target.value;
+        store.getState().activeFontId = e.target.value;
       };
     }
 

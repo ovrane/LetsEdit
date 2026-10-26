@@ -17,6 +17,7 @@ import { AnnotationRenderer } from './canvas/annotation-renderer.js';
 import { CanvasEventsHandler } from './canvas/canvas-events.js';
 import { TextClustering } from './canvas/text-clustering.js';
 import { FloatingBubbleBar } from './canvas/bubble-toolbar.js';
+import { loadAllEditorFonts, getCssFontFamily } from './font-registry.js';
 
 export class CanvasManager {
   constructor(container) {
@@ -31,6 +32,9 @@ export class CanvasManager {
     this.renderedPages = new Set();
     this.pageObserver = null;
     this.currentPageNumber = 1;
+
+    // Load all 150+ Google Fonts into document head for pixel-perfect editing fidelity
+    loadAllEditorFonts();
 
     this.bindGlobalEvents();
   }
@@ -226,12 +230,15 @@ export class CanvasManager {
       span.style.width = `${cluster.width}px`;
       span.style.height = `${cluster.height}px`;
       span.style.fontSize = `${cluster.fontSize}px`;
-      span.style.fontFamily = TextClustering.getCssFontFamily(cluster.fontName);
+      // Use FontRegistry for accurate CSS font matching
+      const clusterFontId = cluster.fontId || TextClustering.detectFontFamily(cluster.fontName);
+      span.style.fontFamily = getCssFontFamily(clusterFontId);
       if (cluster.isBold) span.style.fontWeight = 'bold';
 
       span.dataset.clusterId = cluster.id;
       span.dataset.originalText = cluster.str;
       span.dataset.fontName = cluster.fontName;
+      span.dataset.fontId = clusterFontId;
 
       // Hide if there is already an active annotation replacing this cluster
       if (activeReplacedIds.has(cluster.id)) {
@@ -311,6 +318,10 @@ export class CanvasManager {
 
   makeExistingTextEditable(span, pageNum, cluster) {
     CanvasEventsHandler.makeExistingTextEditable(this, span, pageNum, cluster);
+  }
+
+  makeExistingAnnotationEditable(pageNum, ann, el) {
+    CanvasEventsHandler.makeExistingAnnotationEditable(this, pageNum, ann, el);
   }
 
   renderAnnotations(pageNum) {
