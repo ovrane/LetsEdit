@@ -1,11 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="112" fill="#30050d"/>
-  <rect x="32" y="32" width="448" height="448" rx="80" stroke="rgba(255,255,255,0.12)" stroke-width="4"/>
-  <path d="M336 64H160a48 48 0 0 0-48 48v288a48 48 0 0 0 48 48h192a48 48 0 0 0 48-48V160z" fill="rgba(255,255,255,0.08)"/>
-  <path d="M336 64v96h96" fill="rgba(255,255,255,0.16)"/>
-  <path d="M336 64H160a48 48 0 0 0-48 48v288a48 48 0 0 0 48 48h192a48 48 0 0 0 48-48V160L336 64z" stroke="#ffffff" stroke-width="24" stroke-linejoin="round"/>
-  <polyline points="336 64 336 160 432 160" stroke="#ffffff" stroke-width="24" stroke-linejoin="round"/>
-  <!-- Vector pen nib / edit glyph -->
-  <path d="M236 324l72-72 32 32-72 72-40 8 8-40z" fill="#ffffff" stroke="#ffffff" stroke-width="8" stroke-linejoin="round"/>
-  <circle cx="216" cy="236" r="14" fill="#10b981"/>
+  <rect x="48" y="48" width="192" height="192" rx="60" fill="#EE404C"/>
+  <rect x="272" y="48" width="192" height="192" rx="60" fill="#00B4D8"/>
+  <rect x="48" y="272" width="192" height="192" rx="60" fill="#2F74EE"/>
+  <rect x="272" y="272" width="192" height="192" rx="60" fill="#F0A500"/>
 </svg>
