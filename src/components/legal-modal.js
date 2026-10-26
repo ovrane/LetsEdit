@@ -194,7 +194,7 @@ export class LegalModal {
           <h3>1. What Information We Collect</h3>
           <ul>
             <li><strong>Document Data:</strong> ZERO bytes collected or transmitted to our servers.</li>
-            <li><strong>Personal Information:</strong> If you choose to log in via Firebase Authentication (Google or Microsoft SSO), we receive only your public authentication token, verified email address, and display name to sync your user profile.</li>
+            <li><strong>Personal Information:</strong> If you choose to log in via Firebase Authentication (Google SSO), we receive only your public authentication token, verified email address, and display name to sync your user profile.</li>
             <li><strong>Telemetry:</strong> We do not track document contents, filenames, or reading habits. Anonymous error crash reports contain zero user document bytes.</li>
           </ul>
         </section>

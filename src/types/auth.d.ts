@@ -18,7 +18,7 @@ export interface UserSession {
   name: string;
   photoURL?: string | null;
   plan: UserPlan;
-  provider: 'password' | 'google.com' | 'microsoft.com' | 'saml.sso';
+  provider: 'password' | 'google.com' | 'saml.sso';
   teamMember?: boolean;
   requires2fa?: boolean;
   token?: string;

@@ -20,6 +20,7 @@ npm-debug.log*
 # IDE and editor
 .vscode/
 .idea/
+.firebase/
 
 # Operating system
 .DS_Store

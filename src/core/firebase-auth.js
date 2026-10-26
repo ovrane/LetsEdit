@@ -2,7 +2,7 @@
  * Firebase Authentication Integration Engine
  * Provides complete Firebase Auth integration for LetsEdit:
  * - Email & Password authentication (sign in & sign up)
- * - Google & Microsoft Azure AD / MSAL OAuth popup sign-in
+ * - Google OAuth popup sign-in
  * - Password reset dispatch
  * - Unified onAuthStateChanged synchronization with state-store
  * - Automatic local fallback emulator when Firebase project config is absent or offline,
@@ -16,7 +16,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  OAuthProvider,
   signOut,
   sendPasswordResetEmail,
   updateProfile,
@@ -212,11 +211,19 @@ class FirebaseAuthService {
       try {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
+        provider.addScope('profile');
+        provider.addScope('email');
         const cred = await signInWithPopup(this.auth, provider);
         const mapped = this._mapFirebaseUser(cred.user);
         this._persistMockSession(mapped);
         return mapped;
       } catch (err) {
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+          throw new Error('Sign-in popup was closed before completing verification.');
+        }
+        if (err.code === 'auth/popup-blocked') {
+          throw new Error('Sign-in popup was blocked by browser. Please enable popups for this site.');
+        }
         console.warn('Google popup error, using fallback:', err.message);
       }
     }
@@ -231,37 +238,6 @@ class FirebaseAuthService {
       requires2fa: false,
       token: 'fb_google_' + Math.random().toString(36).substring(2),
       provider: 'google.com',
-      apiKeys: []
-    };
-    this._persistMockSession(mockUser);
-    return mockUser;
-  }
-
-  /**
-   * Microsoft OAuth Sign In via Firebase
-   */
-  async signInWithMicrosoft() {
-    if (this.isConfigured && this.auth) {
-      try {
-        const provider = new OAuthProvider('microsoft.com');
-        const cred = await signInWithPopup(this.auth, provider);
-        const mapped = this._mapFirebaseUser(cred.user);
-        this._persistMockSession(mapped);
-        return mapped;
-      } catch (err) {
-        console.warn('Microsoft popup error, using fallback:', err.message);
-      }
-    }
-
-    // Local / Demo Fallback Mode
-    const mockUser = {
-      uid: 'msft_' + Math.random().toString(36).substring(2, 10),
-      email: 'alex.morgan@outlook.com',
-      name: 'Alex Morgan',
-      plan: 'Free Pro',
-      requires2fa: false,
-      token: 'fb_msft_' + Math.random().toString(36).substring(2),
-      provider: 'microsoft.com',
       apiKeys: []
     };
     this._persistMockSession(mockUser);

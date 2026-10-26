@@ -35,20 +35,13 @@ describe('Firebase Authentication Engine Tests', () => {
     assert.equal(currentUser.email, 'sarah.connor@example.com');
   });
 
-  test('signInWithGoogle completes OAuth flow', async () => {
+  test('signInWithGoogle completes OAuth flow and persists session', async () => {
     const user = await firebaseAuth.signInWithGoogle();
 
     assert.ok(user);
     assert.ok(user.email.includes('alex.morgan@gmail.com') || user.email.includes('google'));
-    assert.ok(user.provider.includes('google'));
-    assert.equal(store.getState().user?.email, user.email);
-  });
-
-  test('signInWithMicrosoft completes OAuth flow', async () => {
-    const user = await firebaseAuth.signInWithMicrosoft();
-
-    assert.ok(user);
-    assert.ok(user.email.includes('outlook.com') || user.provider.includes('microsoft'));
+    assert.equal(user.provider, 'google.com');
+    assert.ok(user.token.startsWith('fb_google_'));
     assert.equal(store.getState().user?.email, user.email);
   });
 

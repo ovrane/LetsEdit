@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "letsedit-pdf"
-  }
+    "default": "letsedit-pdf",
+    "  ": "lets-edit-inc"
+  },
+  "targets": {},
+  "etags": {}
 }
