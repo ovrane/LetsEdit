@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 reference/
+test-results/
 # Environment variables and secrets
 .env
 .env.local
@@ -31,3 +32,4 @@ todo.md
 *.swp
 rea.md
 plan.md
+bug.md

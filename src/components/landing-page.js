@@ -325,7 +325,7 @@ export class LandingPage {
         if (user) {
           authModal.toggleAccountMenu(landingAuthBtn);
         } else {
-          router.navigate('/login');
+          authModal.open('login');
         }
       };
     }

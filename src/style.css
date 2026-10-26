@@ -4932,13 +4932,13 @@ body.show-tool-workflow .tool-options-sidebar {
    ========================================================================== */
 
 .editor-upload-card {
-  max-width: 540px;
+  max-width: 560px;
   width: 100%;
-  margin: 36px auto;
+  margin: 40px auto;
   background: var(--bg-card);
-  border: 1px solid rgba(226, 232, 240, 0.85);
+  border: 2px dashed rgba(203, 213, 225, 0.95);
   border-radius: 24px;
-  padding: 38px 32px 30px 32px;
+  padding: 44px 36px 36px 36px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -4949,14 +4949,20 @@ body.show-tool-workflow .tool-options-sidebar {
 }
 
 [data-theme="dark"] .editor-upload-card {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 2px dashed rgba(255, 255, 255, 0.14);
   box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
+.editor-upload-card:hover {
+  border-color: rgba(48, 5, 13, 0.35);
+}
 
+[data-theme="dark"] .editor-upload-card:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+}
 
 .editor-upload-card.drag-over {
-  border-color: var(--primary);
+  border-color: var(--primary) !important;
   background-color: rgba(48, 5, 13, 0.03);
   transform: scale(1.01);
 }
@@ -5068,7 +5074,7 @@ body.show-tool-workflow .tool-options-sidebar {
 .editor-upload-drop-hint {
   font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 .editor-upload-sample-row {

@@ -37,7 +37,12 @@ export class AccountPage {
     store.subscribe((event) => {
       if (event === 'user-changed') {
         if (document.body.classList.contains('show-account')) {
-          this.render();
+          const user = store.getState().user;
+          if (user) {
+            this.render();
+          } else {
+            this.renderFullPageAuth();
+          }
         }
       }
     });
