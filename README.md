@@ -489,19 +489,20 @@ npm run server
 Create a `.env` file in the project root:
 
 ```env
-# Firebase Authentication Configuration (lets-edit-inc)
-VITE_FIREBASE_API_KEY=AIzaSyB2lOHysn5Uc3qurgRGW6JG49H29NuFNyU
-VITE_FIREBASE_AUTH_DOMAIN=lets-edit-inc.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=lets-edit-inc
-VITE_FIREBASE_STORAGE_BUCKET=lets-edit-inc.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=285657458145
-VITE_FIREBASE_APP_ID=1:285657458145:web:2fe8f13287f73e3ac35ea0
+# Firebase Authentication Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
 
-# Cloudflare Turnstile Bot Protection
-# Generate from Cloudflare Dashboard -> Turnstile -> Add site
-VITE_CLOUDFLARE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
-CLOUDFLARE_TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+# Cloudflare Turnstile Bot Protection Configuration
+# Obtain site and secret keys from Cloudflare Dashboard -> Turnstile
+VITE_CLOUDFLARE_TURNSTILE_SITE_KEY=your_cloudflare_turnstile_site_key
+CLOUDFLARE_TURNSTILE_SECRET_KEY=your_cloudflare_turnstile_secret_key
 ```
+
 
 ---
 
