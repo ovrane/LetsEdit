@@ -488,6 +488,14 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
             </div>
           </div>
         </div>
+
+        <!-- Clean Scroll Indicator Cue -->
+        <button class="landing-hero-scroll-cue" id="btn-landing-scroll-cue" aria-label="Scroll to explore 43+ tools">
+          <span>Explore 43+ PDF Tools</span>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
       </section>
 
       <!-- Executive Feature Showcase: What's New in LetsEdit -->

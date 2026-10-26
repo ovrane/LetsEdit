@@ -236,16 +236,23 @@ export class LandingPage {
       };
     }
 
+    const scrollToTools = () => {
+      const toolsSec = this.container.querySelector('.landing-tools-section');
+      if (toolsSec) {
+        toolsSec.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        router.navigate('/edit_pdf');
+      }
+    };
+
     const heroExploreBtn = this.container.querySelector('#btn-landing-explore-tools');
     if (heroExploreBtn) {
-      heroExploreBtn.onclick = () => {
-        const toolsSec = this.container.querySelector('.landing-tools-section');
-        if (toolsSec) {
-          toolsSec.scrollIntoView({ behavior: 'smooth' });
-        } else {
-          router.navigate('/edit_pdf');
-        }
-      };
+      heroExploreBtn.onclick = scrollToTools;
+    }
+
+    const heroScrollCue = this.container.querySelector('#btn-landing-scroll-cue');
+    if (heroScrollCue) {
+      heroScrollCue.onclick = scrollToTools;
     }
 
     // Executive What's New showcase cards
