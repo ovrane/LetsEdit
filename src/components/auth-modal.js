@@ -14,6 +14,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { router } from '../core/router.js';
 import { firebaseAuth } from '../core/firebase-auth.js';
+import { turnstileManager } from '../core/turnstile.js';
 
 export class AuthModal {
   constructor() {
@@ -21,6 +22,8 @@ export class AuthModal {
     this.mode = 'login'; // 'login' | 'register'
     this.ssoDomains = ['@acme.com', '@enterprise.org', '@company.com', '@corp.net', '@google.com', '@microsoft.com'];
     this.activePopover = null;
+    this.turnstileToken = null;
+    this.turnstileWidgetId = null;
 
     if (typeof document !== 'undefined') {
       this.init();
@@ -130,17 +133,9 @@ export class AuthModal {
               </p>
             </div>
 
-            <!-- Interactive Cloudflare Turnstile Bot Protection -->
-            <div class="turnstile-box">
-              <label class="turnstile-check-label">
-                <input type="checkbox" id="auth-turnstile-check" checked />
-                <span class="turnstile-custom-box"></span>
-                <span class="turnstile-text">Verify you are human</span>
-              </label>
-              <div class="turnstile-badge">
-                <span>Cloudflare</span>
-                <small>Turnstile</small>
-              </div>
+            <!-- Cloudflare Turnstile Human Bot Protection -->
+            <div class="turnstile-container-wrap">
+              <div id="modal-turnstile-container" class="cf-turnstile-target"></div>
             </div>
 
             <!-- Standard Submit Button -->
@@ -181,11 +176,26 @@ export class AuthModal {
     const pwdInput = this.modal.querySelector('#auth-password');
     const form = this.modal.querySelector('#auth-login-form');
     const alertBox = this.modal.querySelector('.auth-alert');
-    const turnstileCheck = this.modal.querySelector('#auth-turnstile-check');
     const pwdFields = this.modal.querySelectorAll('.pwd-field-group');
     const ssoFields = this.modal.querySelectorAll('.sso-field-group');
     const codeGroup = this.modal.querySelector('.verification-code-group');
     const closeBtn = this.modal.querySelector('.modal-close-btn');
+
+    // Mount official Cloudflare Turnstile widget
+    const turnstileContainer = this.modal.querySelector('#modal-turnstile-container');
+    if (turnstileContainer) {
+      turnstileManager.render(turnstileContainer, {
+        action: this.mode === 'register' ? 'register' : 'login',
+        onVerify: (token) => {
+          this.turnstileToken = token;
+        },
+        onExpire: () => {
+          this.turnstileToken = null;
+        }
+      }).then(widgetId => {
+        this.turnstileWidgetId = widgetId;
+      });
+    }
 
     // Tab switcher (Sign In vs Create Account)
     this.modal.querySelectorAll('[data-auth-tab]').forEach(btn => {
@@ -376,6 +386,9 @@ export class AuthModal {
 
   close() {
     this.modal.style.display = 'none';
+    if (this.turnstileWidgetId) {
+      turnstileManager.reset(this.turnstileWidgetId);
+    }
   }
 
   // --- GLOBAL USER ACCOUNT POPOVER MENU ---

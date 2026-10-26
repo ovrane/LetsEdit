@@ -7,6 +7,7 @@
 import { router } from '../../core/router.js';
 import { Toast } from '../toast.js';
 import { firebaseAuth } from '../../core/firebase-auth.js';
+import { turnstileManager } from '../../core/turnstile.js';
 
 export class FullPageAuth {
   static render(accountPage) {
@@ -89,17 +90,9 @@ export class FullPageAuth {
               <small class="form-text text-muted">A verification code was sent to your email.</small>
             </div>
 
-            <!-- Cloudflare Turnstile Mock Widget -->
-            <div class="turnstile-mock-box" id="full-turnstile-box">
-              <label class="turnstile-label">
-                <input type="checkbox" id="chk-full-turnstile" checked />
-                <span class="turnstile-check"></span>
-                <span>I am human</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#f38020"><path d="M18.8 12.8c-.2-1.8-1.5-3.3-3.2-3.8-.4-2.8-2.8-5-5.6-5-2.6 0-4.8 1.8-5.4 4.3C2 8.7 0 11 0 13.8 0 17 2.6 19.6 5.8 19.6h12.5c2.6 0 4.7-2.1 4.7-4.7 0-1-.3-1.8-1-2.5l-3.2.4z"/></svg>
-              </label>
-              <div class="turnstile-branding">
-                <span>Privacy • Terms</span>
-              </div>
+            <!-- Official Cloudflare Turnstile Bot Protection Widget -->
+            <div class="turnstile-container-wrap">
+              <div id="full-turnstile-container" class="cf-turnstile-target"></div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-submit-auth" id="btn-full-submit-auth" style="width:100%; margin-top:16px;">
@@ -131,6 +124,22 @@ export class FullPageAuth {
 
     const backBtn = accountPage.container.querySelector('#btn-auth-back-tools');
     if (backBtn) backBtn.onclick = () => router.navigate('/');
+
+    // Mount Cloudflare Turnstile in full page auth
+    const fullTurnstileContainer = accountPage.container.querySelector('#full-turnstile-container');
+    if (fullTurnstileContainer) {
+      turnstileManager.render(fullTurnstileContainer, {
+        action: accountPage.authMode === 'register' ? 'register' : 'login',
+        onVerify: (token) => {
+          accountPage.turnstileToken = token;
+        },
+        onExpire: () => {
+          accountPage.turnstileToken = null;
+        }
+      }).then(widgetId => {
+        accountPage.turnstileWidgetId = widgetId;
+      });
+    }
 
     const tabSignIn = accountPage.container.querySelector('#btn-tab-signin');
     if (tabSignIn) {
