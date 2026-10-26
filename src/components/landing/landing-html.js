@@ -294,14 +294,14 @@ export function getLandingTemplateHtml() {
             </svg>
           </button>
 
-          <div class="user-account-wrapper" id="landing-account-wrapper" style="display: flex; align-items: center; gap: 8px;">
-            <button class="btn btn-outline btn-sm user-account-btn" id="btn-landing-auth">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <div class="user-account-wrapper landing-nav-actions" id="landing-account-wrapper">
+            <button class="landing-login-btn user-account-btn" id="btn-landing-auth" title="Sign in to your account">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
               <span class="user-name-label">Log in</span>
             </button>
-            <button class="btn btn-primary btn-sm" id="btn-landing-studio-cta" style="padding: 6px 14px; font-weight: 600; font-size: 13px;">
+            <button class="landing-studio-btn" id="btn-landing-studio-cta" title="Launch PDF Editor Studio">
               <span>Open Studio</span>
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-left: 4px;"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
             </button>
           </div>
         </div>
