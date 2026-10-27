@@ -267,20 +267,25 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([fileBytes], { type: mimeType }),
       report: excelResult.report
     };
-  } else if (id === 'pdf-to-ppt') {
-    const text = await pdfEngine.extractDocumentText(primary.bytes);
-    const slides = text.split('\n\n\n').filter(Boolean);
-    const htmlPpt = `
-      <html><head><meta charset='utf-8'><title>${primary.name}</title>
-      <style>body { font-family: Calibri, sans-serif; } .slide { page-break-after: always; padding: 40px; border: 1px solid #ccc; margin-bottom: 20px; }</style>
-      </head><body>
-      ${slides.map((s, i) => `<div class='slide'><h2>Slide ${i + 1}</h2><p>${s.replace(/\n/g, '<br/>')}</p></div>`).join('')}
-      </body></html>
-    `;
+  } else if (id === 'pdf-to-ppt' || id === 'pdf-to-pptx') {
+    let pdfjsDoc = null;
+    if (typeof window !== 'undefined' && pdfjsLib) {
+      try {
+        pdfjsDoc = await pdfjsLib.getDocument({ data: primary.bytes.slice(0) }).promise;
+      } catch (e) {}
+    }
+    const pptxResult = await PageOperations.pdfToPpt(primary.bytes, {
+      mode: manager.pdfToPptMode || 'editable',
+      aspectRatio: manager.pdfToPptAspectRatio || 'auto',
+      pdfjsDoc,
+      withReport: true
+    });
+    const pptxBytes = pptxResult.pptxBytes || pptxResult;
     return {
-      name: `${primary.name.replace(/\.[^/.]+$/, '')}.ppt`,
-      bytes: new TextEncoder().encode(htmlPpt),
-      blob: new Blob([htmlPpt], { type: 'application/vnd.ms-powerpoint;charset=utf-8' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.pptx`,
+      bytes: pptxBytes,
+      blob: new Blob([pptxBytes], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }),
+      report: pptxResult.report
     };
   } else if (id === 'unlock') {
     const unlockedBytes = await pdfEngine.unlockPdf(primary.bytes, manager.unlockPassword || '');

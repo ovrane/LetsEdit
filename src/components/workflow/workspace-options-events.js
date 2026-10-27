@@ -624,6 +624,22 @@ export function bindWorkspaceOptionsEvents(manager) {
     };
   }
 
+  // PDF to PPT presentation options listeners
+  const pdfToPptModeSelect = manager.container.querySelector('#pdf-to-ppt-mode-select');
+  if (pdfToPptModeSelect) {
+    pdfToPptModeSelect.onchange = (e) => {
+      manager.pdfToPptMode = e.target.value;
+      manager.render();
+    };
+  }
+  const ratioBtns = manager.container.querySelectorAll('.btn-pdf-ppt-ratio');
+  ratioBtns.forEach((btn) => {
+    btn.onclick = () => {
+      manager.pdfToPptAspectRatio = btn.dataset.ratio;
+      manager.render();
+    };
+  });
+
   // Form Filler listeners
   if (manager.activeTool.id === 'fill-forms') {
     bindFormFillerEvents(manager);

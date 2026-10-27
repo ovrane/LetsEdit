@@ -280,6 +280,15 @@ export class PdfEngine {
   async pptToPdf(pptxBytes, options = {}) {
     return await PageOperations.pptToPdf(pptxBytes, options);
   }
+
+  async pdfToPpt(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.pdfToPpt(bytes, options);
+  }
+
+  async createSamplePresentationPdf() {
+    return await PageOperations.createSamplePresentationPdf();
+  }
 }
 
 export const pdfEngine = new PdfEngine();

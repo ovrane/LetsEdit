@@ -34,8 +34,9 @@ import { PdfToWordOps } from './operations/pdf-to-word-ops.js';
 import { ExcelToPdfOps } from './operations/excel-to-pdf-ops.js';
 import { PdfToExcelOps } from './operations/pdf-to-excel-ops.js';
 import { PptxToPdfOps } from './operations/pptx-to-pdf-ops.js';
+import { PdfToPptxOps } from './operations/pdf-to-pptx-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -131,6 +132,16 @@ export class PageOperations {
   }
   static pptxToPdf(...args) { return this.pptToPdf(...args); }
   static createSamplePptxFile(...args) { return PptxToPdfOps.createSamplePptxFile(...args); }
+  static async pdfToPpt(pdfBytes, options = {}) {
+    const res = await PdfToPptxOps.pdfToPptx(pdfBytes, options);
+    if (res && res.pptxBytes) {
+      res.pptxBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pptxBytes;
+    }
+    return res;
+  }
+  static pdfToPptx(...args) { return this.pdfToPpt(...args); }
+  static createSamplePresentationPdf(...args) { return PdfToPptxOps.createSamplePresentationPdf(...args); }
   static renderPageToImage(...args) { return PdfToImageOps.renderPageToImage(...args); }
   static renderPagesToZip(...args) { return PdfToImageOps.renderPagesToZip(...args); }
   static createSampleRasterPdf(...args) { return PdfToImageOps.createSampleRasterPdf(...args); }
