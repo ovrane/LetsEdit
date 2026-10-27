@@ -31,8 +31,9 @@ import { PdfToImageOps } from './operations/pdf-to-image-ops.js';
 import { ImageToPdfOps } from './operations/image-to-pdf-ops.js';
 import { WordToPdfOps } from './operations/word-to-pdf-ops.js';
 import { PdfToWordOps } from './operations/pdf-to-word-ops.js';
+import { ExcelToPdfOps } from './operations/excel-to-pdf-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -99,7 +100,15 @@ export class PageOperations {
     return res;
   }
   static createSampleStructuredPdf(...args) { return PdfToWordOps.createSampleStructuredPdf(...args); }
-  static excelToPdf(...args) { return ConvertOps.excelToPdf(...args); }
+  static async excelToPdf(fileInput, options = {}) {
+    const res = await ExcelToPdfOps.excelToPdf(fileInput, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleXlsxFile(...args) { return ExcelToPdfOps.createSampleXlsxFile(...args); }
   static pptToPdf(...args) { return ConvertOps.pptToPdf(...args); }
   static renderPageToImage(...args) { return PdfToImageOps.renderPageToImage(...args); }
   static renderPagesToZip(...args) { return PdfToImageOps.renderPagesToZip(...args); }

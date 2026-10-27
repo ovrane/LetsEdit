@@ -479,13 +479,17 @@ export async function processSingleDocument(manager, tool, file) {
     const title = manager.excelTitle || primary.name.replace(/\.[^/.]+$/, '');
     const pdfBytes = await PageOperations.excelToPdf(primary.bytes, {
       title,
+      fitMode: manager.excelFitMode || 'fit-columns',
       orientation: manager.excelOrientation || 'auto',
-      isCsv: primary.name.toLowerCase().endsWith('.csv')
+      pageSize: manager.excelPageSize || 'a4',
+      gridlines: manager.excelGridlines !== false,
+      zebra: manager.excelZebra !== false
     });
     return {
       name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
       bytes: pdfBytes,
-      blob: new Blob([pdfBytes], { type: 'application/pdf' })
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }),
+      report: pdfBytes.report
     };
   } else if (id === 'ppt-to-pdf') {
     const title = manager.pptTitle || primary.name.replace(/\.[^/.]+$/, '');

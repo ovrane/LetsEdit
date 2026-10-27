@@ -885,10 +885,15 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'excel-to-pdf') {
+      const fit = instance.excelFitMode || 'fit-columns';
       return `
         <div class="workflow-options-group">
-          <label class="workflow-options-label">Document Title</label>
-          <input type="text" id="workflow-excel-title" class="input-sm" value="${instance.excelTitle || primary.name?.replace(/\.[^/.]+$/, '') || 'Spreadsheet Report'}" placeholder="Spreadsheet Report" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
+          <label class="workflow-options-label">Table Fit Mode</label>
+          <select id="excel-fitmode-select" class="select-sm" style="width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="fit-columns" ${fit === 'fit-columns' ? 'selected' : ''}>Fit All Columns to 1 Page Width</option>
+            <option value="fit-sheet" ${fit === 'fit-sheet' ? 'selected' : ''}>Fit Entire Sheet on 1 Page</option>
+            <option value="none" ${fit === 'none' ? 'selected' : ''}>No Scaling (100% Natural Size)</option>
+          </select>
 
           <label class="workflow-options-label">Page Orientation</label>
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
@@ -897,8 +902,17 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
             <button type="button" class="btn btn-xs ${instance.excelOrientation === 'landscape' ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="landscape">Landscape</button>
           </div>
 
+          <div style="display: flex; gap: 14px; margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+              <input type="checkbox" id="excel-gridlines-chk" ${instance.excelGridlines !== false ? 'checked' : ''} /> Gridlines
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+              <input type="checkbox" id="excel-zebra-chk" ${instance.excelZebra !== false ? 'checked' : ''} /> Zebra Stripes
+            </label>
+          </div>
+
           <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Supports Excel (.xlsx, .xls) and CSV sheets. Generates vector tables with styled headers, alternating row colors, and auto-pagination.
+            Parses OpenXML Excel workbooks and RFC-4180 CSV streams with auto-fit column calculations and vector table styling.
           </div>
         </div>
       `;

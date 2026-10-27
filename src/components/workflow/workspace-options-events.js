@@ -571,6 +571,27 @@ export function bindWorkspaceOptionsEvents(manager) {
       manager.render();
     };
   });
+  const excelFitSelect = manager.container.querySelector('#excel-fitmode-select');
+  if (excelFitSelect) {
+    excelFitSelect.onchange = (e) => {
+      manager.excelFitMode = e.target.value;
+      manager.render();
+    };
+  }
+  const excelGridlinesChk = manager.container.querySelector('#excel-gridlines-chk');
+  if (excelGridlinesChk) {
+    excelGridlinesChk.onchange = (e) => {
+      manager.excelGridlines = e.target.checked;
+      manager.render();
+    };
+  }
+  const excelZebraChk = manager.container.querySelector('#excel-zebra-chk');
+  if (excelZebraChk) {
+    excelZebraChk.onchange = (e) => {
+      manager.excelZebra = e.target.checked;
+      manager.render();
+    };
+  }
 
   // PPT to PDF options listeners
   const pptTitleInp = manager.container.querySelector('#workflow-ppt-title');
