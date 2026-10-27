@@ -25,8 +25,10 @@ import { BatesOps } from './operations/bates-ops.js';
 import { PageNumbersOps } from './operations/pagenumbers-ops.js';
 import { FlattenOps } from './operations/flatten-ops.js';
 import { RedactOps } from './operations/redact-ops.js';
+import { GrayscaleOps } from './operations/grayscale-ops.js';
+import { DeskewOps } from './operations/deskew-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -50,8 +52,17 @@ export class PageOperations {
   // Geometry & Imposition
   static nUpPdf(...args) { return GeometryOps.nUpPdf(...args); }
   static flipPages(...args) { return GeometryOps.flipPages(...args); }
-  static deskewPdf(...args) { return GeometryOps.deskewPdf(...args); }
+  static async deskewPdf(rawBytes, options = 0) {
+    const res = await DeskewOps.deskewPdf(rawBytes, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
   static detectDeskewAngle(...args) { return GeometryOps.detectDeskewAngle(...args); }
+  static detectSkewAngleFromPixels(...args) { return DeskewOps.detectSkewAngleFromPixels(...args); }
+  static createSampleSkewedPdf(...args) { return DeskewOps.createSampleSkewedPdf(...args); }
   static cropPdf(...args) { return GeometryOps.cropPdf(...args); }
   static detectWhitespaceCrop(...args) { return GeometryOps.detectWhitespaceCrop(...args); }
 
@@ -151,5 +162,9 @@ export class PageOperations {
   static applyRedaction(...args) { return RedactOps.applyRedaction(...args); }
   static searchSensitiveData(...args) { return RedactOps.searchSensitiveData(...args); }
   static createSampleRedactPdf(...args) { return RedactOps.createSampleRedactPdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF DeviceGray Grayscale Toner Saver Engine
+  static convertToGrayscale(...args) { return GrayscaleOps.convertToGrayscale(...args); }
+  static createSampleGrayscalePdf(...args) { return GrayscaleOps.createSampleGrayscalePdf(...args); }
 }
 

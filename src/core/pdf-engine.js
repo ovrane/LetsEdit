@@ -195,9 +195,10 @@ export class PdfEngine {
     return await TransformOperations.compressPdf(bytes, options);
   }
 
-  async convertToGrayscale(pdfBytes = null) {
+  async convertToGrayscale(pdfBytes = null, options = {}) {
     const bytes = pdfBytes || this.rawBytes;
-    return await TransformOperations.convertToGrayscale(bytes);
+    const res = await PageOperations.convertToGrayscale(bytes, options);
+    return res.pdfBytes || res;
   }
 
   // --- Security Operations ---

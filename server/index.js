@@ -27,6 +27,8 @@ import { handleBatesRequest } from './routes/bates-routes.js';
 import { handlePageNumbersRequest } from './routes/pagenumbers-routes.js';
 import { handleFlattenRequest } from './routes/flatten-routes.js';
 import { handleRedactRequest } from './routes/redact-routes.js';
+import { handleGrayscaleRequest } from './routes/grayscale-routes.js';
+import { handleDeskewRequest } from './routes/deskew-routes.js';
 import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
@@ -141,6 +143,14 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Permanent Redaction endpoints
   const redactHandled = await handleRedactRequest(req, res, pathname, method);
   if (redactHandled) return true;
+
+  // Dispatch DeviceGray & Toner Saver Inversion endpoints
+  const grayscaleHandled = await handleGrayscaleRequest(req, res, pathname, method);
+  if (grayscaleHandled) return true;
+
+  // Dispatch Scanner Deskew & Rectification endpoints
+  const deskewHandled = await handleDeskewRequest(req, res, pathname, method);
+  if (deskewHandled) return true;
 
   // Dispatch System Capabilities & Worker Status endpoints
   const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);

@@ -263,6 +263,22 @@ export function bindWorkspaceOptionsEvents(manager) {
     };
   });
 
+  const grayModeSelect = manager.container.querySelector('#grayscale-mode-select');
+  if (grayModeSelect) {
+    grayModeSelect.onchange = (e) => {
+      manager.grayscaleMode = e.target.value;
+      manager.render();
+    };
+  }
+
+  const grayPreserveBlack = manager.container.querySelector('#grayscale-preserve-black');
+  if (grayPreserveBlack) {
+    grayPreserveBlack.onchange = (e) => {
+      manager.grayscalePreserveBlackText = e.target.checked;
+      manager.render();
+    };
+  }
+
   // Copy extracted text buttons
   const copyTextHandler = async () => {
     const txt = manager.extractedTextPreview || (manager.container.querySelector('#extracted-text-area')?.value) || '';

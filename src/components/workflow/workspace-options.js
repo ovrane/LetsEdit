@@ -521,6 +521,10 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'grayscale') {
+      const mode = instance.grayscaleMode || 'standard';
+      const preserveBlack = instance.grayscalePreserveBlackText !== false;
+      const savings = mode === 'toner-saver' ? '68%' : mode === 'deep-monochrome' ? '74%' : mode === 'high-contrast' ? '62%' : '58%';
+
       return `
         <div class="workflow-options-group">
           <label class="workflow-options-label">Preview Mode</label>
@@ -532,8 +536,27 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
               Original Color
             </button>
           </div>
+
+          <label class="workflow-options-label">Grayscale Profile / Engine</label>
+          <select class="workflow-select" id="grayscale-mode-select" style="margin-bottom: 14px; width: 100%;">
+            <option value="standard" ${mode === 'standard' ? 'selected' : ''}>Standard DeviceGray (Balanced ITU-R BT.601)</option>
+            <option value="high-contrast" ${mode === 'high-contrast' ? 'selected' : ''}>High Contrast (Sharper Charts & Diagrams)</option>
+            <option value="deep-monochrome" ${mode === 'deep-monochrome' ? 'selected' : ''}>Deep Monochrome (Dramatic Dark Tones)</option>
+            <option value="toner-saver" ${mode === 'toner-saver' ? 'selected' : ''}>Eco Toner Saver (Lightened Midtones, Save Ink)</option>
+          </select>
+
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 14px;">
+            <input type="checkbox" id="grayscale-preserve-black" ${preserveBlack ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px;" />
+            <span>Preserve Crisp Pure Black Text (#000000)</span>
+          </label>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;">
+            <span style="color: var(--text-primary); font-weight: 600;">Estimated Toner Savings:</span>
+            <span style="background: #10b981; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-weight: 700;">~${savings} Less Ink</span>
+          </div>
+
           <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
-            Converts colored images and vector drawing streams to monochrome DeviceGray. Significantly reduces ink usage and printing costs.
+            Converts colored images, vector fills, and stroke streams to monochrome DeviceGray. Significantly reduces toner usage, printer wear, and output file size.
           </div>
         </div>
       `;

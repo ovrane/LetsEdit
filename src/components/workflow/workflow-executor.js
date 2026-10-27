@@ -94,7 +94,10 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([rotBytes], { type: 'application/pdf' })
     };
   } else if (id === 'grayscale') {
-    const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes);
+    const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes, {
+      mode: manager.grayscaleMode || 'standard',
+      preserveBlackText: manager.grayscalePreserveBlackText !== false
+    });
     return {
       name: `Grayscale_${primary.name}`,
       bytes: grayBytes,

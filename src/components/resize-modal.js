@@ -145,7 +145,8 @@ export class ResizeModal {
     // Apply button
     this.modal.querySelector('#btn-resize-apply').onclick = async () => {
       const state = store.getState();
-      if (!state.pdfBytes) {
+      const bytes = state.pdfBytes || pdfEngine.rawBytes;
+      if (!bytes) {
         Toast.error('No document loaded');
         return;
       }
@@ -159,7 +160,7 @@ export class ResizeModal {
 
       try {
         Toast.info('Resizing pages and margins...');
-        const newBytes = await pdfEngine.resizePdfMargins(state.pdfBytes, {
+        const newBytes = await pdfEngine.resizePdfMargins(bytes, {
           marginTop: top,
           marginRight: right,
           marginBottom: bottom,
