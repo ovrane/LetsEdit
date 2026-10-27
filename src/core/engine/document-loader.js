@@ -22,9 +22,15 @@ export class DocumentLoader {
   }
 
   async loadPdf(arrayBuffer) {
-    this.rawBytes = arrayBuffer;
+    // Clone buffer so PDF.js Web Worker transfer never detaches this.rawBytes
+    const safeBuffer = arrayBuffer instanceof ArrayBuffer
+      ? arrayBuffer.slice(0)
+      : (arrayBuffer?.buffer ? arrayBuffer.buffer.slice(arrayBuffer.byteOffset, arrayBuffer.byteOffset + arrayBuffer.byteLength) : arrayBuffer);
+    this.rawBytes = safeBuffer;
+
+    const dataForWorker = safeBuffer.slice(0);
     const loadingTask = pdfjsLib.getDocument({
-      data: arrayBuffer,
+      data: dataForWorker,
       cMapUrl: 'https://unpkg.com/pdfjs-dist@6.4.299/cmaps/',
       cMapPacked: true
     });

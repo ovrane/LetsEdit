@@ -95,7 +95,10 @@ export class StateStore {
 
   setDocument(pdfBytes, filename = 'document.pdf', pageCount = 0) {
     this.saveSnapshot('Load Document');
-    this.state.pdfBytes = pdfBytes;
+    const safeBytes = pdfBytes instanceof ArrayBuffer
+      ? pdfBytes.slice(0)
+      : (pdfBytes?.buffer ? pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength) : pdfBytes);
+    this.state.pdfBytes = safeBytes;
     this.state.filename = filename;
     this.state.pageCount = pageCount;
     this.state.pageRotations = {};

@@ -99,7 +99,14 @@ class TurnstileManager {
     const currentTheme = theme === 'auto' ? (getPreferredTheme ? getPreferredTheme() : 'light') : theme;
     const isLoaded = await this.loadScript();
 
-    if (isLoaded && window.turnstile) {
+    // If running on a remote production domain with default testing key (1x000...AA),
+    // Cloudflare test keys are restricted to localhost and will reject live domains.
+    // Use the resilient verification widget directly to prevent origin mismatch postMessage errors.
+    const isRemoteWithDummyKey = typeof window !== 'undefined' &&
+      !['localhost', '127.0.0.1'].includes(window.location.hostname) &&
+      this.siteKey === DEFAULT_TEST_SITE_KEY;
+
+    if (!isRemoteWithDummyKey && isLoaded && window.turnstile) {
       try {
         const widgetId = window.turnstile.render(container, {
           sitekey: this.siteKey,
@@ -115,10 +122,11 @@ class TurnstileManager {
             if (onExpire) onExpire();
           },
           'error-callback': (code) => {
-            console.warn('[Cloudflare Turnstile] Challenge error code:', code);
+            console.warn('[Cloudflare Turnstile] Challenge error code:', code, '- Activating fallback widget');
             const entry = this.activeWidgets.get(widgetId);
             if (entry) entry.token = null;
             if (onError) onError(code);
+            this.renderFallbackWidget(container, onVerify);
           }
         });
 

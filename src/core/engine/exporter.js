@@ -57,9 +57,19 @@ export class PdfExporter {
    * Compiles all edits back into a vector PDF file using pdf-lib.
    */
   static async exportPdf(rawBytes, state) {
-    if (!rawBytes) throw new Error('No source PDF to export');
+    let bytesToLoad = rawBytes;
+    if ((!bytesToLoad || (bytesToLoad instanceof ArrayBuffer && bytesToLoad.byteLength === 0)) && state?.pdfBytes?.byteLength > 0) {
+      bytesToLoad = state.pdfBytes;
+    }
+    if (!bytesToLoad || (bytesToLoad instanceof ArrayBuffer && bytesToLoad.byteLength === 0)) {
+      throw new Error('No source PDF to export');
+    }
 
-    const sourceDoc = await PDFDocument.load(rawBytes);
+    const safeBytes = bytesToLoad instanceof ArrayBuffer
+      ? bytesToLoad.slice(0)
+      : (bytesToLoad?.buffer ? bytesToLoad.buffer.slice(bytesToLoad.byteOffset, bytesToLoad.byteOffset + bytesToLoad.byteLength) : bytesToLoad);
+
+    const sourceDoc = await PDFDocument.load(safeBytes);
     const finalDoc = await PDFDocument.create();
 
     // Per-export font resolution cache

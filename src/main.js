@@ -157,12 +157,14 @@ class App {
     store.subscribe((event, state) => {
       if (['annotation-added', 'annotation-updated', 'annotation-removed', 'watermark-updated', 'pagenumbers-updated'].includes(event)) {
         try {
+          const rawAnnots = state.annotations;
+          const serializedAnnots = rawAnnots instanceof Map
+            ? Object.fromEntries(rawAnnots.entries())
+            : (rawAnnots && typeof rawAnnots === 'object' ? rawAnnots : {});
           const serializable = {
             filename: state.filename || state.documentName || 'Document.pdf',
             pageCount: state.pageCount,
-            annotations: Object.fromEntries(
-              Array.from(state.annotations.entries()).map(([k, v]) => [k, v])
-            ),
+            annotations: serializedAnnots,
             timestamp: Date.now()
           };
           localStorage.setItem('pdf_editor_recovery_v2', JSON.stringify(serializable));

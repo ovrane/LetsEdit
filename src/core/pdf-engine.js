@@ -252,7 +252,11 @@ export class PdfEngine {
   // --- Vector Compilation & Exporter ---
 
   async exportPdf(state) {
-    return await PdfExporter.exportPdf(this.rawBytes, state);
+    let bytes = this.rawBytes;
+    if ((!bytes || (bytes instanceof ArrayBuffer && bytes.byteLength === 0)) && state?.pdfBytes?.byteLength > 0) {
+      bytes = state.pdfBytes;
+    }
+    return await PdfExporter.exportPdf(bytes, state);
   }
 
   async htmlToPdf(htmlString, options = {}) {
