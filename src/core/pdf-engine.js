@@ -72,6 +72,20 @@ export class PdfEngine {
     return info.numPages;
   }
 
+  async insertBlankPage(afterPageIndex = null, width = 595.28, height = 841.89) {
+    const newBytes = await PageOperations.insertBlankPage(this.rawBytes, afterPageIndex, width, height);
+    this.rawBytes = newBytes.buffer;
+    const info = await this.loadPdf(this.rawBytes);
+    return info.numPages;
+  }
+
+  async duplicatePage(pageIndex) {
+    const newBytes = await PageOperations.duplicatePage(this.rawBytes, pageIndex);
+    this.rawBytes = newBytes.buffer;
+    const info = await this.loadPdf(this.rawBytes);
+    return info.numPages;
+  }
+
   async mergeExternalPdf(externalBytes) {
     const newBytes = await PageOperations.mergeExternalPdf(this.rawBytes, externalBytes);
     this.rawBytes = newBytes.buffer;

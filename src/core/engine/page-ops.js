@@ -31,6 +31,8 @@ export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, Fo
 export class PageOperations {
   // Merge & Organize
   static appendBlankPage(...args) { return MergeOps.appendBlankPage(...args); }
+  static insertBlankPage(...args) { return MergeOps.insertBlankPage(...args); }
+  static duplicatePage(...args) { return MergeOps.duplicatePage(...args); }
   static mergeExternalPdf(...args) { return MergeOps.mergeExternalPdf(...args); }
   static mergePdf(...args) { return MergeOps.mergePdf(...args); }
   static mergePdfAdvanced(...args) { return MergeOps.mergePdfAdvanced(...args); }

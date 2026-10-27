@@ -1223,6 +1223,72 @@ body:not(.sidebar-open) .app-sidebar {
   color: var(--text-muted);
 }
 
+/* Quick Page Floating Actions Bar (Adobe Acrobat & Smallpdf reverse engineered) */
+.page-quick-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 45;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.pdf-page-wrap:hover .page-quick-actions,
+.page-quick-actions:focus-within,
+.page-quick-actions:hover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.quick-page-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-main, #1e293b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.quick-page-btn:hover {
+  background: var(--bg-hover, #f1f5f9);
+  color: var(--primary, #30050d);
+  transform: scale(1.08);
+}
+
+.quick-page-btn:active {
+  transform: scale(0.95);
+}
+
+.quick-page-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.quick-page-delete:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+}
+
 /* Inline text editor input */
 .inline-text-editor {
   position: absolute;

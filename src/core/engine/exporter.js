@@ -94,15 +94,20 @@ export class PdfExporter {
 
     // Determine target page sequence from pageOrder
     const targetOrder = state.pageOrder && state.pageOrder.length > 0
-      ? state.pageOrder.filter(p => !state.deletedPages.has(p) && p <= numSourcePages)
+      ? state.pageOrder.filter(p => !state.deletedPages.has(p))
       : Array.from({ length: numSourcePages }, (_, i) => i + 1).filter(p => !state.deletedPages.has(p));
 
     const totalPages = targetOrder.length;
 
     for (let outIdx = 0; outIdx < totalPages; outIdx++) {
       const origPage = targetOrder[outIdx];
-      const [copiedPage] = await finalDoc.copyPages(sourceDoc, [origPage - 1]);
-      finalDoc.addPage(copiedPage);
+      let copiedPage;
+      if (origPage <= numSourcePages) {
+        [copiedPage] = await finalDoc.copyPages(sourceDoc, [origPage - 1]);
+        finalDoc.addPage(copiedPage);
+      } else {
+        copiedPage = finalDoc.addPage([595.28, 841.89]);
+      }
 
       const { width: pWidth, height: pHeight } = copiedPage.getSize();
 
@@ -133,9 +138,13 @@ export class PdfExporter {
 
       for (const ann of annotations) {
         if (ann.type === 'whiteout' || (ann.type === 'text' && ann.hasUnderlay)) {
-          const pdfX = ann.x * pWidth;
-          const pdfY = pHeight - (ann.y * pHeight) - (ann.height * pHeight);
-          redactionBoxes.push({ x: pdfX, y: pdfY, width: ann.width * pWidth, height: ann.height * pHeight });
+          const normX = typeof ann.x === 'number' ? ann.x : 0;
+          const normY = typeof ann.y === 'number' ? ann.y : 0;
+          const normW = typeof ann.width === 'number' ? ann.width : 0.2;
+          const normH = typeof ann.height === 'number' ? ann.height : 0.05;
+          const pdfX = normX * pWidth;
+          const pdfY = pHeight - (normY * pHeight) - (normH * pHeight);
+          redactionBoxes.push({ x: pdfX, y: pdfY, width: normW * pWidth, height: normH * pHeight });
           if (ann.replacedText) textTargets.push(ann.replacedText);
         }
       }
@@ -150,10 +159,14 @@ export class PdfExporter {
 
       // Pass 2: Draw visual annotations
       for (const ann of annotations) {
-        const pdfX = ann.x * pWidth;
-        const pdfY = pHeight - (ann.y * pHeight) - (ann.height * pHeight);
-        const pdfW = ann.width * pWidth;
-        const pdfH = ann.height * pHeight;
+        const normX = typeof ann.x === 'number' ? ann.x : 0;
+        const normY = typeof ann.y === 'number' ? ann.y : 0;
+        const normW = typeof ann.width === 'number' ? ann.width : 0.2;
+        const normH = typeof ann.height === 'number' ? ann.height : 0.05;
+        const pdfX = normX * pWidth;
+        const pdfY = pHeight - (normY * pHeight) - (normH * pHeight);
+        const pdfW = normW * pWidth;
+        const pdfH = normH * pHeight;
 
         if (ann.type === 'whiteout') {
           const isBlackout = ann.color === '#000000' || ann.isBlackout;
@@ -280,13 +293,44 @@ export class PdfExporter {
               borderWidth: ann.strokeWidth || 2,
               color: fill ? rgb(fill.r / 255, fill.g / 255, fill.b / 255) : undefined
             });
-          } else if (ann.shapeType === 'line') {
+          } else if (ann.shapeType === 'line' || ann.shapeType === 'arrow') {
+            const startX = pdfX;
+            const startY = pdfY + pdfH;
+            const endX = pdfX + pdfW;
+            const endY = pdfY;
+            const thickness = ann.strokeWidth || 2;
+            const strokeColor = rgb(sr / 255, sg / 255, sb / 255);
+
             copiedPage.drawLine({
-              start: { x: pdfX, y: pdfY + pdfH },
-              end: { x: pdfX + pdfW, y: pdfY },
-              thickness: ann.strokeWidth || 2,
-              color: rgb(sr / 255, sg / 255, sb / 255)
+              start: { x: startX, y: startY },
+              end: { x: endX, y: endY },
+              thickness,
+              color: strokeColor
             });
+
+            if (ann.shapeType === 'arrow') {
+              const angle = Math.atan2(endY - startY, endX - startX);
+              const headLen = Math.max(8, thickness * 3.5);
+              const angleOffset = Math.PI / 6;
+
+              const head1X = endX - headLen * Math.cos(angle - angleOffset);
+              const head1Y = endY - headLen * Math.sin(angle - angleOffset);
+              const head2X = endX - headLen * Math.cos(angle + angleOffset);
+              const head2Y = endY - headLen * Math.sin(angle + angleOffset);
+
+              copiedPage.drawLine({
+                start: { x: endX, y: endY },
+                end: { x: head1X, y: head1Y },
+                thickness,
+                color: strokeColor
+              });
+              copiedPage.drawLine({
+                start: { x: endX, y: endY },
+                end: { x: head2X, y: head2Y },
+                thickness,
+                color: strokeColor
+              });
+            }
           }
 
         } else if (ann.type === 'image' || ann.type === 'signature') {

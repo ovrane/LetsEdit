@@ -321,18 +321,16 @@ export function getLandingTemplateHtml() {
 Powerful PDF tools to simplify your workflow, streamline document management, and get more done.              </p>
 
               <div class="landing-hero-actions">
-                <input type="file" id="landing-hero-file-input" accept="application/pdf" style="display:none;" />
-                <button class="btn landing-hero-btn-primary" id="btn-landing-upload-pdf">
+                <button class="btn landing-hero-btn-primary" id="btn-landing-explore-tools">
                   <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="12" y1="18" x2="12" y2="12"></line>
-                    <polyline points="9 15 12 12 15 15"></polyline>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
                   </svg>
-                  <span>Upload PDF</span>
+                  <span>Explore 43+ Tools</span>
                 </button>
-                <button class="btn landing-hero-btn-outline" id="btn-landing-explore-tools">
-                  Explore All PDF Tools
+                <button class="btn landing-hero-btn-outline" id="btn-landing-open-editor">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                  <span>Open PDF Editor</span>
                 </button>
               </div>
 
@@ -349,7 +347,7 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
             </div>
 
             <!-- Right Column: Interactive Mockup Illustration with Floating Tool Badges & Confetti -->
-            <div class="landing-hero-right" id="landing-hero-dropzone" title="Drop PDF here or click to choose file">
+            <div class="landing-hero-right" id="landing-hero-preview">
               <div class="hero-illustration-wrapper">
                 <!-- Floating Decorative Accents (confetti matching screenshot) -->
                 <div class="hero-accent-item accent-plus-orange">+</div>

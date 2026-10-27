@@ -194,45 +194,19 @@ export class LandingPage {
       };
     }
 
-    if (heroDropzone) {
-      heroDropzone.ondragover = (e) => {
-        e.preventDefault();
-        heroDropzone.classList.add('drag-over');
-      };
-      heroDropzone.ondragleave = () => {
-        heroDropzone.classList.remove('drag-over');
-      };
-      heroDropzone.ondrop = async (e) => {
-        e.preventDefault();
-        heroDropzone.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type === 'application/pdf') {
-          try {
-            Toast.info('Loading PDF into Studio...');
-            const ab = await readFileAsArrayBuffer(file);
-            const info = await pdfEngine.loadPdf(ab);
-            store.setDocument(ab, file.name, info.numPages);
-            const filenameEl = document.getElementById('current-filename');
-            if (filenameEl) filenameEl.textContent = file.name;
-            router.navigate('/edit_pdf');
-            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
-          } catch (err) {
-            console.error(err);
-            Toast.error('Could not load PDF');
-          }
-        } else {
-          Toast.error('Please drop a valid PDF document');
-        }
-      };
+    const heroOpenEditorBtn = this.container.querySelector('#btn-landing-open-editor');
+    if (heroOpenEditorBtn) {
+      heroOpenEditorBtn.onclick = () => router.navigate('/edit_pdf');
+    }
 
-      heroDropzone.onclick = (e) => {
+    const heroPreview = this.container.querySelector('#landing-hero-preview');
+    if (heroPreview) {
+      heroPreview.onclick = (e) => {
         const floatBadge = e.target.closest('.hero-float-badge');
         if (floatBadge && floatBadge.getAttribute('data-tool')) {
           e.stopPropagation();
           this.handleToolAction(floatBadge.getAttribute('data-tool'));
-          return;
         }
-        if (heroFileInput) heroFileInput.click();
       };
     }
 
