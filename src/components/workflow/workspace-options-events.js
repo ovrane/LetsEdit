@@ -311,6 +311,22 @@ export function bindWorkspaceOptionsEvents(manager) {
     };
   }
 
+  // PDF to Excel controls
+  const pdfToExcelFmtSelect = manager.container.querySelector('#pdf-to-excel-format-select');
+  if (pdfToExcelFmtSelect) {
+    pdfToExcelFmtSelect.onchange = (e) => {
+      manager.pdfToExcelFormat = e.target.value;
+      manager.render();
+    };
+  }
+  const pdfToExcelNormChk = manager.container.querySelector('#pdf-to-excel-normalize-chk');
+  if (pdfToExcelNormChk) {
+    pdfToExcelNormChk.onchange = (e) => {
+      manager.pdfToExcelNormalize = e.target.checked;
+      manager.render();
+    };
+  }
+
   // Copy extracted text buttons
   const copyTextHandler = async () => {
     const txt = manager.extractedTextPreview || (manager.container.querySelector('#extracted-text-area')?.value) || '';

@@ -679,6 +679,29 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
       `;
     }
 
+    if (id === 'pdf-to-excel') {
+      const fmt = instance.pdfToExcelFormat || 'xlsx';
+      const norm = instance.pdfToExcelNormalize !== false;
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Output Spreadsheet Format</label>
+          <select id="pdf-to-excel-format-select" class="select-sm" style="width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="xlsx" ${fmt === 'xlsx' ? 'selected' : ''}>Microsoft Excel (.xlsx)</option>
+            <option value="csv" ${fmt === 'csv' ? 'selected' : ''}>Comma-Separated Values (.csv)</option>
+          </select>
+
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; cursor: pointer;">
+            <input type="checkbox" id="pdf-to-excel-normalize-chk" ${norm ? 'checked' : ''} />
+            <span>Format Numbers for Calculation ($1,234.56 &rarr; 1234.56)</span>
+          </label>
+
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Extracts multi-column tabular grids into styled Excel worksheets with auto-detected headers and vector borders.
+          </div>
+        </div>
+      `;
+    }
+
     if (id === 'pdf-to-text') {
       return `
         <div class="workflow-options-group">

@@ -242,15 +242,30 @@ export async function processSingleDocument(manager, tool, file) {
       report: docxResult.report
     };
   } else if (id === 'pdf-to-excel') {
-    const text = await pdfEngine.extractDocumentText(primary.bytes);
-    const csvRows = text.split('\n').map(line => {
-      const cols = line.trim().split(/\s{2,}|\t/);
-      return cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',');
-    }).join('\n');
+    let pdfjsDoc = null;
+    if (typeof window !== 'undefined' && pdfjsLib) {
+      try {
+        pdfjsDoc = await pdfjsLib.getDocument({ data: primary.bytes.slice(0) }).promise;
+      } catch (e) {}
+    }
+    const format = manager.pdfToExcelFormat || 'xlsx';
+    const excelResult = await PageOperations.pdfToExcel(primary.bytes, {
+      format,
+      normalizeNumbers: manager.pdfToExcelNormalize !== false,
+      pdfjsDoc,
+      withReport: true
+    });
+    const isXlsx = format === 'xlsx';
+    const fileBytes = excelResult.fileBytes || excelResult;
+    const mimeType = isXlsx
+      ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      : 'text/csv;charset=utf-8';
+    const ext = isXlsx ? 'xlsx' : 'csv';
     return {
-      name: `${primary.name.replace(/\.[^/.]+$/, '')}.csv`,
-      bytes: new TextEncoder().encode(csvRows),
-      blob: new Blob([csvRows], { type: 'text/csv;charset=utf-8' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.${ext}`,
+      bytes: fileBytes,
+      blob: new Blob([fileBytes], { type: mimeType }),
+      report: excelResult.report
     };
   } else if (id === 'pdf-to-ppt') {
     const text = await pdfEngine.extractDocumentText(primary.bytes);

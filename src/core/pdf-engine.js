@@ -272,6 +272,11 @@ export class PdfEngine {
     return await PageOperations.excelToPdf(fileBytes, options);
   }
 
+  async pdfToExcel(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.pdfToExcel(bytes, options);
+  }
+
   async pptToPdf(pptxBytes, options = {}) {
     return await PageOperations.pptToPdf(pptxBytes, options);
   }

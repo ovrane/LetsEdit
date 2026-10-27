@@ -32,8 +32,9 @@ import { ImageToPdfOps } from './operations/image-to-pdf-ops.js';
 import { WordToPdfOps } from './operations/word-to-pdf-ops.js';
 import { PdfToWordOps } from './operations/pdf-to-word-ops.js';
 import { ExcelToPdfOps } from './operations/excel-to-pdf-ops.js';
+import { PdfToExcelOps } from './operations/pdf-to-excel-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -109,6 +110,16 @@ export class PageOperations {
     return res;
   }
   static createSampleXlsxFile(...args) { return ExcelToPdfOps.createSampleXlsxFile(...args); }
+  static async pdfToExcel(pdfBytes, options = {}) {
+    const res = await PdfToExcelOps.pdfToExcel(pdfBytes, options);
+    if (res && res.fileBytes) {
+      res.fileBytes.report = res.report;
+      res.fileBytes.csvText = res.csvText;
+      return typeof options === 'object' && options.withReport ? res : res.fileBytes;
+    }
+    return res;
+  }
+  static createSampleFinancialTablePdf(...args) { return PdfToExcelOps.createSampleFinancialTablePdf(...args); }
   static pptToPdf(...args) { return ConvertOps.pptToPdf(...args); }
   static renderPageToImage(...args) { return PdfToImageOps.renderPageToImage(...args); }
   static renderPagesToZip(...args) { return PdfToImageOps.renderPagesToZip(...args); }
