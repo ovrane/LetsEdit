@@ -8,30 +8,31 @@
 
 export function getLandingTemplateHtml() {
   return `
-    <!-- Landing Header / Top Navigation (Smallpdf Executive Style) -->
+    <!-- Landing Header / Top Navigation (Pryzm Minimalist Executive Style) -->
     <header class="landing-header">
       <div class="landing-nav-inner">
-        <div class="lets-logo" id="landing-brand-logo" title="LetsEdit — Home">
-          <div class="lets-logo-badge">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
-              <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8"/>
-              <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE"/>
-              <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500"/>
-            </svg>
+        <!-- Left Cluster: Brand & Nav Links immediately grouped together (Pryzm Style) -->
+        <div class="landing-nav-left-cluster">
+          <div class="lets-logo" id="landing-brand-logo" title="LetsEdit — Home" style="cursor: pointer;">
+            <div class="lets-logo-badge">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
+                <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8"/>
+                <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE"/>
+                <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500"/>
+              </svg>
+            </div>
+            <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
           </div>
-          <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
-        </div>
 
-        <!-- Desktop Quick Links (Smallpdf Pill + Nav Style) -->
-        <nav class="landing-desktop-nav">
-          <!-- Smallpdf-Style Tools Mega Menu Trigger Button -->
-          <div class="landing-dropdown mega-dropdown">
-            <button class="landing-tools-pill-btn dropdown-toggle" id="btn-landing-mega-menu" title="Browse all 43+ PDF tools">
-              <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z"/></svg>
-              <span>Tools</span>
-              <svg class="chevron-icon" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
+          <!-- Desktop Quick Links (Pryzm Style) -->
+          <nav class="landing-desktop-nav">
+            <!-- Tools Mega Menu Trigger Button -->
+            <div class="landing-dropdown mega-dropdown">
+              <button class="landing-nav-link dropdown-toggle" id="btn-landing-mega-menu" title="Browse all 50+ PDF tools">
+                <span>Tools</span>
+                <svg class="chevron-icon" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
 
             <!-- Smallpdf Comprehensive Tools Grid Mega Menu -->
             <div class="landing-mega-menu-content" id="landing-mega-menu">
@@ -262,26 +263,29 @@ export function getLandingTemplateHtml() {
             </div>
           </div>
 
-          <!-- Smallpdf Direct Top Header Nav Links -->
-          <button class="landing-nav-link" data-tool="compress">Compress</button>
-          <button class="landing-nav-link" data-tool="pdf-to-word">Convert</button>
-          <button class="landing-nav-link" data-tool="merge">Merge</button>
-          <button class="landing-nav-link" data-tool="edit">Edit</button>
-          <button class="landing-nav-link" data-tool="sign">Sign</button>
-          <button class="landing-nav-link" data-tool="security">Protect</button>
-        </nav>
+            <!-- Pryzm-style Nav items with badge -->
+            <button class="landing-nav-link" id="btn-nav-studio-link" data-tool="edit">
+              <span>Studio</span>
+              <span class="nav-pill-badge">BETA</span>
+            </button>
+            <button class="landing-nav-link" data-tool="compress">Compress</button>
+            <button class="landing-nav-link" data-tool="pdf-to-word">Convert</button>
+            <button class="landing-nav-link" data-tool="merge">Merge</button>
+            <button class="landing-nav-link" data-tool="sign">Sign</button>
+          </nav>
+        </div>
 
-        <!-- Right Header CTAs: Search, Theme, Log In, Open Studio -->
+        <!-- Right Header CTAs: Search, Theme, Open studio, Sign in (Pryzm Style) -->
         <div class="landing-header-right">
           <button class="icon-btn" id="btn-landing-search" title="Search tools (Ctrl+K)" aria-label="Search all PDF tools">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
           </button>
 
           <button class="icon-btn" id="btn-landing-theme" title="Toggle Theme (Dark / Light)">
-            <svg class="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="theme-icon-sun" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
               <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -295,13 +299,8 @@ export function getLandingTemplateHtml() {
           </button>
 
           <div class="user-account-wrapper landing-nav-actions" id="landing-account-wrapper">
-            <button class="landing-login-btn user-account-btn" id="btn-landing-auth" title="Sign in to your account">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              <span class="user-name-label">Log in</span>
-            </button>
-            <button class="landing-studio-btn" id="btn-landing-studio-cta" title="Launch PDF Editor Studio">
-              <span>Open Studio</span>
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+            <button class="landing-signin-pill-btn user-account-btn" id="btn-landing-auth" title="Sign in to your account">
+              <span class="user-name-label">Sign in</span>
             </button>
           </div>
         </div>
@@ -317,32 +316,21 @@ export function getLandingTemplateHtml() {
             <!-- Left Column: Copy & Actions -->
             <div class="landing-hero-left">
               <h1 class="landing-hero-title">Work on your <span style="color: var(--primary);">PDF</span><br>With Ease</h1>
-              <p class="landing-hero-subtitle">
-Powerful PDF tools to simplify your workflow, streamline document management, and get more done.              </p>
-
+              <p class="landing-hero-subtitle">Powerful PDF &amp; Office tools to simplify your workflow convert Word, Excel &amp; PPTX, OCR scanned pages, compare diffs, and sign with zero cloud upload.</p>
               <div class="landing-hero-actions">
                 <button class="btn landing-hero-btn-primary" id="btn-landing-explore-tools">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
-                  </svg>
-                  <span>Explore 43+ Tools</span>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon></svg>
+                  <span>Explore 50+ Tools</span>
                 </button>
                 <button class="btn landing-hero-btn-outline" id="btn-landing-open-editor">
                   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                   <span>Open PDF Editor</span>
                 </button>
               </div>
-
               <div class="landing-hero-trust-row">
-                <span class="hero-trust-item">
-                  <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                  Free &amp; No installation
-                </span>
-                <span class="hero-trust-item">
-                  <svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                  100% In-Browser Privacy
-                </span>
+                <span class="hero-trust-item"><svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Free &amp; No installation</span>
+                <span class="hero-trust-item"><svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>100% In-Browser Privacy</span>
+                <span class="hero-trust-item"><svg width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>50+ Enterprise Tools</span>
               </div>
             </div>
 
@@ -448,41 +436,15 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
                 </div>
 
                 <!-- Floating Colorful Tool Badges Orbiting the Window -->
-                <!-- Top Cyan: Edit -->
-                <div class="hero-float-badge badge-top-cyan" data-tool="workflow:edit" title="Edit PDF">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </div>
-                <!-- Top Right Purple: Merge / Combine -->
-                <div class="hero-float-badge badge-top-purple" data-tool="workflow:merge" title="Merge PDF">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/>
-                  </svg>
-                </div>
-                <!-- Left Magenta: Sign / Fountain Pen -->
-                <div class="hero-float-badge badge-left-magenta" data-tool="workflow:sign" title="Sign PDF">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="2"/>
-                  </svg>
-                </div>
-                <!-- Bottom Right Yellow: Image / JPG -->
-                <div class="hero-float-badge badge-right-yellow" data-tool="workflow:pdf-to-jpg" title="PDF to Image">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                </div>
-                <!-- Bottom Right Blue: Word (W) -->
-                <div class="hero-float-badge badge-right-blue" data-tool="workflow:pdf-to-word" title="PDF to Word">
-                  <span class="badge-word-w">W</span>
-                </div>
-                <!-- Bottom Red: Crop / Compress -->
-                <div class="hero-float-badge badge-bottom-red" data-tool="workflow:compress" title="Compress PDF">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <rect x="5" y="5" width="14" height="14" rx="2" stroke-dasharray="3 3"/>
-                    <path d="M9 9h6v6H9z"/>
-                  </svg>
-                </div>
+                <div class="hero-float-badge badge-top-cyan" data-tool="workflow:edit" title="Edit PDF"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                <div class="hero-float-badge badge-top-orange" data-tool="workflow:pdf-to-pptx" title="PDF to PowerPoint"><span class="badge-word-w">P</span></div>
+                <div class="hero-float-badge badge-top-purple" data-tool="workflow:merge" title="Merge PDF"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4a2 2 0 0 1 2-2h12"/></svg></div>
+                <div class="hero-float-badge badge-left-green" data-tool="workflow:pdf-to-excel" title="PDF to Excel"><span class="badge-word-w">X</span></div>
+                <div class="hero-float-badge badge-left-magenta" data-tool="workflow:sign" title="Sign PDF"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="2"/></svg></div>
+                <div class="hero-float-badge badge-ocr-violet" data-tool="workflow:ocr" title="OCR Text Recognition"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></div>
+                <div class="hero-float-badge badge-right-yellow" data-tool="workflow:pdf-to-jpg" title="PDF to Image"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="hero-float-badge badge-right-blue" data-tool="workflow:pdf-to-word" title="PDF to Word"><span class="badge-word-w">W</span></div>
+                <div class="hero-float-badge badge-bottom-red" data-tool="workflow:compress" title="Compress PDF"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2" stroke-dasharray="3 3"/><path d="M9 9h6v6H9z"/></svg></div>
 
                 <!-- Drop Overlay on Illustration when dragging file -->
                 <div class="hero-mockup-drop-overlay">
@@ -495,8 +457,8 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
         </div>
 
         <!-- Clean Scroll Indicator Cue -->
-        <button class="landing-hero-scroll-cue" id="btn-landing-scroll-cue" aria-label="Scroll to explore 43+ tools">
-          <span>Explore 43+ PDF Tools</span>
+        <button class="landing-hero-scroll-cue" id="btn-landing-scroll-cue" aria-label="Scroll to explore 50+ tools">
+          <span>Explore 50+ PDF Tools</span>
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -602,7 +564,7 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
           </div>
 
           <div class="landing-filter-rail" id="landing-filter-rail">
-            <button class="landing-filter-chip active" data-filter="all">All Tools (43)</button>
+            <button class="landing-filter-chip active" data-filter="all">All Tools</button>
             <button class="landing-filter-chip" data-filter="popular">⭐ Most Popular</button>
             <button class="landing-filter-chip" data-filter="merge">🔗 Merge</button>
             <button class="landing-filter-chip" data-filter="split">✂ Split</button>
@@ -970,7 +932,7 @@ Powerful PDF tools to simplify your workflow, streamline document management, an
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="landing-header-search-input" class="landing-header-search-input" placeholder="Search 43+ tools (e.g., merge, redact, sign, ocr, split)..." autocomplete="off" />
+          <input type="text" id="landing-header-search-input" class="landing-header-search-input" placeholder="Search 50+ tools (e.g., word, excel, pptx, ocr, redact, compare, sign)..." autocomplete="off" />
           <button class="landing-search-close-btn" id="btn-close-search-modal" title="Close search">&times;</button>
         </div>
         <div class="landing-search-results-list" id="landing-search-results">

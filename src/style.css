@@ -2,7 +2,7 @@
    Modern PDF Editor UI Design System
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Dancing+Script:wght@700&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Dancing+Script:wght@700&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import './styles/sign-request.css';
 
@@ -255,7 +255,7 @@ body.dark-mode .pdf-page-wrap {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-app);
   color: var(--text-main);
   height: 100vh;
@@ -263,6 +263,17 @@ body {
   flex-direction: column;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6,
+.landing-hero-title,
+.showcase-title,
+.landing-tools-heading,
+.section-main-heading,
+.apps-title,
+.faq-title {
+  font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif;
+  letter-spacing: -0.025em;
 }
 
 /* ==========================================================================
@@ -2330,92 +2341,130 @@ body.show-tool-workflow .tool-workflow-container {
   z-index: 999;
 }
 
-/* Landing Header */
+/* ==========================================================================
+   Landing Header — Clean Minimalist Top Nav (Zero Gradients, Borderless, Shadowless)
+   ========================================================================== */
 .landing-header {
   position: sticky;
   top: 0;
-  height: 80px;
+  margin: 0;
+  width: 100%;
+  height: 64px;
   background-color: var(--bg-surface);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   z-index: 1000;
   display: flex;
   align-items: center;
-  
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: background-color 0.2s ease;
+}
+
+.landing-header.scrolled {
+  box-shadow: none;
+  border: none;
+}
+
+[data-theme="dark"] .landing-header,
+body.dark-mode .landing-header {
+  background-color: rgba(17, 24, 39, 0.96);
+  border: none;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .landing-header.scrolled,
+body.dark-mode .landing-header.scrolled {
+  box-shadow: none;
+  border: none;
 }
 
 .landing-nav-inner {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1320px;
+  height: 100%;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 }
 
-.landing-brand {
+/* Pryzm Left Cluster: Brand & Nav Links closely grouped */
+.landing-nav-left-cluster {
   display: flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  text-decoration: none;
+  gap: 28px;
 }
 
-.brand-logo-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #30050d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(48, 5, 13, 0.3);
-}
-
-.landing-brand .brand-text {
-  font-family: 'Outfit', -apple-system, sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.lets-logo-text-serif {
+  font-family: 'Newsreader', 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   color: var(--text-main);
-  display: flex;
-  align-items: center;
+  user-select: none;
+  line-height: 1;
+  display: inline-block;
+  transition: opacity 0.15s ease;
 }
 
-.landing-brand .brand-name-bold {
-  color: #30050d;
-  font-weight: 800;
+.lets-logo-text-serif:hover {
+  opacity: 0.85;
 }
 
 .landing-desktop-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 16px;
 }
 
-/* AMD / Linear style Pill Buttons */
 .landing-nav-link {
   background: transparent;
-  border: 1px solid transparent;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  border: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--text-muted);
-  padding: 6px 14px;
+  padding: 6px 8px;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   user-select: none;
 }
 
 .landing-nav-link:hover {
-  background-color: var(--bg-secondary);
-  border-color: var(--border-subtle);
   color: var(--text-main);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background-color: var(--bg-surface-hover, rgba(15, 23, 42, 0.04));
+}
+
+[data-theme="dark"] .landing-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Pryzm-style Nav Badge */
+.nav-pill-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.07);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  line-height: 1;
+}
+
+[data-theme="dark"] .nav-pill-badge {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
 }
 
 .landing-nav-link:active {
@@ -2494,7 +2543,7 @@ body.show-tool-workflow .tool-workflow-container {
 /* Smallpdf / Sejda Style Mega Menu Dropdown across Screen Size Width */
 .landing-mega-menu-content {
   position: fixed;
-  top: 80px;
+  top: 88px;
   left: 50%;
   transform: translateX(-50%);
   width: min(96vw, 1380px);
@@ -2561,11 +2610,76 @@ body.show-tool-workflow .tool-workflow-container {
   gap: 12px;
 }
 
-/* Executive Landing Nav Actions: Minimal Login & Clean Studio Button */
+/* Pryzm-style Right Pill Actions: Open studio & Sign in */
 .landing-nav-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.landing-studio-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 18px;
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: #1e293b;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.landing-studio-pill-btn:hover {
+  background: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .landing-studio-pill-btn {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .landing-studio-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.landing-signin-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.landing-signin-pill-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-strong);
+}
+
+[data-theme="dark"] .landing-signin-pill-btn {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+[data-theme="dark"] .landing-signin-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 .landing-login-btn {
@@ -2657,7 +2771,7 @@ body.show-tool-workflow .tool-workflow-container {
 .landing-hero-container {
   width: 100%;
   max-width: 1200px;
-  margin: auto 0;
+  margin: 0 auto;
 }
 
 .landing-hero-grid {
@@ -2699,6 +2813,95 @@ body.show-tool-workflow .tool-workflow-container {
 [data-theme="dark"] .landing-hero-subtitle {
   color: #a3a3a3;
 }
+
+.hero-suite-announcement-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-surface-hover, #f1f5f9);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 9999px;
+  padding: 5px 13px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  user-select: none;
+}
+
+[data-theme="dark"] .hero-suite-announcement-badge {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.hero-announcement-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.hero-tools-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 24px 0;
+}
+
+.hero-quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.hero-quick-chip:hover {
+  background: var(--bg-surface-hover, #f8fafc);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .hero-quick-chip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .hero-quick-chip:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.dot-pptx { background-color: #ea580c; }
+.dot-excel { background-color: #16a34a; }
+.dot-word { background-color: #2563eb; }
+.dot-ocr { background-color: #7c3aed; }
+.dot-diff { background-color: #0d9488; }
+.dot-redact { background-color: #e11d48; }
 
 .landing-hero-actions {
   display: flex;
@@ -3231,6 +3434,27 @@ body.show-tool-workflow .tool-workflow-container {
   right: 80px;
   background: #ef4444;
   animation: floatTop 4.8s ease-in-out infinite 0.6s;
+}
+
+.badge-top-orange {
+  top: 10px;
+  right: 24%;
+  background: #ea580c;
+  animation: floatTop 4.3s ease-in-out infinite 0.3s;
+}
+
+.badge-left-green {
+  top: 24%;
+  left: -12px;
+  background: #16a34a;
+  animation: floatSide 4.1s ease-in-out infinite 0.7s;
+}
+
+.badge-ocr-violet {
+  bottom: 18px;
+  left: 20px;
+  background: #7c3aed;
+  animation: floatSide 4.5s ease-in-out infinite 0.1s;
 }
 
 @keyframes floatTop {
@@ -3837,11 +4061,19 @@ body.show-tool-workflow .tool-workflow-container {
 .why-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 24px;
+  border-radius: 16px;
+  padding: 26px 24px;
   display: flex;
   flex-direction: column;
   position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.why-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.08);
 }
 
 .why-card-top {
@@ -7055,12 +7287,20 @@ body.show-tool-workflow .editor-paging-bar {
 .whats-new-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 22px 20px;
+  border-radius: 14px;
+  padding: 24px 22px;
   display: flex;
   flex-direction: column;
   position: relative;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.whats-new-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.08);
 }
 
 .whats-new-card-top {
@@ -8074,7 +8314,13 @@ body.show-tool-workflow .editor-paging-bar {
 
   /* Landing Page Header & Hero on Small Screens */
   .landing-header {
-    height: 88px;
+    top: 0;
+    margin: 0;
+    width: 100%;
+    height: 60px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .landing-nav-inner {

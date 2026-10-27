@@ -199,6 +199,22 @@ export class LandingPage {
       heroOpenEditorBtn.onclick = () => router.navigate('/edit_pdf');
     }
 
+    // Dynamic Header Shadow: Only show shadow when scrolled past top
+    const header = this.container.querySelector('.landing-header');
+    const updateNavScroll = () => {
+      const scrollY = this.container.scrollTop || window.scrollY || 0;
+      if (header) {
+        if (scrollY > 8) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      }
+    };
+    this.container.addEventListener('scroll', updateNavScroll, { passive: true });
+    window.addEventListener('scroll', updateNavScroll, { passive: true });
+    updateNavScroll();
+
     const heroPreview = this.container.querySelector('#landing-hero-preview');
     if (heroPreview) {
       heroPreview.onclick = (e) => {
@@ -209,6 +225,15 @@ export class LandingPage {
         }
       };
     }
+
+    // Hero quick interactive capability chips (PowerPoint, Excel, Word, OCR, Compare, Redact)
+    this.container.querySelectorAll('.hero-quick-chip').forEach(chip => {
+      chip.onclick = (e) => {
+        e.preventDefault();
+        const tool = chip.getAttribute('data-tool');
+        if (tool) this.handleToolAction(tool);
+      };
+    });
 
     const scrollToTools = () => {
       const toolsSec = this.container.querySelector('.landing-tools-section');
