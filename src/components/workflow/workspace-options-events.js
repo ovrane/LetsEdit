@@ -279,6 +279,38 @@ export function bindWorkspaceOptionsEvents(manager) {
     };
   }
 
+  // Word to PDF controls
+  const wordSizeSelect = manager.container.querySelector('#word-pagesize-select');
+  if (wordSizeSelect) {
+    wordSizeSelect.onchange = (e) => {
+      manager.wordPageSize = e.target.value;
+      manager.render();
+    };
+  }
+  const wordFontSelect = manager.container.querySelector('#word-font-select');
+  if (wordFontSelect) {
+    wordFontSelect.onchange = (e) => {
+      manager.wordFontFamily = e.target.value;
+      manager.render();
+    };
+  }
+
+  // PDF to Word controls
+  const pdfToWordModeSelect = manager.container.querySelector('#pdf-to-word-mode-select');
+  if (pdfToWordModeSelect) {
+    pdfToWordModeSelect.onchange = (e) => {
+      manager.pdfToWordMode = e.target.value;
+      manager.render();
+    };
+  }
+  const pdfToWordTableSelect = manager.container.querySelector('#pdf-to-word-table-select');
+  if (pdfToWordTableSelect) {
+    pdfToWordTableSelect.onchange = (e) => {
+      manager.pdfToWordTableSensitivity = e.target.value;
+      manager.render();
+    };
+  }
+
   // Copy extracted text buttons
   const copyTextHandler = async () => {
     const txt = manager.extractedTextPreview || (manager.container.querySelector('#extracted-text-area')?.value) || '';

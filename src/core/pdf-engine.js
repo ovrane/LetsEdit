@@ -63,6 +63,10 @@ export class PdfEngine {
     return await this.loader.renderPageToImageBlob(pageNum, dpiScale, format);
   }
 
+  async renderPagesToZip(options = {}, onProgress = null) {
+    return await PageOperations.renderPagesToZip(this.rawBytes, options, onProgress);
+  }
+
   // --- Page Operations (Merge, Split, Alternate, N-Up, Flip) ---
 
   async appendBlankPage(width = 595.28, height = 841.89) {
@@ -257,6 +261,11 @@ export class PdfEngine {
 
   async wordToPdf(docxBytes, options = {}) {
     return await PageOperations.wordToPdf(docxBytes, options);
+  }
+
+  async pdfToWord(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.pdfToWord(bytes, options);
   }
 
   async excelToPdf(fileBytes, options = {}) {

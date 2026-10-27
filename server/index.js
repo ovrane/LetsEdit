@@ -29,6 +29,10 @@ import { handleFlattenRequest } from './routes/flatten-routes.js';
 import { handleRedactRequest } from './routes/redact-routes.js';
 import { handleGrayscaleRequest } from './routes/grayscale-routes.js';
 import { handleDeskewRequest } from './routes/deskew-routes.js';
+import { handlePdfToImageRequest } from './routes/pdf-to-image-routes.js';
+import { handleImageToPdfRequest } from './routes/image-to-pdf-routes.js';
+import { handleWordToPdfRequest } from './routes/word-to-pdf-routes.js';
+import { handlePdfToWordRequest } from './routes/pdf-to-word-routes.js';
 import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
@@ -151,6 +155,22 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Scanner Deskew & Rectification endpoints
   const deskewHandled = await handleDeskewRequest(req, res, pathname, method);
   if (deskewHandled) return true;
+
+  // Dispatch High-DPI PDF to Image & Batch ZIP endpoints
+  const pdfToImageHandled = await handlePdfToImageRequest(req, res, pathname, method);
+  if (pdfToImageHandled) return true;
+
+  // Dispatch Raster & Vector Images to PDF endpoints
+  const imageToPdfHandled = await handleImageToPdfRequest(req, res, pathname, method);
+  if (imageToPdfHandled) return true;
+
+  // Dispatch Microsoft Word DOCX to PDF endpoints
+  const wordToPdfHandled = await handleWordToPdfRequest(req, res, pathname, method);
+  if (wordToPdfHandled) return true;
+
+  // Dispatch PDF to Microsoft Word DOCX endpoints
+  const pdfToWordHandled = await handlePdfToWordRequest(req, res, pathname, method);
+  if (pdfToWordHandled) return true;
 
   // Dispatch System Capabilities & Worker Status endpoints
   const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);

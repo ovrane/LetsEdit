@@ -222,21 +222,24 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([halvedBytes], { type: 'application/pdf' })
     };
   } else if (id === 'pdf-to-word') {
-    const text = await pdfEngine.extractDocumentText(primary.bytes);
-    const htmlDoc = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${primary.name}</title>
-      <style>body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.6; padding: 36pt; } p { margin-bottom: 10pt; }</style>
-      </head>
-      <body>
-        ${text.split('\n\n').filter(Boolean).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('')}
-      </body>
-      </html>
-    `;
+    let pdfjsDoc = null;
+    if (typeof window !== 'undefined' && pdfjsLib) {
+      try {
+        pdfjsDoc = await pdfjsLib.getDocument({ data: primary.bytes.slice(0) }).promise;
+      } catch (e) {}
+    }
+    const docxResult = await PageOperations.pdfToWord(primary.bytes, {
+      mode: manager.pdfToWordMode || 'flow',
+      tableSensitivity: manager.pdfToWordTableSensitivity || 'balanced',
+      pdfjsDoc,
+      withReport: true
+    });
+    const docxBytes = docxResult.docxBytes || docxResult;
     return {
-      name: `${primary.name.replace(/\.[^/.]+$/, '')}.doc`,
-      bytes: new TextEncoder().encode(htmlDoc),
-      blob: new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.docx`,
+      bytes: docxBytes,
+      blob: new Blob([docxBytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }),
+      report: docxResult.report
     };
   } else if (id === 'pdf-to-excel') {
     const text = await pdfEngine.extractDocumentText(primary.bytes);
@@ -544,68 +547,14 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([outBytes], { type: 'application/pdf' })
     };
   } else if (id === 'word-to-pdf') {
-    let paragraphs = [];
-    try {
-      const zip = await JSZip.loadAsync(primary.bytes);
-      const docXml = await zip.file('word/document.xml')?.async('text');
-      if (docXml) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(docXml, 'text/xml');
-        paragraphs = Array.from(xmlDoc.getElementsByTagName('w:p')).map(p => {
-          return Array.from(p.getElementsByTagName('w:t')).map(t => t.textContent).join('');
-        }).filter(Boolean);
-      }
-    } catch (e) {
-      console.warn('DOCX ZIP unpack fallback:', e);
-    }
-
-    if (paragraphs.length === 0) {
-      const textDecoder = new TextDecoder('utf-8');
-      paragraphs = textDecoder.decode(primary.bytes).replace(/[^\x20-\x7E\n]/g, ' ').split('\n').map(l => l.trim()).filter(l => l.length > 2);
-    }
-
-    const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    let page = pdfDoc.addPage([595.28, 841.89]);
-    let y = 800;
-
-    const docTitle = primary.name.replace(/\.[^/.]+$/, '');
-    page.drawText(docTitle, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-    y -= 30;
-
-    for (const para of paragraphs) {
-      if (y < 60) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        y = 800;
-      }
-      const words = para.split(' ');
-      let curLine = '';
-      for (const w of words) {
-        const testLine = curLine ? `${curLine} ${w}` : w;
-        if (font.widthOfTextAtSize(testLine, 11) > 495) {
-          page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
-          y -= 16;
-          if (y < 60) {
-            page = pdfDoc.addPage([595.28, 841.89]);
-            y = 800;
-          }
-          curLine = w;
-        } else {
-          curLine = testLine;
-        }
-      }
-      if (curLine) {
-        page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
-        y -= 20;
-      }
-    }
-
-    const outBytes = await pdfDoc.save();
+    const pdfBytes = await PageOperations.wordToPdf(primary.bytes, {
+      fontFamily: manager.wordFontFamily || 'helvetica',
+      pageSize: manager.wordPageSize || 'a4'
+    });
     return {
-      name: `${docTitle}.pdf`,
-      bytes: outBytes,
-      blob: new Blob([outBytes], { type: 'application/pdf' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
+      bytes: pdfBytes,
+      blob: new Blob([pdfBytes], { type: 'application/pdf' })
     };
   } else if (id === 'rename') {
     const text = await pdfEngine.extractDocumentText(primary.bytes);
@@ -785,8 +734,10 @@ export async function executeAction(manager) {
 
       const imgList = manager.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
       const pdfBytes = await PageOperations.imagesToPdf(imgList, {
-        orientation: manager.imgOrientation,
-        margin: parseInt(manager.imgMargin, 10) || 0,
+        pageSize: manager.imgPageSize || 'a4',
+        orientation: manager.imgOrientation || 'auto',
+        margin: manager.imgMargin || 'small',
+        layout: manager.imgLayout || '1-up',
         onProgress: ({ current, total }) => {
           if (manager.uploadedFiles.length > 1) {
             batchProgressModal.completeFile(current - 1);
@@ -804,44 +755,35 @@ export async function executeAction(manager) {
       manager.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
       manager.processedFilename = 'Images_Combined.pdf';
     } else if (t.id === 'to-image') {
-      const loadingTask = pdfjsLib.getDocument({
-        data: primary.bytes.slice(0),
-        cMapUrl: 'https://unpkg.com/pdfjs-dist@6.4.299/cmaps/',
-        cMapPacked: true
-      });
-      const doc = await loadingTask.promise;
-      const numPages = doc.numPages;
       const dpi = parseInt(manager.imageDpi, 10) || 150;
-      const scale = dpi / 72;
-      const mime = manager.imageFormat === 'image/jpeg' ? 'image/jpeg' : 'image/png';
-      const ext = manager.imageFormat === 'image/jpeg' ? 'jpg' : 'png';
+      const format = manager.imageFormat || 'image/jpeg';
+      const quality = (manager.imageQuality || 90) / 100;
+      const pageRange = manager.imagePageRange || 'all';
 
-      const imageBlobs = [];
-      for (let p = 1; p <= numPages; p++) {
-        const page = await doc.getPage(p);
-        const viewport = page.getViewport({ scale });
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext('2d');
-        if (mime === 'image/jpeg') {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const res = await PageOperations.renderPagesToZip(primary.bytes, {
+        dpi,
+        format,
+        quality,
+        pageRange,
+        baseName: primary.name
+      }, (prog) => {
+        if (execBtn) {
+          execBtn.innerHTML = `<span>Rendering Page ${prog.current} of ${prog.total} (${prog.percent}%)...</span>`;
         }
-        await page.render({ canvasContext: ctx, viewport }).promise;
-        const b = await new Promise(res => canvas.toBlob(res, mime, 0.92));
-        imageBlobs.push({ name: `page_${p}.${ext}`, blob: b, bytes: await b.arrayBuffer() });
-      }
-      doc.destroy();
+      });
 
-      if (imageBlobs.length === 1) {
-        manager.processedBlob = imageBlobs[0].blob;
-        manager.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_page_1.${ext}`;
+      if (res.totalImages === 1) {
+        const single = await PageOperations.renderPageToImage(primary.bytes, res.images[0].pageNum, {
+          dpi,
+          format,
+          quality,
+          baseName: primary.name
+        });
+        manager.processedBlob = single.blob;
+        manager.processedFilename = single.filename;
       } else {
-        const zip = new JSZip();
-        imageBlobs.forEach(img => zip.file(img.name, img.bytes));
-        manager.processedBlob = await zip.generateAsync({ type: 'blob' });
-        manager.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_images.zip`;
+        manager.processedBlob = res.zipBlob;
+        manager.processedFilename = res.zipFilename;
       }
     } else if (t.id === 'compare') {
       if (manager.uploadedFiles.length < 2) {

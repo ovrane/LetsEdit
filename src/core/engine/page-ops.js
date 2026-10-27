@@ -27,8 +27,12 @@ import { FlattenOps } from './operations/flatten-ops.js';
 import { RedactOps } from './operations/redact-ops.js';
 import { GrayscaleOps } from './operations/grayscale-ops.js';
 import { DeskewOps } from './operations/deskew-ops.js';
+import { PdfToImageOps } from './operations/pdf-to-image-ops.js';
+import { ImageToPdfOps } from './operations/image-to-pdf-ops.js';
+import { WordToPdfOps } from './operations/word-to-pdf-ops.js';
+import { PdfToWordOps } from './operations/pdf-to-word-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -67,11 +71,39 @@ export class PageOperations {
   static detectWhitespaceCrop(...args) { return GeometryOps.detectWhitespaceCrop(...args); }
 
   // Document Format Converters
-  static imagesToPdf(...args) { return ConvertOps.imagesToPdf(...args); }
+  static async imagesToPdf(imagesList, options = {}) {
+    const res = await ImageToPdfOps.imagesToPdf(imagesList, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleImageBatch(...args) { return ImageToPdfOps.createSampleImageBatch(...args); }
   static htmlToPdf(...args) { return ConvertOps.htmlToPdf(...args); }
-  static wordToPdf(...args) { return ConvertOps.wordToPdf(...args); }
+  static async wordToPdf(docxBytes, options = {}) {
+    const res = await WordToPdfOps.wordToPdf(docxBytes, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleDocxFile(...args) { return WordToPdfOps.createSampleDocxFile(...args); }
+  static async pdfToWord(pdfBytes, options = {}) {
+    const res = await PdfToWordOps.pdfToWord(pdfBytes, options);
+    if (res && res.docxBytes) {
+      res.docxBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.docxBytes;
+    }
+    return res;
+  }
+  static createSampleStructuredPdf(...args) { return PdfToWordOps.createSampleStructuredPdf(...args); }
   static excelToPdf(...args) { return ConvertOps.excelToPdf(...args); }
   static pptToPdf(...args) { return ConvertOps.pptToPdf(...args); }
+  static renderPageToImage(...args) { return PdfToImageOps.renderPageToImage(...args); }
+  static renderPagesToZip(...args) { return PdfToImageOps.renderPagesToZip(...args); }
+  static createSampleRasterPdf(...args) { return PdfToImageOps.createSampleRasterPdf(...args); }
 
   // Stamping & Numbering
   static batesNumberPdf(...args) { return BatesOps.applyBatesNumbering(...args); }

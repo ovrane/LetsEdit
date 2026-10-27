@@ -235,9 +235,22 @@ export function bindWorkspaceEvents(manager) {
   }
 
   // Images to PDF controls
+  const imgPageSizeSel = manager.container.querySelector('#img-pagesize-select');
+  if (imgPageSizeSel) {
+    imgPageSizeSel.onchange = (e) => {
+      manager.imgPageSize = e.target.value;
+      manager.render();
+    };
+  }
   manager.container.querySelectorAll('[data-img-orient]').forEach(btn => {
     btn.onclick = () => {
       manager.imgOrientation = btn.getAttribute('data-img-orient');
+      manager.render();
+    };
+  });
+  manager.container.querySelectorAll('[data-img-layout]').forEach(btn => {
+    btn.onclick = () => {
+      manager.imgLayout = btn.getAttribute('data-img-layout');
       manager.render();
     };
   });
@@ -259,6 +272,21 @@ export function bindWorkspaceEvents(manager) {
   if (dpiSel) {
     dpiSel.onchange = (e) => {
       manager.imageDpi = e.target.value;
+      manager.render();
+    };
+  }
+  const qualRange = manager.container.querySelector('#image-quality-range');
+  if (qualRange) {
+    qualRange.oninput = (e) => {
+      manager.imageQuality = parseInt(e.target.value, 10);
+      const valDisp = manager.container.querySelector('#img-quality-val');
+      if (valDisp) valDisp.textContent = `${manager.imageQuality}%`;
+    };
+  }
+  const pageRangeInp = manager.container.querySelector('#image-pagerange-input');
+  if (pageRangeInp) {
+    pageRangeInp.oninput = (e) => {
+      manager.imagePageRange = e.target.value;
     };
   }
 

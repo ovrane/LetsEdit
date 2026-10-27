@@ -118,28 +118,60 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'images-to-pdf') {
+      const orientation = instance.imgOrientation || 'auto';
+      const pageSize = instance.imgPageSize || 'a4';
+      const margin = instance.imgMargin || 'small';
+      const layout = instance.imgLayout || '1-up';
+
       return `
         <div class="workflow-options-group">
+          <label class="workflow-options-label">Page Size Preset</label>
+          <select id="img-pagesize-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="a4" ${pageSize === 'a4' ? 'selected' : ''}>A4 Standard (210 × 297 mm)</option>
+            <option value="letter" ${pageSize === 'letter' ? 'selected' : ''}>US Letter (8.5 × 11 in)</option>
+            <option value="legal" ${pageSize === 'legal' ? 'selected' : ''}>US Legal (8.5 × 14 in)</option>
+            <option value="fit" ${pageSize === 'fit' ? 'selected' : ''}>Fit Image Exact (No Margins / Original Aspect)</option>
+          </select>
+
           <label class="workflow-options-label">Page Orientation</label>
-          <div class="tool-segmented-control" style="margin-bottom: 14px;">
-            <button type="button" class="tool-seg-btn ${instance.imgOrientation === 'portrait' ? 'active' : ''}" data-img-orient="portrait">
-              Portrait (A4)
+          <div class="tool-segmented-control" style="margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${orientation === 'auto' ? 'active' : ''}" data-img-orient="auto">
+              Auto (Smart)
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imgOrientation === 'landscape' ? 'active' : ''}" data-img-orient="landscape">
-              Landscape (A4)
+            <button type="button" class="tool-seg-btn ${orientation === 'portrait' ? 'active' : ''}" data-img-orient="portrait">
+              Portrait
+            </button>
+            <button type="button" class="tool-seg-btn ${orientation === 'landscape' ? 'active' : ''}" data-img-orient="landscape">
+              Landscape
             </button>
           </div>
 
-          <label class="workflow-options-label">Page Margin</label>
-          <div class="tool-segmented-control">
-            <button type="button" class="tool-seg-btn ${instance.imgMargin === '0' ? 'active' : ''}" data-img-margin="0">
-              No Margin
+          <label class="workflow-options-label">Grid Imposition Layout</label>
+          <div class="tool-segmented-control" style="margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${layout === '1-up' ? 'active' : ''}" data-img-layout="1-up">
+              1-Up
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imgMargin === '20' ? 'active' : ''}" data-img-margin="20">
-              Small (20pt)
+            <button type="button" class="tool-seg-btn ${layout === '2-up' ? 'active' : ''}" data-img-layout="2-up">
+              2-Up
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imgMargin === '40' ? 'active' : ''}" data-img-margin="40">
-              Big (40pt)
+            <button type="button" class="tool-seg-btn ${layout === '4-up' ? 'active' : ''}" data-img-layout="4-up">
+              4-Up (Grid)
+            </button>
+          </div>
+
+          <label class="workflow-options-label">Page Margins</label>
+          <div class="tool-segmented-control" style="margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${margin === 'none' || margin === '0' ? 'active' : ''}" data-img-margin="none">
+              None
+            </button>
+            <button type="button" class="tool-seg-btn ${margin === 'small' || margin === '18' ? 'active' : ''}" data-img-margin="small">
+              Small
+            </button>
+            <button type="button" class="tool-seg-btn ${margin === 'medium' || margin === '36' ? 'active' : ''}" data-img-margin="medium">
+              Med
+            </button>
+            <button type="button" class="tool-seg-btn ${margin === 'large' || margin === '72' ? 'active' : ''}" data-img-margin="large">
+              Large
             </button>
           </div>
         </div>
@@ -147,24 +179,56 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'to-image') {
+      const format = instance.imageFormat || 'image/jpeg';
+      const dpi = parseInt(instance.imageDpi, 10) || 150;
+      const quality = typeof instance.imageQuality === 'number' ? instance.imageQuality : 90;
+      const pageRange = instance.imagePageRange || 'all';
+
+      const scale = dpi / 72;
+      const wPx = Math.round(595.28 * scale);
+      const hPx = Math.round(841.89 * scale);
+      const mp = ((wPx * hPx) / 1_000_000).toFixed(1);
+
       return `
         <div class="workflow-options-group">
           <label class="workflow-options-label">Image Output Format</label>
-          <div class="tool-segmented-control" style="margin-bottom: 14px;">
-            <button type="button" class="tool-seg-btn ${instance.imageFormat === 'image/jpeg' ? 'active' : ''}" data-img-fmt="image/jpeg">
-              JPG (Standard)
+          <div class="tool-segmented-control" style="margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${format === 'image/jpeg' ? 'active' : ''}" data-img-fmt="image/jpeg">
+              JPG
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imageFormat === 'image/png' ? 'active' : ''}" data-img-fmt="image/png">
-              PNG (Lossless)
+            <button type="button" class="tool-seg-btn ${format === 'image/png' ? 'active' : ''}" data-img-fmt="image/png">
+              PNG (Alpha)
+            </button>
+            <button type="button" class="tool-seg-btn ${format === 'image/webp' ? 'active' : ''}" data-img-fmt="image/webp">
+              WebP
             </button>
           </div>
 
           <label class="workflow-options-label">Output DPI Quality</label>
-          <select id="image-dpi-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
-            <option value="150" ${instance.imageDpi === '150' ? 'selected' : ''}>150 DPI (Balanced Standard)</option>
-            <option value="300" ${instance.imageDpi === '300' ? 'selected' : ''}>300 DPI (Ultra High Print Quality)</option>
-            <option value="72" ${instance.imageDpi === '72' ? 'selected' : ''}>72 DPI (Web & Screen Thumbnail)</option>
+          <select id="image-dpi-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="72" ${dpi === 72 ? 'selected' : ''}>72 DPI (Web Screen & Fast Preview)</option>
+            <option value="150" ${dpi === 150 ? 'selected' : ''}>150 DPI (Balanced Standard Office)</option>
+            <option value="300" ${dpi === 300 ? 'selected' : ''}>300 DPI (High-Resolution Print Publication)</option>
+            <option value="600" ${dpi === 600 ? 'selected' : ''}>600 DPI (Archival Ultra-Definition)</option>
           </select>
+
+          ${format !== 'image/png' ? `
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                <span>Compression Quality</span>
+                <span id="img-quality-val">${quality}%</span>
+              </div>
+              <input type="range" id="image-quality-range" min="20" max="100" value="${quality}" style="width: 100%; cursor: pointer;" />
+            </div>
+          ` : ''}
+
+          <label class="workflow-options-label">Pages to Export</label>
+          <input type="text" id="image-pagerange-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 14px;" placeholder="e.g. all, 1-3, 5" value="${pageRange}" />
+
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 10px 12px;">
+            <span style="color: var(--text-primary); font-weight: 600;">Resolution:</span>
+            <span style="color: #2563eb; font-weight: 700;">${wPx} × ${hPx} px (${mp} MP @ ${dpi} DPI)</span>
+          </div>
         </div>
       `;
     }
@@ -557,6 +621,59 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
 
           <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
             Converts colored images, vector fills, and stroke streams to monochrome DeviceGray. Significantly reduces toner usage, printer wear, and output file size.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'word-to-pdf') {
+      const font = instance.wordFontFamily || 'helvetica';
+      const size = instance.wordPageSize || 'a4';
+
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Output Page Format</label>
+          <select id="word-pagesize-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="a4" ${size === 'a4' ? 'selected' : ''}>A4 Standard (210 × 297 mm)</option>
+            <option value="letter" ${size === 'letter' ? 'selected' : ''}>US Letter (8.5 × 11 in)</option>
+            <option value="legal" ${size === 'legal' ? 'selected' : ''}>US Legal (8.5 × 14 in)</option>
+          </select>
+
+          <label class="workflow-options-label">Base Typography Font</label>
+          <select id="word-font-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 14px;">
+            <option value="helvetica" ${font === 'helvetica' ? 'selected' : ''}>Helvetica / Arial (Modern Sans-Serif)</option>
+            <option value="times" ${font === 'times' ? 'selected' : ''}>Times Roman (Classic Serif)</option>
+            <option value="courier" ${font === 'courier' ? 'selected' : ''}>Courier (Monospace Code / Terminal)</option>
+          </select>
+
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Parses OpenXML Word document elements, preserving Heading 1 & 2 styles, bold & italic character formatting, bulleted lists, and structured data tables.
+          </div>
+        </div>
+      `;
+    }
+
+    if (id === 'pdf-to-word') {
+      const mode = instance.pdfToWordMode || 'flow';
+      const sensitivity = instance.pdfToWordTableSensitivity || 'balanced';
+
+      return `
+        <div class="workflow-options-group">
+          <label class="workflow-options-label">Conversion Mode</label>
+          <select id="pdf-to-word-mode-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="flow" ${mode === 'flow' ? 'selected' : ''}>Flowing Paragraphs (Reflowable text for easy editing)</option>
+            <option value="frame" ${mode === 'frame' ? 'selected' : ''}>Exact Visual Frame (Fixed layout line preservation)</option>
+          </select>
+
+          <label class="workflow-options-label">Table Structural Detector</label>
+          <select id="pdf-to-word-table-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 14px;">
+            <option value="balanced" ${sensitivity === 'balanced' ? 'selected' : ''}>Balanced (Auto-detect aligned text grids)</option>
+            <option value="strict" ${sensitivity === 'strict' ? 'selected' : ''}>Strict (High precision column coordinate matching)</option>
+            <option value="aggressive" ${sensitivity === 'aggressive' ? 'selected' : ''}>Aggressive (Extract all spaced gutters as tables)</option>
+          </select>
+
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+            Reconstructs continuous paragraphs, Heading 1 &amp; 2 hierarchy, and native Word &lt;w:tbl&gt; data grids with pure client-side zero-telemetry.
           </div>
         </div>
       `;
