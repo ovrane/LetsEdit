@@ -942,13 +942,18 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'ppt-to-pdf') {
+      const layout = instance.pptHandoutLayout || '1-up';
       return `
         <div class="workflow-options-group">
-          <label class="workflow-options-label">Presentation Title</label>
-          <input type="text" id="workflow-ppt-title" class="input-sm" value="${instance.pptTitle || primary.name?.replace(/\.[^/.]+$/, '') || 'Presentation Deck'}" placeholder="Presentation Deck" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
-
-          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Converts slide texts, bullets, and titles into 16:9 widescreen landscape PDF presentation pages with executive header banners and footer slide counters.
+          <label class="workflow-options-label">Handout Layout Mode</label>
+          <select id="ppt-handout-select" class="select-sm" style="width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="1-up" ${layout === '1-up' ? 'selected' : ''}>1 Slide Per Page (16:9 Widescreen)</option>
+            <option value="2-up" ${layout === '2-up' ? 'selected' : ''}>2 Slides Per Page (Stacked Handout)</option>
+            <option value="3-up" ${layout === '3-up' ? 'selected' : ''}>3 Slides Per Page + Meeting Notes Lines</option>
+            <option value="6-up" ${layout === '6-up' ? 'selected' : ''}>6 Slides Overview Grid</option>
+          </select>
+          <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Converts PowerPoint (.pptx) presentation decks into vector slides or executive meeting handouts.
           </div>
         </div>
       `;

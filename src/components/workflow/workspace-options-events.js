@@ -616,6 +616,13 @@ export function bindWorkspaceOptionsEvents(manager) {
       manager.pptTitle = e.target.value;
     };
   }
+  const pptHandoutSelect = manager.container.querySelector('#ppt-handout-select');
+  if (pptHandoutSelect) {
+    pptHandoutSelect.onchange = (e) => {
+      manager.pptHandoutLayout = e.target.value;
+      manager.render();
+    };
+  }
 
   // Form Filler listeners
   if (manager.activeTool.id === 'fill-forms') {

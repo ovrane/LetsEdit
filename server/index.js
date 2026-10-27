@@ -35,6 +35,7 @@ import { handleWordToPdfRequest } from './routes/word-to-pdf-routes.js';
 import { handlePdfToWordRequest } from './routes/pdf-to-word-routes.js';
 import { handleExcelToPdfRequest } from './routes/excel-to-pdf-routes.js';
 import { handlePdfToExcelRequest } from './routes/pdf-to-excel-routes.js';
+import { handlePptxToPdfRequest } from './routes/pptx-to-pdf-routes.js';
 import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
@@ -181,6 +182,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch PDF to Excel XLSX & CSV endpoints
   const pdfToExcelHandled = await handlePdfToExcelRequest(req, res, pathname, method);
   if (pdfToExcelHandled) return true;
+
+  // Dispatch PowerPoint PPTX to PDF endpoints
+  const pptxToPdfHandled = await handlePptxToPdfRequest(req, res, pathname, method);
+  if (pptxToPdfHandled) return true;
 
   // Dispatch System Capabilities & Worker Status endpoints
   const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);

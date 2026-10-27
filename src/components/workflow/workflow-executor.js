@@ -508,11 +508,15 @@ export async function processSingleDocument(manager, tool, file) {
     };
   } else if (id === 'ppt-to-pdf') {
     const title = manager.pptTitle || primary.name.replace(/\.[^/.]+$/, '');
-    const pdfBytes = await PageOperations.pptToPdf(primary.bytes, { title });
+    const pdfBytes = await PageOperations.pptToPdf(primary.bytes, {
+      title,
+      layout: manager.pptHandoutLayout || '1-up'
+    });
     return {
       name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
       bytes: pdfBytes,
-      blob: new Blob([pdfBytes], { type: 'application/pdf' })
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }),
+      report: pdfBytes.report
     };
   } else if (id === 'html-to-pdf') {
     const textDecoder = new TextDecoder('utf-8');
