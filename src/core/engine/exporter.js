@@ -103,9 +103,10 @@ export class PdfExporter {
     const numSourcePages = sourceDoc.getPageCount();
 
     // Determine target page sequence from pageOrder
+    const isDeleted = (p) => state.deletedPages?.has ? state.deletedPages.has(p) : false;
     const targetOrder = state.pageOrder && state.pageOrder.length > 0
-      ? state.pageOrder.filter(p => !state.deletedPages.has(p))
-      : Array.from({ length: numSourcePages }, (_, i) => i + 1).filter(p => !state.deletedPages.has(p));
+      ? state.pageOrder.filter(p => !isDeleted(p))
+      : Array.from({ length: numSourcePages }, (_, i) => i + 1).filter(p => !isDeleted(p));
 
     const totalPages = targetOrder.length;
 
@@ -134,13 +135,13 @@ export class PdfExporter {
       }
 
       // Apply rotation if any
-      const addRotation = state.pageRotations[origPage] || 0;
+      const addRotation = (state.pageRotations && state.pageRotations[origPage]) || 0;
       if (addRotation !== 0) {
         const curRot = copiedPage.getRotation().angle;
         copiedPage.setRotation(degrees((curRot + addRotation) % 360));
       }
 
-      const annotations = state.annotations[origPage] || [];
+      const annotations = (state.annotations && state.annotations[origPage]) || [];
 
       // Pass 1: True Redaction — purge underlying text content streams
       const redactionBoxes = [];

@@ -42,6 +42,7 @@ import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 import { pwaManager } from './core/pwa-manager.js';
 import { legalModal } from './components/legal-modal.js';
 import { populateFontSelect, loadAllEditorFonts } from './core/font-registry.js';
+import { studioExportModal } from './components/studio-export-modal.js';
 
 class App {
   constructor() {
@@ -374,28 +375,16 @@ class App {
       };
     }
 
-    // Export & Download (Try direct Native File System Save first, fallback to blob download)
-    document.getElementById('btn-save-pdf').onclick = async () => {
-      try {
-        Toast.info('Compiling & generating vector PDF...');
-        const state = store.getState();
-        const pdfBytes = await pdfEngine.exportPdf(state);
-        const name = (state.filename || 'document').replace('.pdf', '') + '_edited.pdf';
-
-        const fsResult = await pwaManager.saveLocalPdfWithFsApi(pdfBytes, name);
-        if (fsResult && fsResult.success) {
-          Toast.success(`Directly saved ${fsResult.name} to disk!`);
-          return;
-        }
-
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        downloadBlob(blob, name);
-        Toast.success('PDF successfully exported!');
-      } catch (err) {
-        console.error('Export error:', err);
-        Toast.error('Failed to export PDF: ' + err.message);
-      }
+    // Apply Changes -> Process -> Export Workflow (Sejda & Smallpdf architecture)
+    const triggerApplyWorkflow = () => {
+      studioExportModal.startWorkflow(store.getState());
     };
+
+    const saveBtn = document.getElementById('btn-save-pdf');
+    if (saveBtn) saveBtn.onclick = triggerApplyWorkflow;
+
+    const floatingApplyBtn = document.getElementById('btn-floating-apply');
+    if (floatingApplyBtn) floatingApplyBtn.onclick = triggerApplyWorkflow;
 
     // Initialize & Wire theme toggle
     applyTheme(getPreferredTheme());

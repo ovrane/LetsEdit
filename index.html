@@ -189,11 +189,11 @@
         </svg>
       </button>
 
-      <button class="btn btn-primary btn-sm btn-export-pdf" id="btn-save-pdf">
+      <button class="btn btn-primary btn-sm btn-export-pdf" id="btn-save-pdf" title="Apply changes & export PDF">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
         </svg>
-        <span>Export PDF</span>
+        <span>Apply changes</span>
       </button>
 
       <div id="user-profile-widget">
@@ -719,6 +719,17 @@
 
     <!-- Right Tool Options Sidebar -->
     <aside class="tool-options-sidebar" id="tool-options-sidebar"></aside>
+
+    <!-- Floating Action Bar for Studio Editor (Sejda-style persistent 'Apply changes') -->
+    <div class="editor-floating-bottom-bar" id="editor-floating-apply">
+      <button class="btn btn-primary btn-apply-changes" id="btn-floating-apply" title="Apply changes and export PDF">
+        <span>Apply changes</span>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
   </main>
 
   <script type="module" src="/src/main.js"></script>
