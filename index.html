@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LetsEdit — Modern, Private Online PDF Editor & Suite</title>
-  <meta name="description" content="Free online PDF editor and tools suite. Edit text, merge, split, compress, fill and sign, watermark, rotate, and protect PDF files 100% in your browser with zero cloud uploads.">
-  <meta name="keywords" content="pdf editor, edit pdf, free pdf editor, merge pdf, split pdf, compress pdf, sign pdf, watermark pdf, rotate pdf, sejda pdf editor, ilovepdf">
+  <meta name="description"
+    content="Free online PDF editor and tools suite. Edit text, merge, split, compress, fill and sign, watermark, rotate, and protect PDF files 100% in your browser with zero cloud uploads.">
+  <meta name="keywords"
+    content="pdf editor, edit pdf, free pdf editor, merge pdf, split pdf, compress pdf, sign pdf, watermark pdf, rotate pdf, sejda pdf editor, ilovepdf">
   <meta property="og:title" content="LetsEdit — Fast, Private Online PDF Suite">
-  <meta property="og:description" content="Every tool you need to work with PDFs in one place. 100% free, private, client-side WebAssembly execution with zero server uploads.">
+  <meta property="og:description"
+    content="Every tool you need to work with PDFs in one place. 100% free, private, client-side WebAssembly execution with zero server uploads.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#30050d">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <script type="application/ld+json">
@@ -33,36 +39,47 @@
   }
   </script>
 </head>
+
 <body class="show-landing sidebar-open tool-sidebar-open">
 
   <!-- Main Top Navbar (Adobe Acrobat Style Executive Command Bar) -->
   <header class="app-navbar">
     <div class="navbar-brand">
       <button class="btn btn-sm btn-outline back-home-btn" id="btn-studio-home" title="Back to Tools Home (/)">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
         <span>Tools Home</span>
       </button>
       <button id="toggle-sidebar-btn" class="icon-btn" title="Toggle Pages Drawer (Shift+P)">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
       </button>
       <div class="lets-logo" id="editor-brand-logo" title="LetsEdit Studio">
         <div class="lets-logo-badge">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
-            <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8"/>
-            <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE"/>
-            <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500"/>
+            <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C" />
+            <rect x="13" y="2" width="9" height="9" rx="2.8" fill="#00B4D8" />
+            <rect x="2" y="13" width="9" height="9" rx="2.8" fill="#2F74EE" />
+            <rect x="13" y="13" width="9" height="9" rx="2.8" fill="#F0A500" />
           </svg>
         </div>
         <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
       </div>
       <div class="file-title-pill" id="current-filename-pill" title="Click to rename document">
         <span class="file-name-tag" id="current-filename">No document selected</span>
-        <svg class="rename-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        <svg class="rename-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
       </div>
       <input type="file" id="upload-pdf-input" accept="application/pdf" style="display:none;" />
       <button class="btn btn-sm btn-outline" id="btn-open-pdf" title="Open PDF file from device">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+        </svg>
         <span>Open PDF</span>
       </button>
     </div>
@@ -71,10 +88,14 @@
     <div class="navbar-center">
       <div class="navbar-cmd-group">
         <button class="icon-btn" id="btn-undo" title="Undo (Ctrl+Z)">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 0 1 5 5v2M3 10l6-6M3 10l6 6"></path></svg>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 10h10a5 5 0 0 1 5 5v2M3 10l6-6M3 10l6 6"></path>
+          </svg>
         </button>
         <button class="icon-btn" id="btn-redo" title="Redo (Ctrl+Y)">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10H11a5 5 0 0 0-5 5v2m15-7l-6-6m6 6l-6 6"></path></svg>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 10H11a5 5 0 0 0-5 5v2m15-7l-6-6m6 6l-6 6"></path>
+          </svg>
         </button>
       </div>
 
@@ -82,11 +103,16 @@
 
       <div class="navbar-cmd-group page-nav-group">
         <button class="icon-btn icon-btn-xs" id="btn-page-prev" title="Previous Page (PgUp)">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
         </button>
-        <span class="page-badge-text">Page <span id="current-page-num">1</span> / <span id="total-page-num">1</span></span>
+        <span class="page-badge-text">Page <span id="current-page-num">1</span> / <span
+            id="total-page-num">1</span></span>
         <button class="icon-btn icon-btn-xs" id="btn-page-next" title="Next Page (PgDn)">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
         </button>
       </div>
 
@@ -94,17 +120,27 @@
 
       <div class="navbar-cmd-group zoom-group">
         <button class="icon-btn icon-btn-xs" id="btn-zoom-out" title="Zoom Out (Ctrl+-)">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
         </button>
         <span id="zoom-level-text" class="zoom-text">100%</span>
         <button class="icon-btn icon-btn-xs" id="btn-zoom-in" title="Zoom In (Ctrl++)">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
         </button>
         <button class="icon-btn icon-btn-xs" id="btn-fit-width" title="Fit to Width">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12h16M4 12l4-4M4 12l4 4M20 12l-4-4M20 12l4 4"></path></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 12h16M4 12l4-4M4 12l4 4M20 12l-4-4M20 12l4 4"></path>
+          </svg>
         </button>
         <button class="icon-btn icon-btn-xs" id="btn-fit-page" title="Fit Entire Page">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"></rect><path d="M9 9h6M9 13h6"></path></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="5" y="4" width="14" height="16" rx="2"></rect>
+            <path d="M9 9h6M9 13h6"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -117,7 +153,8 @@
       </div>
 
       <button class="icon-btn" id="btn-theme-toggle" title="Toggle Theme (Dark / Light)">
-        <svg class="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
           <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -131,22 +168,40 @@
       </button>
 
       <button class="btn btn-sm btn-outline" id="btn-open-all-tools" title="Open 43+ PDF Tools Directory (/)">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="19" r="2"></circle><circle cx="12" cy="19" r="2"></circle><circle cx="19" cy="19" r="2"></circle></svg>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <circle cx="5" cy="5" r="2"></circle>
+          <circle cx="12" cy="5" r="2"></circle>
+          <circle cx="19" cy="5" r="2"></circle>
+          <circle cx="5" cy="12" r="2"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+          <circle cx="19" cy="12" r="2"></circle>
+          <circle cx="5" cy="19" r="2"></circle>
+          <circle cx="12" cy="19" r="2"></circle>
+          <circle cx="19" cy="19" r="2"></circle>
+        </svg>
         <span>All Tools</span>
       </button>
 
       <button class="icon-btn" id="btn-toggle-tool-sidebar" title="Toggle Tool Options Sidebar">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="15" y1="3" x2="15" y2="21"></line>
+        </svg>
       </button>
 
       <button class="btn btn-primary btn-sm btn-export-pdf" id="btn-save-pdf">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+        </svg>
         <span>Export PDF</span>
       </button>
 
       <div id="user-profile-widget">
         <button class="btn btn-outline btn-sm" id="btn-open-auth">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
           <span id="user-display-name">Log in</span>
         </button>
       </div>
@@ -158,17 +213,26 @@
     <!-- Group 1: Selection & Text Editing -->
     <div class="toolbar-group">
       <button class="tool-btn active" data-tool="select" title="Cursor / Select Tool (V)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M3 3l7 18 3-7 7-3L3 3z"></path>
+        </svg>
         <span>Select</span>
       </button>
 
       <button class="tool-btn" data-tool="text" title="Text Tool (T)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="4 7 4 4 20 4 20 7"></polyline>
+          <line x1="9" y1="20" x2="15" y2="20"></line>
+          <line x1="12" y1="4" x2="12" y2="20"></line>
+        </svg>
         <span>Text</span>
       </button>
 
       <button class="tool-btn" data-tool="link" title="Links (Hotspot URL or Page Jump) (L)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
         <span>Link</span>
       </button>
     </div>
@@ -176,32 +240,50 @@
     <!-- Group 2: Annotations, Drawing & Markup -->
     <div class="toolbar-group">
       <button class="tool-btn" data-tool="draw" title="Freehand Pen (P)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+        </svg>
         <span>Draw</span>
       </button>
 
       <button class="tool-btn" data-tool="highlight" title="Highlighter (H)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2l4 4L7 17H3v-4L14 2z"></path><path d="M3 22h18"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M14 2l4 4L7 17H3v-4L14 2z"></path>
+          <path d="M3 22h18"></path>
+        </svg>
         <span>Highlight</span>
       </button>
 
       <button class="tool-btn" data-tool="eraser" title="Eraser (E)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13l-7-7L3 14l7 7 8-8z"></path><line x1="14" y1="22" x2="22" y2="22"></line></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M18 13l-7-7L3 14l7 7 8-8z"></path>
+          <line x1="14" y1="22" x2="22" y2="22"></line>
+        </svg>
         <span>Eraser</span>
       </button>
 
       <button class="tool-btn" data-tool="shape" title="Shapes (Rectangle, Ellipse, Line, Arrow) (S)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 16 16 16"></polygon></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="12 8 8 16 16 16"></polygon>
+        </svg>
         <span>Shapes</span>
       </button>
 
       <button class="tool-btn" data-tool="image" title="Insert Images & Stamps (I)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
         <span>Stamps</span>
       </button>
 
       <button class="tool-btn" data-tool="note" title="Sticky Note & Comments (C)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
         <span>Note</span>
       </button>
     </div>
@@ -209,17 +291,25 @@
     <!-- Group 3: Security, Redaction & Forms -->
     <div class="toolbar-group">
       <button class="tool-btn" data-tool="whiteout" title="Permanent Redaction & Vector Whiteout (R)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+        </svg>
         <span>Redact</span>
       </button>
 
       <button class="tool-btn" data-tool="sign" title="Electronic Signature (F)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M3 17l6-6 4 4 8-8"></path>
+          <path d="M14 7h7v7"></path>
+        </svg>
         <span>Sign</span>
       </button>
 
       <button class="tool-btn" data-tool="form" title="Interactive Form Fields (M)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
         <span>Forms</span>
       </button>
     </div>
@@ -229,34 +319,52 @@
       <!-- Pages Dropdown -->
       <div class="canva-dropdown">
         <button class="tool-btn dropdown-trigger" id="dropdown-pages-btn" title="Organize, Split, Crop & Resize Pages">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
           <span>Pages</span>
-          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
         </button>
         <div class="dropdown-menu">
           <button class="dropdown-item" id="btn-open-split">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 3h5v5M8 3H3v5M12 22V2"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M16 3h5v5M8 3H3v5M12 22V2"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Split Pages</div>
               <div class="dropdown-desc">Extract custom page ranges</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-split-half">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z">
+              </path>
+            </svg>
             <div>
               <div class="dropdown-title">Split in Half</div>
               <div class="dropdown-desc">Bisect two-page book scans</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-mix">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+            </svg>
             <div>
               <div class="dropdown-title">Alternate & Mix</div>
               <div class="dropdown-desc">Interleave duplex scanner pages</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-nup">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="12" y1="3" x2="12" y2="21"></line>
+            </svg>
             <div>
               <div class="dropdown-title">N-Up Imposition</div>
               <div class="dropdown-desc">Print 2 or 4 pages per sheet</div>
@@ -264,21 +372,27 @@
           </button>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="btn-open-crop">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Crop Margins</div>
               <div class="dropdown-desc">Trim whitespace and borders</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-resize">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Resize & Bounds</div>
               <div class="dropdown-desc">Spiral binder margin & A4/Letter fit</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-flip">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M12 4v16"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Flip / Mirror</div>
               <div class="dropdown-desc">Horizontal or vertical flip</div>
@@ -289,77 +403,114 @@
 
       <!-- Document Tools Dropdown -->
       <div class="canva-dropdown">
-        <button class="tool-btn dropdown-trigger" id="dropdown-tools-btn" title="Compress, Watermark, Numbers, Security">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <button class="tool-btn dropdown-trigger" id="dropdown-tools-btn"
+          title="Compress, Watermark, Numbers, Security">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
           <span>Tools</span>
-          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
         </button>
         <div class="dropdown-menu">
           <button class="dropdown-item" id="btn-open-compress">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 14h6m-6-4h6m4 8h6m-6-4h6M4 6h16M4 18h4"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Compress PDF</div>
               <div class="dropdown-desc">Reduce document file size</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-watermark">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Watermark</div>
               <div class="dropdown-desc">Diagonal text or stamp overlay</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-pagenumbers">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="4" y1="9" x2="20" y2="9"></line>
+              <line x1="4" y1="15" x2="20" y2="15"></line>
+              <line x1="10" y1="3" x2="8" y2="21"></line>
+              <line x1="16" y1="3" x2="14" y2="21"></line>
+            </svg>
             <div>
               <div class="dropdown-title">Page Numbers</div>
               <div class="dropdown-desc">Header & Footer numbering</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-bates">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Bates Numbering</div>
               <div class="dropdown-desc">Legal indexing sequences</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-security">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Protect & Encrypt</div>
               <div class="dropdown-desc">AES password security</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-metadata">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
             <div>
               <div class="dropdown-title">Metadata & Properties</div>
               <div class="dropdown-desc">Title, Author, Keywords</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-grayscale">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Grayscale PDF</div>
               <div class="dropdown-desc">Desaturate colors & save ink</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-sanitize">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Sanitize Document</div>
               <div class="dropdown-desc">Purge hidden metadata & scripts</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-flatten">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
             <div>
               <div class="dropdown-title">Flatten Forms</div>
               <div class="dropdown-desc">Lock interactive fields to vector art</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-ocr">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 7V4h16v3M9 20h6M12 4v16"></path>
+            </svg>
             <div>
               <div class="dropdown-title">OCR PDF</div>
               <div class="dropdown-desc">Make scanned text searchable</div>
@@ -371,34 +522,55 @@
       <!-- Convert Dropdown -->
       <div class="canva-dropdown">
         <button class="tool-btn dropdown-trigger" id="dropdown-convert-btn" title="Convert to and from PDF">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
           <span>Convert</span>
-          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+          <svg class="chevron-icon" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
         </button>
         <div class="dropdown-menu">
           <button class="dropdown-item" id="btn-open-to-image">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
             <div>
               <div class="dropdown-title">PDF to JPG / PNG</div>
               <div class="dropdown-desc">High-res 72, 150, or 300 DPI</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-open-extract-images">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
             <div>
               <div class="dropdown-title">Extract Images</div>
               <div class="dropdown-desc">Extract embedded JPEG/PNGs to ZIP</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-quick-images-to-pdf">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+            </svg>
             <div>
               <div class="dropdown-title">Images to PDF</div>
               <div class="dropdown-desc">Combine photos into A4 PDF</div>
             </div>
           </button>
           <button class="dropdown-item" id="btn-quick-extract-text">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="21" y1="10" x2="3" y2="10"></line>
+              <line x1="21" y1="6" x2="3" y2="6"></line>
+              <line x1="21" y1="14" x2="3" y2="14"></line>
+              <line x1="17" y1="18" x2="3" y2="18"></line>
+            </svg>
             <div>
               <div class="dropdown-title">Extract Plain Text</div>
               <div class="dropdown-desc">Save text to .txt document</div>
@@ -408,8 +580,12 @@
       </div>
 
       <!-- Find & Replace Trigger -->
-      <button class="tool-btn" data-tool="replace" id="btn-toggle-find" title="Find & Replace text in document (Ctrl+F)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <button class="tool-btn" data-tool="replace" id="btn-toggle-find"
+        title="Find & Replace text in document (Ctrl+F)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <span>Find</span>
       </button>
     </div>
@@ -450,19 +626,35 @@
       <button class="btn-icon-toggle" id="prop-btn-strike" title="Strikethrough"><s>S</s></button>
       <div class="prop-divider" style="width:1px; height:16px; background:var(--border); margin:0 4px;"></div>
       <button class="btn-icon-toggle active" id="prop-btn-align-left" title="Align Left">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="17" y1="10" x2="3" y2="10"></line>
+          <line x1="21" y1="6" x2="3" y2="6"></line>
+          <line x1="21" y1="14" x2="3" y2="14"></line>
+          <line x1="17" y1="18" x2="3" y2="18"></line>
+        </svg>
       </button>
       <button class="btn-icon-toggle" id="prop-btn-align-center" title="Align Center">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="18" y1="10" x2="6" y2="10"></line>
+          <line x1="21" y1="6" x2="3" y2="6"></line>
+          <line x1="21" y1="14" x2="3" y2="14"></line>
+          <line x1="18" y1="18" x2="6" y2="18"></line>
+        </svg>
       </button>
       <button class="btn-icon-toggle" id="prop-btn-align-right" title="Align Right">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="21" y1="10" x2="7" y2="10"></line>
+          <line x1="21" y1="6" x2="3" y2="6"></line>
+          <line x1="21" y1="14" x2="3" y2="14"></line>
+          <line x1="21" y1="18" x2="7" y2="18"></line>
+        </svg>
       </button>
     </div>
 
     <div class="prop-item" id="prop-highlight-wrap" style="display:none; align-items:center; gap:6px;">
       <label>Highlight:</label>
-      <input type="color" id="prop-highlight-color" class="color-input-badge" value="#fef08a" title="Text Background Highlight" />
+      <input type="color" id="prop-highlight-color" class="color-input-badge" value="#fef08a"
+        title="Text Background Highlight" />
     </div>
 
     <div class="prop-item" id="prop-stroke-width-wrap">
@@ -497,16 +689,21 @@
       <input type="text" id="replace-query-input" class="input-sm" placeholder="Replace with..." />
       <button class="btn btn-sm btn-outline" id="btn-do-search">Search</button>
       <div style="display:flex; align-items:center; gap:3px;">
-        <button class="btn btn-sm btn-outline" id="btn-prev-match" title="Previous Match" style="padding:4px 8px;">◀</button>
-        <span id="search-count-badge" style="font-size:12px; color:var(--text-muted); min-width:44px; text-align:center;">0/0</span>
-        <button class="btn btn-sm btn-outline" id="btn-next-match" title="Next Match" style="padding:4px 8px;">▶</button>
+        <button class="btn btn-sm btn-outline" id="btn-prev-match" title="Previous Match"
+          style="padding:4px 8px;">◀</button>
+        <span id="search-count-badge"
+          style="font-size:12px; color:var(--text-muted); min-width:44px; text-align:center;">0/0</span>
+        <button class="btn btn-sm btn-outline" id="btn-next-match" title="Next Match"
+          style="padding:4px 8px;">▶</button>
       </div>
       <button class="btn btn-sm btn-outline" id="btn-do-replace-one">Replace</button>
       <button class="btn btn-sm btn-primary" id="btn-do-replace">Replace All</button>
-      <label style="display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); cursor:pointer;">
+      <label
+        style="display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); cursor:pointer;">
         <input type="checkbox" id="chk-search-case" /> Case
       </label>
-      <label style="display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); cursor:pointer;">
+      <label
+        style="display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); cursor:pointer;">
         <input type="checkbox" id="chk-search-regex" /> Regex
       </label>
     </div>
@@ -526,4 +723,5 @@
 
   <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>

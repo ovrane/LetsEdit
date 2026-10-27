@@ -10,6 +10,7 @@ import { Toast } from '../../components/toast.js';
 import { EraserHandler } from './eraser.js';
 import { TextClustering } from './text-clustering.js';
 import { getCssFontFamily, detectFontIdFromPdf } from '../font-registry.js';
+import { FormTool } from '../../tools/form-tool.js';
 
 export class CanvasEventsHandler {
   static bindPageEvents(manager, pageNum, wrap, annotCanvas) {
@@ -57,6 +58,10 @@ export class CanvasEventsHandler {
         CanvasEventsHandler.promptNewText(pageNum, pos, wrap);
       } else if (state.activeTool === 'note' || state.activeTool === 'comment') {
         CanvasEventsHandler.addStickyNote(pageNum, pos, wrap);
+      } else if (state.activeTool === 'form' || state.activeTool === 'forms') {
+        if (e.cancelable) e.preventDefault();
+        const formType = state.activeFormType || 'text';
+        FormTool.addField(formType, pageNum, pos.normX, pos.normY);
       }
     };
 

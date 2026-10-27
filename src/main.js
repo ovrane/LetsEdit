@@ -574,8 +574,7 @@ class App {
         }
 
         if (tool === 'image') {
-          this.imageTool.triggerUpload();
-          return;
+          this.imageTool.open();
         }
 
         toolBtns.forEach(b => b.classList.remove('active'));
@@ -889,5 +888,6 @@ class App {
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = new App();
+  window.letseditStudio = app;
   app.init();
 });

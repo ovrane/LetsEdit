@@ -118,25 +118,33 @@ export class LandingPage {
     const heroSampleMultiBtn = this.container.querySelector('#btn-landing-load-sample-multipage');
     const heroDropzone = this.container.querySelector('#landing-hero-dropzone');
 
+    const handleUploadAndOpen = async (file) => {
+      if (!file) return;
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        Toast.warning('Please select a valid PDF document');
+        return;
+      }
+      try {
+        Toast.info('Loading PDF into Studio...');
+        const ab = await readFileAsArrayBuffer(file);
+        const info = await pdfEngine.loadPdf(ab);
+        store.setDocument(ab, file.name, info.numPages);
+        const filenameEl = document.getElementById('current-filename');
+        if (filenameEl) filenameEl.textContent = file.name;
+        router.navigate('/edit_pdf');
+        Toast.success(`Opened ${file.name} in PDF Editor!`);
+      } catch (err) {
+        console.error('Failed to load PDF on landing page:', err);
+        Toast.error('Could not load PDF file');
+      }
+    };
+
     if (heroUploadBtn && heroFileInput) {
       heroUploadBtn.onclick = () => heroFileInput.click();
-      heroFileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file && file.type === 'application/pdf') {
-          try {
-            Toast.info('Loading PDF into Studio...');
-            const ab = await readFileAsArrayBuffer(file);
-            const info = await pdfEngine.loadPdf(ab);
-            store.setDocument(ab, file.name, info.numPages);
-            const filenameEl = document.getElementById('current-filename');
-            if (filenameEl) filenameEl.textContent = file.name;
-            router.navigate('/edit_pdf');
-            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
-          } catch (err) {
-            console.error(err);
-            Toast.error('Could not load PDF');
-          }
-        }
+      heroFileInput.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) handleUploadAndOpen(file);
+        heroFileInput.value = '';
       };
     }
 
@@ -198,6 +206,52 @@ export class LandingPage {
     if (heroOpenEditorBtn) {
       heroOpenEditorBtn.onclick = () => router.navigate('/edit_pdf');
     }
+
+
+    // Hero Drag & Drop PDF support
+    const heroSection = this.container.querySelector('.landing-hero-section');
+    if (heroSection) {
+      ['dragenter', 'dragover'].forEach(evt => {
+        heroSection.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          heroSection.classList.add('hero-drag-over');
+        });
+      });
+      ['dragleave', 'drop'].forEach(evt => {
+        heroSection.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          heroSection.classList.remove('hero-drag-over');
+        });
+      });
+      heroSection.addEventListener('drop', (e) => {
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) handleUploadAndOpen(file);
+      });
+    }
+
+    // Most Popular PDF Tools 3x2 Grid Cards
+    this.container.querySelectorAll('.hero-popular-card').forEach(card => {
+      const handleAction = () => {
+        const tool = card.getAttribute('data-tool');
+        if (tool === 'studio:edit') {
+          router.navigate('/edit_pdf');
+        } else if (tool) {
+          this.handleToolAction(tool);
+        }
+      };
+      card.onclick = (e) => {
+        e.preventDefault();
+        handleAction();
+      };
+      card.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleAction();
+        }
+      };
+    });
 
     // Dynamic Header Shadow: Only show shadow when scrolled past top
     const header = this.container.querySelector('.landing-header');

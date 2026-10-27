@@ -6,6 +6,8 @@
  * Strict Constraint: No file dropzone on the landing page hero.
  */
 
+import { getPopularToolsHtml } from './landing-popular.js';
+
 export function getLandingTemplateHtml() {
   return `
     <!-- Landing Header / Top Navigation (Pryzm Minimalist Executive Style) -->
@@ -318,10 +320,11 @@ export function getLandingTemplateHtml() {
               <h1 class="landing-hero-title">Work on your <span style="color: var(--primary);">PDF</span><br>With Ease</h1>
               <p class="landing-hero-subtitle">Powerful PDF &amp; Office tools to simplify your workflow convert Word, Excel &amp; PPTX, OCR scanned pages, compare diffs, and sign with zero cloud upload.</p>
               <div class="landing-hero-actions">
-                <button class="btn landing-hero-btn-primary" id="btn-landing-explore-tools">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon></svg>
-                  <span>Explore 50+ Tools</span>
+                <button class="btn landing-hero-btn-primary" id="btn-landing-upload-pdf" title="Upload a PDF and launch directly in Studio Editor">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                  <span>Upload PDF to Edit</span>
                 </button>
+                <input type="file" id="landing-hero-file-input" accept="application/pdf" style="display:none;" />
                 <button class="btn landing-hero-btn-outline" id="btn-landing-open-editor">
                   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                   <span>Open PDF Editor</span>
@@ -455,6 +458,9 @@ export function getLandingTemplateHtml() {
             </div>
           </div>
         </div>
+
+        <!-- Most Popular PDF Tools (Smallpdf/Adobe Clean 3x2 Grid) -->
+        ${getPopularToolsHtml()}
 
         <!-- Clean Scroll Indicator Cue -->
         <button class="landing-hero-scroll-cue" id="btn-landing-scroll-cue" aria-label="Scroll to explore 50+ tools">
