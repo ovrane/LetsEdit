@@ -34,15 +34,22 @@ export class LegalPage {
       this.mount(el);
     }
 
-    this.container.style.display = 'block';
+    if (typeof document !== 'undefined' && document?.body?.classList) {
+      document.body.classList.add('show-legal');
+    }
+
+    this.container.style.display = 'flex';
+    this.container.scrollTop = 0;
     this.render();
     this.bindEvents();
 
-    if (updateUrl) {
+    if (updateUrl && typeof window !== 'undefined' && window.history?.pushState) {
       const canonicalPath = this.getTabPath(this.activeTab);
       window.history.pushState({}, '', canonicalPath);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.container) {
+      this.container.scrollTop = 0;
+    }
   }
 
   setTab(tab, updateUrl = true) {
@@ -56,6 +63,9 @@ export class LegalPage {
   hide() {
     if (this.container) {
       this.container.style.display = 'none';
+    }
+    if (typeof document !== 'undefined' && document?.body?.classList) {
+      document.body.classList.remove('show-legal');
     }
   }
 

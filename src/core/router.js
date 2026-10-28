@@ -567,24 +567,39 @@ export class Router {
    */
   navigate(targetPath, { replace = false, trigger = true } = {}) {
     const route = this.match(targetPath);
-    this.currentRoute = route;
+    const hash = targetPath.includes('#') ? '#' + targetPath.split('#')[1] : '';
+    const query = targetPath.includes('?') ? '?' + targetPath.split('?')[1].split('#')[0] : '';
+    const routePayload = { ...route, hash, query, fullTarget: targetPath };
+    this.currentRoute = routePayload;
 
     if (typeof window !== 'undefined' && window.history) {
       const canonical = route.canonicalPath;
+      const fullUrl = canonical + (query || '') + (hash || '');
       if (replace) {
-        window.history.replaceState({ path: canonical }, '', canonical);
-      } else if (window.location.pathname !== canonical) {
-        window.history.pushState({ path: canonical }, '', canonical);
+        window.history.replaceState({ path: fullUrl }, '', fullUrl);
+      } else if (window.location.pathname + window.location.search + window.location.hash !== fullUrl) {
+        window.history.pushState({ path: fullUrl }, '', fullUrl);
       }
 
       this.updateDocumentMetadata(route);
     }
 
     if (trigger) {
-      this.notify(route, false);
+      this.notify(routePayload, false);
     }
 
-    return route;
+    if (hash && typeof document !== 'undefined') {
+      setTimeout(() => {
+        try {
+          const el = document.querySelector(hash);
+          if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch (_) {}
+      }, 80);
+    }
+
+    return routePayload;
   }
 
   /**
@@ -592,20 +607,35 @@ export class Router {
    */
   handleRoute(pathname, isPopState = true) {
     const route = this.match(pathname);
-    this.currentRoute = route;
+    const hash = typeof window !== 'undefined' ? (window.location.hash || '') : (pathname.includes('#') ? '#' + pathname.split('#')[1] : '');
+    const query = typeof window !== 'undefined' ? (window.location.search || '') : (pathname.includes('?') ? '?' + pathname.split('?')[1].split('#')[0] : '');
+    const routePayload = { ...route, hash, query, fullTarget: pathname };
+    this.currentRoute = routePayload;
 
     if (typeof window !== 'undefined' && window.history) {
-      // If the current URL is an alias (e.g. /merge), replace with canonical (/merge_pdf)
       const currentNorm = this.normalizePath(window.location.pathname);
       if (currentNorm !== route.canonicalPath && !isPopState) {
-        window.history.replaceState({ path: route.canonicalPath }, '', route.canonicalPath);
+        const fullUrl = route.canonicalPath + (query || '') + (hash || '');
+        window.history.replaceState({ path: fullUrl }, '', fullUrl);
       }
 
       this.updateDocumentMetadata(route);
     }
 
-    this.notify(route, isPopState);
-    return route;
+    this.notify(routePayload, isPopState);
+
+    if (hash && typeof document !== 'undefined') {
+      setTimeout(() => {
+        try {
+          const el = document.querySelector(hash);
+          if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch (_) {}
+      }, 80);
+    }
+
+    return routePayload;
   }
 
   /**

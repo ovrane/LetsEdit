@@ -1,7 +1,58 @@
 /* ==========================================================================
-   Landing Page & Mega Menu System (iLovePDF & Sejda Style)
+   Landing Page & Complete View Orchestration System (iLovePDF & Sejda Style)
    ========================================================================== */
 
+/* Base: Standalone full-page views are hidden by default unless their view class is active */
+.landing-view-container,
+.account-view-container,
+.tool-workflow-container,
+.docs-page-container,
+.legal-page-container,
+#mobile-pair-container,
+#recipient-sign-container {
+  display: none;
+}
+
+/* Base: Studio elements are hidden if ANY non-studio body class is active */
+body.show-landing .app-navbar,
+body.show-landing .app-toolbar,
+body.show-landing .properties-bar,
+body.show-landing .app-main,
+body.show-landing .editor-floating-bottom-bar,
+body.show-account .app-navbar,
+body.show-account .app-toolbar,
+body.show-account .properties-bar,
+body.show-account .app-main,
+body.show-account .editor-floating-bottom-bar,
+body.show-tool-workflow .app-navbar,
+body.show-tool-workflow .app-toolbar,
+body.show-tool-workflow .properties-bar,
+body.show-tool-workflow .app-main,
+body.show-tool-workflow .editor-floating-bottom-bar,
+body.show-docs .app-navbar,
+body.show-docs .app-toolbar,
+body.show-docs .properties-bar,
+body.show-docs .app-main,
+body.show-docs .editor-floating-bottom-bar,
+body.show-legal .app-navbar,
+body.show-legal .app-toolbar,
+body.show-legal .properties-bar,
+body.show-legal .app-main,
+body.show-legal .editor-floating-bottom-bar,
+body.show-mobile-pair .app-navbar,
+body.show-mobile-pair .app-toolbar,
+body.show-mobile-pair .properties-bar,
+body.show-mobile-pair .app-main,
+body.show-mobile-pair .editor-floating-bottom-bar,
+body.show-recipient-sign .app-navbar,
+body.show-recipient-sign .app-toolbar,
+body.show-recipient-sign .properties-bar,
+body.show-recipient-sign .app-main,
+body.show-recipient-sign .editor-floating-bottom-bar {
+  display: none !important;
+}
+
+/* 1. Landing View */
 body.show-landing .landing-view-container {
   display: flex !important;
   flex-direction: column;
@@ -14,43 +65,18 @@ body.show-landing .landing-view-container {
   z-index: 999;
 }
 
-body.show-landing .app-navbar,
-body.show-landing .app-toolbar,
-body.show-landing .properties-bar,
-body.show-landing .app-main,
-body.show-landing .tool-workflow-container,
-body.show-landing .account-view-container {
-  display: none !important;
-}
-
+/* 2. Studio View: Hide all standalone overlays */
 body.show-studio .landing-view-container,
 body.show-studio .tool-workflow-container,
-body.show-studio .account-view-container {
+body.show-studio .account-view-container,
+body.show-studio .docs-page-container,
+body.show-studio .legal-page-container,
+body.show-studio #mobile-pair-container,
+body.show-studio #recipient-sign-container {
   display: none !important;
 }
 
-body.show-tool-workflow .landing-view-container,
-body.show-tool-workflow .app-navbar,
-body.show-tool-workflow .app-toolbar,
-body.show-tool-workflow .properties-bar,
-body.show-tool-workflow .app-main,
-body.show-tool-workflow .account-view-container {
-  display: none !important;
-}
-
-body.show-account .landing-view-container,
-body.show-account .app-navbar,
-body.show-account .app-toolbar,
-body.show-account .properties-bar,
-body.show-account .app-main,
-body.show-account .tool-workflow-container {
-  display: none !important;
-}
-
-.account-view-container {
-  display: none;
-}
-
+/* 3. Account View */
 body.show-account .account-view-container {
   display: flex !important;
   flex-direction: column;
@@ -63,6 +89,7 @@ body.show-account .account-view-container {
   z-index: 999;
 }
 
+/* 4. Tool Workflow View */
 body.show-tool-workflow .tool-workflow-container {
   display: flex !important;
   flex-direction: column;
@@ -73,6 +100,264 @@ body.show-tool-workflow .tool-workflow-container {
   background-color: var(--bg-app);
   overflow-y: auto;
   z-index: 999;
+}
+
+/* 5. Documentation Page View */
+body.show-docs .docs-page-container {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-surface);
+  overflow-y: auto;
+  z-index: 999;
+}
+
+/* 6. Legal & Policy Hub Page View */
+body.show-legal .legal-page-container {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-surface);
+  overflow-y: auto;
+  z-index: 999;
+}
+
+/* 7. Mobile Device Pairing View */
+body.show-mobile-pair #mobile-pair-container {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-app);
+  overflow-y: auto;
+  z-index: 999;
+}
+
+/* 8. Recipient Sign Portal View */
+body.show-recipient-sign #recipient-sign-container {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-app);
+  overflow-y: auto;
+  z-index: 999;
+}
+
+/* 9. Header Mega Dropdown Menu (All Tools in Header) */
+.nav-item-dropdown {
+  position: relative;
+}
+
+.nav-item-dropdown .mega-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: -20px;
+  min-width: 720px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.14);
+  padding: 24px;
+  display: none;
+  z-index: 1005;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .nav-item-dropdown .mega-dropdown-menu {
+  background: var(--bg-card, #1e1e1e);
+  border-color: var(--border-subtle, #333333);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+}
+
+.nav-item-dropdown:hover .mega-dropdown-menu,
+.nav-item-dropdown:focus-within .mega-dropdown-menu,
+.nav-item-dropdown.open .mega-dropdown-menu {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mega-dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.mega-dropdown-heading {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+}
+
+.mega-dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-main, #0f172a);
+  transition: all 0.15s ease;
+}
+
+.mega-dropdown-link:hover {
+  background: var(--primary-light, rgba(238, 64, 76, 0.08));
+  color: var(--primary, #ee404c);
+  transform: translateX(3px);
+}
+
+.mega-link-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.mega-link-icon.edit-icon { background: rgba(47, 116, 238, 0.12); color: #2f74ee; }
+.mega-link-icon.compress-icon { background: rgba(0, 180, 216, 0.12); color: #00b4d8; }
+.mega-link-icon.merge-icon { background: rgba(238, 64, 76, 0.12); color: #ee404c; }
+.mega-link-icon.split-icon { background: rgba(240, 165, 0, 0.12); color: #f0a500; }
+.mega-link-icon.word-icon { background: rgba(43, 87, 154, 0.15); color: #2b579a; font-weight: 800; }
+.mega-link-icon.excel-icon { background: rgba(33, 115, 70, 0.15); color: #217346; font-weight: 800; }
+.mega-link-icon.ppt-icon { background: rgba(210, 71, 38, 0.15); color: #d24726; font-weight: 800; }
+.mega-link-icon.ocr-icon { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+.mega-link-icon.redact-icon { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.mega-link-icon.bates-icon { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.mega-link-icon.flatten-icon { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+.mega-link-icon.sign-icon { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+.mega-link-text {
+  display: flex;
+  flex-direction: column;
+}
+.mega-link-text strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+}
+[data-theme="dark"] .mega-link-text strong {
+  color: #f1f5f9;
+}
+.mega-link-text span {
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+}
+
+/* 10. Mobile Hamburger Navigation Menu */
+.landing-mobile-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.landing-mobile-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background-color: var(--text-main);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.landing-mobile-toggle.active span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.landing-mobile-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.landing-mobile-toggle.active span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+  .landing-mobile-toggle {
+    display: flex;
+  }
+  .landing-nav-menu {
+    display: none !important;
+  }
+}
+
+.landing-mobile-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  padding: 16px 20px 24px;
+  z-index: 1000;
+}
+
+[data-theme="dark"] .landing-mobile-nav {
+  background: var(--bg-card);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-nav-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-nav-link {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text-main);
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.mobile-nav-link:hover {
+  background: var(--primary-light, rgba(238, 64, 76, 0.08));
+  color: var(--primary);
+}
+
+.mobile-nav-cta {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mobile-nav-cta .btn {
+  width: 100%;
+  justify-content: center;
 }
 
 /* ==========================================================================

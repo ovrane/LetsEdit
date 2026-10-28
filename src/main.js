@@ -107,14 +107,26 @@ class App {
 
     // Wire HTML5 URL Router for distinct iLovePDF routes (/merge_pdf, /compress_pdf, /split_pdf, etc.)
     router.subscribe((route) => {
-      const landingView = document.getElementById('landing-view');
-      const studioView = document.getElementById('studio-view');
       const mobileContainer = document.getElementById('mobile-pair-container');
       const recContainer = document.getElementById('recipient-sign-container');
       const accountContainer = document.getElementById('account-page-container');
       const toolWfContainer = document.getElementById('tool-workflow-container');
 
-      const hideStandaloneViews = () => {
+      const setView = (viewClass) => {
+        const allClasses = [
+          'show-landing',
+          'show-studio',
+          'show-tool-workflow',
+          'show-account',
+          'show-docs',
+          'show-legal',
+          'show-mobile-pair',
+          'show-recipient-sign'
+        ];
+        document.body.classList.remove(...allClasses);
+        if (viewClass) {
+          document.body.classList.add(viewClass);
+        }
         legalPage.hide();
         docsPage.hide();
         if (mobileContainer) mobileContainer.style.display = 'none';
@@ -124,56 +136,48 @@ class App {
       };
 
       if (route.isLanding) {
-        hideStandaloneViews();
+        setView('show-landing');
         landingPage.switchToLanding({ updateUrl: false });
       } else if (route.isEditor) {
-        hideStandaloneViews();
+        setView('show-studio');
         landingPage.switchToStudio({ updateUrl: false });
       } else if (route.isAccount) {
-        hideStandaloneViews();
+        setView('show-account');
         accountPage.show({ updateUrl: false });
       } else if (route.isLogin) {
-        hideStandaloneViews();
+        setView('show-account');
         accountPage.showLogin({ updateUrl: false });
       } else if (route.isRegister) {
-        hideStandaloneViews();
+        setView('show-account');
         accountPage.showRegister({ updateUrl: false });
       } else if (route.isLegal) {
-        if (landingView) landingView.style.display = 'none';
-        if (studioView) studioView.style.display = 'none';
-        hideStandaloneViews();
+        setView('show-legal');
         legalPage.show({ tab: route.legalTab || 'privacy', updateUrl: false });
       } else if (route.isDocs) {
-        if (landingView) landingView.style.display = 'none';
-        if (studioView) studioView.style.display = 'none';
-        hideStandaloneViews();
+        setView('show-docs');
         docsPage.show({ updateUrl: false });
       } else if (route.toolId === 'mobile-pair') {
-        if (landingView) landingView.style.display = 'none';
-        if (studioView) studioView.style.display = 'none';
-        hideStandaloneViews();
+        setView('show-mobile-pair');
         let mc = document.getElementById('mobile-pair-container');
         if (!mc) {
           mc = document.createElement('div');
           mc.id = 'mobile-pair-container';
           document.body.appendChild(mc);
         }
-        mc.style.display = 'block';
+        mc.style.display = 'flex';
         mobilePairPage.mount(mc);
       } else if (route.isRecipientSigning || route.toolId === 'sign-document') {
-        if (landingView) landingView.style.display = 'none';
-        if (studioView) studioView.style.display = 'none';
-        hideStandaloneViews();
+        setView('show-recipient-sign');
         let rc = document.getElementById('recipient-sign-container');
         if (!rc) {
           rc = document.createElement('div');
           rc.id = 'recipient-sign-container';
           document.body.appendChild(rc);
         }
-        rc.style.display = 'block';
+        rc.style.display = 'flex';
         recipientSignPage.mount(rc);
       } else if (route.toolId) {
-        hideStandaloneViews();
+        setView('show-tool-workflow');
         toolWorkflow.openTool(route.toolId, { updateUrl: false });
       }
     });
@@ -428,6 +432,10 @@ class App {
     // All Tools Hub modal
     const allToolsBtn = document.getElementById('btn-open-all-tools');
     if (allToolsBtn) allToolsBtn.onclick = () => allToolsModal.show();
+
+    // Docs & Guide navigation from Studio
+    const openDocsBtn = document.getElementById('btn-open-docs');
+    if (openDocsBtn) openDocsBtn.onclick = () => router.navigate('/docs');
 
     // Inline rename document title
     const filenameEl = document.getElementById('current-filename');

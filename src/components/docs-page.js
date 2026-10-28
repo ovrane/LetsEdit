@@ -1,8 +1,8 @@
 /**
- * Dedicated Documentation & Engineering Hub Page
- * Bridges user-facing walkthroughs for beginners with deep project architecture,
- * 4-layer canvas compositing, cryptographic audit trail, and REST API specifications.
- * Enforces strict < 1,000 lines modular standard.
+ * Dedicated User Documentation & Walkthrough Hub Page
+ * Focused entirely on beginner-to-advanced user guides, tutorials, visual walkthroughs,
+ * keyboard shortcuts, and instant tool actions with top-tier ease-of-use UI/UX.
+ * Strictly adheres to modular < 1,000 lines architecture standard.
  */
 
 import { router } from '../core/router.js';
@@ -12,18 +12,14 @@ import {
   getUserDocsQuickGridHtml,
   getUserDocsContentHtml
 } from './docs/docs-user-content.js';
-import {
-  getProjectDocsNavHtml,
-  getProjectDocsQuickGridHtml,
-  getProjectDocsContentHtml
-} from './docs/docs-project-content.js';
 
 export class DocsPage {
   constructor() {
     this.container = null;
     this.searchQuery = '';
-    this.currentTab = 'user'; // 'user' or 'project'
+    this.activeCategory = 'all';
     this.isMounted = false;
+    this._scrollListener = null;
   }
 
   mount(container) {
@@ -42,47 +38,34 @@ export class DocsPage {
       this.mount(el);
     }
 
-    // Inspect URL parameters and anchor hash safely
-    let isProjectTab = false;
-    try {
-      if (typeof window !== 'undefined' && window.location) {
-        const href = window.location.href || (window.location.origin ? window.location.origin + (window.location.pathname || '') : 'https://letsedit.local/docs');
-        const url = new URL(href, 'https://letsedit.local');
-        if (url.searchParams?.get('tab') === 'project' || (window.location.hash && window.location.hash.startsWith('#proj-'))) {
-          isProjectTab = true;
-        }
-      }
-    } catch {
-      isProjectTab = false;
+    if (typeof document !== 'undefined' && document?.body?.classList) {
+      document.body.classList.add('show-docs');
     }
-    this.currentTab = isProjectTab ? 'project' : 'user';
 
-    this.container.style.display = 'block';
+    this.container.style.display = 'flex';
+    this.container.scrollTop = 0;
     this.render();
     this.bindEvents();
 
     if (updateUrl && typeof window !== 'undefined' && window.history?.pushState) {
-      const targetPath = this.currentTab === 'project' ? '/docs?tab=project' : '/docs';
-      window.history.pushState({}, '', targetPath);
+      window.history.pushState({}, '', '/docs');
     }
 
-    // Smooth scroll to target hash if present
+    // Scroll to target hash anchor if present
     try {
-      if (typeof window !== 'undefined') {
-        const hash = window.location?.hash;
-        if (hash) {
-          const targetEl = document.querySelector(hash);
-          if (targetEl && typeof targetEl.scrollIntoView === 'function') {
-            setTimeout(() => targetEl.scrollIntoView({ behavior: 'smooth' }), 50);
-          } else if (typeof window.scrollTo === 'function') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        } else if (typeof window.scrollTo === 'function') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== 'undefined' && window.location?.hash) {
+        const hash = window.location.hash;
+        const targetEl = document.querySelector(hash);
+        if (targetEl && typeof targetEl.scrollIntoView === 'function') {
+          setTimeout(() => targetEl.scrollIntoView({ behavior: 'smooth' }), 60);
+        } else if (this.container) {
+          this.container.scrollTop = 0;
         }
+      } else if (this.container) {
+        this.container.scrollTop = 0;
       }
     } catch {
-      // Ignore scroll errors in mock environments
+      // Graceful fallback for non-browser testing
     }
   }
 
@@ -90,27 +73,23 @@ export class DocsPage {
     if (this.container) {
       this.container.style.display = 'none';
     }
-  }
-
-  switchTab(tab) {
-    if (this.currentTab === tab) return;
-    this.currentTab = tab;
-    this.render();
-    this.bindEvents();
-    const targetPath = this.currentTab === 'project' ? '/docs?tab=project' : '/docs';
-    window.history.replaceState({}, '', targetPath);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof document !== 'undefined' && document?.body?.classList) {
+      document.body.classList.remove('show-docs');
+    }
+    if (this._scrollListener && this.container) {
+      this.container.removeEventListener('scroll', this._scrollListener);
+      this._scrollListener = null;
+    }
   }
 
   render() {
-    const isProject = this.currentTab === 'project';
-
     this.container.className = 'docs-page-container';
     this.container.innerHTML = `
+      <!-- Fixed Global Docs Header -->
       <header class="docs-header">
         <div class="docs-header-inner">
           <div class="docs-header-left">
-            <div class="lets-logo" id="docs-logo" style="cursor: pointer;">
+            <div class="lets-logo" id="docs-logo" style="cursor: pointer;" title="Back to Home">
               <div class="lets-logo-badge">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <rect x="2" y="2" width="9" height="9" rx="2.8" fill="#EE404C"/>
@@ -121,16 +100,26 @@ export class DocsPage {
               </div>
               <span class="lets-logo-text">Lets<span class="lets-logo-accent">Edit</span></span>
             </div>
-            <a href="/" data-route="/" class="legal-nav-link" id="docs-nav-home">Home</a>
-            <a href="/#landing-tools-section" data-route="/#landing-tools-section" class="legal-nav-link" id="docs-nav-tools">All Tools</a>
-            <a href="/privacy" data-route="/privacy" class="legal-nav-link" id="docs-nav-policy">Privacy &amp; Terms</a>
+            <nav class="docs-nav-breadcrumbs" aria-label="Breadcrumb navigation">
+              <a href="/" data-route="/" class="legal-nav-link" id="docs-nav-home">Home</a>
+              <span class="docs-breadcrumb-sep">/</span>
+              <span class="docs-breadcrumb-current">User Guide</span>
+            </nav>
+            <a href="/#landing-tools-section" data-route="/#landing-tools-section" class="legal-nav-link docs-desktop-link" id="docs-nav-tools">All 40+ Tools</a>
+            <a href="/privacy" data-route="/privacy" class="legal-nav-link docs-desktop-link" id="docs-nav-policy">Privacy &amp; Terms</a>
           </div>
 
           <div class="docs-header-right">
+            <!-- Search Field with Clear Trigger -->
             <div class="docs-search-input-wrap">
               <svg class="docs-search-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" id="docs-search-input" class="docs-search-input" placeholder="Search documentation..." aria-label="Search docs" value="${this.searchQuery}" />
+              <input type="text" id="docs-search-input" class="docs-search-input" placeholder="Search guides, tips &amp; tools..." aria-label="Search user documentation" value="${this.searchQuery}" />
+              <button class="docs-search-clear" id="btn-docs-search-clear" title="Clear search" style="display: ${this.searchQuery ? 'flex' : 'none'};" aria-label="Clear search">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
+
+            <!-- Theme Toggle -->
             <button class="icon-btn" id="btn-docs-theme" title="Toggle Theme" aria-label="Toggle theme">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -140,7 +129,9 @@ export class DocsPage {
                 <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
               </svg>
             </button>
-            <a href="/edit_pdf" data-route="/edit_pdf" class="btn btn-primary btn-sm" id="btn-docs-studio" style="padding: 8px 16px; font-weight: 700;">
+
+            <!-- Studio CTA -->
+            <a href="/edit_pdf" data-route="/edit_pdf" class="btn btn-primary btn-sm docs-header-cta" id="btn-docs-studio">
               <span>Launch Studio</span>
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
             </a>
@@ -148,70 +139,102 @@ export class DocsPage {
         </div>
       </header>
 
+      <!-- Hero Section Designed for Ease of Learning -->
       <section class="docs-hero-section">
         <div class="docs-hero-inner">
-          <span class="docs-badge-pill">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            <span>${isProject ? 'ENGINEERING &amp; ARCHITECTURE' : 'LEARN PDF EDITING'}</span>
-          </span>
+          <div class="docs-badge-pill">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>LEARN PDF EDITING • USER GUIDE &amp; TUTORIALS</span>
+          </div>
+
           <h1 class="docs-hero-title">
-            ${isProject ? 'Project Architecture &amp; <span class="docs-theme-accent">Technical Specs</span>' : 'Documentation &amp; <span class="docs-theme-accent">Beginner\'s Guide</span>'}
+            How to Edit, Sign &amp; Master <span class="docs-theme-accent">Any PDF Document</span>
           </h1>
           <p class="docs-hero-desc">
-            ${isProject
-              ? 'Complete developer documentation covering client-side WebAssembly, 4-layer canvas compositing, text clustering math, REST APIs, and maintenance standards.'
-              : 'Everything you need to know about working with PDFs, from editing existing text to legal Bates numbering, e-signatures, and permanent redaction.'
-            }
+            Visual walkthroughs, step-by-step guides, and practical shortcuts to help you edit text, merge files, permanently redact sensitive data, and collect digital signatures with ease — 100% private in your browser.
           </p>
 
-          <!-- Tab Switcher Segmented Control -->
-          <div class="docs-tab-switcher">
-            <button class="docs-tab-btn ${!isProject ? 'active' : ''}" data-tab="user">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              <span>User Guide &amp; Tutorials</span>
+          <!-- Interactive Category Filter Chips -->
+          <div class="docs-category-chips" id="docs-category-chips">
+            <button class="docs-chip-btn ${this.activeCategory === 'all' ? 'active' : ''}" data-cat="all">
+              <span>All Topics</span>
             </button>
-            <button class="docs-tab-btn ${isProject ? 'active' : ''}" data-tab="project">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-              <span>Project &amp; Engineering Specs</span>
+            <button class="docs-chip-btn ${this.activeCategory === 'editing' ? 'active' : ''}" data-cat="editing">
+              <span>✏️ Text &amp; Images</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'organize' ? 'active' : ''}" data-cat="organize">
+              <span>📂 Merge &amp; Split</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'convert' ? 'active' : ''}" data-cat="convert">
+              <span>🔄 Convert &amp; OCR</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'security' ? 'active' : ''}" data-cat="security">
+              <span>🛡️ Redaction</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'signatures' ? 'active' : ''}" data-cat="signatures">
+              <span>✍️ E-Sign</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'forms' ? 'active' : ''}" data-cat="forms">
+              <span>📋 AcroForms</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'legal' ? 'active' : ''}" data-cat="legal">
+              <span>⚖️ Bates Legal</span>
+            </button>
+            <button class="docs-chip-btn ${this.activeCategory === 'shortcuts' ? 'active' : ''}" data-cat="shortcuts">
+              <span>⌨️ Shortcuts</span>
             </button>
           </div>
 
+          <!-- Quick Jump Cards -->
           <div class="docs-quick-grid" id="docs-quick-grid">
-            ${isProject ? getProjectDocsQuickGridHtml() : getUserDocsQuickGridHtml()}
+            ${getUserDocsQuickGridHtml()}
           </div>
         </div>
       </section>
 
+      <!-- Main 2-Column Documentation Reading View -->
       <main class="docs-main-body">
         <aside class="docs-sidebar">
           <div class="docs-nav-card" id="docs-sidebar-nav">
-            ${isProject ? getProjectDocsNavHtml() : getUserDocsNavHtml()}
+            ${getUserDocsNavHtml()}
           </div>
         </aside>
 
         <section class="docs-content" id="docs-content-container">
-          ${isProject ? getProjectDocsContentHtml() : getUserDocsContentHtml()}
+          ${getUserDocsContentHtml()}
 
           <!-- Empty State for Search -->
-          <div id="docs-search-empty" style="display: none; text-align: center; padding: 48px 24px; background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: 12px; margin-top: 24px;">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" style="margin: 0 auto 12px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 6px;">No documentation matches found</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Try searching for terms like "wasm", "clustering", "redaction", "canvas", or "api".</p>
+          <div id="docs-search-empty" class="docs-search-empty-card" style="display: none;">
+            <div class="docs-search-empty-icon">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <h3 class="docs-search-empty-title">No matching guides found</h3>
+            <p class="docs-search-empty-desc">We couldn't find any documentation matching "<span id="docs-empty-query"></span>". Try searching for "edit", "merge", "redact", "sign", or "shortcuts".</p>
+            <button class="btn btn-secondary btn-sm" id="btn-docs-reset-search" style="margin-top: 12px;">Reset Search &amp; View All</button>
           </div>
         </section>
       </main>
     `;
   }
 
-  filterContent(query = '') {
+  filterContent(query = '', category = null) {
     this.searchQuery = query;
+    if (category !== null) {
+      this.activeCategory = category;
+    }
     if (!this.container) return;
+
     const q = query.toLowerCase().trim();
     const chapters = this.container.querySelectorAll('.docs-chapter');
     let visibleCount = 0;
+
     chapters.forEach(ch => {
+      const chCat = ch.getAttribute('data-category') || '';
       const text = (ch.innerText || ch.textContent || '').toLowerCase();
-      if (!q || text.includes(q)) {
+      const matchesSearch = !q || text.includes(q);
+      const matchesCategory = this.activeCategory === 'all' || chCat === this.activeCategory;
+
+      if (matchesSearch && matchesCategory) {
         ch.style.display = 'block';
         visibleCount++;
       } else {
@@ -219,9 +242,54 @@ export class DocsPage {
       }
     });
 
+    // Update empty state
     const empty = this.container.querySelector('#docs-search-empty');
+    const emptyQuerySpan = this.container.querySelector('#docs-empty-query');
     if (empty) {
       empty.style.display = visibleCount === 0 ? 'block' : 'none';
+      if (emptyQuerySpan) emptyQuerySpan.textContent = query || this.activeCategory;
+    }
+
+    // Toggle clear search button
+    const clearBtn = this.container.querySelector('#btn-docs-search-clear');
+    if (clearBtn) {
+      clearBtn.style.display = q ? 'flex' : 'none';
+    }
+  }
+
+  setupScrollSpy() {
+    if (typeof window === 'undefined') return;
+
+    const navItems = this.container.querySelectorAll('.docs-nav-item');
+    const chapters = this.container.querySelectorAll('.docs-chapter');
+    if (!chapters.length || !navItems.length) return;
+
+    const onScroll = () => {
+      const scrollPos = this.container ? this.container.scrollTop : (window.scrollY || 0);
+      let currentId = '';
+
+      chapters.forEach(ch => {
+        const top = ch.offsetTop - 140;
+        const height = ch.offsetHeight;
+        if (scrollPos >= top && scrollPos < top + height) {
+          currentId = ch.id;
+        }
+      });
+
+      if (currentId) {
+        navItems.forEach(item => {
+          if (item.getAttribute('data-chapter') === currentId) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+    };
+
+    if (this.container) {
+      this.container.addEventListener('scroll', onScroll, { passive: true });
+      this._scrollListener = onScroll;
     }
   }
 
@@ -244,12 +312,22 @@ export class DocsPage {
     const studioBtn = this.container.querySelector('#btn-docs-studio');
     if (studioBtn) studioBtn.onclick = (e) => { e.preventDefault(); router.navigate('/edit_pdf'); };
 
-    // Mode tab buttons (User vs Project)
-    const tabBtns = this.container.querySelectorAll('.docs-tab-btn');
-    tabBtns.forEach(btn => {
-      btn.onclick = () => {
-        const targetTab = btn.getAttribute('data-tab');
-        this.switchTab(targetTab);
+    // Interactive category chips in hero
+    const chips = this.container.querySelectorAll('.docs-chip-btn');
+    chips.forEach(chip => {
+      chip.onclick = () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const cat = chip.getAttribute('data-cat');
+        this.filterContent(this.searchQuery, cat);
+
+        // If specific category, scroll smoothly to the first visible chapter
+        if (cat !== 'all') {
+          const firstTarget = this.container.querySelector(`.docs-chapter[data-category="${cat}"]`);
+          if (firstTarget && typeof firstTarget.scrollIntoView === 'function') {
+            firstTarget.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
       };
     });
 
@@ -257,13 +335,15 @@ export class DocsPage {
     const quickCards = this.container.querySelectorAll('.docs-quick-card');
     quickCards.forEach(card => {
       card.onclick = () => {
-        const target = card.getAttribute('data-target');
-        const el = document.getElementById(target);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        const targetId = card.getAttribute('data-target');
+        const el = document.getElementById(targetId);
+        if (el && typeof el.scrollIntoView === 'function') {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
       };
     });
 
-    // Sidebar navigation
+    // Sidebar navigation chapter jump
     const navItems = this.container.querySelectorAll('.docs-nav-item');
     navItems.forEach(item => {
       item.onclick = () => {
@@ -271,17 +351,54 @@ export class DocsPage {
         item.classList.add('active');
         const chapterId = item.getAttribute('data-chapter');
         const el = document.getElementById(chapterId);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        if (el && typeof el.scrollIntoView === 'function') {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
       };
     });
 
-    // Search inside documentation
+    // Search input typing
     const searchInput = this.container.querySelector('#docs-search-input');
     if (searchInput) {
       searchInput.oninput = (e) => {
         this.filterContent(e.target.value);
       };
     }
+
+    // Clear search button
+    const clearBtn = this.container.querySelector('#btn-docs-search-clear');
+    if (clearBtn) {
+      clearBtn.onclick = () => {
+        if (searchInput) searchInput.value = '';
+        this.filterContent('');
+      };
+    }
+
+    // Reset search from empty state
+    const resetBtn = this.container.querySelector('#btn-docs-reset-search');
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        if (searchInput) searchInput.value = '';
+        this.activeCategory = 'all';
+        chips.forEach(c => c.classList.toggle('active', c.getAttribute('data-cat') === 'all'));
+        this.filterContent('');
+      };
+    }
+
+    // Intercept internal docs action links so they use SPA router navigation
+    const actionLinks = this.container.querySelectorAll('a[data-route], .docs-action-link, .docs-inline-link');
+    actionLinks.forEach(link => {
+      link.onclick = (e) => {
+        const route = link.getAttribute('data-route') || link.getAttribute('href');
+        if (route && route.startsWith('/')) {
+          e.preventDefault();
+          router.navigate(route);
+        }
+      };
+    });
+
+    // Initialize ScrollSpy
+    this.setupScrollSpy();
   }
 }
 

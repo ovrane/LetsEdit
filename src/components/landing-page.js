@@ -513,13 +513,54 @@ export class LandingPage {
       };
     });
 
-    // Documentation Page Triggers
-    this.container.querySelectorAll('a[data-route="/docs"]').forEach(link => {
+    // Documentation Page Triggers (Navbar, Footer, Direct Links)
+    this.container.querySelectorAll('a[href="/docs"], a[data-route="/docs"], a[href^="/docs"]').forEach(link => {
       link.onclick = (e) => {
         e.preventDefault();
-        router.navigate('/docs');
+        const href = link.getAttribute('href') || '/docs';
+        router.navigate(href);
       };
     });
+
+    // Mobile Navigation Drawer Toggle & Interactions
+    const mobileToggle = this.container.querySelector('#landing-mobile-menu-toggle');
+    const mobileNav = this.container.querySelector('#landing-mobile-nav');
+    if (mobileToggle && mobileNav) {
+      mobileToggle.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = mobileNav.style.display !== 'none';
+        mobileNav.style.display = isOpen ? 'none' : 'block';
+        mobileToggle.classList.toggle('active', !isOpen);
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!mobileNav.contains(e.target) && !mobileToggle.contains(e.target)) {
+          mobileNav.style.display = 'none';
+          mobileToggle.classList.remove('active');
+        }
+      });
+    }
+
+    this.container.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (mobileNav) {
+          mobileNav.style.display = 'none';
+          if (mobileToggle) mobileToggle.classList.remove('active');
+        }
+      });
+    });
+
+    const mobileStudioBtn = this.container.querySelector('#btn-mobile-launch-studio');
+    if (mobileStudioBtn) {
+      mobileStudioBtn.onclick = (e) => {
+        e.preventDefault();
+        if (mobileNav) {
+          mobileNav.style.display = 'none';
+          if (mobileToggle) mobileToggle.classList.remove('active');
+        }
+        router.navigate('/edit_pdf');
+      };
+    }
 
     // Windows & Web App Showcase Buttons
     const installDesktopBtn = this.container.querySelector('#btn-install-desktop-app');
