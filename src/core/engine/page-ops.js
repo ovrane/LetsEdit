@@ -38,7 +38,9 @@ import { PdfToPptxOps } from './operations/pdf-to-pptx-ops.js';
 import { HtmlToPdfOps } from './operations/html-to-pdf-ops.js';
 import { ExtractImagesOps } from './operations/extract-images-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps, HtmlToPdfOps, ExtractImagesOps };
+const MultiSignerOps = MultiSignOps;
+
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, MultiSignerOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps, HtmlToPdfOps, ExtractImagesOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -190,6 +192,12 @@ export class PageOperations {
   // Multi-Signer & Field Placement
   static burnSignatureFields(...args) { return MultiSignOps.burnSignatureFields(...args); }
   static compileCompletedDocument(...args) { return MultiSignOps.compileCompletedDocument(...args); }
+  static createSampleSignContract(...args) { return MultiSignOps.createSampleSignContract(...args); }
+  static createSampleSignContractPackage(...args) { return MultiSignOps.createSampleSignContractPackage(...args); }
+  static validateFieldValue(...args) { return MultiSignOps.validateFieldValue(...args); }
+  static validateFieldValues(...args) { return MultiSignOps.validateFieldValues(...args); }
+  static canRecipientSign(...args) { return MultiSignOps.canRecipientSign(...args); }
+  static generateCryptographicToken(...args) { return MultiSignOps.generateCryptographicToken(...args); }
 
   // Form Filler & Form Data Export/Import
   static inspectFormFields(...args) { return FormOps.inspectFormFields(...args); }

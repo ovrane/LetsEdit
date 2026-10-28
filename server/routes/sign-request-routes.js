@@ -26,19 +26,76 @@ function generateTxId() {
 }
 
 export async function handleSignRequest(req, res, pathname, method) {
-  // 1. Create a new multi-signer signature request: POST /api/signatures/request
-  if (pathname === '/api/signatures/request' && method === 'POST') {
+  // 0. Sample 3-Page Contract: GET /api/signature/sample or GET /api/signatures/sample
+  if ((pathname === '/api/signature/sample' || pathname === '/api/signatures/sample') && method === 'GET') {
+    try {
+      const pkg = await MultiSignOps.createSampleSignContractPackage();
+      const isJson = req.headers['accept']?.includes('application/json');
+      if (isJson) {
+        return sendJson(res, 200, {
+          success: true,
+          title: pkg.title,
+          documentName: pkg.documentName,
+          recipients: pkg.recipients,
+          fields: pkg.fields,
+          documentBase64: Buffer.from(pkg.pdfBytes).toString('base64')
+        });
+      }
+      const buf = Buffer.from(pkg.pdfBytes);
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${pkg.documentName}"`,
+        'Content-Length': buf.length
+      });
+      res.end(buf);
+      return true;
+    } catch (err) {
+      return sendJson(res, 500, { success: false, error: err.message });
+    }
+  }
+
+  // 0b. List active signature requests: GET /api/signature/requests or GET /api/signatures/requests
+  if ((pathname === '/api/signature/requests' || pathname === '/api/signatures/requests') && method === 'GET') {
+    const list = Array.from(SIGNATURE_REQUESTS.values()).map(r => ({
+      requestId: r.id,
+      transactionId: r.transactionId,
+      title: r.title,
+      documentName: r.documentName,
+      status: r.status,
+      signingOrder: r.signingOrder || 'parallel',
+      recipientCount: r.recipients.length,
+      signedCount: r.recipients.filter(rec => rec.status === 'signed').length,
+      createdAt: r.createdAt,
+      completedAt: r.completedAt
+    }));
+    return sendJson(res, 200, { success: true, count: list.length, requests: list });
+  }
+
+  // 1. Create a new multi-signer signature request: POST /api/signatures/request, /api/signature/create-request, /api/signatures/create-request
+  const isCreateReq = (pathname === '/api/signatures/request' || pathname === '/api/signature/create-request' || pathname === '/api/signatures/create-request') && method === 'POST';
+  if (isCreateReq) {
     try {
       const body = await parseJsonBody(req);
-      const {
+      let {
         title = 'Untitled Document',
         documentName = 'Document.pdf',
         documentBase64 = null,
         recipients = [],
         fields = [],
         senderName = 'Document Owner',
-        senderEmail = 'owner@letsedit.dev'
+        senderEmail = 'owner@letsedit.dev',
+        signingOrder = 'parallel', // 'parallel' | 'sequential'
+        useSample = false
       } = body;
+
+      if (!documentBase64 && useSample) {
+        const pkg = await MultiSignOps.createSampleSignContractPackage();
+        documentBase64 = Buffer.from(pkg.pdfBytes).toString('base64');
+        if (recipients.length === 0) recipients = pkg.recipients;
+        if (fields.length === 0) fields = pkg.fields;
+        if (title === 'Untitled Document') title = pkg.title;
+        if (documentName === 'Document.pdf') documentName = pkg.documentName;
+      }
 
       if (!documentBase64) {
         return sendJson(res, 400, { success: false, error: 'Document base64 content is required.' });
@@ -62,7 +119,7 @@ export async function handleSignRequest(req, res, pathname, method) {
         email: (r.email || '').trim().toLowerCase(),
         role: r.role || 'signer', // 'signer' | 'approver' | 'viewer'
         color: r.color || colorPalette[idx % colorPalette.length],
-        token: 'sign_tok_' + crypto.randomBytes(12).toString('hex'),
+        token: MultiSignOps.generateCryptographicToken(r.id || `rec_${idx + 1}`, transactionId),
         status: 'pending', // 'pending' | 'viewed' | 'signed'
         signedAt: null,
         ipAddress: null,
@@ -73,13 +130,17 @@ export async function handleSignRequest(req, res, pathname, method) {
       const enrichedFields = fields.map((f, idx) => ({
         id: f.id || `fld_${idx + 1}`,
         recipientEmail: (f.recipientEmail || enrichedRecipients[0]?.email || '').trim().toLowerCase(),
-        type: f.type || 'signature', // 'signature' | 'initials' | 'date' | 'text' | 'checkbox'
+        type: f.type || 'signature', // 'signature' | 'initials' | 'date' | 'text' | 'checkbox' | 'company'
         page: parseInt(f.page !== undefined ? f.page : 0, 10),
         x: parseFloat(f.x) || 100,
         y: parseFloat(f.y) || 100,
         width: parseFloat(f.width) || (f.type === 'signature' ? 140 : f.type === 'checkbox' ? 24 : 100),
         height: parseFloat(f.height) || (f.type === 'signature' ? 50 : f.type === 'checkbox' ? 24 : 28),
         required: f.required !== false,
+        minLength: f.minLength || null,
+        maxLength: f.maxLength || null,
+        mask: f.mask || null,
+        regex: f.regex || null,
         label: f.label || (f.type.charAt(0).toUpperCase() + f.type.slice(1)),
         value: null
       }));
@@ -92,6 +153,7 @@ export async function handleSignRequest(req, res, pathname, method) {
         documentBase64,
         senderName,
         senderEmail,
+        signingOrder: signingOrder === 'sequential' ? 'sequential' : 'parallel',
         recipients: enrichedRecipients,
         fields: enrichedFields,
         status: 'pending', // 'pending' | 'partially_signed' | 'completed' | 'cancelled'
@@ -104,7 +166,7 @@ export async function handleSignRequest(req, res, pathname, method) {
             event: 'REQUEST_CREATED',
             timestamp: now,
             actor: `${senderName} (${senderEmail})`,
-            details: `Signature request initiated with ${enrichedRecipients.length} recipients and ${enrichedFields.length} fields.`
+            details: `Signature request initiated with ${enrichedRecipients.length} recipients, ${enrichedFields.length} fields, and ${signingOrder} routing.`
           }
         ]
       };
@@ -116,6 +178,7 @@ export async function handleSignRequest(req, res, pathname, method) {
         requestId,
         transactionId,
         status: record.status,
+        signingOrder: record.signingOrder,
         recipients: enrichedRecipients.map(r => ({
           name: r.name,
           email: r.email,
@@ -129,8 +192,8 @@ export async function handleSignRequest(req, res, pathname, method) {
     }
   }
 
-  // 2. Query signature request details: GET /api/signatures/request/:id
-  const matchGetReq = pathname.match(/^\/api\/signatures\/request\/([a-zA-Z0-9_-]+)$/);
+  // 2. Query signature request details: GET /api/signatures/request/:id or /api/signature/request/:id
+  const matchGetReq = pathname.match(/^\/api\/signatures?\/request\/([a-zA-Z0-9_-]+)$/);
   if (matchGetReq && method === 'GET') {
     const reqId = matchGetReq[1];
     const record = SIGNATURE_REQUESTS.get(reqId);
@@ -164,8 +227,8 @@ export async function handleSignRequest(req, res, pathname, method) {
     });
   }
 
-  // 3. Recipient token query: GET /api/signatures/recipient/:token
-  const matchRecQuery = pathname.match(/^\/api\/signatures\/recipient\/([a-zA-Z0-9_-]+)$/);
+  // 3. Recipient token query: GET /api/signatures/recipient/:token, /api/signature/recipient-view/:token, /api/signatures/recipient-view/:token
+  const matchRecQuery = pathname.match(/^\/api\/signatures?\/(?:recipient|recipient-view)\/([a-zA-Z0-9_-]+)$/);
   if (matchRecQuery && method === 'GET') {
     const token = matchRecQuery[1];
     let foundRecord = null;
@@ -183,6 +246,8 @@ export async function handleSignRequest(req, res, pathname, method) {
     if (!foundRecord || !currentRecipient) {
       return sendJson(res, 404, { success: false, error: 'Invalid or expired signing token.' });
     }
+
+    const signCheck = MultiSignOps.canRecipientSign(foundRecord, currentRecipient.email);
 
     // Mark recipient as viewed if pending
     if (currentRecipient.status === 'pending') {
@@ -207,6 +272,10 @@ export async function handleSignRequest(req, res, pathname, method) {
         width: f.width,
         height: f.height,
         required: f.required,
+        minLength: f.minLength,
+        maxLength: f.maxLength,
+        mask: f.mask,
+        regex: f.regex,
         label: f.label,
         value: f.value
       }));
@@ -218,23 +287,33 @@ export async function handleSignRequest(req, res, pathname, method) {
       documentName: foundRecord.documentName,
       title: foundRecord.title,
       senderName: foundRecord.senderName,
+      signingOrder: foundRecord.signingOrder || 'parallel',
+      canSign: signCheck.allowed,
+      sequenceMessage: signCheck.error || null,
       recipient: {
         id: currentRecipient.id,
         name: currentRecipient.name,
         email: currentRecipient.email,
         status: currentRecipient.status,
-        color: currentRecipient.color
+        color: currentRecipient.color,
+        role: currentRecipient.role
       },
       fields: recipientFields,
       documentBase64: foundRecord.documentBase64
     });
   }
 
-  // 4. Recipient signature submission: POST /api/signatures/recipient/:token/submit
-  const matchRecSubmit = pathname.match(/^\/api\/signatures\/recipient\/([a-zA-Z0-9_-]+)\/submit$/);
+  // 4. Recipient signature submission: POST /api/signatures/recipient/:token/submit, /api/signature/submit-signature, /api/signatures/submit-signature
+  const matchRecSubmit = pathname.match(/^\/api\/signatures?\/(?:recipient\/([a-zA-Z0-9_-]+)\/submit|submit-signature)$/);
   if (matchRecSubmit && method === 'POST') {
     try {
-      const token = matchRecSubmit[1];
+      const body = await parseJsonBody(req);
+      const token = matchRecSubmit[1] || body.token;
+
+      if (!token) {
+        return sendJson(res, 400, { success: false, error: 'Recipient signing token is required.' });
+      }
+
       let foundRecord = null;
       let currentRecipient = null;
 
@@ -255,9 +334,21 @@ export async function handleSignRequest(req, res, pathname, method) {
         return sendJson(res, 400, { success: false, error: 'This document has already been signed by you.' });
       }
 
-      const body = await parseJsonBody(req);
+      // Enforce sequential signing order
+      const signCheck = MultiSignOps.canRecipientSign(foundRecord, currentRecipient.email);
+      if (!signCheck.allowed) {
+        return sendJson(res, 403, { success: false, error: signCheck.error });
+      }
+
       const { fieldValues = {} } = body;
       const now = new Date().toISOString();
+
+      // Validate field constraints (required, minLength, mask)
+      const assignedFields = foundRecord.fields.filter(f => f.recipientEmail === currentRecipient.email);
+      const valResult = MultiSignOps.validateFieldValues(assignedFields, fieldValues);
+      if (!valResult.valid) {
+        return sendJson(res, 400, { success: false, error: valResult.error, fieldId: valResult.fieldId });
+      }
 
       // Populate values for assigned fields
       foundRecord.fields.forEach(f => {
@@ -279,8 +370,8 @@ export async function handleSignRequest(req, res, pathname, method) {
         details: `Successfully signed and submitted all assigned fields.`
       });
 
-      // Check if all signers have signed
-      const allSigned = foundRecord.recipients.every(r => r.status === 'signed');
+      // Check if all signers and approvers have signed
+      const allSigned = foundRecord.recipients.filter(r => r.role !== 'viewer').every(r => r.status === 'signed');
       if (allSigned) {
         foundRecord.status = 'completed';
         foundRecord.completedAt = now;
@@ -316,8 +407,8 @@ export async function handleSignRequest(req, res, pathname, method) {
     }
   }
 
-  // 5. Download finalized signed document: GET /api/signatures/request/:id/download
-  const matchDownload = pathname.match(/^\/api\/signatures\/request\/([a-zA-Z0-9_-]+)\/download$/);
+  // 5. Download finalized signed document: GET /api/signatures/request/:id/download or /api/signature/request/:id/download
+  const matchDownload = pathname.match(/^\/api\/signatures?\/request\/([a-zA-Z0-9_-]+)\/download$/);
   if (matchDownload && method === 'GET') {
     const reqId = matchDownload[1];
     const record = SIGNATURE_REQUESTS.get(reqId);
