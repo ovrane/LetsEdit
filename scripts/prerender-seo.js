@@ -36,9 +36,15 @@ export function prerenderRoutes() {
       `$1\n  <div id="landing-view" class="landing-view-container">\n${landingHtml}\n  </div>`
     );
   }
+  homeHtml = homeHtml.replace(/<title>[\s\S]*?<\/title>/i, `<title>Free Online PDF Editor &amp; Tools | LetsEdit</title>`);
+  homeHtml = homeHtml.replace(/<meta name="description"[\s\S]*?>/i, `<meta name="description" content="Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing.">`);
   homeHtml = homeHtml.replace(/<link rel="canonical" href="[^"]*">/i, `<link rel="canonical" href="${BASE_URL}/">`);
+  homeHtml = homeHtml.replace(/<meta property="og:title" content="[^"]*">/i, `<meta property="og:title" content="Free Online PDF Editor &amp; Tools | LetsEdit">`);
+  homeHtml = homeHtml.replace(/<meta property="og:description" content="[^"]*">/i, `<meta property="og:description" content="Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing.">`);
   homeHtml = homeHtml.replace(/<meta property="og:url" content="[^"]*">/i, `<meta property="og:url" content="${BASE_URL}/">`);
   homeHtml = homeHtml.replace(/<meta property="og:image" content="[^"]*">/i, `<meta property="og:image" content="${BASE_URL}/og-image.png">`);
+  homeHtml = homeHtml.replace(/<meta name="twitter:title" content="[^"]*">/i, `<meta name="twitter:title" content="Free Online PDF Editor &amp; Tools | LetsEdit">`);
+  homeHtml = homeHtml.replace(/<meta name="twitter:description" content="[^"]*">/i, `<meta name="twitter:description" content="Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing.">`);
   homeHtml = homeHtml.replace(/<meta name="twitter:image" content="[^"]*">/i, `<meta name="twitter:image" content="${BASE_URL}/og-image.png">`);
   fs.writeFileSync(baseHtmlPath, homeHtml, 'utf-8');
   count++;
@@ -48,6 +54,7 @@ export function prerenderRoutes() {
     if (route.path === '/') continue;
 
     const toolName = route.title ? route.title.split('—')[0].split('.')[0].trim() : 'PDF Tool';
+    const cleanHeading = toolName.toLowerCase().includes('online') ? toolName : `${toolName} Online Free`;
     const canonicalUrl = `${BASE_URL}${route.path}`;
 
     // Schema.org Structured Data
@@ -193,6 +200,62 @@ export function prerenderRoutes() {
     // JSON-LD replacement
     const jsonLdScript = `<script type="application/ld+json" id="letsedit-route-jsonld">\n${JSON.stringify(jsonLd, null, 2)}\n  </script>`;
     html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/i, jsonLdScript);
+
+    // Inject semantic pre-rendered HTML shell for crawlers (Googlebot, Bingbot)
+    const semanticContent = `
+  <main id="tool-prerender-seo" class="tool-prerender-seo-shell">
+    <section class="workflow-uploader-card" style="max-width: 860px; margin: 36px auto; padding: 32px 24px; text-align: center;">
+      <h1 class="workflow-title" style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">${cleanHeading}</h1>
+      <p class="workflow-subtitle" style="font-size: 15px; color: #64748b; margin-bottom: 24px; max-width: 650px; margin-left: auto; margin-right: auto;">${route.description || 'Fast, private, client-side PDF tool with zero server uploads.'}</p>
+      <div class="workflow-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 16px; padding: 36px 20px; background: #f8fafc; margin-bottom: 24px;">
+        <a href="${canonicalUrl}" class="workflow-primary-cta btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 9999px; text-decoration: none; font-weight: 700;">
+          <span>Choose PDF files</span>
+        </a>
+        <p style="margin-top: 12px; font-size: 12.5px; color: #94a3b8;">100% In-Browser Execution &bull; Zero Server Uploads &bull; Free Forever</p>
+      </div>
+    </section>
+
+    <!-- Semantic Educational Content for Search Engine Crawlers -->
+    <section class="workflow-seo-container" style="max-width: 860px; margin: 0 auto 60px; padding: 0 20px;">
+      <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 14px;">How to use ${toolName} Online for Free</h2>
+      <ol style="margin-bottom: 28px; line-height: 1.8; color: #475569; padding-left: 20px;">
+        <li><strong>Select Files:</strong> Click Choose PDF files or drag and drop your document into the upload area.</li>
+        <li><strong>Configure:</strong> Adjust settings, page order, or compression directly in your browser.</li>
+        <li><strong>Process & Download:</strong> Click Process to generate your PDF instantly with client-side WebAssembly.</li>
+      </ol>
+
+      <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 14px;">Why Choose LetsEdit for ${toolName}</h2>
+      <ul style="margin-bottom: 28px; line-height: 1.8; color: #475569; padding-left: 20px;">
+        <li><strong>100% Client-Side Privacy:</strong> Your documents never leave your browser or get uploaded to cloud servers.</li>
+        <li><strong>Zero Limits & Paywalls:</strong> No hourly task limits, no subscriptions, no forced watermarks.</li>
+        <li><strong>Sub-Second Speed:</strong> Local processing avoids slow upload/download roundtrips.</li>
+      </ul>
+
+      <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 14px;">Frequently Asked Questions</h2>
+      <div class="seo-faq-list" style="margin-bottom: 28px;">
+        <details style="margin-bottom: 10px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <summary style="font-weight: 600; cursor: pointer;">Is LetsEdit ${toolName} completely free?</summary>
+          <p style="margin-top: 8px; color: #64748b; font-size: 14px;">Yes, LetsEdit is 100% free with unlimited tasks and zero hidden fees or credit card requirements.</p>
+        </details>
+        <details style="margin-bottom: 10px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <summary style="font-weight: 600; cursor: pointer;">Are my confidential files secure?</summary>
+          <p style="margin-top: 8px; color: #64748b; font-size: 14px;">Yes. Processing runs entirely in client-side WebAssembly inside your browser sandbox. Files never touch any remote server.</p>
+        </details>
+      </div>
+
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Related PDF Tools</h2>
+      <nav class="seo-related-tools" style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="/edit-pdf" style="padding: 5px 12px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #334155; font-size: 12.5px;">Edit PDF</a>
+        <a href="/merge-pdf" style="padding: 5px 12px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #334155; font-size: 12.5px;">Merge PDF</a>
+        <a href="/compress-pdf" style="padding: 5px 12px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #334155; font-size: 12.5px;">Compress PDF</a>
+        <a href="/split-pdf" style="padding: 5px 12px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #334155; font-size: 12.5px;">Split PDF</a>
+        <a href="/sign-pdf" style="padding: 5px 12px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #334155; font-size: 12.5px;">Sign PDF</a>
+        <a href="/pdf-to-word" style="padding: 5px 12px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #334155; font-size: 12.5px;">PDF to Word</a>
+      </nav>
+    </section>
+  </main>
+`;
+    html = html.replace(/(<body[^>]*>)/i, `$1\n${semanticContent}`);
 
     // Prerender both primary path and all aliases
     const allPaths = [route.path, ...(route.aliases || [])];

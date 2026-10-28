@@ -131,8 +131,9 @@ class App {
         docsPage.hide();
         if (mobileContainer) mobileContainer.style.display = 'none';
         if (recContainer) recContainer.style.display = 'none';
-        if (accountContainer) accountContainer.style.display = 'none';
         if (toolWfContainer) toolWfContainer.style.display = 'none';
+        const prerenderEl = document.getElementById('tool-prerender-seo');
+        if (prerenderEl) prerenderEl.remove();
       };
 
       if (route.isLanding) {
@@ -186,6 +187,13 @@ class App {
 
     // Register PWA Service Worker for offline execution
     pwaManager.registerServiceWorker();
+
+    // Smoothly dismiss pre-hydration loader
+    const initialLoader = document.getElementById('app-initial-loader');
+    if (initialLoader) {
+      initialLoader.style.opacity = '0';
+      setTimeout(() => initialLoader.remove(), 250);
+    }
   }
 
   setupAutosave() {

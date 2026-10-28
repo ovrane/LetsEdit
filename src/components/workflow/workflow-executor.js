@@ -16,6 +16,7 @@ import { redactPageContentStreams } from '../../core/pdf-redactor.js';
 import { Toast } from '../toast.js';
 import { hexToRgb } from '../../utils/helpers.js';
 import { batchProgressModal } from './batch-progress-modal.js';
+import { getMiniLoadingSvg } from '../../utils/loading-spinner.js';
 
 export async function processSingleDocument(manager, tool, file) {
   const primary = file;
@@ -593,7 +594,7 @@ export async function executeAction(manager) {
   const execBtn = manager.container.querySelector('#btn-workspace-execute');
   if (execBtn) {
     execBtn.disabled = true;
-    execBtn.innerHTML = `<span>Processing in browser...</span>`;
+    execBtn.innerHTML = `${getMiniLoadingSvg(14)} <span>Processing in browser...</span>`;
   }
 
   try {

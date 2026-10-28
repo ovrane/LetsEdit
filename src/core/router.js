@@ -17,8 +17,8 @@ export const ROUTE_DEFINITIONS = [
     path: '/',
     toolId: null,
     isLanding: true,
-    title: "LetsEdit — All-in-One Online PDF Editor & Tools",
-    description: "Every tool you need to work with PDFs 100% free and in your browser."
+    title: "Free Online PDF Editor & Tools | LetsEdit",
+    description: "Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing."
   },
   {
     path: '/edit_pdf',
