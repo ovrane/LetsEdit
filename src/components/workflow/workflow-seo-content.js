@@ -10,7 +10,7 @@ export function getToolSeoContentHtml(tool) {
   const toolName = t.title ? t.title.split('—')[0].split('.')[0].trim() : 'PDF Tool';
 
   return `
-    <div class="workflow-seo-section" style="max-width: 980px; margin: 48px auto 0; padding: 0 16px;">
+    <div class="workflow-seo-section" style="width: 100%; max-width: 980px; margin: 48px auto 0; padding: 0 16px; box-sizing: border-box;">
       <!-- Breadcrumbs -->
       <nav class="workflow-seo-breadcrumbs" aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
         <a href="/" data-route="/" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">Home</a>

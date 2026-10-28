@@ -17,6 +17,10 @@ import { getToolSeoContentHtml } from './workflow-seo-content.js';
 
 export function renderUploadPrompt(manager) {
   const t = manager.activeTool;
+  const uploadButtonText = t.buttonText && !t.buttonText.toLowerCase().includes('pdf') && (t.buttonText.toLowerCase().includes('word') || t.buttonText.toLowerCase().includes('image') || t.buttonText.toLowerCase().includes('excel') || t.buttonText.toLowerCase().includes('html') || t.buttonText.toLowerCase().includes('presentation'))
+    ? t.buttonText
+    : 'Select PDF files';
+
   manager.container.innerHTML = `
     <header class="workflow-header">
       <div class="workflow-header-inner">
@@ -50,25 +54,25 @@ export function renderUploadPrompt(manager) {
 
     <main class="workflow-main">
       <div class="workflow-hero-card">
-        <div class="workflow-tool-badge" style="background: ${t.color}18; color: ${t.color};">
+        <div class="workflow-tool-badge" style="background: var(--primary-light); color: var(--primary);">
           ${t.icon}
         </div>
         <h1 class="workflow-title">${t.title}</h1>
         <p class="workflow-subtitle">${t.subtitle}</p>
 
-        <div class="workflow-dropzone" id="workflow-dropzone" style="--zone-color: ${t.color};">
+        <div class="workflow-dropzone" id="workflow-dropzone">
           <input type="file" id="workflow-file-input" accept="${t.accept}" ${t.multiple ? 'multiple' : ''} style="display: none;" />
-          <div class="dropzone-icon-ring" style="background: ${t.color}15; color: ${t.color};">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <div class="dropzone-icon-ring" style="background: var(--primary-light); color: var(--primary);">
+            <svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
             </svg>
           </div>
-          <button class="workflow-primary-cta" id="btn-workflow-choose" style="background: ${t.color};">
-            <span>${t.buttonText}</span>
+          <button class="workflow-primary-cta" id="btn-workflow-choose" type="button">
+            <span>${uploadButtonText}</span>
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
           </button>
-          <span class="workflow-droptxt">${t.dropText}</span>
-          <span class="workflow-format-chip">${t.badge}</span>
+          <span class="workflow-droptxt">${t.dropText || 'or drop files here'}</span>
+          <span class="workflow-format-chip">${t.badge || 'PDF'}</span>
         </div>
 
         <div class="workflow-cloud-quick-actions" style="margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
