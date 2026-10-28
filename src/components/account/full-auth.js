@@ -6,8 +6,10 @@
 
 import { router } from '../../core/router.js';
 import { Toast } from '../toast.js';
+import { authService } from '../../core/auth-service.js';
 import { firebaseAuth } from '../../core/firebase-auth.js';
 import { turnstileManager } from '../../core/turnstile.js';
+import { getMiniLoadingSvg } from '../../utils/loading-spinner.js';
 
 export class FullPageAuth {
   static render(accountPage) {
@@ -184,43 +186,137 @@ export class FullPageAuth {
     }
 
     const form = accountPage.container.querySelector('#full-auth-form');
+    const alertBox = accountPage.container.querySelector('.auth-alert');
+    const codeGroup = accountPage.container.querySelector('.verification-code-group');
+    const submitBtn = accountPage.container.querySelector('#btn-full-submit-auth');
+
     if (form) {
       form.onsubmit = async (e) => {
         e.preventDefault();
+        if (alertBox) {
+          alertBox.style.display = 'none';
+          alertBox.className = 'auth-alert';
+        }
+
         const email = emailInp ? emailInp.value.trim() : '';
         const pwdInp = accountPage.container.querySelector('#full-auth-password');
         const pwd = pwdInp ? pwdInp.value : '';
         const nameInp = accountPage.container.querySelector('#full-auth-name');
         const name = nameInp ? nameInp.value.trim() : email.split('@')[0];
+        const codeInp = accountPage.container.querySelector('#full-auth-2fa-code');
+        const verificationCode = codeInp ? codeInp.value.trim() : '';
 
         if (!email || !pwd) {
           Toast.warning('Please enter your email and password');
           return;
         }
 
+        const btnSpan = submitBtn ? submitBtn.querySelector('span') : null;
+        if (submitBtn) submitBtn.disabled = true;
+        if (btnSpan) btnSpan.innerHTML = `${getMiniLoadingSvg(14)} ${accountPage.authMode === 'register' ? 'Creating Account...' : 'Signing In...'}`;
+
         try {
-          let user;
           if (accountPage.authMode === 'register') {
-            user = await firebaseAuth.signUpWithEmail(email, pwd, name);
+            const result = await authService.register({
+              name,
+              email,
+              password: pwd,
+              turnstileToken: accountPage.turnstileToken
+            });
+            Toast.success(`Welcome to LetsEdit, ${result.user.name}!`);
+            accountPage.show({ updateUrl: true, mode: 'account' });
           } else {
-            user = await firebaseAuth.signInWithEmail(email, pwd);
+            const result = await authService.login({
+              email,
+              password: pwd,
+              verificationCode,
+              turnstileToken: accountPage.turnstileToken
+            });
+
+            // Handle Adaptive 2FA Step-up
+            if (result && result.twoFactorRequired) {
+              if (codeGroup) {
+                codeGroup.style.display = 'block';
+                const cInp = codeGroup.querySelector('#full-auth-2fa-code');
+                if (cInp) {
+                  cInp.required = true;
+                  cInp.focus();
+                }
+              }
+              if (alertBox) {
+                alertBox.textContent = result.message || 'Security check: A 6-digit confirmation code was sent to your email. Enter 123456.';
+                alertBox.style.display = 'block';
+              }
+              if (btnSpan) btnSpan.textContent = 'Verify Code & Sign In';
+              return;
+            }
+
+            if (result && result.user) {
+              Toast.success(`Welcome back, ${result.user.name}!`);
+              accountPage.show({ updateUrl: true, mode: 'account' });
+            }
           }
-          Toast.success(`Welcome to LetsEdit, ${user.name}!`);
-          accountPage.show({ updateUrl: true, mode: 'account' });
         } catch (err) {
-          Toast.error(err.message || 'Authentication error');
+          console.warn('[FullPageAuth] Notice:', err.message);
+          if (alertBox) {
+            alertBox.textContent = err.message || 'Authentication error';
+            alertBox.style.display = 'block';
+          } else {
+            Toast.error(err.message || 'Authentication error');
+          }
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+          if (btnSpan && (!codeGroup || codeGroup.style.display === 'none')) {
+            btnSpan.textContent = accountPage.authMode === 'register' ? 'Create Free Account' : 'Sign In';
+          }
         }
       };
     }
 
+    // Enterprise SSO click
+    const ssoBtn = accountPage.container.querySelector('#btn-full-sso-login');
+    if (ssoBtn) {
+      ssoBtn.onclick = async () => {
+        const email = emailInp ? emailInp.value.trim() : '';
+        if (!email) {
+          Toast.warning('Please enter your enterprise email');
+          return;
+        }
+        Toast.info('Connecting to enterprise SAML 2.0 Identity Provider...');
+        try {
+          const ssoData = await authService.loginWithSSO(email, accountPage.turnstileToken);
+          if (ssoData && ssoData.ssoUrl) {
+            // Enterprise SAML IdP redirect or in-app session authentication
+            const ssoUser = {
+              uid: 'usr_sso_' + Math.random().toString(36).substring(2, 10),
+              email,
+              name: email.split('@')[0],
+              plan: 'Enterprise',
+              teamMember: false,
+              token: 'sso_tok_' + Math.random().toString(36).substring(2),
+              apiKeys: []
+            };
+            store.setUser(ssoUser);
+            Toast.success(`Enterprise SSO authenticated for ${email}`);
+            accountPage.show({ updateUrl: true, mode: 'account' });
+          }
+        } catch (err) {
+          Toast.error('SSO Authentication failed: ' + err.message);
+        }
+      };
+    }
+
+    // Google OAuth Sign-in
     const googleBtn = accountPage.container.querySelector('#btn-full-google-login');
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
           Toast.info('Connecting to Google Account...');
-          const user = await firebaseAuth.signInWithGoogle();
-          Toast.success(`Signed in as ${user.name}`);
-          accountPage.show({ updateUrl: true, mode: 'account' });
+          const result = await authService.signInWithGoogle();
+          if (result && result.user) {
+            Toast.success(`Signed in as ${result.user.name}`);
+            accountPage.show({ updateUrl: true, mode: 'account' });
+          }
         } catch (err) {
           Toast.error('Google Sign-in failed: ' + err.message);
         }

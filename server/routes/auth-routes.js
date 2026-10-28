@@ -324,8 +324,8 @@ export async function handleAuthRequest(req, res, pathname, method) {
     return true;
   }
 
-  // 10. Sejda Auth API: POST /users/forgot-password
-  if (pathname === '/users/forgot-password' && method === 'POST') {
+  // 10. Sejda Auth API: POST /users/forgot-password & /users/reset-password
+  if ((pathname === '/users/forgot-password' || pathname === '/users/reset-password') && method === 'POST') {
     try {
       const body = await parseJsonBody(req);
       const email = (body.email || '').trim();

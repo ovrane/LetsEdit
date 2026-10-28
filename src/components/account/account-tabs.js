@@ -6,6 +6,7 @@
 
 import { store } from '../../core/state-store.js';
 import { Toast } from '../toast.js';
+import { authService } from '../../core/auth-service.js';
 
 export class AccountTabsRenderer {
   static getCodeSnippet(codeTab, token) {
@@ -279,12 +280,11 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
     // Profile update form
     const profileForm = accountPage.container.querySelector('#form-update-profile');
     if (profileForm) {
-      profileForm.onsubmit = (e) => {
+      profileForm.onsubmit = async (e) => {
         e.preventDefault();
         const newName = accountPage.container.querySelector('#profile-name-input').value.trim();
         if (newName) {
-          const updated = { ...user, name: newName };
-          store.setUser(updated);
+          const updated = await authService.updateProfile({ name: newName });
           Toast.success('Profile details saved successfully!');
           accountPage.render();
         }
@@ -294,10 +294,9 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
     // Security toggle
     const chk2fa = accountPage.container.querySelector('#chk-toggle-2fa');
     if (chk2fa) {
-      chk2fa.onchange = (e) => {
+      chk2fa.onchange = async (e) => {
         const val = e.target.checked;
-        const updated = { ...user, requires2fa: val };
-        store.setUser(updated);
+        await authService.updateProfile({ requires2fa: val });
         Toast.info(`Adaptive 2FA ${val ? 'enabled' : 'disabled'}`);
       };
     }
@@ -305,17 +304,9 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
     // Create API Key
     const createKeyBtn = accountPage.container.querySelector('#btn-create-api-key');
     if (createKeyBtn) {
-      createKeyBtn.onclick = () => {
+      createKeyBtn.onclick = async () => {
         const label = prompt('Enter a label for this API key:', 'Production Key') || 'Default API Key';
-        const newKey = {
-          id: 'key_' + Math.random().toString(36).substring(2, 8),
-          token: 'api_live_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-          label: label.trim(),
-          createdAt: new Date().toISOString()
-        };
-        const currentKeys = user.apiKeys || [];
-        const updated = { ...user, apiKeys: [newKey, ...currentKeys] };
-        store.setUser(updated);
+        const newKey = await authService.createApiKey(label.trim());
         Toast.success(`API key '${newKey.label}' created!`);
         accountPage.render();
       };
@@ -336,12 +327,10 @@ print("Merged PDF length:", len(data["pdfBase64"]))`;
     // Revoke Token
     const revokeBtns = accountPage.container.querySelectorAll('.btn-revoke-key');
     revokeBtns.forEach(btn => {
-      btn.onclick = () => {
+      btn.onclick = async () => {
         const id = btn.dataset.id;
         if (confirm('Are you sure you want to revoke this API key? Applications using it will lose access.')) {
-          const filtered = (user.apiKeys || []).filter(k => k.id !== id);
-          const updated = { ...user, apiKeys: filtered };
-          store.setUser(updated);
+          await authService.revokeApiKey(id);
           Toast.info('API key revoked.');
           accountPage.render();
         }

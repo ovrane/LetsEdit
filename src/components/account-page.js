@@ -10,6 +10,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { router } from '../core/router.js';
 import { toggleTheme, getPreferredTheme } from '../utils/theme.js';
+import { authService } from '../core/auth-service.js';
 import { firebaseAuth } from '../core/firebase-auth.js';
 import { FullPageAuth } from './account/full-auth.js';
 import { AccountTabsRenderer } from './account/account-tabs.js';
@@ -210,7 +211,7 @@ export class AccountPage {
     const logoutBtn = this.container.querySelector('#btn-account-logout');
     if (logoutBtn) {
       logoutBtn.onclick = async () => {
-        await firebaseAuth.signOut();
+        await authService.logout();
         Toast.info('Signed out of LetsEdit');
         this.showLogin({ updateUrl: true });
       };
