@@ -525,50 +525,27 @@ export async function processSingleDocument(manager, tool, file) {
     };
   } else if (id === 'html-to-pdf') {
     const textDecoder = new TextDecoder('utf-8');
-    const rawHtml = textDecoder.decode(primary.bytes);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(rawHtml, 'text/html');
-    const title = doc.querySelector('title')?.textContent || primary.name.replace(/\.[^/.]+$/, '');
-    const elements = Array.from(doc.body.querySelectorAll('h1, h2, h3, p, li, pre, blockquote, div')).map(el => el.textContent.trim()).filter(Boolean);
-    const lines = elements.length > 0 ? elements : rawHtml.replace(/<[^>]+>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean);
+    const inputContent = textDecoder.decode(primary.bytes);
+    const title = manager.htmlPdfDocTitle || primary.name.replace(/\.[^/.]+$/, '');
+    const theme = manager.htmlPdfTheme || 'modern';
+    const pageSize = manager.htmlPdfPageSize || 'A4';
+    const orientation = manager.htmlPdfOrientation || 'portrait';
+    const margin = manager.htmlPdfMargin || 40;
+    const showHeader = manager.htmlPdfShowHeader !== false;
+    const showFooter = manager.htmlPdfShowFooter !== false;
 
-    const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    let page = pdfDoc.addPage([595.28, 841.89]);
-    let y = 800;
+    const convertResult = await PageOperations.htmlToPdf(inputContent, {
+      title,
+      theme,
+      pageSize,
+      orientation,
+      margin,
+      showHeader,
+      showFooter,
+      withReport: true
+    });
 
-    page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-    y -= 30;
-
-    for (const line of lines) {
-      if (y < 60) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        y = 800;
-      }
-      const words = line.split(' ');
-      let curLine = '';
-      for (const w of words) {
-        const testLine = curLine ? `${curLine} ${w}` : w;
-        if (font.widthOfTextAtSize(testLine, 10.5) > 495) {
-          page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
-          y -= 15;
-          if (y < 60) {
-            page = pdfDoc.addPage([595.28, 841.89]);
-            y = 800;
-          }
-          curLine = w;
-        } else {
-          curLine = testLine;
-        }
-      }
-      if (curLine) {
-        page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
-        y -= 18;
-      }
-    }
-
-    const outBytes = await pdfDoc.save();
+    const outBytes = convertResult.pdfBytes || convertResult;
     return {
       name: `${title.replace(/[/\\?%*:|"<>]/g, '_')}.pdf`,
       bytes: outBytes,
@@ -828,20 +805,37 @@ export async function executeAction(manager) {
       manager.compareResult = cmp;
       manager.compareDocA = manager.uploadedFiles[0];
       manager.compareDocB = manager.uploadedFiles[1];
-    } else if (t.id === 'extract-images') {
-      const imgs = await pdfEngine.extractImages(primary.bytes);
-      if (imgs.length === 0) {
-        Toast.warning('No embedded image objects found in this PDF');
+    } else if (['extract-images', 'extract_images'].includes(t.id)) {
+      const minDimension = parseInt(manager.extractMinSize, 10) || 0;
+      const deduplicate = manager.extractDeduplicate !== false;
+      const targetFormat = manager.extractTargetFormat || 'all';
+
+      const result = await PageOperations.extractImages(primary.bytes, {
+        minWidth: minDimension,
+        minHeight: minDimension,
+        deduplicate,
+        targetFormat,
+        withReport: true
+      });
+
+      if (!result.images || result.images.length === 0) {
+        Toast.warning('No embedded image objects found matching your filter criteria');
         if (execBtn) {
           execBtn.disabled = false;
           execBtn.innerHTML = `<span>${manager.getExecuteButtonLabel()}</span>`;
         }
         return;
       }
-      const zip = new JSZip();
-      imgs.forEach(im => zip.file(im.name, im.bytes));
-      manager.processedBlob = await zip.generateAsync({ type: 'blob' });
-      manager.processedFilename = `Extracted_Images_${primary.name}.zip`;
+
+      manager.processedBlob = new Blob([result.zipBytes], { type: 'application/zip' });
+      manager.processedFilename = `Extracted_Images_${primary.name.replace(/\.[^/.]+$/, '')}.zip`;
+      manager.lastOperationMetrics = {
+        operation: 'extract-images',
+        imageCount: result.images.length,
+        skippedDuplicates: result.report?.skippedDuplicates || 0,
+        originalSize: primary.size,
+        processedSize: result.zipBytes.byteLength
+      };
     } else if (t.id === 'organize') {
       if (manager.organizePages.length === 0) {
         Toast.warning('Cannot save empty document. Please keep at least one page.');

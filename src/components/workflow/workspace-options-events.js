@@ -694,4 +694,83 @@ export function bindWorkspaceOptionsEvents(manager) {
   if (['watermark', 'watermark-pdf', 'add-watermark'].includes(manager.activeTool.id)) {
     bindWatermarkEvents(manager);
   }
+
+  // HTML5 & Markdown to PDF listeners
+  if (manager.activeTool.id === 'html-to-pdf') {
+    const titleInput = manager.container.querySelector('#html-pdf-title-input');
+    if (titleInput) {
+      titleInput.oninput = (e) => {
+        manager.htmlPdfDocTitle = e.target.value.trim();
+      };
+    }
+
+    const themeBtns = manager.container.querySelectorAll('[data-html-theme]');
+    themeBtns.forEach(btn => {
+      btn.onclick = () => {
+        manager.htmlPdfTheme = btn.getAttribute('data-html-theme');
+        manager.render();
+      };
+    });
+
+    const pageSizeSelect = manager.container.querySelector('#html-pdf-pagesize-select');
+    if (pageSizeSelect) {
+      pageSizeSelect.onchange = (e) => {
+        manager.htmlPdfPageSize = e.target.value;
+      };
+    }
+
+    const orientationSelect = manager.container.querySelector('#html-pdf-orientation-select');
+    if (orientationSelect) {
+      orientationSelect.onchange = (e) => {
+        manager.htmlPdfOrientation = e.target.value;
+      };
+    }
+
+    const marginBtns = manager.container.querySelectorAll('[data-html-margin]');
+    marginBtns.forEach(btn => {
+      btn.onclick = () => {
+        manager.htmlPdfMargin = parseInt(btn.getAttribute('data-html-margin'), 10) || 40;
+        manager.render();
+      };
+    });
+
+    const checkHeader = manager.container.querySelector('#html-pdf-check-header');
+    if (checkHeader) {
+      checkHeader.onchange = (e) => {
+        manager.htmlPdfShowHeader = e.target.checked;
+      };
+    }
+
+    const checkFooter = manager.container.querySelector('#html-pdf-check-footer');
+    if (checkFooter) {
+      checkFooter.onchange = (e) => {
+        manager.htmlPdfShowFooter = e.target.checked;
+      };
+    }
+  }
+
+  // Embedded Images Extraction listeners
+  if (['extract-images', 'extract_images'].includes(manager.activeTool.id)) {
+    const minSizeSelect = manager.container.querySelector('#extract-minsize-select');
+    if (minSizeSelect) {
+      minSizeSelect.onchange = (e) => {
+        manager.extractMinSize = e.target.value;
+      };
+    }
+
+    const formatBtns = manager.container.querySelectorAll('[data-extract-format]');
+    formatBtns.forEach(btn => {
+      btn.onclick = () => {
+        manager.extractTargetFormat = btn.getAttribute('data-extract-format');
+        manager.render();
+      };
+    });
+
+    const dedupCheck = manager.container.querySelector('#extract-deduplicate-check');
+    if (dedupCheck) {
+      dedupCheck.onchange = (e) => {
+        manager.extractDeduplicate = e.target.checked;
+      };
+    }
+  }
 }

@@ -35,8 +35,10 @@ import { ExcelToPdfOps } from './operations/excel-to-pdf-ops.js';
 import { PdfToExcelOps } from './operations/pdf-to-excel-ops.js';
 import { PptxToPdfOps } from './operations/pptx-to-pdf-ops.js';
 import { PdfToPptxOps } from './operations/pdf-to-pptx-ops.js';
+import { HtmlToPdfOps } from './operations/html-to-pdf-ops.js';
+import { ExtractImagesOps } from './operations/extract-images-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps, HtmlToPdfOps, ExtractImagesOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -84,7 +86,36 @@ export class PageOperations {
     return res;
   }
   static createSampleImageBatch(...args) { return ImageToPdfOps.createSampleImageBatch(...args); }
-  static htmlToPdf(...args) { return ConvertOps.htmlToPdf(...args); }
+  static async htmlToPdf(htmlString, options = {}) {
+    const res = await HtmlToPdfOps.convertHtmlToPdf(htmlString, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static async markdownToPdf(markdownString, options = {}) {
+    const res = await HtmlToPdfOps.convertMarkdownToPdf(markdownString, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleHtmlString() { return HtmlToPdfOps.createSampleHtmlString(); }
+  static createSampleMarkdownString() { return HtmlToPdfOps.createSampleMarkdownString(); }
+  static async extractImages(rawBytes, options = {}) {
+    const res = await ExtractImagesOps.extractImages(rawBytes, options);
+    if (res && res.zipBytes) {
+      res.zipBytes.report = res.report;
+      res.zipBytes.images = res.images;
+      res.zipBytes.manifest = res.manifest;
+      return typeof options === 'object' && options.withReport ? res : res.zipBytes;
+    }
+    return res;
+  }
+  static analyzeImages(rawBytes) { return ExtractImagesOps.analyzeImages(rawBytes); }
+  static createSampleMultiImagePdf() { return ExtractImagesOps.createSampleMultiImagePdf(); }
   static async wordToPdf(docxBytes, options = {}) {
     const res = await WordToPdfOps.wordToPdf(docxBytes, options);
     if (res && res.pdfBytes) {

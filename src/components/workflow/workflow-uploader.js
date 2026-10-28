@@ -205,6 +205,13 @@ export function bindUploadEvents(manager) {
       } else if (['redact', 'redact-pdf'].includes(manager.activeTool.id)) {
         sampleBytes = await PageOperations.createSampleRedactPdf();
         sampleName = 'Sample_PII_Discovery_Record.pdf';
+      } else if (manager.activeTool.id === 'html-to-pdf') {
+        const htmlStr = PageOperations.createSampleHtmlString();
+        sampleBytes = new TextEncoder().encode(htmlStr);
+        sampleName = 'Sample_Technical_Documentation.html';
+      } else if (['extract-images', 'extract_images'].includes(manager.activeTool.id)) {
+        sampleBytes = await PageOperations.createSampleMultiImagePdf();
+        sampleName = 'Sample_Document_With_Images.pdf';
       } else {
         sampleBytes = await pdfEngine.createSamplePdf();
       }

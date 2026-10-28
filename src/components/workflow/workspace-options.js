@@ -25,6 +25,8 @@ import {
   renderPptToPdfOptionsHtml,
   renderPdfToPptOptionsHtml
 } from './workspace-office-options.js';
+import { renderHtmlToPdfOptionsHtml } from './workspace-html-to-pdf-options.js';
+import { renderExtractImagesOptionsHtml } from './workspace-extract-images-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -84,6 +86,14 @@ import {
 
     if (id === 'repair') {
       return renderRepairDiagnosticOptionsHtml(instance);
+    }
+
+    if (id === 'html-to-pdf') {
+      return renderHtmlToPdfOptionsHtml(instance);
+    }
+
+    if (['extract-images', 'extract_images'].includes(id)) {
+      return renderExtractImagesOptionsHtml(instance);
     }
 
     if (id === 'merge') {

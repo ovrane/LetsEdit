@@ -37,6 +37,8 @@ import { handleExcelToPdfRequest } from './routes/excel-to-pdf-routes.js';
 import { handlePdfToExcelRequest } from './routes/pdf-to-excel-routes.js';
 import { handlePptxToPdfRequest } from './routes/pptx-to-pdf-routes.js';
 import { handlePdfToPptxRequest } from './routes/pdf-to-pptx-routes.js';
+import { handleHtmlToPdfRequest } from './routes/html-to-pdf-routes.js';
+import { handleExtractImagesRequest } from './routes/extract-images-routes.js';
 import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
@@ -191,6 +193,14 @@ export async function handleBackendRequest(req, res) {
   // Dispatch PDF to PowerPoint PPTX endpoints
   const pdfToPptxHandled = await handlePdfToPptxRequest(req, res, pathname, method);
   if (pdfToPptxHandled) return true;
+
+  // Dispatch HTML5 & Markdown to PDF endpoints
+  const htmlToPdfHandled = await handleHtmlToPdfRequest(req, res, pathname, method);
+  if (htmlToPdfHandled) return true;
+
+  // Dispatch Embedded Images Extraction endpoints
+  const extractImagesHandled = await handleExtractImagesRequest(req, res, pathname, method);
+  if (extractImagesHandled) return true;
 
   // Dispatch System Capabilities & Worker Status endpoints
   const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);
