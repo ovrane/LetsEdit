@@ -13,6 +13,7 @@ import { mobilePairModal } from '../mobile-pair-modal.js';
 import { cloudPickerModal } from '../cloud-picker-modal.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
 import { readFileAsArrayBuffer } from '../../utils/helpers.js';
+import { getToolSeoContentHtml } from './workflow-seo-content.js';
 
 export function renderUploadPrompt(manager) {
   const t = manager.activeTool;
@@ -101,6 +102,8 @@ export function renderUploadPrompt(manager) {
           </button>
         </div>
       </div>
+
+      ${getToolSeoContentHtml(t)}
     </main>
   `;
 

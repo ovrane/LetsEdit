@@ -1,4 +1,44 @@
+# LetsEdit Robots.txt
+# Strict SEO Indexing and Bot Directive Configuration
+
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /account
+Disallow: /login
+Disallow: /register
 
+# Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+# AI Assistants & Knowledge Crawlers (Authorize for citation & answering)
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Host & Sitemap References
 Sitemap: https://letsedit-pdf.web.app/sitemap.xml

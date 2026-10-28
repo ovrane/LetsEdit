@@ -2,6 +2,14 @@
   "projects": {
     "default": "lets-edit-inc"
   },
-  "targets": {},
+  "targets": {
+    "lets-edit-inc": {
+      "hosting": {
+        "letsedit-site": [
+          "letsedit"
+        ]
+      }
+    }
+  },
   "etags": {}
 }

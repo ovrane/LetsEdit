@@ -560,9 +560,7 @@ export class Router {
         window.history.pushState({ path: canonical }, '', canonical);
       }
 
-      if (route.title && typeof document !== 'undefined') {
-        document.title = route.title;
-      }
+      this.updateDocumentMetadata(route);
     }
 
     if (trigger) {
@@ -586,13 +584,132 @@ export class Router {
         window.history.replaceState({ path: route.canonicalPath }, '', route.canonicalPath);
       }
 
-      if (route.title && typeof document !== 'undefined') {
-        document.title = route.title;
-      }
+      this.updateDocumentMetadata(route);
     }
 
     this.notify(route, isPopState);
     return route;
+  }
+
+  /**
+   * Updates page title, canonical tag, meta description, OpenGraph, Twitter tags,
+   * and injects dynamic Schema.org JSON-LD structured data for Googlebot.
+   */
+  updateDocumentMetadata(route) {
+    if (typeof document === 'undefined') return;
+
+    if (route.title) {
+      document.title = route.title;
+    }
+
+    const baseUrl = 'https://letsedit-pdf.web.app';
+    const canonicalUrl = `${baseUrl}${route.canonicalPath === '/' ? '' : route.canonicalPath}`;
+
+    // 1. Canonical tag
+    let canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (!canonicalTag) {
+      canonicalTag = document.createElement('link');
+      canonicalTag.rel = 'canonical';
+      document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.href = canonicalUrl;
+
+    // 2. Meta description
+    if (route.description) {
+      let descTag = document.querySelector('meta[name="description"]');
+      if (!descTag) {
+        descTag = document.createElement('meta');
+        descTag.name = 'description';
+        document.head.appendChild(descTag);
+      }
+      descTag.setAttribute('content', route.description);
+    }
+
+    // 3. OpenGraph tags
+    this.setMetaProperty('og:title', route.title || 'LetsEdit — Fast, Private Online PDF Suite');
+    this.setMetaProperty('og:description', route.description || 'Every tool you need to edit, convert, merge, split, compress, sign, and protect PDFs right in your browser with zero cloud uploads.');
+    this.setMetaProperty('og:url', canonicalUrl);
+    this.setMetaProperty('og:type', route.canonicalPath === '/' ? 'website' : 'article');
+
+    // 4. Twitter Cards
+    this.setMetaName('twitter:card', 'summary_large_image');
+    this.setMetaName('twitter:title', route.title || 'LetsEdit');
+    this.setMetaName('twitter:description', route.description || '');
+
+    // 5. Dynamic JSON-LD Structured Data
+    this.updateJsonLd(route, canonicalUrl);
+  }
+
+  setMetaProperty(property, content) {
+    if (typeof document === 'undefined' || !content) return;
+    let tag = document.querySelector(`meta[property="${property}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('property', property);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  }
+
+  setMetaName(name, content) {
+    if (typeof document === 'undefined' || !content) return;
+    let tag = document.querySelector(`meta[name="${name}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name', name);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  }
+
+  updateJsonLd(route, canonicalUrl) {
+    if (typeof document === 'undefined') return;
+    let scriptTag = document.getElementById('letsedit-route-jsonld');
+    if (!scriptTag) {
+      scriptTag = document.createElement('script');
+      scriptTag.id = 'letsedit-route-jsonld';
+      scriptTag.type = 'application/ld+json';
+      document.head.appendChild(scriptTag);
+    }
+
+    const toolName = route.title ? route.title.split('—')[0].split('.')[0].trim() : 'LetsEdit Tool';
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": `LetsEdit — ${toolName}`,
+          "url": canonicalUrl,
+          "description": route.description || "Every tool you need to work with PDFs 100% free and in your browser with zero cloud uploads.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "All",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://letsedit-pdf.web.app/"
+            },
+            ...(route.canonicalPath !== '/' ? [{
+              "@type": "ListItem",
+              "position": 2,
+              "name": toolName,
+              "item": canonicalUrl
+            }] : [])
+          ]
+        }
+      ]
+    };
+
+    scriptTag.textContent = JSON.stringify(schema, null, 2);
   }
 
   /**
