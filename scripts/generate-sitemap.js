@@ -48,8 +48,11 @@ function getPriorityAndFreq(route) {
   if (['/request_signature', '/sign_document', '/mobile_pair'].includes(p)) {
     return { priority: '0.7', changefreq: 'monthly' };
   }
-  if (['/privacy', '/terms', '/security-whitepaper', '/security'].includes(p)) {
-    return { priority: '0.5', changefreq: 'monthly' };
+  if (p === '/docs') {
+    return { priority: '0.85', changefreq: 'weekly' };
+  }
+  if (['/privacy', '/terms', '/security-whitepaper', '/security', '/cookies'].includes(p)) {
+    return { priority: '0.6', changefreq: 'monthly' };
   }
   // Exclude internal auth / account routes from indexing sitemap
   if (['/login', '/register', '/account'].includes(p)) {

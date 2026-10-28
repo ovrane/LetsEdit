@@ -335,6 +335,15 @@ export class LandingPage {
       };
     });
 
+    // In-Section Live Tool Search Input
+    const inlineSearch = this.container.querySelector('#tools-inline-search-input');
+    if (inlineSearch) {
+      inlineSearch.oninput = (e) => {
+        this.searchQuery = e.target.value;
+        this.renderCards();
+      };
+    }
+
     // Header Quick Tool Search Modal (Spotlight style)
     this.setupHeaderQuickSearch();
 
@@ -477,12 +486,24 @@ export class LandingPage {
       };
     });
 
-    // Legal & Policies Dialog Triggers
+    // Legal & Policies Page Triggers (Standalone Dedicated Hub)
     this.container.querySelectorAll('[data-legal]').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
         const tab = btn.getAttribute('data-legal') || 'privacy';
-        legalModal.open(tab);
+        if (tab === 'privacy') router.navigate('/privacy');
+        else if (tab === 'terms') router.navigate('/terms');
+        else if (tab === 'security') router.navigate('/security-whitepaper');
+        else if (tab === 'cookies') router.navigate('/cookies');
+        else legalModal.open(tab);
+      };
+    });
+
+    // Documentation Page Triggers
+    this.container.querySelectorAll('a[data-route="/docs"]').forEach(link => {
+      link.onclick = (e) => {
+        e.preventDefault();
+        router.navigate('/docs');
       };
     });
 

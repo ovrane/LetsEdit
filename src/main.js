@@ -41,6 +41,8 @@ import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 import { pwaManager } from './core/pwa-manager.js';
 import { legalModal } from './components/legal-modal.js';
+import { legalPage } from './components/legal-page.js';
+import { docsPage } from './components/docs-page.js';
 import { populateFontSelect, loadAllEditorFonts } from './core/font-registry.js';
 import { studioExportModal } from './components/studio-export-modal.js';
 
@@ -105,45 +107,73 @@ class App {
 
     // Wire HTML5 URL Router for distinct iLovePDF routes (/merge_pdf, /compress_pdf, /split_pdf, etc.)
     router.subscribe((route) => {
+      const landingView = document.getElementById('landing-view');
+      const studioView = document.getElementById('studio-view');
+      const mobileContainer = document.getElementById('mobile-pair-container');
+      const recContainer = document.getElementById('recipient-sign-container');
+      const accountContainer = document.getElementById('account-page-container');
+      const toolWfContainer = document.getElementById('tool-workflow-container');
+
+      const hideStandaloneViews = () => {
+        legalPage.hide();
+        docsPage.hide();
+        if (mobileContainer) mobileContainer.style.display = 'none';
+        if (recContainer) recContainer.style.display = 'none';
+        if (accountContainer) accountContainer.style.display = 'none';
+        if (toolWfContainer) toolWfContainer.style.display = 'none';
+      };
+
       if (route.isLanding) {
+        hideStandaloneViews();
         landingPage.switchToLanding({ updateUrl: false });
       } else if (route.isEditor) {
+        hideStandaloneViews();
         landingPage.switchToStudio({ updateUrl: false });
       } else if (route.isAccount) {
+        hideStandaloneViews();
         accountPage.show({ updateUrl: false });
       } else if (route.isLogin) {
+        hideStandaloneViews();
         accountPage.showLogin({ updateUrl: false });
       } else if (route.isRegister) {
+        hideStandaloneViews();
         accountPage.showRegister({ updateUrl: false });
       } else if (route.isLegal) {
-        legalModal.open(route.legalTab || 'privacy');
+        if (landingView) landingView.style.display = 'none';
+        if (studioView) studioView.style.display = 'none';
+        hideStandaloneViews();
+        legalPage.show({ tab: route.legalTab || 'privacy', updateUrl: false });
+      } else if (route.isDocs) {
+        if (landingView) landingView.style.display = 'none';
+        if (studioView) studioView.style.display = 'none';
+        hideStandaloneViews();
+        docsPage.show({ updateUrl: false });
       } else if (route.toolId === 'mobile-pair') {
-        const landingView = document.getElementById('landing-view');
-        const studioView = document.getElementById('studio-view');
         if (landingView) landingView.style.display = 'none';
         if (studioView) studioView.style.display = 'none';
-        let mobileContainer = document.getElementById('mobile-pair-container');
-        if (!mobileContainer) {
-          mobileContainer = document.createElement('div');
-          mobileContainer.id = 'mobile-pair-container';
-          document.body.appendChild(mobileContainer);
+        hideStandaloneViews();
+        let mc = document.getElementById('mobile-pair-container');
+        if (!mc) {
+          mc = document.createElement('div');
+          mc.id = 'mobile-pair-container';
+          document.body.appendChild(mc);
         }
-        mobileContainer.style.display = 'block';
-        mobilePairPage.mount(mobileContainer);
+        mc.style.display = 'block';
+        mobilePairPage.mount(mc);
       } else if (route.isRecipientSigning || route.toolId === 'sign-document') {
-        const landingView = document.getElementById('landing-view');
-        const studioView = document.getElementById('studio-view');
         if (landingView) landingView.style.display = 'none';
         if (studioView) studioView.style.display = 'none';
-        let recContainer = document.getElementById('recipient-sign-container');
-        if (!recContainer) {
-          recContainer = document.createElement('div');
-          recContainer.id = 'recipient-sign-container';
-          document.body.appendChild(recContainer);
+        hideStandaloneViews();
+        let rc = document.getElementById('recipient-sign-container');
+        if (!rc) {
+          rc = document.createElement('div');
+          rc.id = 'recipient-sign-container';
+          document.body.appendChild(rc);
         }
-        recContainer.style.display = 'block';
-        recipientSignPage.mount(recContainer);
+        rc.style.display = 'block';
+        recipientSignPage.mount(rc);
       } else if (route.toolId) {
+        hideStandaloneViews();
         toolWorkflow.openTool(route.toolId, { updateUrl: false });
       }
     });

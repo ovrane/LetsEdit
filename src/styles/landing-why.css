@@ -65,11 +65,11 @@
 }
 
 .suite-highlight {
-  color: #2563eb;
+  color: #6e0b20;
 }
 
 [data-theme="dark"] .suite-highlight {
-  color: #60a5fa;
+  color: #6e0b20;
 }
 
 .section-sub-heading {

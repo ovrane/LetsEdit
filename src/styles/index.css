@@ -34,6 +34,8 @@
 @import './account.css';
 @import './sign-request.css';
 @import './huds.css';
+@import './legal-page.css';
+@import './docs-page.css';
 
 /* 5. Mobile & Tablet Responsive Engine */
 @import './responsive.css';

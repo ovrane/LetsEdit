@@ -2,6 +2,7 @@
   "hosting": {
     "target": "letsedit-site",
     "public": "dist",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",

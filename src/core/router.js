@@ -423,6 +423,23 @@ export const ROUTE_DEFINITIONS = [
     aliases: ['/security-policy', '/compliance', '/security_whitepaper', '/security_policy'],
     title: "Security & Cryptographic Compliance Whitepaper — LetsEdit",
     description: "Technical details of our client-side WebAssembly execution, SHA-256 verification, and permanent vector redaction."
+  },
+  {
+    path: '/cookies',
+    toolId: null,
+    isLegal: true,
+    legalTab: 'cookies',
+    aliases: ['/cookie-policy', '/cookies-policy'],
+    title: "Cookie Policy & Tracking Disclosure — LetsEdit",
+    description: "Read about our zero-tracking, essential-only cookie and local storage policy."
+  },
+  {
+    path: '/docs',
+    toolId: null,
+    isDocs: true,
+    aliases: ['/documentation', '/guide', '/user-guide', '/help-docs'],
+    title: "Documentation & Complete Beginner's Guide to PDF Editing — LetsEdit",
+    description: "Learn how to edit, merge, split, compress, redact, sign, and convert PDF files with step-by-step beginner guides and keyboard shortcuts."
   }
 ];
 

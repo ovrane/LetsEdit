@@ -630,18 +630,33 @@ export function getLandingTemplateHtml() {
         </div>
       </section>
 
-      <!-- Tool Filter Rail Directory (Search moved to header) -->
+      <!-- Tool Filter Rail Directory -->
       <section class="landing-tools-section" id="landing-tools-section">
         <div class="landing-tools-container">
           <div class="landing-tools-header">
+            <span class="tools-tag-pill">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>ALL PDF TOOLS</span>
+            </span>
             <div class="landing-tools-heading-wrap">
-              <h2 class="landing-tools-heading">Explore All PDF Tools</h2>
+              <h2 class="landing-tools-heading">Explore All PDF <span class="tools-theme-accent">Tools</span></h2>
               <p class="landing-tools-subheading">Choose a tool to launch immediately or open inside the interactive studio.</p>
+            </div>
+            <!-- Quick Search Bar with Instant In-Section Filtering -->
+            <div class="tools-inline-search-wrap">
+              <div class="tools-inline-search-box">
+                <svg class="tools-inline-search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="tools-inline-search-input" class="tools-inline-search-input" placeholder="Search tools..." aria-label="Search all tools" autocomplete="off" />
+                <kbd class="tools-inline-search-kbd">⌘K</kbd>
+              </div>
             </div>
           </div>
 
           <div class="landing-filter-rail" id="landing-filter-rail">
-            <button class="landing-filter-chip active" data-filter="all">All Tools</button>
+            <button class="landing-filter-chip active" data-filter="all">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>All Tools</span>
+            </button>
             <button class="landing-filter-chip" data-filter="popular">⭐ Most Popular</button>
             <button class="landing-filter-chip" data-filter="merge">🔗 Merge</button>
             <button class="landing-filter-chip" data-filter="split">✂ Split</button>
@@ -1111,7 +1126,7 @@ export function getLandingTemplateHtml() {
               <p class="help-desc">Find answers to common questions about features, privacy, offline usage, and more. Still can't find what you're looking for? Our docs and support are just a click away.</p>
 
               <div class="help-btns-row">
-                <a href="https://github.com" target="_blank" rel="noopener" class="help-btn-dark">
+                <a href="/docs" data-route="/docs" class="help-btn-dark" id="btn-faq-browse-docs">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                   <span>Browse Documentation</span>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -1468,7 +1483,7 @@ export function getLandingTemplateHtml() {
                   <span>Supported Platforms</span>
                   <svg class="footer-link-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </a>
-                <a href="https://github.com" target="_blank" rel="noopener" class="footer-link-item">
+                <a href="/docs" data-route="/docs" class="footer-link-item">
                   <span>Documentation</span>
                   <svg class="footer-link-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </a>
