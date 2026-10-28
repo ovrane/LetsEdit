@@ -13,8 +13,8 @@ export function getLandingHeroHtml() {
         <div class="landing-hero-grid">
           <!-- Left Column: Copy & Actions -->
           <div class="landing-hero-left">
-            <h1 class="landing-hero-title">Work on your <span style="color: var(--primary);">PDF</span><br>With Ease</h1>
-            <p class="landing-hero-subtitle">Powerful PDF &amp; Office tools to simplify your workflow convert Word, Excel &amp; PPTX, OCR scanned pages, compare diffs, and sign with zero cloud upload.</p>
+            <h1 class="landing-hero-title">Free Online <span style="color: var(--primary);">PDF Editor</span> &amp; Tools</h1>
+            <p class="landing-hero-subtitle">Powerful PDF &amp; Office tools to simplify your workflow — convert Word, Excel &amp; PPTX, OCR scanned pages, compare diffs, and sign with zero cloud upload.</p>
             <div class="landing-hero-actions">
               <button class="btn landing-hero-btn-primary" id="btn-landing-upload-pdf" title="Upload a PDF and launch directly in Studio Editor">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>

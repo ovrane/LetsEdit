@@ -144,3 +144,62 @@
   color: #6366f1;
   border: 1px solid rgba(99, 102, 241, 0.25);
 }
+
+/* ==========================================================================
+   Minimal Loading SVG & Micro Spinner Utilities
+   ========================================================================== */
+
+@keyframes mini-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.mini-loading-svg {
+  display: inline-block;
+  vertical-align: middle;
+  animation: mini-spin 0.65s linear infinite;
+  transform-origin: center;
+  flex-shrink: 0;
+}
+
+.btn .mini-loading-svg {
+  margin-right: 4px;
+}
+
+/* Ultra-minimal pre-hydration loader */
+.app-initial-loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-surface, #ffffff);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.22s ease-out, visibility 0.22s ease-out;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .app-initial-loader {
+  background: #18181b;
+}
+
+.initial-loader-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  background: var(--bg-card, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted, #71717a);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .initial-loader-pill {
+  background: #27272a;
+  border-color: #3f3f46;
+  color: #a1a1aa;
+}
+

@@ -41,4 +41,4 @@ User-agent: Applebot
 Allow: /
 
 # Host & Sitemap References
-Sitemap: https://letsedit-pdf.web.app/sitemap.xml
+Sitemap: https://letsedit.web.app/sitemap.xml

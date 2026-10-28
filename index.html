@@ -4,23 +4,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LetsEdit — Modern, Private Online PDF Editor & Suite</title>
+  <title>Free Online PDF Editor &amp; Tools | LetsEdit</title>
   <meta name="description"
-    content="Free online PDF editor and tools suite. Edit text, merge, split, compress, fill and sign, watermark, rotate, and protect PDF files 100% in your browser with zero cloud uploads.">
+    content="Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing.">
   <meta name="keywords"
     content="pdf editor, edit pdf, free pdf editor, merge pdf, split pdf, compress pdf, sign pdf, watermark pdf, rotate pdf, sejda pdf editor, ilovepdf">
-  <link rel="canonical" href="https://letsedit-pdf.web.app/">
-  <meta property="og:title" content="LetsEdit — Fast, Private Online PDF Suite">
+  <link rel="canonical" href="https://letsedit.web.app/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:title" content="Free Online PDF Editor &amp; Tools | LetsEdit">
   <meta property="og:description"
-    content="Every tool you need to work with PDFs in one place. 100% free, private, client-side WebAssembly execution with zero server uploads.">
-  <meta property="og:url" content="https://letsedit-pdf.web.app/">
+    content="Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing.">
+  <meta property="og:url" content="https://letsedit.web.app/">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://letsedit-pdf.web.app/icon.svg">
+  <meta property="og:site_name" content="LetsEdit">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://letsedit.web.app/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="LetsEdit — Modern, Private Online PDF Editor &amp; Tools Suite">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="LetsEdit — Fast, Private Online PDF Suite">
+  <meta name="twitter:title" content="Free Online PDF Editor &amp; Tools | LetsEdit">
   <meta name="twitter:description"
-    content="Free online PDF editor and tools suite. Edit text, merge, split, compress, fill and sign, watermark, rotate, and protect PDF files 100% in your browser with zero cloud uploads.">
-  <meta name="twitter:image" content="https://letsedit-pdf.web.app/icon.svg">
+    content="Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing.">
+  <meta name="twitter:image" content="https://letsedit.web.app/og-image.png">
   <meta name="theme-color" content="#30050d">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icon.svg">
@@ -34,21 +40,97 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "LetsEdit",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "All",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "description": "Every tool you need to edit, convert, merge, split, compress, sign, and protect PDFs right in your browser with zero cloud uploads."
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "LetsEdit",
+        "url": "https://letsedit.web.app/",
+        "logo": "https://letsedit.web.app/icon.svg",
+        "description": "Private, zero-cloud online PDF editor and 50+ document tools powered by WebAssembly."
+      },
+      {
+        "@type": "WebSite",
+        "name": "LetsEdit",
+        "url": "https://letsedit.web.app/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://letsedit.web.app/docs?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "name": "LetsEdit PDF Suite",
+        "url": "https://letsedit.web.app/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires a modern web browser with WebAssembly support",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Every tool you need to edit, convert, merge, split, compress, sign, and protect PDFs right in your browser with zero cloud uploads."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is LetsEdit completely free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, LetsEdit is 100% free with unlimited tasks and zero hidden fees or credit card requirements."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are my files uploaded to any server or cloud?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. LetsEdit processes documents entirely inside your browser using client-side WebAssembly (WASM). Your files never leave your device."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I edit existing text in a PDF file?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. LetsEdit features an intelligent Text Clustering Engine that detects baselines and lets you double-click any word to edit it with matching fonts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are electronic signatures created on LetsEdit legally binding?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Signatures comply with the U.S. ESIGN Act and EU eIDAS regulations and include verifiable cryptographic audit certificates."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does permanent redaction work in LetsEdit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Unlike standard black boxes, LetsEdit permanently purges character glyphs, coordinates, and stream tokens from the underlying PDF so the data cannot be forensically recovered."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 </head>
 
 <body class="show-landing sidebar-open tool-sidebar-open">
+
+  <!-- Ultra-minimal pre-hydration loader for smooth perceived load & zero CLS -->
+  <div id="app-initial-loader" class="app-initial-loader" aria-hidden="true">
+    <div class="initial-loader-pill">
+      <svg class="mini-loading-svg" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="8" r="6" stroke-opacity="0.2"/><path d="M8 2a6 6 0 0 1 6 6"/></svg>
+      <span>Loading LetsEdit...</span>
+    </div>
+  </div>
 
   <!-- Main Top Navbar (Adobe Acrobat Style Executive Command Bar) -->
   <header class="app-navbar">

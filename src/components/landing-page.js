@@ -37,13 +37,17 @@ export class LandingPage {
   }
 
   init() {
-    this.container = document.createElement('div');
-    this.container.id = 'landing-view';
-    this.container.className = 'landing-view-container';
+    let existing = document.getElementById('landing-view');
+    if (existing) {
+      this.container = existing;
+    } else {
+      this.container = document.createElement('div');
+      this.container.id = 'landing-view';
+      this.container.className = 'landing-view-container';
+      this.container.innerHTML = getLandingTemplateHtml();
+      document.body.prepend(this.container);
+    }
     this.searchQuery = '';
-    this.container.innerHTML = getLandingTemplateHtml();
-
-    document.body.prepend(this.container);
     this.bindEvents();
     this.renderCards();
   }

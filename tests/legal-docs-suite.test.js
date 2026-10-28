@@ -190,7 +190,7 @@ describe('Legal & Documentation System Suite', () => {
     assert.ok(fs.existsSync(docsHtmlPath), 'dist/docs/index.html must exist');
     const docsHtml = fs.readFileSync(docsHtmlPath, 'utf-8');
     assert.ok(docsHtml.includes('<title>Documentation &amp; Complete Beginner&#39;s Guide to PDF Editing — LetsEdit</title>') || docsHtml.includes('Documentation'), 'Docs HTML has title');
-    assert.ok(docsHtml.includes('https://letsedit-pdf.web.app/docs'), 'Docs HTML has canonical url');
+    assert.ok(docsHtml.includes('https://letsedit.web.app/docs'), 'Docs HTML has canonical url');
 
     const cookiesHtmlPath = path.resolve(ROOT_DIR, 'dist', 'cookies', 'index.html');
     assert.ok(fs.existsSync(cookiesHtmlPath), 'dist/cookies/index.html must exist');

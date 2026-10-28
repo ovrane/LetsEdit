@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 const PUBLIC_SITEMAP = path.resolve(ROOT_DIR, 'public', 'sitemap.xml');
-const BASE_URL = 'https://letsedit-pdf.web.app';
+const BASE_URL = 'https://letsedit.web.app';
 
 // Today's date in ISO YYYY-MM-DD
 const TODAY = new Date().toISOString().split('T')[0];

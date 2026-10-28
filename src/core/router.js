@@ -649,7 +649,7 @@ export class Router {
       document.title = route.title;
     }
 
-    const baseUrl = 'https://letsedit-pdf.web.app';
+    const baseUrl = 'https://letsedit.web.app';
     const canonicalUrl = `${baseUrl}${route.canonicalPath === '/' ? '' : route.canonicalPath}`;
 
     // 1. Canonical tag
@@ -677,11 +677,15 @@ export class Router {
     this.setMetaProperty('og:description', route.description || 'Every tool you need to edit, convert, merge, split, compress, sign, and protect PDFs right in your browser with zero cloud uploads.');
     this.setMetaProperty('og:url', canonicalUrl);
     this.setMetaProperty('og:type', route.canonicalPath === '/' ? 'website' : 'article');
+    this.setMetaProperty('og:site_name', 'LetsEdit');
+    this.setMetaProperty('og:locale', 'en_US');
+    this.setMetaProperty('og:image', `${baseUrl}/og-image.png`);
 
     // 4. Twitter Cards
     this.setMetaName('twitter:card', 'summary_large_image');
     this.setMetaName('twitter:title', route.title || 'LetsEdit');
     this.setMetaName('twitter:description', route.description || '');
+    this.setMetaName('twitter:image', `${baseUrl}/og-image.png`);
 
     // 5. Dynamic JSON-LD Structured Data
     this.updateJsonLd(route, canonicalUrl);
@@ -743,7 +747,7 @@ export class Router {
               "@type": "ListItem",
               "position": 1,
               "name": "Home",
-              "item": "https://letsedit-pdf.web.app/"
+              "item": "https://letsedit.web.app/"
             },
             ...(route.canonicalPath !== '/' ? [{
               "@type": "ListItem",

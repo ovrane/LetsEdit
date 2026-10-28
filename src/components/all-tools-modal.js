@@ -451,15 +451,42 @@ export class AllToolsModal {
 
           <div class="modal-filter-rail" id="all-tools-filter-chips">
             <button class="tool-filter-chip active" data-filter="all"><span class="chip-dot"></span>All Tools</button>
-            <button class="tool-filter-chip" data-filter="popular">⭐ Most Popular</button>
-            <button class="tool-filter-chip" data-filter="merge">🔗 Merge & Combine</button>
-            <button class="tool-filter-chip" data-filter="split">✂ Split & Extract</button>
-            <button class="tool-filter-chip" data-filter="edit-sign">✏ Edit & Sign</button>
-            <button class="tool-filter-chip" data-filter="compress-scans">🗜 Compress & OCR</button>
-            <button class="tool-filter-chip" data-filter="security">🔒 Security & Redact</button>
-            <button class="tool-filter-chip" data-filter="convert-from">📤 Convert from PDF</button>
-            <button class="tool-filter-chip" data-filter="convert-to">📥 Convert to PDF</button>
-            <button class="tool-filter-chip" data-filter="others">⚡ Page Operations</button>
+            <button class="tool-filter-chip" data-filter="popular">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Most Popular</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="merge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              <span>Merge &amp; Combine</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="split">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+              <span>Split &amp; Extract</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="edit-sign">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <span>Edit &amp; Sign</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="compress-scans">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+              <span>Compress &amp; OCR</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="security">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Security &amp; Redact</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="convert-from">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+              <span>Convert from PDF</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="convert-to">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="12" x2="12" y2="18"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+              <span>Convert to PDF</span>
+            </button>
+            <button class="tool-filter-chip" data-filter="others">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v18M6 8l6-5 6 5M6 8l-3 7h6L6 8zm12 0l-3 7h6l-3-7z"></path></svg>
+              <span>Page Operations</span>
+            </button>
           </div>
         </div>
 

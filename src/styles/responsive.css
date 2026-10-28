@@ -445,8 +445,10 @@
 
   .landing-filter-chip {
     flex-shrink: 0;
-    font-size: 12px;
-    padding: 6px 12px;
+    font-size: 11px;
+    padding: 3.5px 9px;
+    height: 27px;
+    gap: 4px;
   }
 
   /* 8-Column Directory Grid: 2 Columns on Tablet */
