@@ -1,0 +1,641 @@
+/* ==========================================================================
+   Main Workspace & Layout
+   ========================================================================== */
+
+.app-main {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sidebar Drawer */
+.app-sidebar {
+  width: 240px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+body:not(.sidebar-open) .app-sidebar {
+  margin-left: -240px;
+}
+
+.sidebar-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sidebar-actions {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.thumbnail-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.thumb-card {
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.thumb-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.thumb-card.dragging {
+  opacity: 0.35;
+  border: 2px dashed var(--primary);
+}
+
+.thumb-card.drag-over-top {
+  border-top: 3px solid var(--primary) !important;
+  transform: translateY(2px);
+}
+
+.thumb-card.drag-over-bottom {
+  border-bottom: 3px solid var(--primary) !important;
+  transform: translateY(-2px);
+}
+
+.thumb-canvas {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border-subtle);
+  background: white;
+  border-radius: 3px;
+}
+
+.thumb-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.thumb-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.thumb-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.thumb-btn:hover {
+  background: var(--bg-app);
+  color: var(--text-main);
+}
+
+.thumb-btn.delete-btn:hover {
+  color: var(--danger);
+  background: #fee2e2;
+}
+
+.thumb-btn.duplicate-btn:hover {
+  color: var(--primary);
+  background: var(--bg-hover, rgba(48, 5, 13, 0.08));
+}
+
+.thumb-btn.insert-btn:hover {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+/* Document Viewport */
+.document-viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  background: var(--bg-app);
+}
+
+/* Page Wrapper with Multi-Layer Compositing */
+.pdf-page-wrap {
+  position: relative;
+  background: white;
+  box-shadow: var(--shadow-paper);
+  border-radius: 4px;
+  user-select: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.pdf-page-wrap:hover {
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.2), 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.pdf-page-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+/* Text layer overlay */
+.pdf-text-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.text-item {
+  position: absolute;
+  color: transparent;
+  cursor: text;
+  white-space: pre;
+  transform-origin: 0 0;
+  line-height: 1.15;
+  box-sizing: border-box;
+  user-select: none;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.text-item:hover {
+  background: rgba(48, 5, 13, 0.12);
+  box-shadow: 0 0 0 1.5px rgba(48, 5, 13, 0.45);
+  border-radius: 3px;
+  cursor: text;
+}
+
+/* Annotations & drawing canvas */
+.pdf-annotation-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* DOM Layer for interactive boxes */
+.pdf-dom-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.annot-item {
+  position: absolute;
+  pointer-events: auto;
+  cursor: move;
+  border: 1px dashed transparent;
+  transition: border-color 0.15s ease;
+}
+
+.annot-item:hover {
+  border-color: var(--primary);
+}
+
+.annot-item.selected {
+  border: 1.5px solid var(--primary) !important;
+  box-shadow: 0 0 0 1px rgba(48, 5, 13, 0.25);
+  z-index: 15;
+}
+
+.annot-item.selected .annot-delete-btn {
+  display: flex;
+}
+
+/* 8-Point Transform Handles */
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border: 1.5px solid var(--primary);
+  border-radius: 2px;
+  z-index: 20;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.annot-item.selected .resize-handle {
+  display: block;
+}
+
+.handle-nw { top: -4px; left: -4px; cursor: nwse-resize; }
+.handle-n  { top: -4px; left: calc(50% - 4px); cursor: ns-resize; }
+.handle-ne { top: -4px; right: -4px; cursor: nesw-resize; }
+.handle-e  { top: calc(50% - 4px); right: -4px; cursor: ew-resize; }
+.handle-se { bottom: -4px; right: -4px; cursor: nwse-resize; }
+.handle-s  { bottom: -4px; left: calc(50% - 4px); cursor: ns-resize; }
+.handle-sw { bottom: -4px; left: -4px; cursor: nesw-resize; }
+.handle-w  { top: calc(50% - 4px); left: -4px; cursor: ew-resize; }
+
+.annot-text {
+  background: transparent;
+  padding: 2px 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.annot-text-underlay {
+  background: white;
+}
+
+.annot-whiteout {
+  background: white;
+  border: 1px dashed #cbd5e1;
+}
+
+/* Link Hotspot Annotation */
+.annot-link-hotspot {
+  background: rgba(48, 5, 13, 0.08);
+  border: 1.5px dashed #30050d !important;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  overflow: visible;
+}
+
+.annot-link-hotspot:hover {
+  background: rgba(48, 5, 13, 0.18);
+  border-color: #4a0914 !important;
+}
+
+.annot-link-badge {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 12;
+}
+
+.annot-link-badge:hover {
+  background: #30050d;
+}
+
+/* Adobe Acrobat & Smallpdf Style Sticky Note & Comments */
+.annot-note-container {
+  overflow: visible !important;
+  cursor: grab;
+  z-index: 14;
+}
+
+.note-pin-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px 8px 8px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.note-pin-badge:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.note-floating-card {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  width: 240px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  padding: 10px;
+  z-index: 30;
+}
+
+[data-theme="dark"] .note-floating-card {
+  background: #222222;
+  border-color: #383838;
+  color: #f1f5f9;
+}
+
+.note-floating-card.open {
+  display: flex;
+  animation: noteCardPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes noteCardPop {
+  0% { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.note-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 3px solid #f59e0b;
+  padding-left: 8px;
+  margin-bottom: 8px;
+}
+
+.note-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.note-author-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+[data-theme="dark"] .note-author-name {
+  color: #f8fafc;
+}
+
+.note-timestamp {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.note-card-close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.note-card-close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1e293b;
+}
+
+[data-theme="dark"] .note-card-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 68px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease;
+}
+
+[data-theme="dark"] .note-textarea {
+  background: #181818;
+  border-color: #333333;
+  color: #e2e8f0;
+}
+
+.note-textarea:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
+.note-palette {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.note-palette-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.note-palette-dot:hover {
+  transform: scale(1.2);
+}
+
+.note-palette-dot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1.5px #1e293b;
+}
+
+.form-field-select {
+  width: 100%;
+  height: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  font-size: 12px;
+  color: var(--text-color);
+  outline: none;
+  cursor: pointer;
+}
+
+.annot-delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+}
+
+.annot-item:hover .annot-delete-btn {
+  display: flex;
+}
+
+/* Page badge */
+.page-number-badge {
+  position: absolute;
+  bottom: -24px;
+  right: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Quick Page Floating Actions Bar (Adobe Acrobat & Smallpdf reverse engineered) */
+.page-quick-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 45;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.pdf-page-wrap:hover .page-quick-actions,
+.page-quick-actions:focus-within,
+.page-quick-actions:hover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.quick-page-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-main, #1e293b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.quick-page-btn:hover {
+  background: var(--bg-hover, #f1f5f9);
+  color: var(--primary, #30050d);
+  transform: scale(1.08);
+}
+
+.quick-page-btn:active {
+  transform: scale(0.95);
+}
+
+.quick-page-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.quick-page-delete:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+}
+
+/* Inline text editor input */
+.inline-text-editor {
+  position: absolute;
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 3px;
+  padding: 2px 6px;
+  outline: none;
+  font-family: inherit;
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.live-drag-box {
+  position: absolute;
+  border: 2px dashed var(--primary);
+  background: rgba(48, 5, 13, 0.1);
+  pointer-events: none;
+  z-index: 50;
+}
+
+.search-match-highlight {
+  position: absolute;
+  background: rgba(250, 204, 21, 0.45);
+  border-bottom: 2px solid #ca8a04;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 2px;
+  z-index: 3;
+  transition: all 0.15s ease;
+}
+
+.search-match-highlight.active-match {
+  background: rgba(249, 115, 22, 0.65) !important;
+  border: 1.5px solid #ea580c !important;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.6);
+  z-index: 6;
+}

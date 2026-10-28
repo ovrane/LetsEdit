@@ -587,80 +587,229 @@ export function getLandingTemplateHtml() {
         </div>
       </section>
 
-      <!-- Why Choose LetsEdit (Clean Executive Value Props) -->
+      <!-- Security & Performance / Why Choose (Redesigned 3-Column Suite Showcase) -->
       <section class="landing-why-choose-section">
         <div class="why-choose-container">
+          <!-- Section Header -->
           <div class="section-badge-header">
             <span class="section-tag-pill">SECURITY & PERFORMANCE</span>
-            <h2 class="section-main-heading">The Safe, Fast, and Uncompromising PDF Suite</h2>
+            <h2 class="section-main-heading">The Safe, Fast, and Uncompromising <span class="suite-highlight">PDF Suite</span></h2>
             <p class="section-sub-heading">Built for legal professionals, enterprises, and everyday creators who demand 100% private in-browser speed with zero server uploads.</p>
           </div>
 
-          <div class="why-choose-grid">
-            <div class="why-card">
-              <div class="why-card-top">
-                <div class="why-icon-box">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <!-- 3-Column Flanked Grid -->
+          <div class="why-flanked-layout">
+            <!-- Left Features Column (01, 02, 03) -->
+            <div class="why-col why-col-left">
+              <!-- Feature 01 -->
+              <div class="why-feat-row">
+                <span class="why-num-label">01</span>
+                <div class="why-feat-icon blue">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <span class="why-pill-badge">100% Client-Side</span>
+                <div class="why-feat-info">
+                  <h3 class="why-feat-title">Zero Cloud Uploads &amp; Maximum Privacy</h3>
+                  <p class="why-feat-desc">Your confidential contracts, financials, and medical records never leave your device. Processing runs entirely in your browser with zero server telemetry.</p>
+                </div>
               </div>
-              <h3 class="why-card-title">Zero Cloud Uploads & Maximum Privacy</h3>
-              <p class="why-card-desc">Your confidential contracts, financials, and medical records never leave your machine. Processing runs inside client-side WebAssembly with zero server telemetry.</p>
+
+              <!-- Feature 02 -->
+              <div class="why-feat-row">
+                <span class="why-num-label">02</span>
+                <div class="why-feat-icon purple">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <div class="why-feat-info">
+                  <h3 class="why-feat-title">Blazing Fast WebAssembly Performance</h3>
+                  <p class="why-feat-desc">Zero bandwidth lag, zero upload waiting, and no server timeouts. Split 500-page files or compress multi-gigabyte scans directly on your local hardware.</p>
+                </div>
+              </div>
+
+              <!-- Feature 03 -->
+              <div class="why-feat-row">
+                <span class="why-num-label">03</span>
+                <div class="why-feat-icon green">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div class="why-feat-info">
+                  <h3 class="why-feat-title">Bates Numbering &amp; Form Flattening</h3>
+                  <p class="why-feat-desc">Conform to legal discovery protocols with 8-digit zero-padded Bates sequencing, 6-zone layout alignment, and AcroForm vector flattening to lock finalized contracts.</p>
+                </div>
+              </div>
             </div>
 
-            <div class="why-card">
-              <div class="why-card-top">
-                <div class="why-icon-box">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                </div>
-                <span class="why-pill-badge">Sub-Second Speed</span>
+            <!-- Center Interactive Studio Mockup Column -->
+            <div class="why-col why-col-center">
+              <!-- Subtle Connector Line Left -->
+              <div class="connector-line-left" aria-hidden="true">
+                <span class="connector-dot"></span>
               </div>
-              <h3 class="why-card-title">Blazing Fast WebAssembly Performance</h3>
-              <p class="why-card-desc">Zero bandwidth lag, zero upload waiting, and no server timeouts. Split 500-page discovery files or compress multi-gigabyte scans directly on your local hardware.</p>
+              <!-- Subtle Connector Line Right -->
+              <div class="connector-line-right" aria-hidden="true">
+                <span class="connector-dot"></span>
+              </div>
+
+              <!-- Studio Window Mockup -->
+              <div class="why-center-window">
+                <div class="why-window-header">
+                  <div class="why-window-dots">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                  </div>
+                  <div class="why-window-menu">
+                    <span class="menu-pill">Edit <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    <span class="menu-icon">🔍</span>
+                    <span class="menu-pill">100% <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+                  </div>
+                  <div class="why-window-export">
+                    <span>Export</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+
+                <div class="why-window-body">
+                  <!-- Left Thumbnails (3 Pages) -->
+                  <div class="why-window-thumbs">
+                    <div class="why-thumb-card active">
+                      <div class="why-thumb-lines">
+                        <div class="t-line"></div>
+                        <div class="t-line"></div>
+                        <div class="t-line"></div>
+                      </div>
+                      <span class="why-thumb-idx">1</span>
+                    </div>
+                    <div class="why-thumb-card">
+                      <div class="why-thumb-lines">
+                        <div class="t-line"></div>
+                        <div class="t-line"></div>
+                      </div>
+                      <span class="why-thumb-idx">2</span>
+                    </div>
+                    <div class="why-thumb-card">
+                      <div class="why-thumb-lines">
+                        <div class="t-line"></div>
+                        <div class="t-line"></div>
+                      </div>
+                      <span class="why-thumb-idx">3</span>
+                    </div>
+                  </div>
+
+                  <!-- Center Document Page -->
+                  <div class="why-window-canvas">
+                    <div class="why-canvas-paper">
+                      <h4 class="why-doc-title">Contract Agreement</h4>
+                      <div class="why-doc-lines">
+                        <div class="w-line full"></div>
+                        <div class="w-line med"></div>
+                      </div>
+                      <!-- Selected bounding box with resize handles -->
+                      <div class="why-selected-box">
+                        <div class="why-sel-handle nw"></div>
+                        <div class="why-sel-handle ne"></div>
+                        <div class="why-sel-handle sw"></div>
+                        <div class="why-sel-handle se"></div>
+                        <div class="why-sel-fill"></div>
+                      </div>
+                      <div class="why-doc-lines">
+                        <div class="w-line full"></div>
+                        <div class="w-line med"></div>
+                      </div>
+                      <!-- Ink signature stroke -->
+                      <div class="why-doc-signature">
+                        <svg width="65" height="22" viewBox="0 0 100 35" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round">
+                          <path d="M8 22 C 16 10, 24 26, 32 16 C 38 12, 44 24, 52 18 C 60 12, 66 22, 76 16 C 84 12, 90 22, 96 18"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Right Vertical Dock -->
+                  <div class="why-window-dock">
+                    <span class="w-dock-btn" title="Text">T</span>
+                    <span class="w-dock-btn" title="Pen">✏</span>
+                    <span class="w-dock-btn" title="Crop">▢</span>
+                    <span class="w-dock-btn" title="Image">🖼</span>
+                    <span class="w-dock-btn" title="Sign">✍</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Beneath Window: Horizontal Micro-Trust Pillars Card -->
+              <div class="why-trust-pill-bar">
+                <div class="why-micro-pillar">
+                  <div class="micro-pillar-icon blue">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <div class="micro-pillar-text">
+                    <strong>Private</strong>
+                    <span>Stays on your device</span>
+                  </div>
+                </div>
+
+                <div class="why-pillar-divider"></div>
+
+                <div class="why-micro-pillar">
+                  <div class="micro-pillar-icon blue">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </div>
+                  <div class="micro-pillar-text">
+                    <strong>Fast</strong>
+                    <span>Powered by WebAssembly</span>
+                  </div>
+                </div>
+
+                <div class="why-pillar-divider"></div>
+
+                <div class="why-micro-pillar">
+                  <div class="micro-pillar-icon green">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                  </div>
+                  <div class="micro-pillar-text">
+                    <strong>Enterprise Ready</strong>
+                    <span>Built for compliance</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="why-card">
-              <div class="why-card-top">
-                <div class="why-icon-box">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <!-- Right Features Column (04, 05, 06) -->
+            <div class="why-col why-col-right">
+              <!-- Feature 04 -->
+              <div class="why-feat-row">
+                <span class="why-num-label">04</span>
+                <div class="why-feat-icon orange">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                 </div>
-                <span class="why-pill-badge">Direct Editing</span>
+                <div class="why-feat-info">
+                  <h3 class="why-feat-title">True Text Editing In Your Browser</h3>
+                  <p class="why-feat-desc">Correct typos and rewrite original paragraphs directly in your PDF. Our text engine matches font families, glyph weights, font sizes, and baseline alignments automatically.</p>
+                </div>
               </div>
-              <h3 class="why-card-title">True Text Editing In Your Browser</h3>
-              <p class="why-card-desc">Correct typos and rewrite original paragraphs directly in your PDF. Our text engine matches font families, glyph weights, font sizes, and baseline alignments automatically.</p>
-            </div>
 
-            <div class="why-card">
-              <div class="why-card-top">
-                <div class="why-icon-box">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+              <!-- Feature 05 -->
+              <div class="why-feat-row">
+                <span class="why-num-label">05</span>
+                <div class="why-feat-icon red">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
                 </div>
-                <span class="why-pill-badge">Legal Grade</span>
+                <div class="why-feat-info">
+                  <h3 class="why-feat-title">Permanent Vector Redaction</h3>
+                  <p class="why-feat-desc">True forensic sanitization: parses content streams and permanently deletes glyph tokens and underlying text matrices. Opaque redaction masks cannot be reversed.</p>
+                </div>
               </div>
-              <h3 class="why-card-title">Permanent Vector Redaction</h3>
-              <p class="why-card-desc">True forensic sanitization: parses content streams and permanently deletes glyph tokens and underlying text matrices. Opaque redaction masks cannot be reversed.</p>
-            </div>
 
-            <div class="why-card">
-              <div class="why-card-top">
-                <div class="why-icon-box">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <!-- Feature 06 -->
+              <div class="why-feat-row">
+                <span class="why-num-label">06</span>
+                <div class="why-feat-icon sky">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
                 </div>
-                <span class="why-pill-badge">Bates & Flattening</span>
-              </div>
-              <h3 class="why-card-title">Bates Numbering & Form Flattening</h3>
-              <p class="why-card-desc">Conform to legal discovery protocols with 8-digit zero-padded Bates sequencing, 6-zone layout alignment, and AcroForm vector flattening to lock finalized contracts.</p>
-            </div>
-
-            <div class="why-card">
-              <div class="why-card-top">
-                <div class="why-icon-box">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+                <div class="why-feat-info">
+                  <h3 class="why-feat-title">Digital Signatures with Audit Trails</h3>
+                  <p class="why-feat-desc">Sign documents electronically with tamper-evident SHA-256 verification, unique transaction UUIDs, timestamp certificates, and audit trails.</p>
                 </div>
-                <span class="why-pill-badge">Audit Ready</span>
               </div>
-              <h3 class="why-card-title">Digital Signatures with Audit Trails</h3>
-              <p class="why-card-desc">Sign documents electronically with tamper-evident SHA-256 cryptographic verification, unique transaction UUIDs, timestamp certificates, and audit trails.</p>
             </div>
           </div>
         </div>
@@ -724,19 +873,28 @@ export function getLandingTemplateHtml() {
             </div>
 
             <div class="apps-preview-box">
+              <!-- Ambient Ethereal Glow Mesh -->
+              <div class="apps-glow-mesh"></div>
+
+              <!-- 4-point Blue Sparkle Star (Reference matching) -->
+              <div class="apps-sparkle-star" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#3b82f6"><path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z"/></svg>
+              </div>
+
+              <!-- Offline Ready Annotation Tag with Curved Arrow -->
               <div class="apps-offline-badge-callout">
-                <span>Offline Ready</span>
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.56 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-                <svg class="apps-curved-arrow" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4c0 8 6 14 14 14m0 0l-4-4m4 4l-4 4"/></svg>
+                <span class="offline-callout-text">Offline Ready</span>
+                <svg class="offline-wifi-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.56 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                <svg class="apps-curved-arrow" width="34" height="34" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 8 C 8 26, 26 28, 28 32 M 20 28 L 28 32 L 26 24" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
 
               <div class="apps-devices-showcase">
-                <!-- Floating Document Icon -->
-                <div class="floating-doc-badge">
+                <!-- Floating Document Icon Badge -->
+                <div class="floating-doc-badge" title="Local Client-Side Processing">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
 
-                <!-- Laptop Mockup (MacBook / Surface) -->
+                <!-- Laptop Mockup (MacBook Pro) -->
                 <div class="laptop-mockup">
                   <div class="laptop-screen">
                     <div class="laptop-titlebar">
@@ -755,7 +913,7 @@ export function getLandingTemplateHtml() {
                       <div class="laptop-export-btn">Export</div>
                     </div>
                     <div class="laptop-workspace">
-                      <!-- Left Thumbnails -->
+                      <!-- Left Page Thumbnails -->
                       <div class="laptop-thumbnails">
                         <div class="thumb-card active">
                           <div class="thumb-line title"></div>
@@ -769,7 +927,7 @@ export function getLandingTemplateHtml() {
                           <span class="thumb-num">2</span>
                         </div>
                       </div>
-                      <!-- Center Canvas Document -->
+                      <!-- Center Canvas Document Page -->
                       <div class="laptop-canvas">
                         <div class="canvas-doc-page">
                           <div class="doc-header-text">Contract Agreement</div>
@@ -778,7 +936,7 @@ export function getLandingTemplateHtml() {
                             <div class="doc-line medium"></div>
                             <div class="doc-line short"></div>
                           </div>
-                          <!-- Selected highlight box with blue handles -->
+                          <!-- Selected highlight box with 4 corner resize handles -->
                           <div class="doc-selected-box">
                             <div class="sel-handle nw"></div>
                             <div class="sel-handle ne"></div>
@@ -790,15 +948,15 @@ export function getLandingTemplateHtml() {
                             <div class="doc-line full"></div>
                             <div class="doc-line medium"></div>
                           </div>
-                          <!-- Signature stroke -->
+                          <!-- Digital Ink Signature Stroke -->
                           <div class="doc-signature-line">
-                            <svg class="sig-svg" width="60" height="22" viewBox="0 0 100 40">
-                              <path d="M10 25 Q30 5, 45 22 T70 15 T90 28" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
+                            <svg class="sig-svg" width="70" height="24" viewBox="0 0 100 35">
+                              <path d="M8 24 C 18 8, 26 28, 34 16 C 42 10, 46 25, 54 18 C 62 12, 68 22, 78 16 C 86 12, 92 22, 96 18" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>
                             </svg>
                           </div>
                         </div>
                       </div>
-                      <!-- Right Floating Tools -->
+                      <!-- Right Vertical Floating Tools Dock -->
                       <div class="laptop-right-dock">
                         <span class="dock-btn">T</span>
                         <span class="dock-btn">✏</span>
@@ -811,7 +969,7 @@ export function getLandingTemplateHtml() {
                   <div class="laptop-base"></div>
                 </div>
 
-                <!-- Overlapping iPhone Mockup -->
+                <!-- Overlapping iPhone Mockup with Dynamic Island -->
                 <div class="phone-mockup">
                   <div class="phone-island"></div>
                   <div class="phone-screen">
@@ -838,10 +996,10 @@ export function getLandingTemplateHtml() {
                 </div>
               </div>
 
-              <!-- Platform Compatibility Bar -->
+              <!-- Platform Compatibility Bar (Directly beneath devices) -->
               <div class="apps-platforms-bar">
                 <div class="platform-chip">
-                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                  <svg width="15" height="15" fill="#0078d4" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
                   <span>Windows 11/10</span>
                 </div>
                 <div class="platform-chip">
@@ -849,11 +1007,11 @@ export function getLandingTemplateHtml() {
                   <span>macOS Sonoma</span>
                 </div>
                 <div class="platform-chip">
-                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 0c-3.155 0-5.712 2.557-5.712 5.712 0 1.258.406 2.42 1.096 3.364-1.472.932-2.57 2.378-3.033 4.108-.415 1.547-.282 3.208.384 4.676-1.282 1.157-2.085 2.825-2.085 4.686 0 .524.066 1.033.188 1.52h18.396c.122-.487.188-.996.188-1.52 0-1.861-.803-3.529-2.085-4.686.666-1.468.799-3.129.384-4.676-.463-1.73-1.561-3.176-3.033-4.108.69-.944 1.096-2.106 1.096-3.364 0-3.155-2.557-5.712-5.712-5.712z"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#f59e0b" d="M12 2C8.5 2 6 5 6 9c0 3 1.5 5.5 1 8-.5 2.5-2 3-2 3h14s-1.5-.5-2-3c-.5-2.5 1-5 1-8 0-4-2.5-7-6-7z"/><circle cx="10" cy="8" r="1.2" fill="#000"/><circle cx="14" cy="8" r="1.2" fill="#000"/><polygon points="12 10 10 12 14 12" fill="#ea580c"/><ellipse cx="12" cy="15" rx="3.5" ry="4" fill="#ffffff"/></svg>
                   <span>Linux</span>
                 </div>
                 <div class="platform-chip">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z"/></svg>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                   <span>iOS & Android</span>
                 </div>
               </div>

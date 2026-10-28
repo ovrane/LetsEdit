@@ -1,0 +1,448 @@
+/* ==========================================================================
+   PDF Studio Tools Hub Modal & Filter Rail (Executive Redesign)
+   ========================================================================== */
+
+.tools-hub-dialog {
+  max-width: 1420px !important;
+  width: min(96vw, 1420px) !important;
+  max-height: 90vh;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+  background: var(--bg-surface);
+  margin-top: ;
+}
+
+.tools-hub-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+}
+
+.tools-hub-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tools-hub-logo-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #30050d 0%, #5e0b1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(48, 5, 13, 0.25);
+  flex-shrink: 0;
+}
+
+.tools-hub-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tools-hub-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.tools-hub-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(48, 5, 13, 0.08);
+  border: 1px solid rgba(48, 5, 13, 0.14);
+  padding: 2px 7px;
+  border-radius: 9999px;
+}
+
+.tools-hub-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+}
+
+.modal-close-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.modal-close-icon-btn:hover {
+  background: var(--bg-app);
+  color: var(--text-main);
+  border-color: var(--border-subtle);
+}
+
+.tools-hub-controls {
+  padding: 14px 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.modal-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.modal-search-input {
+  width: 100%;
+  padding: 10px 84px 10px 42px;
+  font-size: 13.5px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-app);
+  color: var(--text-main);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.modal-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(48, 5, 13, 0.12);
+}
+
+.modal-search-meta {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-search-clear {
+  background: var(--border-subtle);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.modal-search-clear:hover {
+  background: var(--border-strong);
+  color: var(--text-main);
+}
+
+.modal-shortcut-badge kbd {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: inherit;
+}
+
+/* Modal Filter Rail: Horizontal scrolling without ugly default scrollbars */
+.modal-filter-rail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 4px 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-filter-rail::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.modal-filter-rail .tool-filter-chip {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.modal-filter-rail .tool-filter-chip:hover {
+  color: var(--text-main);
+  border-color: var(--border-strong);
+}
+
+.modal-filter-rail .tool-filter-chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(48, 5, 13, 0.22);
+}
+
+.tools-hub-body {
+  padding: 22px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tools-hub-dialog .landing-cards-grid {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.tools-hub-dialog .landing-tool-card {
+  padding: 18px 16px;
+  border-radius: 14px;
+}
+
+.tools-hub-footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-surface);
+}
+
+.tools-hub-footer-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tools-hub-kbd {
+  background: var(--bg-app);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.tools-hub-divider {
+  opacity: 0.4;
+}
+
+.tools-hub-sec-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tools-hub-close-cta {
+  padding: 6px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Header Quick Tool Search Modal (Spotlight / Command Palette Style)
+   ========================================================================== */
+.landing-search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+}
+
+.landing-search-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.landing-search-dialog {
+  position: relative;
+  z-index: 3001;
+  width: min(92vw, 600px);
+  max-height: calc(85vh - 100px);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: landingSearchFadeIn 0.15s ease-out;
+}
+
+@keyframes landingSearchFadeIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.landing-search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.landing-search-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.landing-header-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 15.5px;
+  font-family: inherit;
+  color: var(--text-main);
+}
+
+.landing-header-search-input::placeholder {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.landing-search-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.landing-search-close-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-hover);
+}
+
+.landing-search-results-list {
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.landing-search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+  transition: all 0.12s ease;
+}
+
+.landing-search-item:hover,
+.landing-search-item:focus {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-subtle);
+}
+
+.landing-search-item-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
+.landing-search-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-search-item-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-search-item-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-app);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.landing-search-item-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.landing-search-empty {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
