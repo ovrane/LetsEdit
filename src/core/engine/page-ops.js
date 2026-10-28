@@ -37,10 +37,11 @@ import { PptxToPdfOps } from './operations/pptx-to-pdf-ops.js';
 import { PdfToPptxOps } from './operations/pdf-to-pptx-ops.js';
 import { HtmlToPdfOps } from './operations/html-to-pdf-ops.js';
 import { ExtractImagesOps } from './operations/extract-images-ops.js';
+import { InkScannerOps } from './operations/ink-scanner-ops.js';
 
 const MultiSignerOps = MultiSignOps;
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, MultiSignerOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps, HtmlToPdfOps, ExtractImagesOps };
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, MultiSignerOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps, HtmlToPdfOps, ExtractImagesOps, InkScannerOps };
 
 export class PageOperations {
   // Merge & Organize
@@ -198,6 +199,13 @@ export class PageOperations {
   static validateFieldValues(...args) { return MultiSignOps.validateFieldValues(...args); }
   static canRecipientSign(...args) { return MultiSignOps.canRecipientSign(...args); }
   static generateCryptographicToken(...args) { return MultiSignOps.generateCryptographicToken(...args); }
+
+  // Hardware & Camera Ink Scanner Suite
+  static processInkImage(...args) { return InkScannerOps.processInkImage(...args); }
+  static extractTransparentInk(...args) { return InkScannerOps.extractTransparentInk(...args); }
+  static computeOtsuThreshold(...args) { return InkScannerOps.computeOtsuThreshold(...args); }
+  static normalizeIllumination(...args) { return InkScannerOps.normalizeIllumination(...args); }
+  static createSampleInkCapture(...args) { return InkScannerOps.createSampleInkCapture(...args); }
 
   // Form Filler & Form Data Export/Import
   static inspectFormFields(...args) { return FormOps.inspectFormFields(...args); }

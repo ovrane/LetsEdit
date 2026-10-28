@@ -7,12 +7,14 @@ import { store } from '../core/state-store.js';
 import { uid } from '../utils/helpers.js';
 import { Toast } from '../components/toast.js';
 import { mobilePairModal } from '../components/mobile-pair-modal.js';
+import { InkScannerOps } from '../core/engine/operations/ink-scanner-ops.js';
 
 export class SignatureTool {
   constructor() {
     this.modal = null;
     this.activeTab = 'draw';
     this.inkColor = '#0f172a';
+    this.cameraInkColor = '#1a365d';
     this.cameraStream = null;
     this.initModal();
   }
@@ -85,24 +87,50 @@ export class SignatureTool {
           <!-- Tab 4: Camera (Webcam Signature Extractor) -->
           <div class="tab-content" id="tab-camera" style="display:none;">
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; text-align:center;">
-              <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
-                Hold a white piece of paper with your signature up to your webcam.
+              <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:8px;">
+                Hold a piece of paper with your signature up to your camera inside the framing guides.
               </p>
               
-              <div style="position:relative; width:100%; height:200px; background:#000; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+              <div style="position:relative; width:100%; height:200px; background:#0f172a; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
                 <video id="sig-camera-video" autoplay playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
                 <canvas id="sig-camera-canvas" width="600" height="200" style="display:none;"></canvas>
                 <div id="sig-camera-placeholder" style="color:#94a3b8; font-size:13px;">Camera not active</div>
+                
+                <!-- Viewfinder Framing Guide -->
+                <div id="sig-camera-viewfinder" style="display:none; position:absolute; width:80%; height:65%; border:2px dashed rgba(255,255,255,0.75); border-radius:8px; pointer-events:none; box-shadow:0 0 0 9999px rgba(0,0,0,0.35);">
+                  <span style="position:absolute; bottom:6px; left:0; width:100%; text-align:center; font-size:10px; color:rgba(255,255,255,0.9); font-weight:600; text-shadow:0 1px 3px rgba(0,0,0,0.8);">ALIGN SIGNATURE HERE</span>
+                </div>
               </div>
 
-              <div style="display:flex; justify-content:center; gap:10px; margin-top:12px;">
-                <button class="btn btn-outline btn-sm" id="btn-start-camera">Turn On Camera</button>
-                <button class="btn btn-primary btn-sm" id="btn-capture-camera" style="display:none;">Snap & Extract Ink</button>
+              <!-- Controls: Start, Snap, Threshold Slider & Ink Colors -->
+              <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-start-camera">Turn On Camera</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-capture-camera" style="display:none;">Snap & Extract Ink</button>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-test-sample-camera" style="font-size:11px;">Load Test Paper</button>
               </div>
 
-              <div id="sig-extracted-wrap" style="display:none; margin-top:14px; padding:10px; background:white; border:1px dashed #cbd5e1; border-radius:6px;">
-                <p style="font-size:11px; color:#64748b; margin-bottom:4px;">Extracted Transparent Signature:</p>
-                <img id="sig-extracted-img" style="max-height:80px;" />
+              <!-- Extraction Settings -->
+              <div id="sig-camera-controls-panel" style="margin-top:10px; padding:8px 12px; background:white; border:1px solid #e2e8f0; border-radius:6px; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:11.5px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="color:var(--text-muted); font-weight:600;">Ink Color:</span>
+                  <button type="button" class="color-dot active cam-color-dot" data-color="#1a365d" style="background:#1a365d;" title="Classic Blue"></button>
+                  <button type="button" class="color-dot cam-color-dot" data-color="#0a0a0a" style="background:#0a0a0a;" title="Executive Black"></button>
+                  <button type="button" class="color-dot cam-color-dot" data-color="#047857" style="background:#047857;" title="Emerald Ink"></button>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; flex:1; max-width:180px;">
+                  <span style="color:var(--text-muted); font-weight:600;">Threshold:</span>
+                  <input type="range" id="sig-camera-thresh-slider" min="-50" max="50" value="0" style="width:100%; cursor:pointer;" title="Adjust extraction sensitivity" />
+                </div>
+              </div>
+
+              <div id="sig-extracted-wrap" style="display:none; margin-top:12px; padding:10px; background:white; border:1px dashed #cbd5e1; border-radius:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:11px; font-weight:600; color:#64748b;">Extracted Transparent Signature (Otsu Binarized):</span>
+                  <button type="button" class="btn btn-xs btn-outline" id="btn-save-vault" style="gap:4px; font-size:11px;">
+                    <span>⭐ Save to Vault</span>
+                  </button>
+                </div>
+                <img id="sig-extracted-img" style="max-height:80px; max-width:100%; object-fit:contain; display:block; margin:auto;" />
               </div>
             </div>
           </div>
@@ -143,8 +171,10 @@ export class SignatureTool {
     const placeholder = this.modal.querySelector('#sig-camera-placeholder');
     const snapBtn = this.modal.querySelector('#btn-capture-camera');
     const startBtn = this.modal.querySelector('#btn-start-camera');
+    const viewfinder = this.modal.querySelector('#sig-camera-viewfinder');
 
     if (video) video.style.display = 'none';
+    if (viewfinder) viewfinder.style.display = 'none';
     if (placeholder) placeholder.style.display = 'block';
     if (snapBtn) snapBtn.style.display = 'none';
     if (startBtn) startBtn.style.display = 'inline-block';
@@ -255,9 +285,87 @@ export class SignatureTool {
     const placeholder = this.modal.querySelector('#sig-camera-placeholder');
     const snapBtn = this.modal.querySelector('#btn-capture-camera');
     const startBtn = this.modal.querySelector('#btn-start-camera');
+    const sampleBtn = this.modal.querySelector('#btn-test-sample-camera');
+    const viewfinder = this.modal.querySelector('#sig-camera-viewfinder');
+    const threshSlider = this.modal.querySelector('#sig-camera-thresh-slider');
+    const vaultBtn = this.modal.querySelector('#btn-save-vault');
     const extractedWrap = this.modal.querySelector('#sig-extracted-wrap');
     const extractedImg = this.modal.querySelector('#sig-extracted-img');
+    const camColorDots = this.modal.querySelectorAll('.cam-color-dot');
     let cameraExtractedUrl = null;
+    let lastRawRgba = null;
+    let lastW = 600;
+    let lastH = 200;
+
+    const performExtraction = () => {
+      if (!lastRawRgba) return;
+      const thresholdOffset = parseInt(threshSlider?.value || 0, 10);
+      const res = InkScannerOps.extractTransparentInk(lastRawRgba, lastW, lastH, {
+        thresholdOffset,
+        color: this.cameraInkColor || '#1a365d',
+        smoothing: true,
+        normalizeIllum: true
+      });
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = lastW;
+      offscreen.height = lastH;
+      const octx = offscreen.getContext('2d');
+      const imgData = new ImageData(new Uint8ClampedArray(res.outputRgba.buffer), lastW, lastH);
+      octx.putImageData(imgData, 0, 0);
+
+      cameraExtractedUrl = offscreen.toDataURL('image/png');
+      if (extractedImg) extractedImg.src = cameraExtractedUrl;
+      if (extractedWrap) extractedWrap.style.display = 'block';
+    };
+
+    camColorDots.forEach(dot => {
+      dot.onclick = () => {
+        camColorDots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        this.cameraInkColor = dot.getAttribute('data-color') || '#1a365d';
+        performExtraction();
+      };
+    });
+
+    if (threshSlider) {
+      threshSlider.oninput = () => performExtraction();
+    }
+
+    if (vaultBtn) {
+      vaultBtn.onclick = () => {
+        if (!cameraExtractedUrl) {
+          Toast.warning('Snap or load a signature first.');
+          return;
+        }
+        try {
+          localStorage.setItem('letsedit_vault_signature', cameraExtractedUrl);
+          Toast.success('Signature saved to vault for future document signing!');
+        } catch (e) {
+          Toast.error('Failed to save to vault: ' + e.message);
+        }
+      };
+    }
+
+    if (sampleBtn) {
+      sampleBtn.onclick = async () => {
+        sampleBtn.disabled = true;
+        sampleBtn.textContent = 'Generating...';
+        try {
+          const sample = await InkScannerOps.createSampleInkCapture(600, 200);
+          lastRawRgba = sample.rgba;
+          lastW = 600;
+          lastH = 200;
+          performExtraction();
+          Toast.success('Loaded synthetic test paper! Adjust slider or colors below.');
+        } catch (e) {
+          Toast.error('Failed to generate sample: ' + e.message);
+        } finally {
+          sampleBtn.disabled = false;
+          sampleBtn.textContent = 'Load Test Paper';
+        }
+      };
+    }
 
     startBtn.onclick = async () => {
       try {
@@ -268,6 +376,7 @@ export class SignatureTool {
         this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
         video.srcObject = this.cameraStream;
         video.style.display = 'block';
+        if (viewfinder) viewfinder.style.display = 'block';
         placeholder.style.display = 'none';
         startBtn.style.display = 'none';
         snapBtn.style.display = 'inline-block';
@@ -294,33 +403,12 @@ export class SignatureTool {
 
       octx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, 600, 200);
 
-      // Extract ink by adaptive paper binarization
       const imgData = octx.getImageData(0, 0, 600, 200);
-      const data = imgData.data;
+      lastRawRgba = new Uint8Array(imgData.data.buffer);
+      lastW = 600;
+      lastH = 200;
 
-      // Threshold: darker pixels stay ink, lighter background paper becomes fully transparent
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        if (brightness < 140) {
-          // Keep as dark ink (using selected ink color #0f172a)
-          data[i] = 15;
-          data[i + 1] = 23;
-          data[i + 2] = 42;
-          data[i + 3] = 255;
-        } else {
-          // Transparent paper
-          data[i + 3] = 0;
-        }
-      }
-
-      octx.putImageData(imgData, 0, 0);
-      cameraExtractedUrl = offscreen.toDataURL('image/png');
-      extractedImg.src = cameraExtractedUrl;
-      extractedWrap.style.display = 'block';
+      performExtraction();
       Toast.success('Signature isolated from paper background!');
     };
 

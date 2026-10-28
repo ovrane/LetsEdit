@@ -39,6 +39,7 @@ import { handlePptxToPdfRequest } from './routes/pptx-to-pdf-routes.js';
 import { handlePdfToPptxRequest } from './routes/pdf-to-pptx-routes.js';
 import { handleHtmlToPdfRequest } from './routes/html-to-pdf-routes.js';
 import { handleExtractImagesRequest } from './routes/extract-images-routes.js';
+import { handleInkScannerRequest } from './routes/ink-scanner-routes.js';
 import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
@@ -201,6 +202,10 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Embedded Images Extraction endpoints
   const extractImagesHandled = await handleExtractImagesRequest(req, res, pathname, method);
   if (extractImagesHandled) return true;
+
+  // Dispatch Hardware & Camera Ink Scanner endpoints
+  const inkScannerHandled = await handleInkScannerRequest(req, res, pathname, method);
+  if (inkScannerHandled) return true;
 
   // Dispatch System Capabilities & Worker Status endpoints
   const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);
