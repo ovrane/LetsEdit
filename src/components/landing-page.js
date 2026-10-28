@@ -71,6 +71,12 @@ export class LandingPage {
       if (match) matchedId = match.id;
     }
 
+    // 0. Direct docs navigation
+    if (action === 'navigate:/docs' || matchedId === 'docs') {
+      router.navigate('/docs');
+      return;
+    }
+
     // 1. Direct workflow action prefix
     if (action && action.startsWith('workflow:')) {
       const toolKey = action.replace('workflow:', '');
@@ -434,6 +440,14 @@ export class LandingPage {
     }
 
     // Navbar quick links
+    const docsNav = this.container.querySelector('#btn-nav-docs-link');
+    if (docsNav) {
+      docsNav.onclick = (e) => {
+        e.preventDefault();
+        router.navigate('/docs');
+      };
+    }
+
     this.container.querySelectorAll('.landing-nav-link[data-tool]').forEach(btn => {
       btn.onclick = () => {
         const tool = btn.getAttribute('data-tool');

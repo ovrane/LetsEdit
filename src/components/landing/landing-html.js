@@ -274,6 +274,7 @@ export function getLandingTemplateHtml() {
             <button class="landing-nav-link" data-tool="pdf-to-word">Convert</button>
             <button class="landing-nav-link" data-tool="merge">Merge</button>
             <button class="landing-nav-link" data-tool="sign">Sign</button>
+            <a href="/docs" data-route="/docs" class="landing-nav-link" id="btn-nav-docs-link">Docs</a>
           </nav>
         </div>
 
@@ -666,6 +667,7 @@ export function getLandingTemplateHtml() {
             <button class="landing-filter-chip" data-filter="convert-from">📤 Convert from PDF</button>
             <button class="landing-filter-chip" data-filter="convert-to">📥 Convert to PDF</button>
             <button class="landing-filter-chip" data-filter="others">⚖ Legal & Archival</button>
+            <button class="landing-filter-chip" data-filter="docs">📖 Docs &amp; Specs</button>
           </div>
 
           <!-- Responsive Cards Grid -->
