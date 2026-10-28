@@ -25,7 +25,7 @@
   grid-template-columns: 1.15fr 1fr;
   gap: 56px;
   align-items: center;
-  box-shadow: 0 20px 48px -16px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
   position: relative;
   overflow: hidden;
 }
@@ -33,7 +33,7 @@
 [data-theme="dark"] .apps-banner {
   background: var(--bg-card);
   border-color: var(--border-subtle);
-  box-shadow: 0 20px 48px -16px rgba(0, 0, 0, 0.6);
+  box-shadow: none;
 }
 
 @media (max-width: 1040px) {
@@ -360,7 +360,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px -4px rgba(124, 58, 237, 0.16), 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   z-index: 9;
   animation: floatDoc 3s ease-in-out infinite;
 }
@@ -368,7 +368,7 @@
 [data-theme="dark"] .floating-doc-badge {
   background: var(--bg-secondary);
   border-color: var(--border-subtle);
-  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.45);
+  box-shadow: none;
 }
 
 @keyframes floatDoc {
@@ -382,13 +382,14 @@
   background: #1e293b;
   border-radius: 14px 14px 0 0;
   padding: 7px 7px 0 7px;
-  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.16), 0 8px 20px -4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   position: relative;
   z-index: 4;
 }
 
 [data-theme="dark"] .laptop-mockup {
   background: #262626;
+  box-shadow: none;
 }
 
 .laptop-screen {
@@ -711,7 +712,7 @@
   background: #09090b;
   border-radius: 30px;
   border: 4.5px solid #27272a;
-  box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.38), 0 10px 20px -5px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   z-index: 7;
 }
@@ -719,6 +720,7 @@
 [data-theme="dark"] .phone-mockup {
   background: #18181b;
   border-color: #383838;
+  box-shadow: none;
 }
 
 .phone-island {
