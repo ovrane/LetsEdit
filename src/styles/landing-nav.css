@@ -306,7 +306,8 @@ body.show-recipient-sign #recipient-sign-container {
   .landing-mobile-toggle {
     display: flex;
   }
-  .landing-nav-menu {
+  .landing-nav-menu,
+  .landing-desktop-nav {
     display: none !important;
   }
 }

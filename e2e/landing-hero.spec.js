@@ -47,6 +47,9 @@ test.describe('Landing Page & Display-Height Hero', () => {
     // Check data-theme attribute
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
+    // Wait for the 0.2s background-color CSS transition to complete
+    await page.waitForTimeout(300);
+
     // Verify background color of landing hero is #232323 (rgb(35, 35, 35) or rgb(36, 36, 36) in mobile renderers)
     const heroBg = await page.locator('.landing-hero-section').evaluate((el) => {
       return window.getComputedStyle(el).backgroundColor;

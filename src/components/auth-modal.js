@@ -357,19 +357,13 @@ export class AuthModal {
         }
         Toast.info('Connecting to enterprise SAML 2.0 Identity Provider...');
         try {
-          const ssoData = await authService.loginWithSSO(email, this.turnstileToken);
+          const ssoToken = this.turnstileToken || turnstileManager.getToken(this.turnstileWidgetId) || '';
+          const ssoData = await authService.loginWithSSO(email, ssoToken);
           if (ssoData && ssoData.ssoUrl) {
-            // Enterprise SAML IdP redirect or in-app session authentication
-            const ssoUser = {
-              uid: 'usr_sso_' + Math.random().toString(36).substring(2, 10),
-              email,
-              name: email.split('@')[0],
-              plan: 'Enterprise',
-              teamMember: false,
-              token: 'sso_tok_' + Math.random().toString(36).substring(2),
-              apiKeys: []
-            };
-            this.handleSuccessfulAuth(ssoUser);
+            Toast.info(`Redirecting to ${email.split('@')[1]} Identity Provider...`);
+            if (typeof window !== 'undefined') {
+              window.location.href = ssoData.ssoUrl;
+            }
           }
         } catch (err) {
           Toast.error('SSO Authentication failed: ' + err.message);
@@ -404,6 +398,11 @@ export class AuthModal {
   }
 
   open(mode = 'login') {
+    if (this.turnstileWidgetId) {
+      turnstileManager.remove(this.turnstileWidgetId);
+      this.turnstileWidgetId = null;
+    }
+    this.turnstileToken = null;
     this.mode = mode;
     this.renderModal();
     const emailInput = this.modal.querySelector('#auth-email');
@@ -417,8 +416,10 @@ export class AuthModal {
   close() {
     this.modal.style.display = 'none';
     if (this.turnstileWidgetId) {
-      turnstileManager.reset(this.turnstileWidgetId);
+      turnstileManager.remove(this.turnstileWidgetId);
+      this.turnstileWidgetId = null;
     }
+    this.turnstileToken = null;
   }
 
   // --- GLOBAL USER ACCOUNT POPOVER MENU ---

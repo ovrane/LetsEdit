@@ -4,18 +4,51 @@
 
 export const USERS = new Map([
   [
-    'demo@[EMAIL_ADDRESS]',
+    'demo@example.com',
     {
-      email: 'demo@[EMAIL_ADDRESS]',
+      email: 'demo@example.com',
       password: 'password123',
-      name: 'Sejda Demo User',
+      name: 'Demo User',
       plan: 'Pro',
       teamMember: false,
       requires2fa: false
     }
   ],
   [
-    'security@[EMAIL_ADDRESS]',
+    'alex.pro@example.com',
+    {
+      email: 'alex.pro@example.com',
+      password: 'StandardPassword123',
+      name: 'Alex Morgan',
+      plan: 'Pro',
+      teamMember: false,
+      requires2fa: false
+    }
+  ],
+  [
+    'developer@example.com',
+    {
+      email: 'developer@example.com',
+      password: 'DevPassword123',
+      name: 'Developer',
+      plan: 'Pro',
+      teamMember: false,
+      requires2fa: false
+    }
+  ],
+  [
+    'security.2fa@example.com',
+    {
+      email: 'security.2fa@example.com',
+      password: 'demo',
+      name: 'Security Analyst',
+      plan: 'Enterprise',
+      teamMember: true,
+      requires2fa: true
+    }
+  ],
+  [
+    'security@enterprise.org',
     {
       email: 'security@enterprise.org',
       password: 'demo',

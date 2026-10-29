@@ -146,6 +146,11 @@ export class FullPageAuth {
     const tabSignIn = accountPage.container.querySelector('#btn-tab-signin');
     if (tabSignIn) {
       tabSignIn.onclick = () => {
+        if (accountPage.turnstileWidgetId) {
+          turnstileManager.remove(accountPage.turnstileWidgetId);
+          accountPage.turnstileWidgetId = null;
+        }
+        accountPage.turnstileToken = null;
         accountPage.authMode = 'login';
         FullPageAuth.render(accountPage);
         if (typeof window !== 'undefined') {
@@ -158,6 +163,11 @@ export class FullPageAuth {
     const tabReg = accountPage.container.querySelector('#btn-tab-register');
     if (tabReg) {
       tabReg.onclick = () => {
+        if (accountPage.turnstileWidgetId) {
+          turnstileManager.remove(accountPage.turnstileWidgetId);
+          accountPage.turnstileWidgetId = null;
+        }
+        accountPage.turnstileToken = null;
         accountPage.authMode = 'register';
         FullPageAuth.render(accountPage);
         if (typeof window !== 'undefined') {
@@ -284,21 +294,13 @@ export class FullPageAuth {
         }
         Toast.info('Connecting to enterprise SAML 2.0 Identity Provider...');
         try {
-          const ssoData = await authService.loginWithSSO(email, accountPage.turnstileToken);
+          const ssoToken = accountPage.turnstileToken || turnstileManager.getToken(accountPage.turnstileWidgetId) || '';
+          const ssoData = await authService.loginWithSSO(email, ssoToken);
           if (ssoData && ssoData.ssoUrl) {
-            // Enterprise SAML IdP redirect or in-app session authentication
-            const ssoUser = {
-              uid: 'usr_sso_' + Math.random().toString(36).substring(2, 10),
-              email,
-              name: email.split('@')[0],
-              plan: 'Enterprise',
-              teamMember: false,
-              token: 'sso_tok_' + Math.random().toString(36).substring(2),
-              apiKeys: []
-            };
-            store.setUser(ssoUser);
-            Toast.success(`Enterprise SSO authenticated for ${email}`);
-            accountPage.show({ updateUrl: true, mode: 'account' });
+            Toast.info(`Redirecting to ${email.split('@')[1]} Identity Provider...`);
+            if (typeof window !== 'undefined') {
+              window.location.href = ssoData.ssoUrl;
+            }
           }
         } catch (err) {
           Toast.error('SSO Authentication failed: ' + err.message);
