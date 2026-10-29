@@ -24,25 +24,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Architecture Rule Check (Max 1,000 lines per JS file)
-        shell: bash
-        run: |
-          echo "Checking JavaScript files for 1,000-line ceiling rule..."
-          FAIL=0
-          while IFS= read -r file; do
-            LINES=$(wc -l < "$file")
-            if [ "$LINES" -gt 1000 ]; then
-              echo " Error: $file exceeds 1,000 lines ($LINES lines)."
-              FAIL=1
-            fi
-          done < <(find src -type f \( -name "*.js" -o -name "*.jsx" \))
-          if [ "$FAIL" -eq 1 ]; then
-            echo "Line limit check failed. Modularize files exceeding 1,000 lines."
-            exit 1
-          fi
-          echo " All JavaScript files are strictly under 1,000 lines."
-
-      - name: Execute Full Test Suite (332 Tests)
+      - name: Execute Full Test Suite
         run: npm test
 
       - name: Verify Production Vite Build

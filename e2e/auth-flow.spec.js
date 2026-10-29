@@ -2,8 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Authentication System & Google OAuth Verification', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
   });
 
   test('login modal renders with Google Auth and without Microsoft Auth', async ({ page }) => {
@@ -36,8 +35,7 @@ test.describe('Authentication System & Google OAuth Verification', () => {
   });
 
   test('dedicated /login and /signup pages render with Google Auth only', async ({ page }) => {
-    await page.goto('/login');
-    await page.waitForLoadState('domcontentloaded');
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
 
     // Check full-page Google button
     const googleBtn = page.locator('#btn-full-google-login');
