@@ -9,6 +9,7 @@ import { Toast } from '../toast.js';
 import { uid } from '../../utils/helpers.js';
 import { searchReplace } from '../../tools/search-replace.js';
 import { FormTool } from '../../tools/form-tool.js';
+import { generateFontOptionsHtml } from '../../core/font-registry.js';
 
 export class ToolRenderers {
   static renderTool(panel, tool) {
@@ -21,12 +22,7 @@ export class ToolRenderers {
           <div class="opt-group">
             <label class="opt-label">Font Family</label>
             <select class="select-sm w-full" id="opt-text-font">
-              <option value="Helvetica" ${state.activeFontFamily === 'Helvetica' ? 'selected' : ''}>Helvetica / Arial</option>
-              <option value="TimesRoman" ${state.activeFontFamily === 'TimesRoman' ? 'selected' : ''}>Times New Roman</option>
-              <option value="Courier" ${state.activeFontFamily === 'Courier' ? 'selected' : ''}>Courier Monospace</option>
-              <option value="Roboto" ${state.activeFontFamily === 'Roboto' ? 'selected' : ''}>Roboto</option>
-              <option value="Montserrat" ${state.activeFontFamily === 'Montserrat' ? 'selected' : ''}>Montserrat</option>
-              <option value="Caveat" ${state.activeFontFamily === 'Caveat' ? 'selected' : ''}>Caveat (Signature)</option>
+              ${generateFontOptionsHtml(state.activeFontFamily || state.activeFontId || 'Helvetica')}
             </select>
           </div>
 
@@ -249,12 +245,13 @@ export class ToolRenderers {
         break;
 
       case 'image':
+      case 'stamp':
         panel.setHeading('Stamps & Badges', `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`);
         panel.bodyEl.innerHTML = `
           <div class="opt-group">
             <button class="btn btn-outline btn-sm w-full mb-3" id="opt-btn-upload-image">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-              <span>Upload Custom Image</span>
+              <span>Upload Custom Image / Logo</span>
             </button>
           </div>
 
@@ -267,10 +264,12 @@ export class ToolRenderers {
                 { text: 'CONFIDENTIAL', color: '#30050d' },
                 { text: 'PAID', color: '#059669' },
                 { text: 'VOID', color: '#ea580c' },
-                { text: 'FINAL', color: '#7c3aed' }
+                { text: 'FINAL', color: '#7c3aed' },
+                { text: 'SIGN HERE', color: '#d97706' },
+                { text: 'DATE', color: '#0284c7' }
               ].map(s => `
                 <button class="stamp-badge-btn" data-stamp="${s.text}" data-color="${s.color}" style="border-color:${s.color}; color:${s.color};">
-                  ${s.text}
+                  ${s.text === 'DATE' ? '📅 DATE STAMP' : s.text}
                 </button>
               `).join('')}
             </div>
@@ -280,15 +279,23 @@ export class ToolRenderers {
         const uploadImgBtn = panel.bodyEl.querySelector('#opt-btn-upload-image');
         if (uploadImgBtn) {
           uploadImgBtn.onclick = () => {
-            const imgToolBtn = document.querySelector('[data-tool="image"]');
-            if (imgToolBtn) imgToolBtn.click();
+            if (window.letseditStudio && window.letseditStudio.imageTool) {
+              window.letseditStudio.imageTool.open();
+            } else {
+              const imgToolBtn = document.querySelector('[data-tool="image"]');
+              if (imgToolBtn) imgToolBtn.click();
+            }
           };
         }
 
         const stampBtns = panel.bodyEl.querySelectorAll('.stamp-badge-btn');
         stampBtns.forEach(b => {
           b.onclick = () => {
-            const text = b.dataset.stamp;
+            let text = b.dataset.stamp;
+            if (text === 'DATE') {
+              const d = new Date();
+              text = d.toISOString().slice(0, 10);
+            }
             const color = b.dataset.color;
             ToolRenderers.insertStampAnnotation(text, color);
           };
@@ -296,12 +303,14 @@ export class ToolRenderers {
         break;
 
       case 'form':
+      case 'forms':
         panel.setHeading('Form Fields', `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`);
         panel.bodyEl.innerHTML = `
           <div class="opt-group">
-            <label class="opt-label">Insert Field</label>
+            <label class="opt-label">Interactive Field Types</label>
             <div class="flex flex-col gap-2">
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-textbox">+ Text Box</button>
+              <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-textarea">+ Text Area</button>
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-checkbox">+ Checkbox</button>
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-radio">+ Radio Button</button>
               <button class="btn btn-outline btn-sm w-full" id="opt-btn-add-dropdown">+ Dropdown Menu</button>
@@ -310,20 +319,35 @@ export class ToolRenderers {
 
           <div class="opt-group">
             <div class="info-callout text-xs text-muted">
-              📝 Interactive AcroForm fields can be filled by recipients in standard PDF readers (Acrobat, Chrome, Edge).
+              📝 Click any button above or click directly anywhere on the page to place fields.
             </div>
           </div>
         `;
 
         const addTxt = panel.bodyEl.querySelector('#opt-btn-add-textbox');
+        const addTa = panel.bodyEl.querySelector('#opt-btn-add-textarea');
         const addCb = panel.bodyEl.querySelector('#opt-btn-add-checkbox');
         const addRad = panel.bodyEl.querySelector('#opt-btn-add-radio');
         const addDd = panel.bodyEl.querySelector('#opt-btn-add-dropdown');
 
-        if (addTxt) addTxt.onclick = () => document.getElementById('btn-add-form-text')?.click();
-        if (addCb) addCb.onclick = () => document.getElementById('btn-add-form-checkbox')?.click();
-        if (addRad) addRad.onclick = () => document.getElementById('btn-add-form-radio')?.click();
+        if (addTxt) addTxt.onclick = () => {
+          store.setState({ activeFormType: 'text' });
+          FormTool.addField('text');
+        };
+        if (addTa) addTa.onclick = () => {
+          store.setState({ activeFormType: 'textarea' });
+          FormTool.addField('textarea');
+        };
+        if (addCb) addCb.onclick = () => {
+          store.setState({ activeFormType: 'checkbox' });
+          FormTool.addField('checkbox');
+        };
+        if (addRad) addRad.onclick = () => {
+          store.setState({ activeFormType: 'radio' });
+          FormTool.addField('radio');
+        };
         if (addDd) addDd.onclick = () => {
+          store.setState({ activeFormType: 'dropdown' });
           FormTool.addField('dropdown');
         };
         break;
@@ -466,6 +490,7 @@ export class ToolRenderers {
     if (fontSel) {
       fontSel.onchange = (e) => {
         store.getState().activeFontFamily = e.target.value;
+        store.getState().activeFontId = e.target.value;
       };
     }
 
@@ -646,7 +671,17 @@ export class ToolRenderers {
   }
 
   static insertStampAnnotation(text, color) {
-    const pageNum = 1;
+    const state = store.getState();
+    let pageNum = state.currentPage || 1;
+    if (state.deletedPages.has(pageNum)) {
+      for (let p = 1; p <= state.pageCount; p++) {
+        if (!state.deletedPages.has(p)) {
+          pageNum = p;
+          break;
+        }
+      }
+    }
+
     const cvs = document.createElement('canvas');
     cvs.width = 300;
     cvs.height = 100;
@@ -658,7 +693,7 @@ export class ToolRenderers {
     ctx.lineWidth = 6;
     ctx.strokeRect(8, 8, 284, 84);
 
-    ctx.font = 'bold 32px Helvetica, Arial, sans-serif';
+    ctx.font = 'bold 28px Helvetica, Arial, sans-serif';
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -677,6 +712,6 @@ export class ToolRenderers {
     };
 
     store.addAnnotation(pageNum, ann);
-    Toast.success(`Placed ${text} stamp on page 1`);
+    Toast.success(`Placed ${text} stamp on page ${pageNum}`);
   }
 }

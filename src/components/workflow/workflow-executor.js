@@ -16,6 +16,7 @@ import { redactPageContentStreams } from '../../core/pdf-redactor.js';
 import { Toast } from '../toast.js';
 import { hexToRgb } from '../../utils/helpers.js';
 import { batchProgressModal } from './batch-progress-modal.js';
+import { getMiniLoadingSvg } from '../../utils/loading-spinner.js';
 
 export async function processSingleDocument(manager, tool, file) {
   const primary = file;
@@ -94,7 +95,10 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([rotBytes], { type: 'application/pdf' })
     };
   } else if (id === 'grayscale') {
-    const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes);
+    const grayBytes = await pdfEngine.convertToGrayscale(primary.bytes, {
+      mode: manager.grayscaleMode || 'standard',
+      preserveBlackText: manager.grayscalePreserveBlackText !== false
+    });
     return {
       name: `Grayscale_${primary.name}`,
       bytes: grayBytes,
@@ -219,47 +223,70 @@ export async function processSingleDocument(manager, tool, file) {
       blob: new Blob([halvedBytes], { type: 'application/pdf' })
     };
   } else if (id === 'pdf-to-word') {
-    const text = await pdfEngine.extractDocumentText(primary.bytes);
-    const htmlDoc = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${primary.name}</title>
-      <style>body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.6; padding: 36pt; } p { margin-bottom: 10pt; }</style>
-      </head>
-      <body>
-        ${text.split('\n\n').filter(Boolean).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('')}
-      </body>
-      </html>
-    `;
+    let pdfjsDoc = null;
+    if (typeof window !== 'undefined' && pdfjsLib) {
+      try {
+        pdfjsDoc = await pdfjsLib.getDocument({ data: primary.bytes.slice(0) }).promise;
+      } catch (e) {}
+    }
+    const docxResult = await PageOperations.pdfToWord(primary.bytes, {
+      mode: manager.pdfToWordMode || 'flow',
+      tableSensitivity: manager.pdfToWordTableSensitivity || 'balanced',
+      pdfjsDoc,
+      withReport: true
+    });
+    const docxBytes = docxResult.docxBytes || docxResult;
     return {
-      name: `${primary.name.replace(/\.[^/.]+$/, '')}.doc`,
-      bytes: new TextEncoder().encode(htmlDoc),
-      blob: new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.docx`,
+      bytes: docxBytes,
+      blob: new Blob([docxBytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }),
+      report: docxResult.report
     };
   } else if (id === 'pdf-to-excel') {
-    const text = await pdfEngine.extractDocumentText(primary.bytes);
-    const csvRows = text.split('\n').map(line => {
-      const cols = line.trim().split(/\s{2,}|\t/);
-      return cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',');
-    }).join('\n');
+    let pdfjsDoc = null;
+    if (typeof window !== 'undefined' && pdfjsLib) {
+      try {
+        pdfjsDoc = await pdfjsLib.getDocument({ data: primary.bytes.slice(0) }).promise;
+      } catch (e) {}
+    }
+    const format = manager.pdfToExcelFormat || 'xlsx';
+    const excelResult = await PageOperations.pdfToExcel(primary.bytes, {
+      format,
+      normalizeNumbers: manager.pdfToExcelNormalize !== false,
+      pdfjsDoc,
+      withReport: true
+    });
+    const isXlsx = format === 'xlsx';
+    const fileBytes = excelResult.fileBytes || excelResult;
+    const mimeType = isXlsx
+      ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      : 'text/csv;charset=utf-8';
+    const ext = isXlsx ? 'xlsx' : 'csv';
     return {
-      name: `${primary.name.replace(/\.[^/.]+$/, '')}.csv`,
-      bytes: new TextEncoder().encode(csvRows),
-      blob: new Blob([csvRows], { type: 'text/csv;charset=utf-8' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.${ext}`,
+      bytes: fileBytes,
+      blob: new Blob([fileBytes], { type: mimeType }),
+      report: excelResult.report
     };
-  } else if (id === 'pdf-to-ppt') {
-    const text = await pdfEngine.extractDocumentText(primary.bytes);
-    const slides = text.split('\n\n\n').filter(Boolean);
-    const htmlPpt = `
-      <html><head><meta charset='utf-8'><title>${primary.name}</title>
-      <style>body { font-family: Calibri, sans-serif; } .slide { page-break-after: always; padding: 40px; border: 1px solid #ccc; margin-bottom: 20px; }</style>
-      </head><body>
-      ${slides.map((s, i) => `<div class='slide'><h2>Slide ${i + 1}</h2><p>${s.replace(/\n/g, '<br/>')}</p></div>`).join('')}
-      </body></html>
-    `;
+  } else if (id === 'pdf-to-ppt' || id === 'pdf-to-pptx') {
+    let pdfjsDoc = null;
+    if (typeof window !== 'undefined' && pdfjsLib) {
+      try {
+        pdfjsDoc = await pdfjsLib.getDocument({ data: primary.bytes.slice(0) }).promise;
+      } catch (e) {}
+    }
+    const pptxResult = await PageOperations.pdfToPpt(primary.bytes, {
+      mode: manager.pdfToPptMode || 'editable',
+      aspectRatio: manager.pdfToPptAspectRatio || 'auto',
+      pdfjsDoc,
+      withReport: true
+    });
+    const pptxBytes = pptxResult.pptxBytes || pptxResult;
     return {
-      name: `${primary.name.replace(/\.[^/.]+$/, '')}.ppt`,
-      bytes: new TextEncoder().encode(htmlPpt),
-      blob: new Blob([htmlPpt], { type: 'application/vnd.ms-powerpoint;charset=utf-8' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.pptx`,
+      bytes: pptxBytes,
+      blob: new Blob([pptxBytes], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }),
+      report: pptxResult.report
     };
   } else if (id === 'unlock') {
     const unlockedBytes = await pdfEngine.unlockPdf(primary.bytes, manager.unlockPassword || '');
@@ -473,136 +500,67 @@ export async function processSingleDocument(manager, tool, file) {
     const title = manager.excelTitle || primary.name.replace(/\.[^/.]+$/, '');
     const pdfBytes = await PageOperations.excelToPdf(primary.bytes, {
       title,
+      fitMode: manager.excelFitMode || 'fit-columns',
       orientation: manager.excelOrientation || 'auto',
-      isCsv: primary.name.toLowerCase().endsWith('.csv')
+      pageSize: manager.excelPageSize || 'a4',
+      gridlines: manager.excelGridlines !== false,
+      zebra: manager.excelZebra !== false
     });
     return {
       name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
       bytes: pdfBytes,
-      blob: new Blob([pdfBytes], { type: 'application/pdf' })
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }),
+      report: pdfBytes.report
     };
   } else if (id === 'ppt-to-pdf') {
     const title = manager.pptTitle || primary.name.replace(/\.[^/.]+$/, '');
-    const pdfBytes = await PageOperations.pptToPdf(primary.bytes, { title });
+    const pdfBytes = await PageOperations.pptToPdf(primary.bytes, {
+      title,
+      layout: manager.pptHandoutLayout || '1-up'
+    });
     return {
       name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
       bytes: pdfBytes,
-      blob: new Blob([pdfBytes], { type: 'application/pdf' })
+      blob: new Blob([pdfBytes], { type: 'application/pdf' }),
+      report: pdfBytes.report
     };
   } else if (id === 'html-to-pdf') {
     const textDecoder = new TextDecoder('utf-8');
-    const rawHtml = textDecoder.decode(primary.bytes);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(rawHtml, 'text/html');
-    const title = doc.querySelector('title')?.textContent || primary.name.replace(/\.[^/.]+$/, '');
-    const elements = Array.from(doc.body.querySelectorAll('h1, h2, h3, p, li, pre, blockquote, div')).map(el => el.textContent.trim()).filter(Boolean);
-    const lines = elements.length > 0 ? elements : rawHtml.replace(/<[^>]+>/g, ' ').split('\n').map(l => l.trim()).filter(Boolean);
+    const inputContent = textDecoder.decode(primary.bytes);
+    const title = manager.htmlPdfDocTitle || primary.name.replace(/\.[^/.]+$/, '');
+    const theme = manager.htmlPdfTheme || 'modern';
+    const pageSize = manager.htmlPdfPageSize || 'A4';
+    const orientation = manager.htmlPdfOrientation || 'portrait';
+    const margin = manager.htmlPdfMargin || 40;
+    const showHeader = manager.htmlPdfShowHeader !== false;
+    const showFooter = manager.htmlPdfShowFooter !== false;
 
-    const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    let page = pdfDoc.addPage([595.28, 841.89]);
-    let y = 800;
+    const convertResult = await PageOperations.htmlToPdf(inputContent, {
+      title,
+      theme,
+      pageSize,
+      orientation,
+      margin,
+      showHeader,
+      showFooter,
+      withReport: true
+    });
 
-    page.drawText(title, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-    y -= 30;
-
-    for (const line of lines) {
-      if (y < 60) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        y = 800;
-      }
-      const words = line.split(' ');
-      let curLine = '';
-      for (const w of words) {
-        const testLine = curLine ? `${curLine} ${w}` : w;
-        if (font.widthOfTextAtSize(testLine, 10.5) > 495) {
-          page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
-          y -= 15;
-          if (y < 60) {
-            page = pdfDoc.addPage([595.28, 841.89]);
-            y = 800;
-          }
-          curLine = w;
-        } else {
-          curLine = testLine;
-        }
-      }
-      if (curLine) {
-        page.drawText(curLine, { x: 50, y, size: 10.5, font, color: rgb(0.2, 0.2, 0.2) });
-        y -= 18;
-      }
-    }
-
-    const outBytes = await pdfDoc.save();
+    const outBytes = convertResult.pdfBytes || convertResult;
     return {
       name: `${title.replace(/[/\\?%*:|"<>]/g, '_')}.pdf`,
       bytes: outBytes,
       blob: new Blob([outBytes], { type: 'application/pdf' })
     };
   } else if (id === 'word-to-pdf') {
-    let paragraphs = [];
-    try {
-      const zip = await JSZip.loadAsync(primary.bytes);
-      const docXml = await zip.file('word/document.xml')?.async('text');
-      if (docXml) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(docXml, 'text/xml');
-        paragraphs = Array.from(xmlDoc.getElementsByTagName('w:p')).map(p => {
-          return Array.from(p.getElementsByTagName('w:t')).map(t => t.textContent).join('');
-        }).filter(Boolean);
-      }
-    } catch (e) {
-      console.warn('DOCX ZIP unpack fallback:', e);
-    }
-
-    if (paragraphs.length === 0) {
-      const textDecoder = new TextDecoder('utf-8');
-      paragraphs = textDecoder.decode(primary.bytes).replace(/[^\x20-\x7E\n]/g, ' ').split('\n').map(l => l.trim()).filter(l => l.length > 2);
-    }
-
-    const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    let page = pdfDoc.addPage([595.28, 841.89]);
-    let y = 800;
-
-    const docTitle = primary.name.replace(/\.[^/.]+$/, '');
-    page.drawText(docTitle, { x: 50, y, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-    y -= 30;
-
-    for (const para of paragraphs) {
-      if (y < 60) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        y = 800;
-      }
-      const words = para.split(' ');
-      let curLine = '';
-      for (const w of words) {
-        const testLine = curLine ? `${curLine} ${w}` : w;
-        if (font.widthOfTextAtSize(testLine, 11) > 495) {
-          page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
-          y -= 16;
-          if (y < 60) {
-            page = pdfDoc.addPage([595.28, 841.89]);
-            y = 800;
-          }
-          curLine = w;
-        } else {
-          curLine = testLine;
-        }
-      }
-      if (curLine) {
-        page.drawText(curLine, { x: 50, y, size: 11, font, color: rgb(0.15, 0.15, 0.15) });
-        y -= 20;
-      }
-    }
-
-    const outBytes = await pdfDoc.save();
+    const pdfBytes = await PageOperations.wordToPdf(primary.bytes, {
+      fontFamily: manager.wordFontFamily || 'helvetica',
+      pageSize: manager.wordPageSize || 'a4'
+    });
     return {
-      name: `${docTitle}.pdf`,
-      bytes: outBytes,
-      blob: new Blob([outBytes], { type: 'application/pdf' })
+      name: `${primary.name.replace(/\.[^/.]+$/, '')}.pdf`,
+      bytes: pdfBytes,
+      blob: new Blob([pdfBytes], { type: 'application/pdf' })
     };
   } else if (id === 'rename') {
     const text = await pdfEngine.extractDocumentText(primary.bytes);
@@ -636,7 +594,7 @@ export async function executeAction(manager) {
   const execBtn = manager.container.querySelector('#btn-workspace-execute');
   if (execBtn) {
     execBtn.disabled = true;
-    execBtn.innerHTML = `<span>Processing in browser...</span>`;
+    execBtn.innerHTML = `${getMiniLoadingSvg(14)} <span>Processing in browser...</span>`;
   }
 
   try {
@@ -782,8 +740,10 @@ export async function executeAction(manager) {
 
       const imgList = manager.uploadedFiles.map(f => ({ bytes: f.bytes, name: f.name }));
       const pdfBytes = await PageOperations.imagesToPdf(imgList, {
-        orientation: manager.imgOrientation,
-        margin: parseInt(manager.imgMargin, 10) || 0,
+        pageSize: manager.imgPageSize || 'a4',
+        orientation: manager.imgOrientation || 'auto',
+        margin: manager.imgMargin || 'small',
+        layout: manager.imgLayout || '1-up',
         onProgress: ({ current, total }) => {
           if (manager.uploadedFiles.length > 1) {
             batchProgressModal.completeFile(current - 1);
@@ -801,44 +761,35 @@ export async function executeAction(manager) {
       manager.processedBlob = new Blob([pdfBytes], { type: 'application/pdf' });
       manager.processedFilename = 'Images_Combined.pdf';
     } else if (t.id === 'to-image') {
-      const loadingTask = pdfjsLib.getDocument({
-        data: primary.bytes.slice(0),
-        cMapUrl: 'https://unpkg.com/pdfjs-dist@6.4.299/cmaps/',
-        cMapPacked: true
-      });
-      const doc = await loadingTask.promise;
-      const numPages = doc.numPages;
       const dpi = parseInt(manager.imageDpi, 10) || 150;
-      const scale = dpi / 72;
-      const mime = manager.imageFormat === 'image/jpeg' ? 'image/jpeg' : 'image/png';
-      const ext = manager.imageFormat === 'image/jpeg' ? 'jpg' : 'png';
+      const format = manager.imageFormat || 'image/jpeg';
+      const quality = (manager.imageQuality || 90) / 100;
+      const pageRange = manager.imagePageRange || 'all';
 
-      const imageBlobs = [];
-      for (let p = 1; p <= numPages; p++) {
-        const page = await doc.getPage(p);
-        const viewport = page.getViewport({ scale });
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext('2d');
-        if (mime === 'image/jpeg') {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const res = await PageOperations.renderPagesToZip(primary.bytes, {
+        dpi,
+        format,
+        quality,
+        pageRange,
+        baseName: primary.name
+      }, (prog) => {
+        if (execBtn) {
+          execBtn.innerHTML = `<span>Rendering Page ${prog.current} of ${prog.total} (${prog.percent}%)...</span>`;
         }
-        await page.render({ canvasContext: ctx, viewport }).promise;
-        const b = await new Promise(res => canvas.toBlob(res, mime, 0.92));
-        imageBlobs.push({ name: `page_${p}.${ext}`, blob: b, bytes: await b.arrayBuffer() });
-      }
-      doc.destroy();
+      });
 
-      if (imageBlobs.length === 1) {
-        manager.processedBlob = imageBlobs[0].blob;
-        manager.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_page_1.${ext}`;
+      if (res.totalImages === 1) {
+        const single = await PageOperations.renderPageToImage(primary.bytes, res.images[0].pageNum, {
+          dpi,
+          format,
+          quality,
+          baseName: primary.name
+        });
+        manager.processedBlob = single.blob;
+        manager.processedFilename = single.filename;
       } else {
-        const zip = new JSZip();
-        imageBlobs.forEach(img => zip.file(img.name, img.bytes));
-        manager.processedBlob = await zip.generateAsync({ type: 'blob' });
-        manager.processedFilename = `${primary.name.replace(/\.[^/.]+$/, '')}_images.zip`;
+        manager.processedBlob = res.zipBlob;
+        manager.processedFilename = res.zipFilename;
       }
     } else if (t.id === 'compare') {
       if (manager.uploadedFiles.length < 2) {
@@ -855,20 +806,37 @@ export async function executeAction(manager) {
       manager.compareResult = cmp;
       manager.compareDocA = manager.uploadedFiles[0];
       manager.compareDocB = manager.uploadedFiles[1];
-    } else if (t.id === 'extract-images') {
-      const imgs = await pdfEngine.extractImages(primary.bytes);
-      if (imgs.length === 0) {
-        Toast.warning('No embedded image objects found in this PDF');
+    } else if (['extract-images', 'extract_images'].includes(t.id)) {
+      const minDimension = parseInt(manager.extractMinSize, 10) || 0;
+      const deduplicate = manager.extractDeduplicate !== false;
+      const targetFormat = manager.extractTargetFormat || 'all';
+
+      const result = await PageOperations.extractImages(primary.bytes, {
+        minWidth: minDimension,
+        minHeight: minDimension,
+        deduplicate,
+        targetFormat,
+        withReport: true
+      });
+
+      if (!result.images || result.images.length === 0) {
+        Toast.warning('No embedded image objects found matching your filter criteria');
         if (execBtn) {
           execBtn.disabled = false;
           execBtn.innerHTML = `<span>${manager.getExecuteButtonLabel()}</span>`;
         }
         return;
       }
-      const zip = new JSZip();
-      imgs.forEach(im => zip.file(im.name, im.bytes));
-      manager.processedBlob = await zip.generateAsync({ type: 'blob' });
-      manager.processedFilename = `Extracted_Images_${primary.name}.zip`;
+
+      manager.processedBlob = new Blob([result.zipBytes], { type: 'application/zip' });
+      manager.processedFilename = `Extracted_Images_${primary.name.replace(/\.[^/.]+$/, '')}.zip`;
+      manager.lastOperationMetrics = {
+        operation: 'extract-images',
+        imageCount: result.images.length,
+        skippedDuplicates: result.report?.skippedDuplicates || 0,
+        originalSize: primary.size,
+        processedSize: result.zipBytes.byteLength
+      };
     } else if (t.id === 'organize') {
       if (manager.organizePages.length === 0) {
         Toast.warning('Cannot save empty document. Please keep at least one page.');

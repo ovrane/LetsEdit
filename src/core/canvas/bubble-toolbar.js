@@ -6,6 +6,7 @@
 
 import { store } from '../state-store.js';
 import { uid } from '../../utils/helpers.js';
+import { generateFontOptionsHtml } from '../font-registry.js';
 
 export class FloatingBubbleBar {
   static currentBar = null;
@@ -25,18 +26,41 @@ export class FloatingBubbleBar {
     let controlsHtml = '';
 
     if (isText) {
+      const activeFont = ann.fontId || ann.fontFamily || 'Helvetica';
+      const curAlign = ann.align || 'left';
       controlsHtml += `
+        <select class="bubble-font-select" id="bubble-font-select" title="Change font family">
+          ${generateFontOptionsHtml(activeFont)}
+        </select>
         <button class="bubble-btn bubble-btn-step" id="bubble-size-minus" title="Decrease font size">-</button>
         <span class="bubble-text-val" id="bubble-size-val">${ann.fontSize || 16}px</span>
         <button class="bubble-btn bubble-btn-step" id="bubble-size-plus" title="Increase font size">+</button>
         <div class="bubble-divider"></div>
+        <button class="bubble-btn ${ann.bold ? 'active' : ''}" id="bubble-btn-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="bubble-btn ${ann.italic ? 'active' : ''}" id="bubble-btn-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button class="bubble-btn ${ann.underline ? 'active' : ''}" id="bubble-btn-underline" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button class="bubble-btn ${ann.strikethrough ? 'active' : ''}" id="bubble-btn-strike" title="Strikethrough"><s>S</s></button>
+        <button class="bubble-btn" id="bubble-btn-align" title="Align: ${curAlign}">
+          ${curAlign === 'center' ? '≡' : curAlign === 'right' ? '⇥' : '⇤'}
+        </button>
+        <div class="bubble-divider"></div>
       `;
     }
 
-    // Color dot picker
+    // Color dot picker (Text or stroke)
     const currentColor = ann.color || ann.strokeColor || '#000000';
     controlsHtml += `
-      <div class="bubble-color-dot" id="bubble-color-dot" style="background-color: ${currentColor};" title="Click to change color"></div>
+      <div class="bubble-color-dot" id="bubble-color-dot" style="background-color: ${currentColor};" title="Text / Stroke Color"></div>
+    `;
+
+    if (isText) {
+      const bgHighlight = ann.bgColor && ann.bgColor !== 'transparent' ? ann.bgColor : 'rgba(255,255,255,0.2)';
+      controlsHtml += `
+        <div class="bubble-color-dot bubble-bg-dot" id="bubble-bg-dot" style="background-color: ${bgHighlight};" title="Text Highlight / Background"></div>
+      `;
+    }
+
+    controlsHtml += `
       <div class="bubble-divider"></div>
       <button class="bubble-btn" id="bubble-btn-duplicate" title="Duplicate (Ctrl+D)">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -55,11 +79,91 @@ export class FloatingBubbleBar {
     bar.onclick = (e) => e.stopPropagation();
 
     // Event bindings
+    const fontSel = bar.querySelector('#bubble-font-select');
     const sizeMinus = bar.querySelector('#bubble-size-minus');
     const sizePlus = bar.querySelector('#bubble-size-plus');
     const colorDot = bar.querySelector('#bubble-color-dot');
     const dupBtn = bar.querySelector('#bubble-btn-duplicate');
     const delBtn = bar.querySelector('#bubble-btn-delete');
+
+    const boldBtn = bar.querySelector('#bubble-btn-bold');
+    const italicBtn = bar.querySelector('#bubble-btn-italic');
+    const underlineBtn = bar.querySelector('#bubble-btn-underline');
+    const strikeBtn = bar.querySelector('#bubble-btn-strike');
+    const alignBtn = bar.querySelector('#bubble-btn-align');
+    const bgDot = bar.querySelector('#bubble-bg-dot');
+
+    if (boldBtn) {
+      boldBtn.onclick = (e) => {
+        e.stopPropagation();
+        ann.bold = !ann.bold;
+        boldBtn.classList.toggle('active', !!ann.bold);
+        store.updateAnnotation(pageNum, ann.id, { bold: ann.bold });
+      };
+    }
+
+    if (italicBtn) {
+      italicBtn.onclick = (e) => {
+        e.stopPropagation();
+        ann.italic = !ann.italic;
+        italicBtn.classList.toggle('active', !!ann.italic);
+        store.updateAnnotation(pageNum, ann.id, { italic: ann.italic });
+      };
+    }
+
+    if (underlineBtn) {
+      underlineBtn.onclick = (e) => {
+        e.stopPropagation();
+        ann.underline = !ann.underline;
+        underlineBtn.classList.toggle('active', !!ann.underline);
+        store.updateAnnotation(pageNum, ann.id, { underline: ann.underline });
+      };
+    }
+
+    if (strikeBtn) {
+      strikeBtn.onclick = (e) => {
+        e.stopPropagation();
+        ann.strikethrough = !ann.strikethrough;
+        strikeBtn.classList.toggle('active', !!ann.strikethrough);
+        store.updateAnnotation(pageNum, ann.id, { strikethrough: ann.strikethrough });
+      };
+    }
+
+    if (alignBtn) {
+      alignBtn.onclick = (e) => {
+        e.stopPropagation();
+        const aligns = ['left', 'center', 'right'];
+        const curIdx = aligns.indexOf(ann.align || 'left');
+        const nextAlign = aligns[(curIdx + 1) % aligns.length];
+        ann.align = nextAlign;
+        alignBtn.textContent = nextAlign === 'center' ? '≡' : nextAlign === 'right' ? '⇥' : '⇤';
+        alignBtn.title = `Align: ${nextAlign}`;
+        store.updateAnnotation(pageNum, ann.id, { align: nextAlign });
+      };
+    }
+
+    if (bgDot) {
+      const bgPalette = ['transparent', '#fef08a', '#bbf7d0', '#bae6fd', '#fbcfe8', '#fed7aa', '#ffffff'];
+      bgDot.onclick = (e) => {
+        e.stopPropagation();
+        const cur = (ann.bgColor || 'transparent').toLowerCase();
+        let nextIdx = (bgPalette.indexOf(cur) + 1) % bgPalette.length;
+        const nextBg = bgPalette[nextIdx];
+        ann.bgColor = nextBg;
+        bgDot.style.backgroundColor = nextBg === 'transparent' ? 'rgba(255,255,255,0.2)' : nextBg;
+        store.updateAnnotation(pageNum, ann.id, { bgColor: nextBg });
+      };
+    }
+
+    if (fontSel) {
+      fontSel.onchange = (e) => {
+        e.stopPropagation();
+        const fId = e.target.value;
+        ann.fontId = fId;
+        ann.fontFamily = fId;
+        store.updateAnnotation(pageNum, ann.id, { fontId: fId, fontFamily: fId });
+      };
+    }
 
     if (sizeMinus) {
       sizeMinus.onclick = (e) => {

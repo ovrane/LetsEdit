@@ -1,0 +1,276 @@
+/* ==========================================================================
+   Modern PDF Editor UI Design System
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Dancing+Script:wght@700&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #30050d;
+  --color-primary-hover: #4a0914;
+  --color-primary-light: rgba(48, 5, 13, 0.08);
+  --color-primary-glow: rgba(48, 5, 13, 0.25);
+  --color-accent: #5e0b1a;
+  --color-wine-50: #fdf2f4;
+  --color-wine-100: #fbe6e9;
+  --color-wine-200: #f6ced4;
+  --color-wine-300: #efa6b3;
+  --color-wine-400: #e37489;
+  --color-wine-500: #d44763;
+  --color-wine-600: #be2e4e;
+  --color-wine-700: #a0203d;
+  --color-wine-800: #851c35;
+  --color-wine-900: #30050d;
+  --color-wine-950: #1a0207;
+}
+
+:root {
+  --bg-app: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-toolbar: #ffffff;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+  --primary: #30050d;
+  --primary-hover: #4a0914;
+  --primary-light: rgba(48, 5, 13, 0.08);
+  --primary-glow: rgba(48, 5, 13, 0.25);
+  --accent: #5e0b1a;
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-paper: 0 12px 32px -8px rgba(15, 23, 42, 0.15), 0 4px 12px rgba(15, 23, 42, 0.05);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"], body.dark-mode {
+  --bg-app: #232323;
+  --bg-surface: #232323;
+  --bg-secondary: #2e2e2e;
+  --bg-card: #282828;
+  --bg-sidebar: #232323;
+  --bg-toolbar: #1e1e1e;
+  --border-subtle: #383838;
+  --border-strong: #4a4a4a;
+  --text-main: #ffffff;
+  --text-muted: #a3a3a3;
+  --text-inverse: #232323;
+  --primary: #801426;
+  --primary-hover: #9e1931;
+  --primary-light: rgba(128, 20, 38, 0.25);
+  --primary-glow: rgba(128, 20, 38, 0.4);
+  --accent: #d46374;
+  --shadow-paper: 0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .landing-header,
+[data-theme="dark"] .landing-view-container,
+[data-theme="dark"] .landing-features-section,
+[data-theme="dark"] .landing-footer,
+[data-theme="dark"] .landing-dropdown-menu,
+[data-theme="dark"] .landing-mega-menu-content {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .hero-dropzone-card,
+[data-theme="dark"] .landing-tool-card,
+[data-theme="dark"] .landing-filter-chip,
+[data-theme="dark"] .faq-item {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .landing-hero-section {
+  background: #232323 !important;
+}
+
+[data-theme="dark"] .landing-tool-card:hover {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--primary-glow) !important;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.8), 0 0 20px -4px var(--tool-accent, var(--primary-glow)) !important;
+}
+
+[data-theme="dark"] .landing-nav-link {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .landing-nav-link:hover {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-strong) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .mega-item {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .mega-item:hover {
+  background-color: var(--primary-light) !important;
+  color: var(--accent, #d46374) !important;
+}
+
+[data-theme="dark"] .modal-dialog {
+  background: #232323 !important;
+  color: #ffffff !important;
+  border: 1px solid #383838 !important;
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .select-sm,
+[data-theme="dark"] .input-sm {
+  background: #2b2b2b !important;
+  color: #ffffff !important;
+  border-color: #3d3d3d !important;
+}
+
+[data-theme="dark"] .properties-bar,
+body.dark-mode .properties-bar {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .document-viewport,
+body.dark-mode .document-viewport {
+  background: var(--bg-app) !important;
+}
+
+[data-theme="dark"] .btn-outline,
+body.dark-mode .btn-outline {
+  background: var(--bg-secondary) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-strong) !important;
+}
+
+[data-theme="dark"] .btn-outline:hover,
+body.dark-mode .btn-outline:hover {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--accent, #d46374) !important;
+}
+
+[data-theme="dark"] .btn-secondary,
+body.dark-mode .btn-secondary {
+  background: var(--bg-secondary) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover,
+body.dark-mode .btn-secondary:hover {
+  background: #383838 !important;
+}
+
+[data-theme="dark"] .thumb-card,
+body.dark-mode .thumb-card {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .thumb-card:hover,
+body.dark-mode .thumb-card:hover {
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .thumb-btn:hover,
+body.dark-mode .thumb-btn:hover {
+  background: var(--bg-secondary) !important;
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .file-name-tag,
+body.dark-mode .file-name-tag {
+  background: var(--bg-secondary) !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .dropdown-menu,
+body.dark-mode .dropdown-menu {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-strong) !important;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="dark"] .dropdown-item,
+body.dark-mode .dropdown-item {
+  color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover,
+body.dark-mode .dropdown-item:hover {
+  background: var(--primary-light) !important;
+  color: var(--accent, #d46374) !important;
+}
+
+[data-theme="dark"] .toast-item,
+body.dark-mode .toast-item {
+  background: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-strong) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .tool-btn {
+  color: #a3a3a3;
+}
+
+[data-theme="dark"] .tool-btn:hover {
+  background: #2e2e2e;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .tool-btn.active {
+  background: var(--primary-light);
+  color: var(--accent, #d46374);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .pdf-page-wrap,
+body.dark-mode .pdf-page-wrap {
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6,
+.landing-hero-title,
+.showcase-title,
+.landing-tools-heading,
+.section-main-heading,
+.apps-title,
+.faq-title {
+  font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif;
+  letter-spacing: -0.025em;
+}

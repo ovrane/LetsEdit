@@ -91,13 +91,18 @@ export class PwaManager {
     }
 
     if (this.deferredPrompt) {
-      this.deferredPrompt.prompt();
-      const choiceResult = await this.deferredPrompt.userChoice;
-      if (choiceResult.outcome === 'accepted') {
-        Toast.success('Installing LetsEdit Desktop App...');
-      }
+      const promptEvent = this.deferredPrompt;
       this.deferredPrompt = null;
-      return choiceResult;
+      try {
+        await promptEvent.prompt();
+        const choiceResult = await promptEvent.userChoice;
+        if (choiceResult && choiceResult.outcome === 'accepted') {
+          Toast.success('Installing LetsEdit Desktop App...');
+        }
+        return choiceResult;
+      } catch (err) {
+        console.warn('PWA install prompt skipped:', err);
+      }
     }
 
     // Manual guidance when browser does not fire prompt automatically

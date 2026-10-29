@@ -10,6 +10,7 @@
 
 import * as pdfjsLib from 'pdfjs-dist';
 import { Toast } from '../toast.js';
+import { MultiSignOps } from '../../core/engine/operations/multi-sign-ops.js';
 
 class SignRequestModal {
   constructor() {
@@ -22,6 +23,7 @@ class SignRequestModal {
     this.pageScale = 1.0;
     this.pageWidth = 595;
     this.pageHeight = 842;
+    this.signingOrder = 'parallel';
 
     // Default recipients palette
     this.recipients = [
@@ -46,6 +48,18 @@ class SignRequestModal {
   }
 
   async open(pdfBytes, documentName = 'Document.pdf', options = {}) {
+    if (!pdfBytes) {
+      try {
+        const pkg = await MultiSignOps.createSampleSignContractPackage();
+        pdfBytes = pkg.pdfBytes;
+        documentName = pkg.documentName;
+        this.recipients = pkg.recipients;
+        this.fields = pkg.fields;
+      } catch (err) {
+        console.warn('[SignRequestModal] Error loading sample contract:', err);
+      }
+    }
+
     this.pdfBytes = pdfBytes;
     this.documentName = documentName;
     this.onCompletedCallback = options.onCompleted || null;
@@ -53,8 +67,13 @@ class SignRequestModal {
     if (Array.isArray(options.recipients) && options.recipients.length > 0) {
       this.recipients = options.recipients;
     }
+    if (options.signingOrder) {
+      this.signingOrder = options.signingOrder;
+    }
 
-    this.fields = [];
+    if (!this.fields || this.fields.length === 0) {
+      this.fields = [];
+    }
     this.currentPage = 1;
     this.activeRecipientIndex = 0;
 
@@ -116,6 +135,13 @@ class SignRequestModal {
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <span>Edit Signers</span>
               </button>
+              <div class="signing-order-wrap" style="display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;">
+                <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Order:</span>
+                <select id="sel-signing-order" class="recipient-select" style="padding: 2px 6px; font-size: 11.5px; height: 26px;">
+                  <option value="parallel" ${this.signingOrder === 'parallel' ? 'selected' : ''}>Parallel</option>
+                  <option value="sequential" ${this.signingOrder === 'sequential' ? 'selected' : ''}>Sequential</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -166,6 +192,14 @@ class SignRequestModal {
                   <div class="f-text">
                     <strong>Text Field</strong>
                     <span>Custom text input</span>
+                  </div>
+                </button>
+
+                <button type="button" class="field-btn" data-type="company" style="border-left: 3px solid ${currentRec.color};">
+                  <span class="f-icon">🏢</span>
+                  <div class="f-text">
+                    <strong>Company Entity</strong>
+                    <span>Organization / Title</span>
                   </div>
                 </button>
 
@@ -292,6 +326,14 @@ class SignRequestModal {
       manageRecBtn.onclick = () => this.openRecipientsManagerModal();
     }
 
+    const orderSelect = this.container.querySelector('#sel-signing-order');
+    if (orderSelect) {
+      orderSelect.onchange = (e) => {
+        this.signingOrder = e.target.value;
+        Toast.info(`Signing order set to ${this.signingOrder}.`);
+      };
+    }
+
     const clearBtn = this.container.querySelector('#btn-clear-fields');
     if (clearBtn) {
       clearBtn.onclick = () => {
@@ -348,7 +390,7 @@ class SignRequestModal {
       currentRec.email = `${currentRec.name.toLowerCase().replace(/\s+/g, '')}@example.com`;
     }
 
-    const width = type === 'signature' ? 140 : type === 'checkbox' ? 26 : 110;
+    const width = type === 'signature' ? 140 : type === 'checkbox' ? 26 : type === 'company' ? 130 : 110;
     const height = type === 'signature' ? 48 : type === 'checkbox' ? 26 : 30;
 
     // Place staggered on canvas
@@ -361,6 +403,7 @@ class SignRequestModal {
       initials: 'Initials',
       date: 'Date Signed',
       text: 'Text Input',
+      company: 'Company Entity',
       checkbox: 'Checkbox'
     };
 
@@ -581,13 +624,14 @@ class SignRequestModal {
         title: this.documentName.replace(/\.[^/.]+$/, ''),
         documentName: this.documentName,
         documentBase64,
+        signingOrder: this.signingOrder || 'parallel',
         recipients: this.recipients,
         fields: this.fields,
         senderName: 'LetsEdit User',
         senderEmail: 'user@letsedit.dev'
       };
 
-      const response = await fetch('/api/signatures/request', {
+      const response = await fetch('/api/signature/create-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -115,6 +115,8 @@ export class Sidebar {
         <span class="thumb-num">${seqIdx + 1} <small style="color:#94a3b8;">(orig ${p})</small></span>
         <div class="thumb-actions">
           <button class="thumb-btn rotate-btn" title="Rotate 90°">↻</button>
+          <button class="thumb-btn duplicate-btn" title="Duplicate Page">⧉</button>
+          <button class="thumb-btn insert-btn" title="Insert Blank Page After">+</button>
           <button class="thumb-btn delete-btn" title="Delete Page">🗑</button>
         </div>
       `;
@@ -181,6 +183,22 @@ export class Sidebar {
         store.rotatePage(p, 90);
         Toast.info(`Rotated page ${seqIdx + 1}`);
       };
+
+      const dupBtn = footer.querySelector('.duplicate-btn');
+      if (dupBtn) {
+        dupBtn.onclick = () => {
+          store.duplicatePage(p);
+          Toast.success(`Duplicated page ${seqIdx + 1}`);
+        };
+      }
+
+      const insBtn = footer.querySelector('.insert-btn');
+      if (insBtn) {
+        insBtn.onclick = () => {
+          store.addBlankPage(seqIdx);
+          Toast.success(`Inserted blank page after page ${seqIdx + 1}`);
+        };
+      }
 
       footer.querySelector('.delete-btn').onclick = () => {
         if (activeCount <= 1) {

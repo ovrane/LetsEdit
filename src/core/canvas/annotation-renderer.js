@@ -8,6 +8,7 @@ import { store } from '../state-store.js';
 import { Toast } from '../../components/toast.js';
 import { FloatingBubbleBar } from './bubble-toolbar.js';
 import { ResizeGizmo } from './resize-gizmo.js';
+import { getCssFontFamily } from '../font-registry.js';
 
 export class AnnotationRenderer {
   static renderAnnotations(manager, pageNum) {
@@ -100,8 +101,8 @@ export class AnnotationRenderer {
         ctx.restore();
       }
 
-      // Interactive DOM elements (Text, Images, Signatures, Form Controls, Links)
-      if (['text', 'image', 'signature', 'form', 'whiteout', 'link'].includes(ann.type)) {
+      // Interactive DOM elements (Text, Images, Signatures, Form Controls, Links, Notes)
+      if (['text', 'image', 'signature', 'form', 'whiteout', 'link', 'note'].includes(ann.type)) {
         this.renderDomElement(manager, pageNum, ann, px, py, pw, ph, domLayer);
       }
     }
@@ -182,10 +183,32 @@ export class AnnotationRenderer {
       }
       el.textContent = ann.text;
       el.style.fontSize = `${ann.fontSize || 16}px`;
-      el.style.fontFamily = ann.fontFamily || 'Helvetica';
+      el.style.fontFamily = getCssFontFamily(ann.fontId || ann.fontFamily);
       el.style.color = ann.color || '#000000';
       if (ann.bold) el.style.fontWeight = 'bold';
       if (ann.italic) el.style.fontStyle = 'italic';
+      if (ann.underline && ann.strikethrough) {
+        el.style.textDecoration = 'underline line-through';
+      } else if (ann.underline) {
+        el.style.textDecoration = 'underline';
+      } else if (ann.strikethrough) {
+        el.style.textDecoration = 'line-through';
+      } else {
+        el.style.textDecoration = 'none';
+      }
+      if (ann.align) el.style.textAlign = ann.align;
+      if (ann.opacity !== undefined) el.style.opacity = ann.opacity;
+      if (ann.bgColor && ann.bgColor !== 'transparent') {
+        el.style.backgroundColor = ann.bgColor;
+        el.style.padding = '0 3px';
+        el.style.borderRadius = '2px';
+      }
+
+      // Double-click to edit existing text annotation in place
+      el.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        manager.makeExistingAnnotationEditable(pageNum, ann, el);
+      });
     } else if (ann.type === 'link') {
       el.classList.add('annot-link-hotspot');
       const badge = document.createElement('div');
@@ -247,6 +270,84 @@ export class AnnotationRenderer {
         inp.oninput = (e) => store.updateAnnotation(pageNum, ann.id, { value: e.target.value });
         el.appendChild(inp);
       }
+    } else if (ann.type === 'note') {
+      el.classList.add('annot-note-container');
+      const noteColor = ann.color || '#f59e0b';
+
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'note-pin-badge';
+      iconWrap.style.backgroundColor = noteColor;
+      iconWrap.title = ann.text ? (ann.text.length > 50 ? ann.text.slice(0, 47) + '...' : ann.text) : 'Sticky Note';
+      iconWrap.innerHTML = `<svg width="15" height="15" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+
+      const card = document.createElement('div');
+      card.className = `note-floating-card ${ann.isOpen ? 'open' : ''}`;
+
+      const cardHeader = document.createElement('div');
+      cardHeader.className = 'note-card-header';
+      cardHeader.style.borderLeftColor = noteColor;
+      cardHeader.innerHTML = `
+        <div class="note-author-info">
+          <span class="note-author-name">${ann.author || 'User'}</span>
+          <span class="note-timestamp">${ann.date || ''}</span>
+        </div>
+        <div class="note-header-actions">
+          <button class="note-card-close-btn" title="Minimize">&minus;</button>
+        </div>
+      `;
+
+      const cardCloseBtn = cardHeader.querySelector('.note-card-close-btn');
+      cardCloseBtn.onclick = (e) => {
+        e.stopPropagation();
+        ann.isOpen = false;
+        card.classList.remove('open');
+        store.updateAnnotation(pageNum, ann.id, { isOpen: false });
+      };
+
+      const textarea = document.createElement('textarea');
+      textarea.className = 'note-textarea';
+      textarea.value = ann.text || '';
+      textarea.placeholder = 'Write a comment...';
+      textarea.oninput = (e) => {
+        ann.text = e.target.value;
+        store.updateAnnotation(pageNum, ann.id, { text: e.target.value });
+      };
+
+      const palette = document.createElement('div');
+      palette.className = 'note-palette';
+      const colors = ['#f59e0b', '#0ea5e9', '#10b981', '#f43f5e', '#8b5cf6'];
+      colors.forEach(col => {
+        const dot = document.createElement('button');
+        dot.className = `note-palette-dot ${col === noteColor ? 'active' : ''}`;
+        dot.style.backgroundColor = col;
+        dot.title = 'Change color';
+        dot.onclick = (e) => {
+          e.stopPropagation();
+          store.updateAnnotation(pageNum, ann.id, { color: col });
+        };
+        palette.appendChild(dot);
+      });
+
+      card.appendChild(cardHeader);
+      card.appendChild(textarea);
+      card.appendChild(palette);
+
+      iconWrap.onclick = (e) => {
+        e.stopPropagation();
+        const nextOpen = !card.classList.contains('open');
+        card.classList.toggle('open', nextOpen);
+        store.updateAnnotation(pageNum, ann.id, { isOpen: nextOpen });
+        if (nextOpen) {
+          setTimeout(() => textarea.focus(), 50);
+        }
+      };
+
+      el.appendChild(iconWrap);
+      el.appendChild(card);
+
+      if (ann.isOpen) {
+        setTimeout(() => textarea.focus(), 100);
+      }
     }
 
     // Controls: Delete & drag handles
@@ -265,7 +366,9 @@ export class AnnotationRenderer {
       manager.selectAnnotation(pageNum, ann, el);
     });
 
-    ResizeGizmo.attachResizeHandles(el, pageNum, ann, manager.pageElements, (p, a, e) => manager.selectAnnotation(p, a, e));
+    if (ann.type !== 'note') {
+      ResizeGizmo.attachResizeHandles(el, pageNum, ann, manager.pageElements, (p, a, e) => manager.selectAnnotation(p, a, e));
+    }
     ResizeGizmo.makeDraggable(el, pageNum, ann, manager.pageElements, (p, a, e) => manager.selectAnnotation(p, a, e));
     container.appendChild(el);
   }

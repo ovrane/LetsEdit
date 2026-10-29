@@ -25,12 +25,29 @@ import { BatesOps } from './operations/bates-ops.js';
 import { PageNumbersOps } from './operations/pagenumbers-ops.js';
 import { FlattenOps } from './operations/flatten-ops.js';
 import { RedactOps } from './operations/redact-ops.js';
+import { GrayscaleOps } from './operations/grayscale-ops.js';
+import { DeskewOps } from './operations/deskew-ops.js';
+import { PdfToImageOps } from './operations/pdf-to-image-ops.js';
+import { ImageToPdfOps } from './operations/image-to-pdf-ops.js';
+import { WordToPdfOps } from './operations/word-to-pdf-ops.js';
+import { PdfToWordOps } from './operations/pdf-to-word-ops.js';
+import { ExcelToPdfOps } from './operations/excel-to-pdf-ops.js';
+import { PdfToExcelOps } from './operations/pdf-to-excel-ops.js';
+import { PptxToPdfOps } from './operations/pptx-to-pdf-ops.js';
+import { PdfToPptxOps } from './operations/pdf-to-pptx-ops.js';
+import { HtmlToPdfOps } from './operations/html-to-pdf-ops.js';
+import { ExtractImagesOps } from './operations/extract-images-ops.js';
+import { InkScannerOps } from './operations/ink-scanner-ops.js';
 
-export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps };
+const MultiSignerOps = MultiSignOps;
+
+export { MergeOps, SplitOps, GeometryOps, ConvertOps, StampOps, MultiSignOps, MultiSignerOps, FormOps, RepairOps, MetadataOps, PageLabelsOps, SanitizeOps, OutlineOps, HeaderFooterOps, NupOps, ResizeOps, WatermarkOps, BatesOps, PageNumbersOps, FlattenOps, RedactOps, GrayscaleOps, DeskewOps, PdfToImageOps, ImageToPdfOps, WordToPdfOps, PdfToWordOps, ExcelToPdfOps, PdfToExcelOps, PptxToPdfOps, PdfToPptxOps, HtmlToPdfOps, ExtractImagesOps, InkScannerOps };
 
 export class PageOperations {
   // Merge & Organize
   static appendBlankPage(...args) { return MergeOps.appendBlankPage(...args); }
+  static insertBlankPage(...args) { return MergeOps.insertBlankPage(...args); }
+  static duplicatePage(...args) { return MergeOps.duplicatePage(...args); }
   static mergeExternalPdf(...args) { return MergeOps.mergeExternalPdf(...args); }
   static mergePdf(...args) { return MergeOps.mergePdf(...args); }
   static mergePdfAdvanced(...args) { return MergeOps.mergePdfAdvanced(...args); }
@@ -48,17 +65,120 @@ export class PageOperations {
   // Geometry & Imposition
   static nUpPdf(...args) { return GeometryOps.nUpPdf(...args); }
   static flipPages(...args) { return GeometryOps.flipPages(...args); }
-  static deskewPdf(...args) { return GeometryOps.deskewPdf(...args); }
+  static async deskewPdf(rawBytes, options = 0) {
+    const res = await DeskewOps.deskewPdf(rawBytes, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
   static detectDeskewAngle(...args) { return GeometryOps.detectDeskewAngle(...args); }
+  static detectSkewAngleFromPixels(...args) { return DeskewOps.detectSkewAngleFromPixels(...args); }
+  static createSampleSkewedPdf(...args) { return DeskewOps.createSampleSkewedPdf(...args); }
   static cropPdf(...args) { return GeometryOps.cropPdf(...args); }
   static detectWhitespaceCrop(...args) { return GeometryOps.detectWhitespaceCrop(...args); }
 
   // Document Format Converters
-  static imagesToPdf(...args) { return ConvertOps.imagesToPdf(...args); }
-  static htmlToPdf(...args) { return ConvertOps.htmlToPdf(...args); }
-  static wordToPdf(...args) { return ConvertOps.wordToPdf(...args); }
-  static excelToPdf(...args) { return ConvertOps.excelToPdf(...args); }
-  static pptToPdf(...args) { return ConvertOps.pptToPdf(...args); }
+  static async imagesToPdf(imagesList, options = {}) {
+    const res = await ImageToPdfOps.imagesToPdf(imagesList, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleImageBatch(...args) { return ImageToPdfOps.createSampleImageBatch(...args); }
+  static async htmlToPdf(htmlString, options = {}) {
+    const res = await HtmlToPdfOps.convertHtmlToPdf(htmlString, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static async markdownToPdf(markdownString, options = {}) {
+    const res = await HtmlToPdfOps.convertMarkdownToPdf(markdownString, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleHtmlString() { return HtmlToPdfOps.createSampleHtmlString(); }
+  static createSampleMarkdownString() { return HtmlToPdfOps.createSampleMarkdownString(); }
+  static async extractImages(rawBytes, options = {}) {
+    const res = await ExtractImagesOps.extractImages(rawBytes, options);
+    if (res && res.zipBytes) {
+      res.zipBytes.report = res.report;
+      res.zipBytes.images = res.images;
+      res.zipBytes.manifest = res.manifest;
+      return typeof options === 'object' && options.withReport ? res : res.zipBytes;
+    }
+    return res;
+  }
+  static analyzeImages(rawBytes) { return ExtractImagesOps.analyzeImages(rawBytes); }
+  static createSampleMultiImagePdf() { return ExtractImagesOps.createSampleMultiImagePdf(); }
+  static async wordToPdf(docxBytes, options = {}) {
+    const res = await WordToPdfOps.wordToPdf(docxBytes, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleDocxFile(...args) { return WordToPdfOps.createSampleDocxFile(...args); }
+  static async pdfToWord(pdfBytes, options = {}) {
+    const res = await PdfToWordOps.pdfToWord(pdfBytes, options);
+    if (res && res.docxBytes) {
+      res.docxBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.docxBytes;
+    }
+    return res;
+  }
+  static createSampleStructuredPdf(...args) { return PdfToWordOps.createSampleStructuredPdf(...args); }
+  static async excelToPdf(fileInput, options = {}) {
+    const res = await ExcelToPdfOps.excelToPdf(fileInput, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static createSampleXlsxFile(...args) { return ExcelToPdfOps.createSampleXlsxFile(...args); }
+  static async pdfToExcel(pdfBytes, options = {}) {
+    const res = await PdfToExcelOps.pdfToExcel(pdfBytes, options);
+    if (res && res.fileBytes) {
+      res.fileBytes.report = res.report;
+      res.fileBytes.csvText = res.csvText;
+      return typeof options === 'object' && options.withReport ? res : res.fileBytes;
+    }
+    return res;
+  }
+  static createSampleFinancialTablePdf(...args) { return PdfToExcelOps.createSampleFinancialTablePdf(...args); }
+  static async pptToPdf(pptxBytes, options = {}) {
+    const res = await PptxToPdfOps.pptToPdf(pptxBytes, options);
+    if (res && res.pdfBytes) {
+      res.pdfBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pdfBytes;
+    }
+    return res;
+  }
+  static pptxToPdf(...args) { return this.pptToPdf(...args); }
+  static createSamplePptxFile(...args) { return PptxToPdfOps.createSamplePptxFile(...args); }
+  static async pdfToPpt(pdfBytes, options = {}) {
+    const res = await PdfToPptxOps.pdfToPptx(pdfBytes, options);
+    if (res && res.pptxBytes) {
+      res.pptxBytes.report = res.report;
+      return typeof options === 'object' && options.withReport ? res : res.pptxBytes;
+    }
+    return res;
+  }
+  static pdfToPptx(...args) { return this.pdfToPpt(...args); }
+  static createSamplePresentationPdf(...args) { return PdfToPptxOps.createSamplePresentationPdf(...args); }
+  static renderPageToImage(...args) { return PdfToImageOps.renderPageToImage(...args); }
+  static renderPagesToZip(...args) { return PdfToImageOps.renderPagesToZip(...args); }
+  static createSampleRasterPdf(...args) { return PdfToImageOps.createSampleRasterPdf(...args); }
 
   // Stamping & Numbering
   static batesNumberPdf(...args) { return BatesOps.applyBatesNumbering(...args); }
@@ -73,6 +193,19 @@ export class PageOperations {
   // Multi-Signer & Field Placement
   static burnSignatureFields(...args) { return MultiSignOps.burnSignatureFields(...args); }
   static compileCompletedDocument(...args) { return MultiSignOps.compileCompletedDocument(...args); }
+  static createSampleSignContract(...args) { return MultiSignOps.createSampleSignContract(...args); }
+  static createSampleSignContractPackage(...args) { return MultiSignOps.createSampleSignContractPackage(...args); }
+  static validateFieldValue(...args) { return MultiSignOps.validateFieldValue(...args); }
+  static validateFieldValues(...args) { return MultiSignOps.validateFieldValues(...args); }
+  static canRecipientSign(...args) { return MultiSignOps.canRecipientSign(...args); }
+  static generateCryptographicToken(...args) { return MultiSignOps.generateCryptographicToken(...args); }
+
+  // Hardware & Camera Ink Scanner Suite
+  static processInkImage(...args) { return InkScannerOps.processInkImage(...args); }
+  static extractTransparentInk(...args) { return InkScannerOps.extractTransparentInk(...args); }
+  static computeOtsuThreshold(...args) { return InkScannerOps.computeOtsuThreshold(...args); }
+  static normalizeIllumination(...args) { return InkScannerOps.normalizeIllumination(...args); }
+  static createSampleInkCapture(...args) { return InkScannerOps.createSampleInkCapture(...args); }
 
   // Form Filler & Form Data Export/Import
   static inspectFormFields(...args) { return FormOps.inspectFormFields(...args); }
@@ -149,5 +282,9 @@ export class PageOperations {
   static applyRedaction(...args) { return RedactOps.applyRedaction(...args); }
   static searchSensitiveData(...args) { return RedactOps.searchSensitiveData(...args); }
   static createSampleRedactPdf(...args) { return RedactOps.createSampleRedactPdf(...args); }
+
+  // Adobe Acrobat Pro & iLovePDF DeviceGray Grayscale Toner Saver Engine
+  static convertToGrayscale(...args) { return GrayscaleOps.convertToGrayscale(...args); }
+  static createSampleGrayscalePdf(...args) { return GrayscaleOps.createSampleGrayscalePdf(...args); }
 }
 

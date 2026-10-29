@@ -2,8 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Studio Editor Empty State & Document Uploader', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/edit_pdf');
-    await page.waitForLoadState('domcontentloaded');
+    await page.goto('/edit_pdf', { waitUntil: 'domcontentloaded' });
   });
 
   test('studio upload card renders with clean Adobe Acrobat style and no test buttons', async ({ page }) => {

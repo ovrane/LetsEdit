@@ -70,6 +70,26 @@ describe('StateStore Engine Tests', () => {
     assert.deepStrictEqual(s.annotations[3], []);
   });
 
+  test('duplicatePage clones page, annotations, and supports undo', () => {
+    store.setDocument(new ArrayBuffer(8), 'test.pdf', 2);
+    store.addAnnotation(1, { id: 'orig-ann', type: 'text', text: 'Important Note' });
+    store.rotatePage(1, 90);
+
+    const dupPageNum = store.duplicatePage(1);
+    const s = store.getState();
+    assert.strictEqual(s.pageCount, 3);
+    assert.deepStrictEqual(s.pageOrder, [1, 3, 2]);
+    assert.strictEqual(s.pageRotations[3], 90);
+    assert.strictEqual(s.annotations[3].length, 1);
+    assert.strictEqual(s.annotations[3][0].text, 'Important Note');
+    assert.notStrictEqual(s.annotations[3][0].id, 'orig-ann');
+
+    // Test undo reverts duplication
+    store.undo();
+    assert.deepStrictEqual(store.getState().pageOrder, [1, 2]);
+    assert.strictEqual(store.getState().pageCount, 2);
+  });
+
   test('annotation add, update, and remove with undo/redo', () => {
     store.setDocument(new ArrayBuffer(8), 'doc.pdf', 2);
 

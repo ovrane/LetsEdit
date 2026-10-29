@@ -17,6 +17,8 @@ import { AnnotationRenderer } from './canvas/annotation-renderer.js';
 import { CanvasEventsHandler } from './canvas/canvas-events.js';
 import { TextClustering } from './canvas/text-clustering.js';
 import { FloatingBubbleBar } from './canvas/bubble-toolbar.js';
+import { loadAllEditorFonts, getCssFontFamily } from './font-registry.js';
+import { Toast } from '../components/toast.js';
 
 export class CanvasManager {
   constructor(container) {
@@ -31,6 +33,9 @@ export class CanvasManager {
     this.renderedPages = new Set();
     this.pageObserver = null;
     this.currentPageNumber = 1;
+
+    // Load all 150+ Google Fonts into document head for pixel-perfect editing fidelity
+    loadAllEditorFonts();
 
     this.bindGlobalEvents();
   }
@@ -154,11 +159,98 @@ export class CanvasManager {
     badge.className = 'page-number-badge';
     badge.innerText = `Page ${pageNum}`;
 
+    // Floating Quick Page Action Bar (Adobe Acrobat / Smallpdf reverse engineered)
+    const quickBar = document.createElement('div');
+    quickBar.className = 'page-quick-actions';
+    quickBar.innerHTML = `
+      <button type="button" class="quick-page-btn" data-action="rotate-cw" title="Rotate Clockwise 90°" aria-label="Rotate Clockwise 90°">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M23 4v6h-6"></path>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+      </button>
+      <button type="button" class="quick-page-btn" data-action="rotate-ccw" title="Rotate Counterclockwise 90°" aria-label="Rotate Counterclockwise 90°">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M1 4v6h6"></path>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+      </button>
+      <button type="button" class="quick-page-btn" data-action="duplicate" title="Duplicate Page" aria-label="Duplicate Page">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      </button>
+      <button type="button" class="quick-page-btn" data-action="add-blank" title="Insert Blank Page After" aria-label="Insert Blank Page After">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+      </button>
+      <button type="button" class="quick-page-btn quick-page-delete" data-action="delete" title="Delete Page" aria-label="Delete Page">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+    `;
+
+    quickBar.querySelectorAll('.quick-page-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const action = btn.dataset.action;
+        if (action === 'rotate-cw') {
+          store.rotatePage(pageNum, 90);
+          Toast.show(`Page ${pageNum} rotated 90° clockwise`, 'info');
+        } else if (action === 'rotate-ccw') {
+          store.rotatePage(pageNum, 270);
+          Toast.show(`Page ${pageNum} rotated 90° counterclockwise`, 'info');
+        } else if (action === 'duplicate') {
+          try {
+            btn.disabled = true;
+            Toast.show(`Duplicating page ${pageNum}...`, 'info');
+            await pdfEngine.duplicatePage(pageNum - 1);
+            store.duplicatePage(pageNum);
+            Toast.show(`Page ${pageNum} duplicated!`, 'success');
+          } catch (err) {
+            console.error(err);
+            Toast.show('Failed to duplicate page: ' + err.message, 'error');
+          } finally {
+            btn.disabled = false;
+          }
+        } else if (action === 'add-blank') {
+          try {
+            btn.disabled = true;
+            Toast.show(`Inserting blank page after page ${pageNum}...`, 'info');
+            await pdfEngine.insertBlankPage(pageNum - 1);
+            store.addBlankPage(pageNum - 1);
+            Toast.show(`Blank page inserted after page ${pageNum}!`, 'success');
+          } catch (err) {
+            console.error(err);
+            Toast.show('Failed to insert blank page: ' + err.message, 'error');
+          } finally {
+            btn.disabled = false;
+          }
+        } else if (action === 'delete') {
+          const activeCount = store.getState().pageOrder.filter(p => !store.getState().deletedPages.has(p)).length;
+          if (activeCount <= 1) {
+            Toast.show('Cannot delete the only page in the document', 'warning');
+            return;
+          }
+          store.deletePage(pageNum);
+          Toast.show(`Page ${pageNum} deleted`, 'info');
+        }
+      });
+    });
+
     wrap.appendChild(canvas);
     wrap.appendChild(textLayer);
     wrap.appendChild(annotCanvas);
     wrap.appendChild(domLayer);
     wrap.appendChild(badge);
+    wrap.appendChild(quickBar);
 
     this.pageElements.set(pageNum, { wrap, canvas, textLayer, annotCanvas, domLayer });
     this.bindPageEvents(pageNum, wrap, annotCanvas, domLayer);
@@ -226,12 +318,15 @@ export class CanvasManager {
       span.style.width = `${cluster.width}px`;
       span.style.height = `${cluster.height}px`;
       span.style.fontSize = `${cluster.fontSize}px`;
-      span.style.fontFamily = TextClustering.getCssFontFamily(cluster.fontName);
+      // Use FontRegistry for accurate CSS font matching
+      const clusterFontId = cluster.fontId || TextClustering.detectFontFamily(cluster.fontName);
+      span.style.fontFamily = getCssFontFamily(clusterFontId);
       if (cluster.isBold) span.style.fontWeight = 'bold';
 
       span.dataset.clusterId = cluster.id;
       span.dataset.originalText = cluster.str;
       span.dataset.fontName = cluster.fontName;
+      span.dataset.fontId = clusterFontId;
 
       // Hide if there is already an active annotation replacing this cluster
       if (activeReplacedIds.has(cluster.id)) {
@@ -313,6 +408,10 @@ export class CanvasManager {
     CanvasEventsHandler.makeExistingTextEditable(this, span, pageNum, cluster);
   }
 
+  makeExistingAnnotationEditable(pageNum, ann, el) {
+    CanvasEventsHandler.makeExistingAnnotationEditable(this, pageNum, ann, el);
+  }
+
   renderAnnotations(pageNum) {
     AnnotationRenderer.renderAnnotations(this, pageNum);
   }
@@ -366,7 +465,7 @@ export class CanvasManager {
 
   bindGlobalEvents() {
     store.subscribe((event, state, payload) => {
-      if (event === 'document-loaded' || event === 'scale-changed' || event === 'pages-reordered' || event === 'page-added') {
+      if (event === 'document-loaded' || event === 'scale-changed' || event === 'pages-reordered' || event === 'page-added' || event === 'page-duplicated') {
         this.renderDocument();
       } else if (event === 'annotation-added' || event === 'annotation-updated' || event === 'annotation-removed') {
         if (payload?.pageNum) {

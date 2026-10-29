@@ -19,6 +19,33 @@ export class MergeOps {
   }
 
   /**
+   * Inserts a blank page after the specified 0-indexed page index into rawBytes.
+   */
+  static async insertBlankPage(rawBytes, afterPageIndex = null, width = 595.28, height = 841.89) {
+    if (!rawBytes) throw new Error('No PDF loaded');
+    const doc = await PDFDocument.load(rawBytes);
+    const numPages = doc.getPageCount();
+    const insertIdx = (afterPageIndex === null || afterPageIndex >= numPages - 1)
+      ? numPages
+      : Math.max(0, afterPageIndex + 1);
+    doc.insertPage(insertIdx, [width, height]);
+    return await doc.save();
+  }
+
+  /**
+   * Duplicates a page at the specified 0-indexed page index in rawBytes.
+   */
+  static async duplicatePage(rawBytes, pageIndex) {
+    if (!rawBytes) throw new Error('No PDF loaded');
+    const doc = await PDFDocument.load(rawBytes);
+    const numPages = doc.getPageCount();
+    const idx = Math.max(0, Math.min(numPages - 1, pageIndex));
+    const [copiedPage] = await doc.copyPages(doc, [idx]);
+    doc.insertPage(idx + 1, copiedPage);
+    return await doc.save();
+  }
+
+  /**
    * Merges an external PDF into rawBytes.
    */
   static async mergeExternalPdf(rawBytes, externalBytes) {

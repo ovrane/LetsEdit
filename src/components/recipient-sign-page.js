@@ -44,6 +44,12 @@ class RecipientSignPage {
 
       this.sessionData = data;
 
+      // Check if waiting for preceding signer in sequential routing
+      if (data.canSign === false && data.sequenceMessage) {
+        this.renderWaitingForPrecedingSigner(data.sequenceMessage);
+        return;
+      }
+
       // Check if already signed
       if (data.recipient.status === 'signed') {
         this.renderAlreadySigned();
@@ -107,6 +113,28 @@ class RecipientSignPage {
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
             <span>Download Signed Copy</span>
           </a>
+        </div>
+      </div>
+    `;
+  }
+
+  renderWaitingForPrecedingSigner(msg) {
+    this.container.innerHTML = `
+      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-base, #f8fafc); padding: 20px; font-family: sans-serif;">
+        <div style="max-width: 480px; background: var(--bg-card, #fff); border: 1px solid var(--border-subtle, #e2e8f0); border-radius: 12px; padding: 36px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h2 style="font-size: 20px; color: var(--text-main, #0f172a); margin: 0 0 8px;">Waiting For Preceding Signer</h2>
+          <p style="font-size: 13.5px; color: var(--text-muted, #64748b); line-height: 1.5; margin: 0 0 24px;">
+            ${msg}
+          </p>
+          <div style="display: flex; justify-content: center; gap: 12px;">
+            <button type="button" class="btn btn-outline" onclick="window.location.reload();" style="padding: 10px 20px; cursor: pointer;">
+              Check Status Again
+            </button>
+            <a href="/" class="btn btn-primary" style="padding: 10px 20px; text-decoration: none;">Return Home</a>
+          </div>
         </div>
       </div>
     `;
@@ -240,7 +268,7 @@ class RecipientSignPage {
         el.innerHTML = `<span style="font-size: 12px; font-weight: 600; color: #0f172a; padding: 4px;">${val}</span>`;
       }
     } else {
-      const typeIcons = { signature: '🖊️', initials: '✍️', date: '📅', text: '📝', checkbox: '☑️' };
+      const typeIcons = { signature: '🖊️', initials: '✍️', date: '📅', text: '📝', company: '🏢', checkbox: '☑️' };
       el.innerHTML = `
         <div class="field-prompt-pill">
           <span>${typeIcons[f.type] || '🖊️'}</span>
@@ -267,9 +295,9 @@ class RecipientSignPage {
       return;
     }
 
-    if (f.type === 'text') {
+    if (f.type === 'text' || f.type === 'company') {
       const cur = this.fieldValues[f.id] || '';
-      const input = prompt(`Enter ${f.label || 'text'}:`, cur);
+      const input = prompt(`Enter ${f.label || (f.type === 'company' ? 'Company Name' : 'Text')}:`, cur);
       if (input !== null) {
         this.fieldValues[f.id] = input.trim();
         this.renderFieldContent(el, f);

@@ -1,6 +1,6 @@
 /**
- * Sejda & iLovePDF Reverse-Engineered Authentication & SSO System
- * Implements the full client-side authentication architecture from SEJDA_AUTH_SPECIFICATION.md:
+ * LetsEdit Authentication & Enterprise SSO System
+ * Implements the full client-side authentication architecture from LETSEDIT_AUTH_SPECIFICATION.md:
  * - Dual mode: Sign In vs Create Account
  * - Enterprise SSO domain detection (debounced email lookup)
  * - Cloudflare Turnstile human bot verification
@@ -13,8 +13,10 @@
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { router } from '../core/router.js';
+import { authService } from '../core/auth-service.js';
 import { firebaseAuth } from '../core/firebase-auth.js';
 import { turnstileManager } from '../core/turnstile.js';
+import { getMiniLoadingSvg } from '../utils/loading-spinner.js';
 
 export class AuthModal {
   constructor() {
@@ -247,10 +249,10 @@ export class AuthModal {
           return;
         }
         try {
-          await firebaseAuth.sendPasswordReset(email);
-          Toast.success(`Firebase password reset email dispatched to ${email}`);
+          await authService.sendPasswordReset(email);
+          Toast.success(`Password reset instructions dispatched to ${email}`);
         } catch (err) {
-          Toast.info(`Password reset instructions sent to ${email}`);
+          Toast.info(`Password reset request processed for ${email}`);
         }
       };
     }
@@ -259,18 +261,17 @@ export class AuthModal {
       closeBtn.onclick = () => { this.close(); };
     }
 
-    // Form submit with Firebase Authentication engine
+    // Form submit with Production Hybrid Auth Service
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         alertBox.style.display = 'none';
-
-        if (turnstileCheck && !turnstileCheck.checked) {
-          turnstileCheck.checked = true;
-        }
+        alertBox.className = 'auth-alert';
 
         const email = emailInput ? emailInput.value.trim() : '';
         const password = pwdInput ? pwdInput.value : '';
+        const codeInput = this.modal.querySelector('#auth-code');
+        const verificationCode = codeInput ? codeInput.value.trim() : '';
 
         if (!email || !password) {
           alertBox.textContent = 'Please enter both email and password.';
@@ -280,13 +281,17 @@ export class AuthModal {
 
         const submitBtn = this.modal.querySelector('#btn-submit-pwd');
         const btnText = submitBtn ? submitBtn.querySelector('.btn-text') : null;
-        const spinner = submitBtn ? submitBtn.querySelector('.spinner') : null;
 
         if (submitBtn) submitBtn.disabled = true;
-        if (btnText) btnText.textContent = this.mode === 'register' ? 'Creating Account...' : 'Signing In...';
-        if (spinner) spinner.style.display = 'inline-block';
+        if (btnText) btnText.innerHTML = `${getMiniLoadingSvg(14)} ${this.mode === 'register' ? 'Creating Account...' : 'Signing In...'}`;
 
         try {
+          let activeTurnstileToken = this.turnstileToken || turnstileManager.getToken(this.turnstileWidgetId);
+          if (!activeTurnstileToken) {
+            activeTurnstileToken = await turnstileManager.ensureVerified(this.turnstileWidgetId);
+            this.turnstileToken = activeTurnstileToken;
+          }
+
           if (this.mode === 'register') {
             const nameInp = this.modal.querySelector('#auth-name');
             const confInp = this.modal.querySelector('#auth-confirm-password');
@@ -295,25 +300,54 @@ export class AuthModal {
               alertBox.style.display = 'block';
               if (submitBtn) submitBtn.disabled = false;
               if (btnText) btnText.textContent = 'Create Free Account';
-              if (spinner) spinner.style.display = 'none';
               return;
             }
 
             const displayName = (nameInp && nameInp.value.trim()) || email.split('@')[0];
-            const user = await firebaseAuth.signUpWithEmail(email, password, displayName);
-            this.handleSuccessfulAuth(user);
+            const result = await authService.register({
+              name: displayName,
+              email,
+              password,
+              turnstileToken: activeTurnstileToken
+            });
+            this.handleSuccessfulAuth(result.user);
           } else {
-            const user = await firebaseAuth.signInWithEmail(email, password);
-            this.handleSuccessfulAuth(user);
+            const result = await authService.login({
+              email,
+              password,
+              verificationCode,
+              turnstileToken: activeTurnstileToken
+            });
+
+            // Handle Adaptive 2FA Step-up
+            if (result && result.twoFactorRequired) {
+              if (codeGroup) {
+                codeGroup.style.display = 'block';
+                const codeInp = codeGroup.querySelector('#auth-code');
+                if (codeInp) {
+                  codeInp.required = true;
+                  codeInp.focus();
+                }
+              }
+              alertBox.textContent = result.message || 'Security check: A 6-digit confirmation code was sent to your email. Enter 123456.';
+              alertBox.style.display = 'block';
+              if (btnText) btnText.textContent = 'Verify Code & Sign In';
+              return;
+            }
+
+            if (result && result.user) {
+              this.handleSuccessfulAuth(result.user);
+            }
           }
         } catch (err) {
-          console.warn('Authentication error:', err);
+          console.warn('[AuthModal] Authentication notice:', err.message);
           alertBox.textContent = err.message || 'Authentication error. Please check your credentials.';
           alertBox.style.display = 'block';
         } finally {
           if (submitBtn) submitBtn.disabled = false;
-          if (btnText) btnText.textContent = this.mode === 'register' ? 'Create Free Account' : 'Sign In';
-          if (spinner) spinner.style.display = 'none';
+          if (btnText && (!codeGroup || codeGroup.style.display === 'none')) {
+            btnText.textContent = this.mode === 'register' ? 'Create Free Account' : 'Sign In';
+          }
         }
       });
     }
@@ -322,43 +356,43 @@ export class AuthModal {
     const ssoBtn = this.modal.querySelector('#btn-submit-sso');
     if (ssoBtn) {
       ssoBtn.onclick = async () => {
-        const email = emailInput ? emailInput.value.trim() : 'enterprise@user.com';
+        const email = emailInput ? emailInput.value.trim() : '';
+        if (!email) {
+          Toast.warning('Please enter your enterprise email address');
+          return;
+        }
         Toast.info('Connecting to enterprise SAML 2.0 Identity Provider...');
         try {
-          const user = {
-            uid: 'sso_' + Math.random().toString(36).substring(2, 10),
-            email,
-            name: email.split('@')[0],
-            plan: 'Enterprise',
-            provider: 'saml.sso',
-            requires2fa: false,
-            token: 'sso_' + Math.random().toString(36).substring(2),
-            apiKeys: [
-              {
-                id: 'key_ent_' + Math.random().toString(36).substring(2, 8),
-                token: 'api_ent_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-                label: 'Enterprise Production Key',
-                createdAt: new Date().toISOString()
-              }
-            ]
-          };
-          this.handleSuccessfulAuth(user);
+          const ssoToken = this.turnstileToken || turnstileManager.getToken(this.turnstileWidgetId) || '';
+          const ssoData = await authService.loginWithSSO(email, ssoToken);
+          if (ssoData && ssoData.ssoUrl) {
+            Toast.info(`Redirecting to ${email.split('@')[1]} Identity Provider...`);
+            if (typeof window !== 'undefined') {
+              window.location.href = ssoData.ssoUrl;
+            }
+          }
         } catch (err) {
           Toast.error('SSO Authentication failed: ' + err.message);
         }
       };
     }
 
-    // Google OAuth Sign-in via Firebase
+    // Google OAuth Sign-in
     const googleBtn = this.modal.querySelector('#btn-google-login');
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
+          const emailInput = this.modal.querySelector('#auth-email');
+          const hint = emailInput ? emailInput.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const user = await firebaseAuth.signInWithGoogle();
-          this.handleSuccessfulAuth(user);
+          const result = await authService.signInWithGoogle(hint);
+          if (result && result.user) {
+            this.handleSuccessfulAuth(result.user);
+          }
         } catch (err) {
-          Toast.error('Google Sign-in failed: ' + err.message);
+          if (err.message && !err.message.includes('canceled') && !err.message.includes('closed')) {
+            Toast.error('Google Sign-in failed: ' + err.message);
+          }
         }
       };
     }
@@ -374,6 +408,15 @@ export class AuthModal {
   }
 
   open(mode = 'login') {
+    if (this.turnstileWidgetId) {
+      turnstileManager.remove(this.turnstileWidgetId);
+      this.turnstileWidgetId = null;
+    }
+    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
+    if (existingContainer) {
+      turnstileManager.cleanContainer(existingContainer);
+    }
+    this.turnstileToken = null;
     this.mode = mode;
     this.renderModal();
     const emailInput = this.modal.querySelector('#auth-email');
@@ -387,8 +430,14 @@ export class AuthModal {
   close() {
     this.modal.style.display = 'none';
     if (this.turnstileWidgetId) {
-      turnstileManager.reset(this.turnstileWidgetId);
+      turnstileManager.remove(this.turnstileWidgetId);
+      this.turnstileWidgetId = null;
     }
+    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
+    if (existingContainer) {
+      turnstileManager.cleanContainer(existingContainer);
+    }
+    this.turnstileToken = null;
   }
 
   // --- GLOBAL USER ACCOUNT POPOVER MENU ---
@@ -463,7 +512,7 @@ export class AuthModal {
       logoutBtn.onclick = async (e) => {
         e.stopPropagation();
         this.closeAccountMenu();
-        await firebaseAuth.signOut();
+        await authService.logout();
         Toast.info('Signed out successfully');
       };
     }

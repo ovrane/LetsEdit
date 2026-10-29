@@ -1,7 +1,6 @@
 /**
  * Account & Developer API Management Hub
- * Implements the full-page /account and /login views as specified in SEJDA_AUTH_SPECIFICATION.md
- * and iLovePDF account management architectures.
+ * Implements the full-page /account and /login views as specified in LETSEDIT_AUTH_SPECIFICATION.md
  * Decomposed into modular sub-modules in ./account/:
  * - full-auth.js: Full-page authentication, SSO, Turnstile, and OAuth
  * - account-tabs.js: Profile, telemetry, Pro plan, API tokens, and 2FA
@@ -11,6 +10,7 @@ import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { router } from '../core/router.js';
 import { toggleTheme, getPreferredTheme } from '../utils/theme.js';
+import { authService } from '../core/auth-service.js';
 import { firebaseAuth } from '../core/firebase-auth.js';
 import { FullPageAuth } from './account/full-auth.js';
 import { AccountTabsRenderer } from './account/account-tabs.js';
@@ -211,7 +211,7 @@ export class AccountPage {
     const logoutBtn = this.container.querySelector('#btn-account-logout');
     if (logoutBtn) {
       logoutBtn.onclick = async () => {
-        await firebaseAuth.signOut();
+        await authService.logout();
         Toast.info('Signed out of LetsEdit');
         this.showLogin({ updateUrl: true });
       };

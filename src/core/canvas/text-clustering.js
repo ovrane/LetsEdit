@@ -1,20 +1,25 @@
 /**
  * Text Clustering Sub-Module
- * Reverse-engineered text reconstruction algorithm based on Sejda PDF & PDF.js text layer.
  * Groups fragmented glyphs and word segments emitted by PDF.js getTextContent()
  * into coherent, selectable, editable lines and phrases.
+ *
+ * Font detection delegates to FontRegistry for 150+ font support and
+ * pixel-perfect visual matching between the PDF viewer and the inline editor.
  */
 
 import { uid } from '../../utils/helpers.js';
+import { detectFontIdFromPdf, getCssFontFamily } from '../font-registry.js';
 
 export class TextClustering {
   /**
    * Identifies the canonical PDF standard font name from raw PDF font descriptor.
+   * @param {string} fontName - Raw PDF font name
+   * @returns {string} Standard PDF font name ('Helvetica', 'HelveticaBold', 'TimesRoman', 'Courier')
    */
   static detectFontFamily(fontName) {
     if (!fontName) return 'Helvetica';
     const name = String(fontName).toLowerCase();
-    const isBold = name.includes('bold') || name.includes('black') || name.includes('heavy') || name.includes('w7') || name.includes('w8');
+    const isBold = name.includes('bold') || name.includes('black') || name.includes('heavy') || name.includes('w7') || name.includes('w8') || name.includes('w9');
 
     if (name.includes('times') || name.includes('cambria') || name.includes('georgia') || name.includes('serif') || name.includes('roman')) {
       return 'TimesRoman';
@@ -26,17 +31,22 @@ export class TextClustering {
   }
 
   /**
-   * Generates a web-safe CSS font-family stack corresponding to the detected font.
+   * Auto-detects the 150+ canonical FontRegistry ID from a raw PDF font descriptor.
+   * @param {string} fontName - Raw PDF font name
+   * @returns {string} Canonical FontRegistry font ID
+   */
+  static detectFontId(fontName) {
+    return detectFontIdFromPdf(fontName);
+  }
+
+  /**
+   * Returns the CSS font-family stack for a raw PDF font name.
+   * @param {string} fontName - Raw PDF font name
+   * @returns {string} CSS font-family value
    */
   static getCssFontFamily(fontName) {
-    const canonical = this.detectFontFamily(fontName);
-    if (canonical === 'TimesRoman') {
-      return '"Times New Roman", Times, Georgia, serif';
-    }
-    if (canonical === 'Courier') {
-      return '"Courier New", Courier, monospace';
-    }
-    return 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    const fontId = detectFontIdFromPdf(fontName);
+    return getCssFontFamily(fontId);
   }
 
   /**
@@ -83,15 +93,18 @@ export class TextClustering {
         itemWidth = item.str.length * fontHeight * 0.55;
       }
 
-      const isBold = item.fontName ? (/bold|heavy|black|w[789]/i).test(item.fontName) : false;
+      const rawFontName = item.fontName || 'Helvetica';
+      const isBold = /bold|heavy|black|w[789]/i.test(rawFontName);
 
       mapped.push({
         str: item.str,
-        fontName: item.fontName || 'Helvetica',
+        fontName: rawFontName,
+        // Resolved canonical font ID for this item
+        fontId: detectFontIdFromPdf(rawFontName),
         isBold,
         hasEOL: !!item.hasEOL,
         vx,
-        vy, // Baseline in viewport space
+        vy,
         top: vy - fontHeight,
         width: itemWidth,
         height: fontHeight,
@@ -119,6 +132,7 @@ export class TextClustering {
           id: uid('txtcl'),
           str: item.str,
           fontName: item.fontName,
+          fontId: item.fontId,
           isBold: item.isBold,
           vx: item.vx,
           vy: item.vy,
@@ -147,8 +161,7 @@ export class TextClustering {
       const isSimilarSize = sizeRatio < 0.4;
 
       if (isSameBaseline && isCloseEnough && isSimilarSize && !cur.hasEOL) {
-        // Merge into current cluster
-        // If there's a visible word gap (> 0.2 * fontSize) and neither ends/starts with space, insert space
+        // Insert space between words if visible gap exists and neither boundary has a space
         if (gap > cur.fontSize * 0.22 && !cur.str.endsWith(' ') && !item.str.startsWith(' ')) {
           cur.str += ' ';
         }
@@ -156,21 +169,19 @@ export class TextClustering {
 
         // Expand cluster bounding box
         const newRight = Math.max(curRight, item.vx + item.width);
-        cur.width = newRight - cur.vx;
-        cur.top = Math.min(cur.top, item.top);
-        cur.height = Math.max(cur.height, item.height);
+        cur.width   = newRight - cur.vx;
+        cur.top     = Math.min(cur.top, item.top);
+        cur.height  = Math.max(cur.height, item.height);
         cur.fontSize = Math.max(cur.fontSize, item.fontSize);
-        cur.hasEOL = item.hasEOL;
+        cur.hasEOL  = item.hasEOL;
         cur.items.push(item);
       } else {
-        // Finalize cluster if it has non-whitespace content
-        if (cur.str.trim() !== '') {
-          clusters.push(cur);
-        }
+        if (cur.str.trim() !== '') clusters.push(cur);
         cur = {
           id: uid('txtcl'),
           str: item.str,
           fontName: item.fontName,
+          fontId: item.fontId,
           isBold: item.isBold,
           vx: item.vx,
           vy: item.vy,
@@ -184,9 +195,7 @@ export class TextClustering {
       }
     }
 
-    if (cur && cur.str.trim() !== '') {
-      clusters.push(cur);
-    }
+    if (cur && cur.str.trim() !== '') clusters.push(cur);
 
     return clusters;
   }

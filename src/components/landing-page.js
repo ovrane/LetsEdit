@@ -9,7 +9,7 @@
 
 import { store } from '../core/state-store.js';
 import { pdfEngine } from '../core/pdf-engine.js';
-import { TOOLS_CATALOG, SEJDA_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
+import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, getPreferredTheme, toggleTheme } from '../utils/theme.js';
@@ -37,13 +37,17 @@ export class LandingPage {
   }
 
   init() {
-    this.container = document.createElement('div');
-    this.container.id = 'landing-view';
-    this.container.className = 'landing-view-container';
+    let existing = document.getElementById('landing-view');
+    if (existing) {
+      this.container = existing;
+    } else {
+      this.container = document.createElement('div');
+      this.container.id = 'landing-view';
+      this.container.className = 'landing-view-container';
+      this.container.innerHTML = getLandingTemplateHtml();
+      document.body.prepend(this.container);
+    }
     this.searchQuery = '';
-    this.container.innerHTML = getLandingTemplateHtml();
-
-    document.body.prepend(this.container);
     this.bindEvents();
     this.renderCards();
   }
@@ -69,6 +73,12 @@ export class LandingPage {
     if (!matchedId && action) {
       const match = TOOLS_CATALOG.find(t => t.action === action);
       if (match) matchedId = match.id;
+    }
+
+    // 0. Direct docs navigation
+    if (action === 'navigate:/docs' || matchedId === 'docs') {
+      router.navigate('/docs');
+      return;
     }
 
     // 1. Direct workflow action prefix
@@ -118,25 +128,33 @@ export class LandingPage {
     const heroSampleMultiBtn = this.container.querySelector('#btn-landing-load-sample-multipage');
     const heroDropzone = this.container.querySelector('#landing-hero-dropzone');
 
+    const handleUploadAndOpen = async (file) => {
+      if (!file) return;
+      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+        Toast.warning('Please select a valid PDF document');
+        return;
+      }
+      try {
+        Toast.info('Loading PDF into Studio...');
+        const ab = await readFileAsArrayBuffer(file);
+        const info = await pdfEngine.loadPdf(ab);
+        store.setDocument(ab, file.name, info.numPages);
+        const filenameEl = document.getElementById('current-filename');
+        if (filenameEl) filenameEl.textContent = file.name;
+        router.navigate('/edit_pdf');
+        Toast.success(`Opened ${file.name} in PDF Editor!`);
+      } catch (err) {
+        console.error('Failed to load PDF on landing page:', err);
+        Toast.error('Could not load PDF file');
+      }
+    };
+
     if (heroUploadBtn && heroFileInput) {
       heroUploadBtn.onclick = () => heroFileInput.click();
-      heroFileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file && file.type === 'application/pdf') {
-          try {
-            Toast.info('Loading PDF into Studio...');
-            const ab = await readFileAsArrayBuffer(file);
-            const info = await pdfEngine.loadPdf(ab);
-            store.setDocument(ab, file.name, info.numPages);
-            const filenameEl = document.getElementById('current-filename');
-            if (filenameEl) filenameEl.textContent = file.name;
-            router.navigate('/edit_pdf');
-            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
-          } catch (err) {
-            console.error(err);
-            Toast.error('Could not load PDF');
-          }
-        }
+      heroFileInput.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) handleUploadAndOpen(file);
+        heroFileInput.value = '';
       };
     }
 
@@ -194,47 +212,92 @@ export class LandingPage {
       };
     }
 
-    if (heroDropzone) {
-      heroDropzone.ondragover = (e) => {
-        e.preventDefault();
-        heroDropzone.classList.add('drag-over');
-      };
-      heroDropzone.ondragleave = () => {
-        heroDropzone.classList.remove('drag-over');
-      };
-      heroDropzone.ondrop = async (e) => {
-        e.preventDefault();
-        heroDropzone.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type === 'application/pdf') {
-          try {
-            Toast.info('Loading PDF into Studio...');
-            const ab = await readFileAsArrayBuffer(file);
-            const info = await pdfEngine.loadPdf(ab);
-            store.setDocument(ab, file.name, info.numPages);
-            const filenameEl = document.getElementById('current-filename');
-            if (filenameEl) filenameEl.textContent = file.name;
-            router.navigate('/edit_pdf');
-            Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
-          } catch (err) {
-            console.error(err);
-            Toast.error('Could not load PDF');
-          }
-        } else {
-          Toast.error('Please drop a valid PDF document');
+    const heroOpenEditorBtn = this.container.querySelector('#btn-landing-open-editor');
+    if (heroOpenEditorBtn) {
+      heroOpenEditorBtn.onclick = () => router.navigate('/edit_pdf');
+    }
+
+
+    // Hero Drag & Drop PDF support
+    const heroSection = this.container.querySelector('.landing-hero-section');
+    if (heroSection) {
+      ['dragenter', 'dragover'].forEach(evt => {
+        heroSection.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          heroSection.classList.add('hero-drag-over');
+        });
+      });
+      ['dragleave', 'drop'].forEach(evt => {
+        heroSection.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          heroSection.classList.remove('hero-drag-over');
+        });
+      });
+      heroSection.addEventListener('drop', (e) => {
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) handleUploadAndOpen(file);
+      });
+    }
+
+    // Most Popular PDF Tools 3x2 Grid Cards
+    this.container.querySelectorAll('.hero-popular-card').forEach(card => {
+      const handleAction = () => {
+        const tool = card.getAttribute('data-tool');
+        if (tool === 'studio:edit') {
+          router.navigate('/edit_pdf');
+        } else if (tool) {
+          this.handleToolAction(tool);
         }
       };
+      card.onclick = (e) => {
+        e.preventDefault();
+        handleAction();
+      };
+      card.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleAction();
+        }
+      };
+    });
 
-      heroDropzone.onclick = (e) => {
+    // Dynamic Header Shadow: Only show shadow when scrolled past top
+    const header = this.container.querySelector('.landing-header');
+    const updateNavScroll = () => {
+      const scrollY = this.container.scrollTop || window.scrollY || 0;
+      if (header) {
+        if (scrollY > 8) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      }
+    };
+    this.container.addEventListener('scroll', updateNavScroll, { passive: true });
+    window.addEventListener('scroll', updateNavScroll, { passive: true });
+    updateNavScroll();
+
+    const heroPreview = this.container.querySelector('#landing-hero-preview');
+    if (heroPreview) {
+      heroPreview.onclick = (e) => {
         const floatBadge = e.target.closest('.hero-float-badge');
         if (floatBadge && floatBadge.getAttribute('data-tool')) {
           e.stopPropagation();
           this.handleToolAction(floatBadge.getAttribute('data-tool'));
-          return;
         }
-        if (heroFileInput) heroFileInput.click();
       };
     }
+
+    // Hero quick interactive capability chips (PowerPoint, Excel, Word, OCR, Compare, Redact)
+    this.container.querySelectorAll('.hero-quick-chip').forEach(chip => {
+      chip.onclick = (e) => {
+        e.preventDefault();
+        const tool = chip.getAttribute('data-tool');
+        if (tool) this.handleToolAction(tool);
+      };
+    });
 
     const scrollToTools = () => {
       const toolsSec = this.container.querySelector('.landing-tools-section');
@@ -281,6 +344,15 @@ export class LandingPage {
         this.renderCards();
       };
     });
+
+    // In-Section Live Tool Search Input
+    const inlineSearch = this.container.querySelector('#tools-inline-search-input');
+    if (inlineSearch) {
+      inlineSearch.oninput = (e) => {
+        this.searchQuery = e.target.value;
+        this.renderCards();
+      };
+    }
 
     // Header Quick Tool Search Modal (Spotlight style)
     this.setupHeaderQuickSearch();
@@ -372,6 +444,14 @@ export class LandingPage {
     }
 
     // Navbar quick links
+    const docsNav = this.container.querySelector('#btn-nav-docs-link');
+    if (docsNav) {
+      docsNav.onclick = (e) => {
+        e.preventDefault();
+        router.navigate('/docs');
+      };
+    }
+
     this.container.querySelectorAll('.landing-nav-link[data-tool]').forEach(btn => {
       btn.onclick = () => {
         const tool = btn.getAttribute('data-tool');
@@ -424,14 +504,67 @@ export class LandingPage {
       };
     });
 
-    // Legal & Policies Dialog Triggers
+    // Legal & Policies Page Triggers (Standalone Dedicated Hub)
     this.container.querySelectorAll('[data-legal]').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
         const tab = btn.getAttribute('data-legal') || 'privacy';
-        legalModal.open(tab);
+        if (tab === 'privacy') router.navigate('/privacy');
+        else if (tab === 'terms') router.navigate('/terms');
+        else if (tab === 'security') router.navigate('/security-whitepaper');
+        else if (tab === 'cookies') router.navigate('/cookies');
+        else legalModal.open(tab);
       };
     });
+
+    // Documentation Page Triggers (Navbar, Footer, Direct Links)
+    this.container.querySelectorAll('a[href="/docs"], a[data-route="/docs"], a[href^="/docs"]').forEach(link => {
+      link.onclick = (e) => {
+        e.preventDefault();
+        const href = link.getAttribute('href') || '/docs';
+        router.navigate(href);
+      };
+    });
+
+    // Mobile Navigation Drawer Toggle & Interactions
+    const mobileToggle = this.container.querySelector('#landing-mobile-menu-toggle');
+    const mobileNav = this.container.querySelector('#landing-mobile-nav');
+    if (mobileToggle && mobileNav) {
+      mobileToggle.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = mobileNav.style.display !== 'none';
+        mobileNav.style.display = isOpen ? 'none' : 'block';
+        mobileToggle.classList.toggle('active', !isOpen);
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!mobileNav.contains(e.target) && !mobileToggle.contains(e.target)) {
+          mobileNav.style.display = 'none';
+          mobileToggle.classList.remove('active');
+        }
+      });
+    }
+
+    this.container.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (mobileNav) {
+          mobileNav.style.display = 'none';
+          if (mobileToggle) mobileToggle.classList.remove('active');
+        }
+      });
+    });
+
+    const mobileStudioBtn = this.container.querySelector('#btn-mobile-launch-studio');
+    if (mobileStudioBtn) {
+      mobileStudioBtn.onclick = (e) => {
+        e.preventDefault();
+        if (mobileNav) {
+          mobileNav.style.display = 'none';
+          if (mobileToggle) mobileToggle.classList.remove('active');
+        }
+        router.navigate('/edit_pdf');
+      };
+    }
 
     // Windows & Web App Showcase Buttons
     const installDesktopBtn = this.container.querySelector('#btn-install-desktop-app');
@@ -498,7 +631,7 @@ export class LandingPage {
     // Collect all tools across categories
     const allTools = [];
     const seen = new Set();
-    SEJDA_TOOL_CATEGORIES.forEach(cat => {
+    LETSEDIT_TOOL_CATEGORIES.forEach(cat => {
       cat.tools?.forEach(tool => {
         if (!seen.has(tool.id)) {
           seen.add(tool.id);

@@ -236,3 +236,24 @@ test('Split & Merge API Route - POST /api/split/by-text splits uploaded PDF by k
   assert.strictEqual(data.splits[0].name, 'Split_Invoice_1.pdf');
   assert.strictEqual(data.splits[1].name, 'Split_Invoice_2.pdf');
 });
+
+test('MergeOps - insertBlankPage inserts blank page at target position', async () => {
+  const docBytes = await createTestDocWithPages(['Page 1', 'Page 2']);
+  const withInserted = await MergeOps.insertBlankPage(docBytes, 0); // after index 0
+  const loaded = await PDFDocument.load(withInserted);
+  assert.strictEqual(loaded.getPageCount(), 3);
+});
+
+test('MergeOps - duplicatePage clones page at target index', async () => {
+  const docBytes = await createTestDocWithPages(['Page 1', 'Page 2']);
+  const withDuplicated = await MergeOps.duplicatePage(docBytes, 1); // duplicate page index 1
+  const loaded = await PDFDocument.load(withDuplicated);
+  assert.strictEqual(loaded.getPageCount(), 3);
+});
+
+test('PageOperations facade exposes insertBlankPage and duplicatePage', async () => {
+  const docBytes = await createTestDocWithPages(['Only Page']);
+  const dup = await PageOperations.duplicatePage(docBytes, 0);
+  const loaded = await PDFDocument.load(dup);
+  assert.strictEqual(loaded.getPageCount(), 2);
+});

@@ -17,8 +17,8 @@ export const ROUTE_DEFINITIONS = [
     path: '/',
     toolId: null,
     isLanding: true,
-    title: "LetsEdit — All-in-One Online PDF Editor & Tools",
-    description: "Every tool you need to work with PDFs 100% free and in your browser."
+    title: "Free Online PDF Editor & Tools | LetsEdit",
+    description: "Edit, merge, split, compress, convert, and sign PDFs online for free. Your files stay on your device with browser-based processing."
   },
   {
     path: '/edit_pdf',
@@ -423,6 +423,23 @@ export const ROUTE_DEFINITIONS = [
     aliases: ['/security-policy', '/compliance', '/security_whitepaper', '/security_policy'],
     title: "Security & Cryptographic Compliance Whitepaper — LetsEdit",
     description: "Technical details of our client-side WebAssembly execution, SHA-256 verification, and permanent vector redaction."
+  },
+  {
+    path: '/cookies',
+    toolId: null,
+    isLegal: true,
+    legalTab: 'cookies',
+    aliases: ['/cookie-policy', '/cookies-policy'],
+    title: "Cookie Policy & Tracking Disclosure — LetsEdit",
+    description: "Read about our zero-tracking, essential-only cookie and local storage policy."
+  },
+  {
+    path: '/docs',
+    toolId: null,
+    isDocs: true,
+    aliases: ['/documentation', '/guide', '/user-guide', '/help-docs'],
+    title: "Documentation & Complete Beginner's Guide to PDF Editing — LetsEdit",
+    description: "Learn how to edit, merge, split, compress, redact, sign, and convert PDF files with step-by-step beginner guides and keyboard shortcuts."
   }
 ];
 
@@ -550,26 +567,39 @@ export class Router {
    */
   navigate(targetPath, { replace = false, trigger = true } = {}) {
     const route = this.match(targetPath);
-    this.currentRoute = route;
+    const hash = targetPath.includes('#') ? '#' + targetPath.split('#')[1] : '';
+    const query = targetPath.includes('?') ? '?' + targetPath.split('?')[1].split('#')[0] : '';
+    const routePayload = { ...route, hash, query, fullTarget: targetPath };
+    this.currentRoute = routePayload;
 
     if (typeof window !== 'undefined' && window.history) {
       const canonical = route.canonicalPath;
+      const fullUrl = canonical + (query || '') + (hash || '');
       if (replace) {
-        window.history.replaceState({ path: canonical }, '', canonical);
-      } else if (window.location.pathname !== canonical) {
-        window.history.pushState({ path: canonical }, '', canonical);
+        window.history.replaceState({ path: fullUrl }, '', fullUrl);
+      } else if (window.location.pathname + window.location.search + window.location.hash !== fullUrl) {
+        window.history.pushState({ path: fullUrl }, '', fullUrl);
       }
 
-      if (route.title && typeof document !== 'undefined') {
-        document.title = route.title;
-      }
+      this.updateDocumentMetadata(route);
     }
 
     if (trigger) {
-      this.notify(route, false);
+      this.notify(routePayload, false);
     }
 
-    return route;
+    if (hash && typeof document !== 'undefined') {
+      setTimeout(() => {
+        try {
+          const el = document.querySelector(hash);
+          if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch (_) {}
+      }, 80);
+    }
+
+    return routePayload;
   }
 
   /**
@@ -577,22 +607,160 @@ export class Router {
    */
   handleRoute(pathname, isPopState = true) {
     const route = this.match(pathname);
-    this.currentRoute = route;
+    const hash = typeof window !== 'undefined' ? (window.location.hash || '') : (pathname.includes('#') ? '#' + pathname.split('#')[1] : '');
+    const query = typeof window !== 'undefined' ? (window.location.search || '') : (pathname.includes('?') ? '?' + pathname.split('?')[1].split('#')[0] : '');
+    const routePayload = { ...route, hash, query, fullTarget: pathname };
+    this.currentRoute = routePayload;
 
     if (typeof window !== 'undefined' && window.history) {
-      // If the current URL is an alias (e.g. /merge), replace with canonical (/merge_pdf)
       const currentNorm = this.normalizePath(window.location.pathname);
       if (currentNorm !== route.canonicalPath && !isPopState) {
-        window.history.replaceState({ path: route.canonicalPath }, '', route.canonicalPath);
+        const fullUrl = route.canonicalPath + (query || '') + (hash || '');
+        window.history.replaceState({ path: fullUrl }, '', fullUrl);
       }
 
-      if (route.title && typeof document !== 'undefined') {
-        document.title = route.title;
-      }
+      this.updateDocumentMetadata(route);
     }
 
-    this.notify(route, isPopState);
-    return route;
+    this.notify(routePayload, isPopState);
+
+    if (hash && typeof document !== 'undefined') {
+      setTimeout(() => {
+        try {
+          const el = document.querySelector(hash);
+          if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch (_) {}
+      }, 80);
+    }
+
+    return routePayload;
+  }
+
+  /**
+   * Updates page title, canonical tag, meta description, OpenGraph, Twitter tags,
+   * and injects dynamic Schema.org JSON-LD structured data for Googlebot.
+   */
+  updateDocumentMetadata(route) {
+    if (typeof document === 'undefined') return;
+
+    if (route.title) {
+      document.title = route.title;
+    }
+
+    const baseUrl = 'https://letsedit.web.app';
+    const canonicalUrl = `${baseUrl}${route.canonicalPath === '/' ? '' : route.canonicalPath}`;
+
+    // 1. Canonical tag
+    let canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (!canonicalTag) {
+      canonicalTag = document.createElement('link');
+      canonicalTag.rel = 'canonical';
+      document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.href = canonicalUrl;
+
+    // 2. Meta description
+    if (route.description) {
+      let descTag = document.querySelector('meta[name="description"]');
+      if (!descTag) {
+        descTag = document.createElement('meta');
+        descTag.name = 'description';
+        document.head.appendChild(descTag);
+      }
+      descTag.setAttribute('content', route.description);
+    }
+
+    // 3. OpenGraph tags
+    this.setMetaProperty('og:title', route.title || 'LetsEdit — Fast, Private Online PDF Suite');
+    this.setMetaProperty('og:description', route.description || 'Every tool you need to edit, convert, merge, split, compress, sign, and protect PDFs right in your browser with zero cloud uploads.');
+    this.setMetaProperty('og:url', canonicalUrl);
+    this.setMetaProperty('og:type', route.canonicalPath === '/' ? 'website' : 'article');
+    this.setMetaProperty('og:site_name', 'LetsEdit');
+    this.setMetaProperty('og:locale', 'en_US');
+    this.setMetaProperty('og:image', `${baseUrl}/og-image.png`);
+
+    // 4. Twitter Cards
+    this.setMetaName('twitter:card', 'summary_large_image');
+    this.setMetaName('twitter:title', route.title || 'LetsEdit');
+    this.setMetaName('twitter:description', route.description || '');
+    this.setMetaName('twitter:image', `${baseUrl}/og-image.png`);
+
+    // 5. Dynamic JSON-LD Structured Data
+    this.updateJsonLd(route, canonicalUrl);
+  }
+
+  setMetaProperty(property, content) {
+    if (typeof document === 'undefined' || !content) return;
+    let tag = document.querySelector(`meta[property="${property}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('property', property);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  }
+
+  setMetaName(name, content) {
+    if (typeof document === 'undefined' || !content) return;
+    let tag = document.querySelector(`meta[name="${name}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name', name);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  }
+
+  updateJsonLd(route, canonicalUrl) {
+    if (typeof document === 'undefined') return;
+    let scriptTag = document.getElementById('letsedit-route-jsonld');
+    if (!scriptTag) {
+      scriptTag = document.createElement('script');
+      scriptTag.id = 'letsedit-route-jsonld';
+      scriptTag.type = 'application/ld+json';
+      document.head.appendChild(scriptTag);
+    }
+
+    const toolName = route.title ? route.title.split('—')[0].split('.')[0].trim() : 'LetsEdit Tool';
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": `LetsEdit — ${toolName}`,
+          "url": canonicalUrl,
+          "description": route.description || "Every tool you need to work with PDFs 100% free and in your browser with zero cloud uploads.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "All",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://letsedit.web.app/"
+            },
+            ...(route.canonicalPath !== '/' ? [{
+              "@type": "ListItem",
+              "position": 2,
+              "name": toolName,
+              "item": canonicalUrl
+            }] : [])
+          ]
+        }
+      ]
+    };
+
+    scriptTag.textContent = JSON.stringify(schema, null, 2);
   }
 
   /**

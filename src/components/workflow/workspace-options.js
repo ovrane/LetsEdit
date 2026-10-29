@@ -17,6 +17,16 @@ import { renderBatesOptionsHtml } from './workspace-bates-options.js';
 import { renderPageNumbersOptionsHtml } from './workspace-pagenumbers-options.js';
 import { renderFlattenOptionsHtml } from './workspace-flatten-options.js';
 import { renderRedactOptionsHtml } from './workspace-redact-options.js';
+import {
+  renderWordToPdfOptionsHtml,
+  renderPdfToWordOptionsHtml,
+  renderExcelToPdfOptionsHtml,
+  renderPdfToExcelOptionsHtml,
+  renderPptToPdfOptionsHtml,
+  renderPdfToPptOptionsHtml
+} from './workspace-office-options.js';
+import { renderHtmlToPdfOptionsHtml } from './workspace-html-to-pdf-options.js';
+import { renderExtractImagesOptionsHtml } from './workspace-extract-images-options.js';
 
   export function getBatesPositionCss(instance) {
     switch (instance.batesPos) {
@@ -78,6 +88,14 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
       return renderRepairDiagnosticOptionsHtml(instance);
     }
 
+    if (id === 'html-to-pdf') {
+      return renderHtmlToPdfOptionsHtml(instance);
+    }
+
+    if (['extract-images', 'extract_images'].includes(id)) {
+      return renderExtractImagesOptionsHtml(instance);
+    }
+
     if (id === 'merge') {
       return renderAdvancedMergeOptionsHtml(instance);
     }
@@ -118,28 +136,60 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'images-to-pdf') {
+      const orientation = instance.imgOrientation || 'auto';
+      const pageSize = instance.imgPageSize || 'a4';
+      const margin = instance.imgMargin || 'small';
+      const layout = instance.imgLayout || '1-up';
+
       return `
         <div class="workflow-options-group">
+          <label class="workflow-options-label">Page Size Preset</label>
+          <select id="img-pagesize-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="a4" ${pageSize === 'a4' ? 'selected' : ''}>A4 Standard (210 × 297 mm)</option>
+            <option value="letter" ${pageSize === 'letter' ? 'selected' : ''}>US Letter (8.5 × 11 in)</option>
+            <option value="legal" ${pageSize === 'legal' ? 'selected' : ''}>US Legal (8.5 × 14 in)</option>
+            <option value="fit" ${pageSize === 'fit' ? 'selected' : ''}>Fit Image Exact (No Margins / Original Aspect)</option>
+          </select>
+
           <label class="workflow-options-label">Page Orientation</label>
-          <div class="tool-segmented-control" style="margin-bottom: 14px;">
-            <button type="button" class="tool-seg-btn ${instance.imgOrientation === 'portrait' ? 'active' : ''}" data-img-orient="portrait">
-              Portrait (A4)
+          <div class="tool-segmented-control" style="margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${orientation === 'auto' ? 'active' : ''}" data-img-orient="auto">
+              Auto (Smart)
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imgOrientation === 'landscape' ? 'active' : ''}" data-img-orient="landscape">
-              Landscape (A4)
+            <button type="button" class="tool-seg-btn ${orientation === 'portrait' ? 'active' : ''}" data-img-orient="portrait">
+              Portrait
+            </button>
+            <button type="button" class="tool-seg-btn ${orientation === 'landscape' ? 'active' : ''}" data-img-orient="landscape">
+              Landscape
             </button>
           </div>
 
-          <label class="workflow-options-label">Page Margin</label>
-          <div class="tool-segmented-control">
-            <button type="button" class="tool-seg-btn ${instance.imgMargin === '0' ? 'active' : ''}" data-img-margin="0">
-              No Margin
+          <label class="workflow-options-label">Grid Imposition Layout</label>
+          <div class="tool-segmented-control" style="margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${layout === '1-up' ? 'active' : ''}" data-img-layout="1-up">
+              1-Up
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imgMargin === '20' ? 'active' : ''}" data-img-margin="20">
-              Small (20pt)
+            <button type="button" class="tool-seg-btn ${layout === '2-up' ? 'active' : ''}" data-img-layout="2-up">
+              2-Up
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imgMargin === '40' ? 'active' : ''}" data-img-margin="40">
-              Big (40pt)
+            <button type="button" class="tool-seg-btn ${layout === '4-up' ? 'active' : ''}" data-img-layout="4-up">
+              4-Up (Grid)
+            </button>
+          </div>
+
+          <label class="workflow-options-label">Page Margins</label>
+          <div class="tool-segmented-control" style="margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${margin === 'none' || margin === '0' ? 'active' : ''}" data-img-margin="none">
+              None
+            </button>
+            <button type="button" class="tool-seg-btn ${margin === 'small' || margin === '18' ? 'active' : ''}" data-img-margin="small">
+              Small
+            </button>
+            <button type="button" class="tool-seg-btn ${margin === 'medium' || margin === '36' ? 'active' : ''}" data-img-margin="medium">
+              Med
+            </button>
+            <button type="button" class="tool-seg-btn ${margin === 'large' || margin === '72' ? 'active' : ''}" data-img-margin="large">
+              Large
             </button>
           </div>
         </div>
@@ -147,24 +197,56 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'to-image') {
+      const format = instance.imageFormat || 'image/jpeg';
+      const dpi = parseInt(instance.imageDpi, 10) || 150;
+      const quality = typeof instance.imageQuality === 'number' ? instance.imageQuality : 90;
+      const pageRange = instance.imagePageRange || 'all';
+
+      const scale = dpi / 72;
+      const wPx = Math.round(595.28 * scale);
+      const hPx = Math.round(841.89 * scale);
+      const mp = ((wPx * hPx) / 1_000_000).toFixed(1);
+
       return `
         <div class="workflow-options-group">
           <label class="workflow-options-label">Image Output Format</label>
-          <div class="tool-segmented-control" style="margin-bottom: 14px;">
-            <button type="button" class="tool-seg-btn ${instance.imageFormat === 'image/jpeg' ? 'active' : ''}" data-img-fmt="image/jpeg">
-              JPG (Standard)
+          <div class="tool-segmented-control" style="margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button type="button" class="tool-seg-btn ${format === 'image/jpeg' ? 'active' : ''}" data-img-fmt="image/jpeg">
+              JPG
             </button>
-            <button type="button" class="tool-seg-btn ${instance.imageFormat === 'image/png' ? 'active' : ''}" data-img-fmt="image/png">
-              PNG (Lossless)
+            <button type="button" class="tool-seg-btn ${format === 'image/png' ? 'active' : ''}" data-img-fmt="image/png">
+              PNG (Alpha)
+            </button>
+            <button type="button" class="tool-seg-btn ${format === 'image/webp' ? 'active' : ''}" data-img-fmt="image/webp">
+              WebP
             </button>
           </div>
 
           <label class="workflow-options-label">Output DPI Quality</label>
-          <select id="image-dpi-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main);">
-            <option value="150" ${instance.imageDpi === '150' ? 'selected' : ''}>150 DPI (Balanced Standard)</option>
-            <option value="300" ${instance.imageDpi === '300' ? 'selected' : ''}>300 DPI (Ultra High Print Quality)</option>
-            <option value="72" ${instance.imageDpi === '72' ? 'selected' : ''}>72 DPI (Web & Screen Thumbnail)</option>
+          <select id="image-dpi-select" class="select-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;">
+            <option value="72" ${dpi === 72 ? 'selected' : ''}>72 DPI (Web Screen & Fast Preview)</option>
+            <option value="150" ${dpi === 150 ? 'selected' : ''}>150 DPI (Balanced Standard Office)</option>
+            <option value="300" ${dpi === 300 ? 'selected' : ''}>300 DPI (High-Resolution Print Publication)</option>
+            <option value="600" ${dpi === 600 ? 'selected' : ''}>600 DPI (Archival Ultra-Definition)</option>
           </select>
+
+          ${format !== 'image/png' ? `
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                <span>Compression Quality</span>
+                <span id="img-quality-val">${quality}%</span>
+              </div>
+              <input type="range" id="image-quality-range" min="20" max="100" value="${quality}" style="width: 100%; cursor: pointer;" />
+            </div>
+          ` : ''}
+
+          <label class="workflow-options-label">Pages to Export</label>
+          <input type="text" id="image-pagerange-input" class="input-sm" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 14px;" placeholder="e.g. all, 1-3, 5" value="${pageRange}" />
+
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 10px 12px;">
+            <span style="color: var(--text-primary); font-weight: 600;">Resolution:</span>
+            <span style="color: #2563eb; font-weight: 700;">${wPx} × ${hPx} px (${mp} MP @ ${dpi} DPI)</span>
+          </div>
         </div>
       `;
     }
@@ -521,6 +603,10 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'grayscale') {
+      const mode = instance.grayscaleMode || 'standard';
+      const preserveBlack = instance.grayscalePreserveBlackText !== false;
+      const savings = mode === 'toner-saver' ? '68%' : mode === 'deep-monochrome' ? '74%' : mode === 'high-contrast' ? '62%' : '58%';
+
       return `
         <div class="workflow-options-group">
           <label class="workflow-options-label">Preview Mode</label>
@@ -532,11 +618,42 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
               Original Color
             </button>
           </div>
+
+          <label class="workflow-options-label">Grayscale Profile / Engine</label>
+          <select class="workflow-select" id="grayscale-mode-select" style="margin-bottom: 14px; width: 100%;">
+            <option value="standard" ${mode === 'standard' ? 'selected' : ''}>Standard DeviceGray (Balanced ITU-R BT.601)</option>
+            <option value="high-contrast" ${mode === 'high-contrast' ? 'selected' : ''}>High Contrast (Sharper Charts & Diagrams)</option>
+            <option value="deep-monochrome" ${mode === 'deep-monochrome' ? 'selected' : ''}>Deep Monochrome (Dramatic Dark Tones)</option>
+            <option value="toner-saver" ${mode === 'toner-saver' ? 'selected' : ''}>Eco Toner Saver (Lightened Midtones, Save Ink)</option>
+          </select>
+
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 14px;">
+            <input type="checkbox" id="grayscale-preserve-black" ${preserveBlack ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px;" />
+            <span>Preserve Crisp Pure Black Text (#000000)</span>
+          </label>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;">
+            <span style="color: var(--text-primary); font-weight: 600;">Estimated Toner Savings:</span>
+            <span style="background: #10b981; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-weight: 700;">~${savings} Less Ink</span>
+          </div>
+
           <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-subtle);">
-            Converts colored images and vector drawing streams to monochrome DeviceGray. Significantly reduces ink usage and printing costs.
+            Converts colored images, vector fills, and stroke streams to monochrome DeviceGray. Significantly reduces toner usage, printer wear, and output file size.
           </div>
         </div>
       `;
+    }
+
+    if (id === 'word-to-pdf') {
+      return renderWordToPdfOptionsHtml(instance);
+    }
+
+    if (id === 'pdf-to-word') {
+      return renderPdfToWordOptionsHtml(instance);
+    }
+
+    if (id === 'pdf-to-excel') {
+      return renderPdfToExcelOptionsHtml(instance);
     }
 
     if (id === 'pdf-to-text') {
@@ -745,36 +862,15 @@ import { renderRedactOptionsHtml } from './workspace-redact-options.js';
     }
 
     if (id === 'excel-to-pdf') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Document Title</label>
-          <input type="text" id="workflow-excel-title" class="input-sm" value="${instance.excelTitle || primary.name?.replace(/\.[^/.]+$/, '') || 'Spreadsheet Report'}" placeholder="Spreadsheet Report" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
-
-          <label class="workflow-options-label">Page Orientation</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px;">
-            <button type="button" class="btn btn-xs ${(!instance.excelOrientation || instance.excelOrientation === 'auto') ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="auto">Auto</button>
-            <button type="button" class="btn btn-xs ${instance.excelOrientation === 'portrait' ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="portrait">Portrait</button>
-            <button type="button" class="btn btn-xs ${instance.excelOrientation === 'landscape' ? 'btn-primary' : 'btn-outline'} btn-excel-orient" data-orient="landscape">Landscape</button>
-          </div>
-
-          <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Supports Excel (.xlsx, .xls) and CSV sheets. Generates vector tables with styled headers, alternating row colors, and auto-pagination.
-          </div>
-        </div>
-      `;
+      return renderExcelToPdfOptionsHtml(instance);
     }
 
     if (id === 'ppt-to-pdf') {
-      return `
-        <div class="workflow-options-group">
-          <label class="workflow-options-label">Presentation Title</label>
-          <input type="text" id="workflow-ppt-title" class="input-sm" value="${instance.pptTitle || primary.name?.replace(/\.[^/.]+$/, '') || 'Presentation Deck'}" placeholder="Presentation Deck" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-main); margin-bottom: 12px;" />
+      return renderPptToPdfOptionsHtml(instance);
+    }
 
-          <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Converts slide texts, bullets, and titles into 16:9 widescreen landscape PDF presentation pages with executive header banners and footer slide counters.
-          </div>
-        </div>
-      `;
+    if (id === 'pdf-to-ppt' || id === 'pdf-to-pptx') {
+      return renderPdfToPptOptionsHtml(instance);
     }
 
     if (id === 'edit-metadata') {

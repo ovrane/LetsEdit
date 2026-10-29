@@ -21,6 +21,14 @@ export class StateStore {
       activeColor: '#000000',
       activeFontSize: 16,
       activeFontFamily: 'Helvetica',
+      activeFontId: 'Helvetica',
+      activeBold: false,
+      activeItalic: false,
+      activeUnderline: false,
+      activeStrikethrough: false,
+      activeTextAlign: 'left',
+      activeTextBgColor: 'transparent',
+      activeOpacity: 1.0,
       activeStrokeWidth: 2,
       activeFillColor: 'transparent',
       pageRotations: {},       // pageNum (1-based) -> rotation (0, 90, 180, 270)
@@ -87,7 +95,10 @@ export class StateStore {
 
   setDocument(pdfBytes, filename = 'document.pdf', pageCount = 0) {
     this.saveSnapshot('Load Document');
-    this.state.pdfBytes = pdfBytes;
+    const safeBytes = pdfBytes instanceof ArrayBuffer
+      ? pdfBytes.slice(0)
+      : (pdfBytes?.buffer ? pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength) : pdfBytes);
+    this.state.pdfBytes = safeBytes;
     this.state.filename = filename;
     this.state.pageCount = pageCount;
     this.state.pageRotations = {};
@@ -119,7 +130,27 @@ export class StateStore {
     } else {
       this.state.pageOrder.splice(afterPageIndex + 1, 0, newPageNum);
     }
-    this.notify('page-added', { pageNum: newPageNum, isBlank: true });
+    this.notify('page-added', { pageNum: newPageNum, isBlank: true, pageOrder: this.state.pageOrder });
+  }
+
+  duplicatePage(pageNum) {
+    this.saveSnapshot('Duplicate Page');
+    const newPageNum = ++this.state.pageCount;
+    const sourceAnnots = this.state.annotations[pageNum] || [];
+    this.state.annotations[newPageNum] = JSON.parse(JSON.stringify(sourceAnnots)).map(a => ({
+      ...a,
+      id: 'ann_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)
+    }));
+    this.state.pageRotations[newPageNum] = this.state.pageRotations[pageNum] || 0;
+
+    const idx = this.state.pageOrder.indexOf(pageNum);
+    if (idx !== -1) {
+      this.state.pageOrder.splice(idx + 1, 0, newPageNum);
+    } else {
+      this.state.pageOrder.push(newPageNum);
+    }
+    this.notify('page-duplicated', { pageNum: newPageNum, sourcePageNum: pageNum, pageOrder: this.state.pageOrder });
+    return newPageNum;
   }
 
   setWatermark(watermark) {
@@ -227,6 +258,7 @@ export class StateStore {
   saveSnapshot(actionName = 'Edit') {
     const snapshot = {
       actionName,
+      pageCount: this.state.pageCount,
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
       pageOrder: [...this.state.pageOrder],
@@ -247,6 +279,7 @@ export class StateStore {
   undo() {
     if (this.state.history.length === 0) return;
     const currentSnapshot = {
+      pageCount: this.state.pageCount,
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
       pageOrder: [...this.state.pageOrder],
@@ -259,6 +292,7 @@ export class StateStore {
     this.state.future.push(currentSnapshot);
 
     const prev = this.state.history.pop();
+    if (typeof prev.pageCount === 'number') this.state.pageCount = prev.pageCount;
     this.state.annotations = prev.annotations;
     this.state.pageRotations = prev.pageRotations;
     if (prev.pageOrder) this.state.pageOrder = [...prev.pageOrder];
@@ -277,6 +311,7 @@ export class StateStore {
   redo() {
     if (this.state.future.length === 0) return;
     const currentSnapshot = {
+      pageCount: this.state.pageCount,
       annotations: JSON.parse(JSON.stringify(this.state.annotations)),
       pageRotations: { ...this.state.pageRotations },
       pageOrder: [...this.state.pageOrder],
@@ -289,6 +324,7 @@ export class StateStore {
     this.state.history.push(currentSnapshot);
 
     const next = this.state.future.pop();
+    if (typeof next.pageCount === 'number') this.state.pageCount = next.pageCount;
     this.state.annotations = next.annotations;
     this.state.pageRotations = next.pageRotations;
     if (next.pageOrder) this.state.pageOrder = [...next.pageOrder];

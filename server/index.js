@@ -1,6 +1,6 @@
 /**
  * PDF Studio & LetsEdit Fullstack Backend Server Entry Point
- * Conforms to SEJDA_AUTH_SPECIFICATION.md & SEJDA_FULL_SUITE_REVERSE_ENGINEERING.md
+ * Conforms to LETSEDIT_AUTH_SPECIFICATION.md & LETSEDIT_CORE_EDITOR_SPECIFICATION.md
  * Modular architecture dispatching to db, auth-routes, pdf-routes, and static.
  */
 
@@ -27,6 +27,19 @@ import { handleBatesRequest } from './routes/bates-routes.js';
 import { handlePageNumbersRequest } from './routes/pagenumbers-routes.js';
 import { handleFlattenRequest } from './routes/flatten-routes.js';
 import { handleRedactRequest } from './routes/redact-routes.js';
+import { handleGrayscaleRequest } from './routes/grayscale-routes.js';
+import { handleDeskewRequest } from './routes/deskew-routes.js';
+import { handlePdfToImageRequest } from './routes/pdf-to-image-routes.js';
+import { handleImageToPdfRequest } from './routes/image-to-pdf-routes.js';
+import { handleWordToPdfRequest } from './routes/word-to-pdf-routes.js';
+import { handlePdfToWordRequest } from './routes/pdf-to-word-routes.js';
+import { handleExcelToPdfRequest } from './routes/excel-to-pdf-routes.js';
+import { handlePdfToExcelRequest } from './routes/pdf-to-excel-routes.js';
+import { handlePptxToPdfRequest } from './routes/pptx-to-pdf-routes.js';
+import { handlePdfToPptxRequest } from './routes/pdf-to-pptx-routes.js';
+import { handleHtmlToPdfRequest } from './routes/html-to-pdf-routes.js';
+import { handleExtractImagesRequest } from './routes/extract-images-routes.js';
+import { handleInkScannerRequest } from './routes/ink-scanner-routes.js';
 import { handleWorkerStatusRequest, handleSystemCapabilities } from './routes/worker-status-routes.js';
 import { serveStatic } from './static.js';
 
@@ -141,6 +154,58 @@ export async function handleBackendRequest(req, res) {
   // Dispatch Permanent Redaction endpoints
   const redactHandled = await handleRedactRequest(req, res, pathname, method);
   if (redactHandled) return true;
+
+  // Dispatch DeviceGray & Toner Saver Inversion endpoints
+  const grayscaleHandled = await handleGrayscaleRequest(req, res, pathname, method);
+  if (grayscaleHandled) return true;
+
+  // Dispatch Scanner Deskew & Rectification endpoints
+  const deskewHandled = await handleDeskewRequest(req, res, pathname, method);
+  if (deskewHandled) return true;
+
+  // Dispatch High-DPI PDF to Image & Batch ZIP endpoints
+  const pdfToImageHandled = await handlePdfToImageRequest(req, res, pathname, method);
+  if (pdfToImageHandled) return true;
+
+  // Dispatch Raster & Vector Images to PDF endpoints
+  const imageToPdfHandled = await handleImageToPdfRequest(req, res, pathname, method);
+  if (imageToPdfHandled) return true;
+
+  // Dispatch Microsoft Word DOCX to PDF endpoints
+  const wordToPdfHandled = await handleWordToPdfRequest(req, res, pathname, method);
+  if (wordToPdfHandled) return true;
+
+  // Dispatch PDF to Microsoft Word DOCX endpoints
+  const pdfToWordHandled = await handlePdfToWordRequest(req, res, pathname, method);
+  if (pdfToWordHandled) return true;
+
+  // Dispatch Excel XLSX & CSV to PDF endpoints
+  const excelToPdfHandled = await handleExcelToPdfRequest(req, res, pathname, method);
+  if (excelToPdfHandled) return true;
+
+  // Dispatch PDF to Excel XLSX & CSV endpoints
+  const pdfToExcelHandled = await handlePdfToExcelRequest(req, res, pathname, method);
+  if (pdfToExcelHandled) return true;
+
+  // Dispatch PowerPoint PPTX to PDF endpoints
+  const pptxToPdfHandled = await handlePptxToPdfRequest(req, res, pathname, method);
+  if (pptxToPdfHandled) return true;
+
+  // Dispatch PDF to PowerPoint PPTX endpoints
+  const pdfToPptxHandled = await handlePdfToPptxRequest(req, res, pathname, method);
+  if (pdfToPptxHandled) return true;
+
+  // Dispatch HTML5 & Markdown to PDF endpoints
+  const htmlToPdfHandled = await handleHtmlToPdfRequest(req, res, pathname, method);
+  if (htmlToPdfHandled) return true;
+
+  // Dispatch Embedded Images Extraction endpoints
+  const extractImagesHandled = await handleExtractImagesRequest(req, res, pathname, method);
+  if (extractImagesHandled) return true;
+
+  // Dispatch Hardware & Camera Ink Scanner endpoints
+  const inkScannerHandled = await handleInkScannerRequest(req, res, pathname, method);
+  if (inkScannerHandled) return true;
 
   // Dispatch System Capabilities & Worker Status endpoints
   const workerHandled = await handleWorkerStatusRequest(req, res, pathname, method);

@@ -25,12 +25,12 @@ import { store } from './state-store.js';
 
 // Default configuration with environment variables and lets-edit-inc live Firebase project
 const firebaseConfig = {
-  apiKey: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_API_KEY) || 'AIzaSyB2lOHysn5Uc3qurgRGW6JG49H29NuFNyU',
-  authDomain: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN) || 'lets-edit-inc.firebaseapp.com',
-  projectId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_PROJECT_ID) || 'lets-edit-inc',
-  storageBucket: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET) || 'lets-edit-inc.firebasestorage.app',
-  messagingSenderId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID) || '285657458145',
-  appId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_APP_ID) || '1:285657458145:web:2fe8f13287f73e3ac35ea0'
+  apiKey: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_API_KEY) || '',
+  authDomain: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN) || '',
+  projectId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_PROJECT_ID) || '',
+  storageBucket: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET) || '',
+  messagingSenderId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID) || '',
+  appId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_APP_ID) || ''
 };
 
 class FirebaseAuthService {
@@ -45,8 +45,18 @@ class FirebaseAuthService {
   }
 
   init() {
-    try {
-      if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
+    const isAuthExplicitlyEnabled = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_AUTH_ENABLED === 'true');
+
+    // In headless Node.js test environment or when not explicitly enabled, keep false
+    if (typeof window === 'undefined') {
+      this.isConfigured = false;
+      return;
+    }
+
+    // Only eagerly attach Firebase Auth SDK if explicitly configured and verified
+    // (prevents CONFIGURATION_NOT_FOUND 400 network failures on projects where Auth isn't enabled)
+    if (isAuthExplicitlyEnabled && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
+      try {
         this.app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
         this.auth = getAuth(this.app);
         this.isConfigured = true;
@@ -64,9 +74,12 @@ class FirebaseAuthService {
           }
         });
         return;
+      } catch (err) {
+        console.warn('Firebase live initialization notice:', err.message);
+        this.isConfigured = false;
       }
-    } catch (err) {
-      console.warn('Firebase live initialization notice:', err.message);
+    } else {
+      this.isConfigured = false;
     }
 
     // Read remembered session from localStorage

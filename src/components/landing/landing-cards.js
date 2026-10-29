@@ -1,11 +1,70 @@
 /**
  * Landing Cards & Filter Renderer
  * Manages category filtering, live text search, tool card HTML markup,
- * and card click dispatching.
+ * docs & specifications rendering, and card click dispatching.
  */
 
-import { TOOLS_CATALOG, SEJDA_TOOL_CATEGORIES, SMALLPDF_DIRECTORIES, renderDirectoryItemHtml } from '../all-tools-modal.js';
+import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, SMALLPDF_DIRECTORIES, renderDirectoryItemHtml } from '../all-tools-modal.js';
 import { getTwoToneIconSvg } from './landing-icons.js';
+
+export const DOCS_DIRECTORIES = [
+  {
+    col: 1,
+    sections: [
+      {
+        title: 'User Guide & Tutorials',
+        tools: [
+          { id: 'docs-user-intro', title: 'Beginner Quickstart', action: 'navigate:/docs', iconColor: '#2563eb' },
+          { id: 'docs-user-edit', title: 'Edit Existing Text', action: 'navigate:/docs#ch-edit-text', iconColor: '#059669' },
+          { id: 'docs-user-sign', title: 'E-Sign & Multi-Signer', action: 'navigate:/docs#ch-signatures', iconColor: '#7c3aed' },
+          { id: 'docs-user-redact', title: 'Permanent Redaction', action: 'navigate:/docs#ch-redaction', iconColor: '#dc2626' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 2,
+    sections: [
+      {
+        title: 'Document Processing',
+        tools: [
+          { id: 'docs-user-bates', title: 'Bates Numbering', action: 'navigate:/docs#ch-bates', iconColor: '#d97706' },
+          { id: 'docs-user-organize', title: 'Page Organizer', action: 'navigate:/docs#ch-organize', iconColor: '#0284c7' },
+          { id: 'docs-user-forms', title: 'AcroForms Designer', action: 'navigate:/docs#ch-forms', iconColor: '#0891b2' },
+          { id: 'docs-user-security', title: 'Security & Permissions', action: 'navigate:/docs#ch-security', iconColor: '#4f46e5' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 3,
+    sections: [
+      {
+        title: 'Core Engine Architecture',
+        tools: [
+          { id: 'docs-proj-wasm', title: 'Zero-Cloud WASM Engine', action: 'navigate:/docs?tab=project#proj-wasm-core', iconColor: '#ea580c' },
+          { id: 'docs-proj-clustering', title: 'Text Clustering Math', action: 'navigate:/docs?tab=project#proj-clustering-math', iconColor: '#16a34a' },
+          { id: 'docs-proj-canvas', title: '4-Layer Canvas Stack', action: 'navigate:/docs?tab=project#proj-canvas-compositing', iconColor: '#2563eb' },
+          { id: 'docs-proj-audit', title: 'SHA-256 Audit Trail', action: 'navigate:/docs?tab=project#proj-audit-crypto', iconColor: '#9333ea' }
+        ]
+      }
+    ]
+  },
+  {
+    col: 4,
+    sections: [
+      {
+        title: 'APIs & Maintenance',
+        tools: [
+          { id: 'docs-proj-api', title: 'REST API Reference', action: 'navigate:/docs?tab=project#proj-api-endpoints', iconColor: '#0d9488' },
+          { id: 'docs-proj-standards', title: '<1,000 Lines Standard', action: 'navigate:/docs?tab=project#proj-code-standards', iconColor: '#e11d48' },
+          { id: 'docs-proj-workers', title: 'Web Worker Pool', action: 'navigate:/docs?tab=project#proj-worker-pool', iconColor: '#4338ca' },
+          { id: 'docs-proj-faq', title: 'Engineering FAQ', action: 'navigate:/docs?tab=project#proj-dev-faq', iconColor: '#65a30d' }
+        ]
+      }
+    ]
+  }
+];
 
 export class LandingCardsRenderer {
   static renderSingleCardHtml(tool) {
@@ -32,6 +91,20 @@ export class LandingCardsRenderer {
           });
         });
       });
+
+      // Include docs if query relates to docs or architecture
+      if (q.includes('doc') || q.includes('guide') || q.includes('api') || q.includes('spec') || q.includes('wasm') || q.includes('code') || q.includes('canvas')) {
+        DOCS_DIRECTORIES.forEach(col => {
+          col.sections.forEach(sec => {
+            sec.tools.forEach(t => {
+              if (!seen.has(t.title.toLowerCase())) {
+                seen.add(t.title.toLowerCase());
+                allTools.push(t);
+              }
+            });
+          });
+        });
+      }
 
       const filtered = allTools.filter(tool =>
         tool.title.toLowerCase().includes(q) ||
@@ -73,6 +146,28 @@ export class LandingCardsRenderer {
     // 2. Specific Category selected: render matching sections
     if (landing.activeFilter !== 'all') {
       const target = landing.activeFilter.toLowerCase();
+
+      // Check if user clicked the Docs chip
+      if (target === 'docs') {
+        grid.className = 'landing-dir-wrapper';
+        grid.innerHTML = `
+          <div class="tools-dir-grid" style="grid-template-columns: repeat(4, minmax(180px, 1fr));">
+            ${DOCS_DIRECTORIES.map(col => `
+              <div class="tools-dir-col">
+                ${col.sections.map(sec => `
+                  <div class="tools-dir-section">
+                    <div class="tools-dir-sec-title">${sec.title}</div>
+                    ${sec.tools.map(tool => renderDirectoryItemHtml(tool)).join('')}
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+          </div>
+        `;
+        LandingCardsRenderer.attachLandingCardEvents(grid, landing);
+        return;
+      }
+
       const matchedCols = [];
 
       SMALLPDF_DIRECTORIES.forEach(col => {

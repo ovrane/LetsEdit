@@ -1,0 +1,538 @@
+/* ==========================================================================
+   Redesigned Elite FAQ 2-Column Section (Image 1)
+   ========================================================================== */
+
+.landing-faq-section {
+  padding: 84px 24px;
+  background: var(--bg-surface, #ffffff);
+  border-top: 1px solid var(--border-subtle, #eef2f6);
+}
+
+[data-theme="dark"] .landing-faq-section {
+  background: var(--bg-surface);
+  border-top-color: var(--border-subtle);
+}
+
+.faq-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.faq-section-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.faq-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+[data-theme="dark"] .faq-pill-badge {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.faq-hero-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  letter-spacing: -0.025em;
+  margin: 0 0 12px 0;
+}
+
+[data-theme="dark"] .faq-hero-title {
+  color: var(--text-main);
+}
+
+.faq-hero-subtitle {
+  font-size: 15.5px;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+}
+
+[data-theme="dark"] .faq-hero-subtitle {
+  color: var(--text-muted);
+}
+
+.faq-two-col-grid {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 1040px) {
+  .faq-two-col-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* Left Help Card */
+.faq-help-card {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+[data-theme="dark"] .faq-help-card {
+  background: var(--bg-card);
+  border-color: var(--border-subtle);
+}
+
+.help-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+[data-theme="dark"] .help-eyebrow {
+  color: var(--text-muted);
+}
+
+.help-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px 0;
+}
+
+[data-theme="dark"] .help-title {
+  color: var(--text-main);
+}
+
+.help-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #64748b;
+  margin: 0 0 24px 0;
+}
+
+[data-theme="dark"] .help-desc {
+  color: var(--text-muted);
+}
+
+.help-btns-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.help-btn-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #0f172a;
+  transition: all 0.16s ease;
+}
+
+.help-btn-dark:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+}
+
+.help-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.help-btn-outline:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .help-btn-dark {
+  background: #ffffff;
+  color: #1e1e1e;
+  border-color: #ffffff;
+}
+
+[data-theme="dark"] .help-btn-dark:hover {
+  background: #e5e5e5;
+  color: #000000;
+}
+
+[data-theme="dark"] .help-btn-outline {
+  background: var(--bg-secondary);
+  border-color: var(--border-subtle);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .help-btn-outline:hover {
+  background: var(--bg-card);
+  border-color: var(--border-strong);
+}
+
+/* Illustrated Diagram Card */
+.help-diagram-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px 16px;
+}
+
+[data-theme="dark"] .help-diagram-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-subtle);
+}
+
+.diagram-canvas-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.diagram-tool-dock {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .diagram-tool-dock {
+  background: var(--bg-card);
+  border-color: var(--border-subtle);
+}
+
+.d-tool {
+  font-size: 12px;
+  color: #475569;
+  text-align: center;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .d-tool {
+  color: var(--text-muted);
+}
+
+.diagram-doc-sheet {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  width: 140px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+[data-theme="dark"] .diagram-doc-sheet {
+  background: var(--bg-card);
+  border-color: var(--border-subtle);
+}
+
+.d-doc-badge {
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 3px;
+  width: fit-content;
+}
+
+.d-doc-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.d-line {
+  height: 2.5px;
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .d-line {
+  background: var(--border-strong);
+}
+
+.d-selected-rect {
+  position: relative;
+  border: 1.5px solid var(--primary);
+  border-radius: 2px;
+  padding: 3px;
+  margin: 3px 0;
+}
+
+[data-theme="dark"] .d-selected-rect {
+  border-color: #fca5a5;
+}
+
+.d-sel-fill {
+  height: 12px;
+  background: var(--primary-light);
+  border-radius: 1px;
+}
+
+[data-theme="dark"] .d-sel-fill {
+  background: rgba(248, 113, 113, 0.2);
+}
+
+.d-sel-corner {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 1px;
+}
+
+[data-theme="dark"] .d-sel-corner {
+  background: #fca5a5;
+}
+
+.d-sel-corner.nw { top: -2px; left: -2px; }
+.d-sel-corner.ne { top: -2px; right: -2px; }
+.d-sel-corner.sw { bottom: -2px; left: -2px; }
+.d-sel-corner.se { bottom: -2px; right: -2px; }
+
+.d-cursor-pointer {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+[data-theme="dark"] .d-cursor-pointer {
+  fill: #ffffff;
+  stroke: #1e1e1e;
+}
+
+.d-sig-line {
+  margin-top: 2px;
+}
+
+[data-theme="dark"] .d-sig-line svg path {
+  stroke: #60a5fa;
+}
+
+.diagram-pills-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.d-feature-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.d-pill-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.d-pill-icon.blue { background: #eff6ff; color: #2563eb; }
+.d-pill-icon.orange { background: #fff7ed; color: #f97316; }
+.d-pill-icon.green { background: #ecfdf5; color: #10b981; }
+
+[data-theme="dark"] .d-pill-icon.blue { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+[data-theme="dark"] .d-pill-icon.orange { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+[data-theme="dark"] .d-pill-icon.green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+.d-pill-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.d-pill-text strong {
+  font-size: 11.5px;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .d-pill-text strong {
+  color: var(--text-main);
+}
+
+.d-pill-text span {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .d-pill-text span {
+  color: var(--text-muted);
+}
+
+/* Right FAQ Accordion Column */
+.faq-accordion-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-card-item {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .faq-card-item {
+  background: var(--bg-card);
+  border-color: var(--border-subtle);
+}
+
+.faq-card-item:hover {
+  border-color: #cbd5e1;
+}
+
+[data-theme="dark"] .faq-card-item:hover {
+  border-color: var(--border-strong);
+}
+
+.faq-card-item[open] {
+  border-color: var(--primary-glow);
+  box-shadow: 0 4px 20px rgba(48, 5, 13, 0.05);
+}
+
+[data-theme="dark"] .faq-card-item[open] {
+  border-color: var(--primary-glow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.faq-card-trigger {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.faq-card-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.faq-num-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .faq-num-badge {
+  background: var(--primary-light);
+  color: #fca5a5;
+}
+
+.faq-card-item[open] .faq-num-badge {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .faq-card-item[open] .faq-num-badge {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.faq-question-text {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .faq-question-text {
+  color: var(--text-main);
+}
+
+.faq-toggle-arrow {
+  color: #94a3b8;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+}
+
+[data-theme="dark"] .faq-toggle-arrow {
+  color: var(--text-muted);
+}
+
+.faq-card-item[open] .faq-toggle-arrow {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .faq-card-item[open] .faq-toggle-arrow {
+  color: #fca5a5;
+}
+
+.faq-card-content {
+  padding: 0 20px 20px 68px;
+}
+
+.faq-card-content p {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #475569;
+  margin: 0;
+}
+
+[data-theme="dark"] .faq-card-content p {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+}

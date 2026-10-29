@@ -8,15 +8,15 @@ import { readFileAsArrayBuffer } from '../../utils/helpers.js';
 
 const CATEGORIES = [
   { id: 'all', label: 'All Tools' },
-  { id: 'popular', label: '⭐ Most Popular' },
-  { id: 'merge', label: '🔗 Merge' },
-  { id: 'split', label: '✂ Split' },
-  { id: 'edit-sign', label: '✏ Edit & Sign' },
-  { id: 'compress-scans', label: '🗜 Compress & Scans' },
-  { id: 'security', label: '🔒 Security' },
-  { id: 'convert-from', label: '📤 Convert from PDF' },
-  { id: 'convert-to', label: '📥 Convert to PDF' },
-  { id: 'others', label: '⚡ Others' }
+  { id: 'popular', label: 'Most Popular' },
+  { id: 'merge', label: 'Merge' },
+  { id: 'split', label: 'Split' },
+  { id: 'edit-sign', label: 'Edit & Sign' },
+  { id: 'compress-scans', label: 'Compress & Scans' },
+  { id: 'security', label: 'Security & Redact' },
+  { id: 'convert-from', label: 'Convert from PDF' },
+  { id: 'convert-to', label: 'Convert to PDF' },
+  { id: 'others', label: 'Legal & Archival' }
 ];
 
 export function LandingHero({ onDocumentLoaded }) {
@@ -88,7 +88,7 @@ export function LandingHero({ onDocumentLoaded }) {
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-4 max-w-3xl">
-          The Modern PDF Suite Built for <span className="text-gray-500 dark:white">Speed & Privacy</span>.
+          Free Online <span className="text-[#30050d] dark:text-[#d46374]">PDF Editor</span> &amp; Tools
         </h1>
 
         <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mb-8 leading-relaxed">

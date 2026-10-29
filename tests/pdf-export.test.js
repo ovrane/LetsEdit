@@ -970,6 +970,54 @@ describe('PDF Vector Export & Feature Tests', () => {
     assert.strictEqual(sz1.width, 841.89);
     assert.strictEqual(sz1.height, 595.28);
   });
+
+  test('exportPdf compiles arrow vector shapes correctly', async () => {
+    const state = {
+      pageCount: 1,
+      pageOrder: [1],
+      deletedPages: new Set(),
+      pageRotations: { 1: 0 },
+      annotations: {
+        1: [
+          {
+            id: 'arrow-1',
+            type: 'shape',
+            shapeType: 'arrow',
+            x: 0.1,
+            y: 0.2,
+            width: 0.3,
+            height: 0.2,
+            strokeColor: '#dc2626',
+            strokeWidth: 3
+          }
+        ]
+      }
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    assert(exportedBytes instanceof Uint8Array);
+    const doc = await PDFDocument.load(exportedBytes);
+    assert.strictEqual(doc.getPageCount(), 1);
+  });
+
+  test('exportPdf seamlessly compiles added / duplicated pages beyond source page count', async () => {
+    const state = {
+      pageCount: 3,
+      pageOrder: [1, 3, 2], // page 3 is an inserted blank page
+      deletedPages: new Set(),
+      pageRotations: { 1: 0, 2: 0, 3: 0 },
+      annotations: {
+        1: [{ id: 't1', type: 'text', text: 'Page 1' }],
+        3: [{ id: 't3', type: 'text', text: 'Inserted Blank Page' }],
+        2: [{ id: 't2', type: 'text', text: 'Page 2' }]
+      }
+    };
+
+    const exportedBytes = await pdfEngine.exportPdf(state);
+    assert(exportedBytes instanceof Uint8Array);
+    const doc = await PDFDocument.load(exportedBytes);
+    assert.strictEqual(doc.getPageCount(), 3);
+  });
 });
 
 

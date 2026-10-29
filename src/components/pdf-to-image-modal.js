@@ -102,8 +102,9 @@ export class PdfToImageModal {
         const ext = format === 'image/jpeg' ? 'jpg' : 'png';
         const baseName = (state.filename || 'document').replace('.pdf', '');
 
+        const curPage = state.currentPage || 1;
         const targetPages = scope === 'current'
-          ? [1]
+          ? [curPage]
           : Array.from({ length: state.pageCount }, (_, i) => i + 1);
 
         for (const p of targetPages) {

@@ -63,10 +63,28 @@ export class PdfEngine {
     return await this.loader.renderPageToImageBlob(pageNum, dpiScale, format);
   }
 
+  async renderPagesToZip(options = {}, onProgress = null) {
+    return await PageOperations.renderPagesToZip(this.rawBytes, options, onProgress);
+  }
+
   // --- Page Operations (Merge, Split, Alternate, N-Up, Flip) ---
 
   async appendBlankPage(width = 595.28, height = 841.89) {
     const newBytes = await PageOperations.appendBlankPage(this.rawBytes, width, height);
+    this.rawBytes = newBytes.buffer;
+    const info = await this.loadPdf(this.rawBytes);
+    return info.numPages;
+  }
+
+  async insertBlankPage(afterPageIndex = null, width = 595.28, height = 841.89) {
+    const newBytes = await PageOperations.insertBlankPage(this.rawBytes, afterPageIndex, width, height);
+    this.rawBytes = newBytes.buffer;
+    const info = await this.loadPdf(this.rawBytes);
+    return info.numPages;
+  }
+
+  async duplicatePage(pageIndex) {
+    const newBytes = await PageOperations.duplicatePage(this.rawBytes, pageIndex);
     this.rawBytes = newBytes.buffer;
     const info = await this.loadPdf(this.rawBytes);
     return info.numPages;
@@ -181,9 +199,10 @@ export class PdfEngine {
     return await TransformOperations.compressPdf(bytes, options);
   }
 
-  async convertToGrayscale(pdfBytes = null) {
+  async convertToGrayscale(pdfBytes = null, options = {}) {
     const bytes = pdfBytes || this.rawBytes;
-    return await TransformOperations.convertToGrayscale(bytes);
+    const res = await PageOperations.convertToGrayscale(bytes, options);
+    return res.pdfBytes || res;
   }
 
   // --- Security Operations ---
@@ -233,7 +252,11 @@ export class PdfEngine {
   // --- Vector Compilation & Exporter ---
 
   async exportPdf(state) {
-    return await PdfExporter.exportPdf(this.rawBytes, state);
+    let bytes = this.rawBytes;
+    if ((!bytes || (bytes instanceof ArrayBuffer && bytes.byteLength === 0)) && state?.pdfBytes?.byteLength > 0) {
+      bytes = state.pdfBytes;
+    }
+    return await PdfExporter.exportPdf(bytes, state);
   }
 
   async htmlToPdf(htmlString, options = {}) {
@@ -244,12 +267,31 @@ export class PdfEngine {
     return await PageOperations.wordToPdf(docxBytes, options);
   }
 
+  async pdfToWord(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.pdfToWord(bytes, options);
+  }
+
   async excelToPdf(fileBytes, options = {}) {
     return await PageOperations.excelToPdf(fileBytes, options);
   }
 
+  async pdfToExcel(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.pdfToExcel(bytes, options);
+  }
+
   async pptToPdf(pptxBytes, options = {}) {
     return await PageOperations.pptToPdf(pptxBytes, options);
+  }
+
+  async pdfToPpt(pdfBytes = null, options = {}) {
+    const bytes = pdfBytes || this.rawBytes;
+    return await PageOperations.pdfToPpt(bytes, options);
+  }
+
+  async createSamplePresentationPdf() {
+    return await PageOperations.createSamplePresentationPdf();
   }
 }
 

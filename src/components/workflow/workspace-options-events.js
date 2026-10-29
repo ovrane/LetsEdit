@@ -263,6 +263,70 @@ export function bindWorkspaceOptionsEvents(manager) {
     };
   });
 
+  const grayModeSelect = manager.container.querySelector('#grayscale-mode-select');
+  if (grayModeSelect) {
+    grayModeSelect.onchange = (e) => {
+      manager.grayscaleMode = e.target.value;
+      manager.render();
+    };
+  }
+
+  const grayPreserveBlack = manager.container.querySelector('#grayscale-preserve-black');
+  if (grayPreserveBlack) {
+    grayPreserveBlack.onchange = (e) => {
+      manager.grayscalePreserveBlackText = e.target.checked;
+      manager.render();
+    };
+  }
+
+  // Word to PDF controls
+  const wordSizeSelect = manager.container.querySelector('#word-pagesize-select');
+  if (wordSizeSelect) {
+    wordSizeSelect.onchange = (e) => {
+      manager.wordPageSize = e.target.value;
+      manager.render();
+    };
+  }
+  const wordFontSelect = manager.container.querySelector('#word-font-select');
+  if (wordFontSelect) {
+    wordFontSelect.onchange = (e) => {
+      manager.wordFontFamily = e.target.value;
+      manager.render();
+    };
+  }
+
+  // PDF to Word controls
+  const pdfToWordModeSelect = manager.container.querySelector('#pdf-to-word-mode-select');
+  if (pdfToWordModeSelect) {
+    pdfToWordModeSelect.onchange = (e) => {
+      manager.pdfToWordMode = e.target.value;
+      manager.render();
+    };
+  }
+  const pdfToWordTableSelect = manager.container.querySelector('#pdf-to-word-table-select');
+  if (pdfToWordTableSelect) {
+    pdfToWordTableSelect.onchange = (e) => {
+      manager.pdfToWordTableSensitivity = e.target.value;
+      manager.render();
+    };
+  }
+
+  // PDF to Excel controls
+  const pdfToExcelFmtSelect = manager.container.querySelector('#pdf-to-excel-format-select');
+  if (pdfToExcelFmtSelect) {
+    pdfToExcelFmtSelect.onchange = (e) => {
+      manager.pdfToExcelFormat = e.target.value;
+      manager.render();
+    };
+  }
+  const pdfToExcelNormChk = manager.container.querySelector('#pdf-to-excel-normalize-chk');
+  if (pdfToExcelNormChk) {
+    pdfToExcelNormChk.onchange = (e) => {
+      manager.pdfToExcelNormalize = e.target.checked;
+      manager.render();
+    };
+  }
+
   // Copy extracted text buttons
   const copyTextHandler = async () => {
     const txt = manager.extractedTextPreview || (manager.container.querySelector('#extracted-text-area')?.value) || '';
@@ -523,6 +587,27 @@ export function bindWorkspaceOptionsEvents(manager) {
       manager.render();
     };
   });
+  const excelFitSelect = manager.container.querySelector('#excel-fitmode-select');
+  if (excelFitSelect) {
+    excelFitSelect.onchange = (e) => {
+      manager.excelFitMode = e.target.value;
+      manager.render();
+    };
+  }
+  const excelGridlinesChk = manager.container.querySelector('#excel-gridlines-chk');
+  if (excelGridlinesChk) {
+    excelGridlinesChk.onchange = (e) => {
+      manager.excelGridlines = e.target.checked;
+      manager.render();
+    };
+  }
+  const excelZebraChk = manager.container.querySelector('#excel-zebra-chk');
+  if (excelZebraChk) {
+    excelZebraChk.onchange = (e) => {
+      manager.excelZebra = e.target.checked;
+      manager.render();
+    };
+  }
 
   // PPT to PDF options listeners
   const pptTitleInp = manager.container.querySelector('#workflow-ppt-title');
@@ -531,6 +616,29 @@ export function bindWorkspaceOptionsEvents(manager) {
       manager.pptTitle = e.target.value;
     };
   }
+  const pptHandoutSelect = manager.container.querySelector('#ppt-handout-select');
+  if (pptHandoutSelect) {
+    pptHandoutSelect.onchange = (e) => {
+      manager.pptHandoutLayout = e.target.value;
+      manager.render();
+    };
+  }
+
+  // PDF to PPT presentation options listeners
+  const pdfToPptModeSelect = manager.container.querySelector('#pdf-to-ppt-mode-select');
+  if (pdfToPptModeSelect) {
+    pdfToPptModeSelect.onchange = (e) => {
+      manager.pdfToPptMode = e.target.value;
+      manager.render();
+    };
+  }
+  const ratioBtns = manager.container.querySelectorAll('.btn-pdf-ppt-ratio');
+  ratioBtns.forEach((btn) => {
+    btn.onclick = () => {
+      manager.pdfToPptAspectRatio = btn.dataset.ratio;
+      manager.render();
+    };
+  });
 
   // Form Filler listeners
   if (manager.activeTool.id === 'fill-forms') {
@@ -585,5 +693,84 @@ export function bindWorkspaceOptionsEvents(manager) {
   // Watermark & Stamp Engine listeners
   if (['watermark', 'watermark-pdf', 'add-watermark'].includes(manager.activeTool.id)) {
     bindWatermarkEvents(manager);
+  }
+
+  // HTML5 & Markdown to PDF listeners
+  if (manager.activeTool.id === 'html-to-pdf') {
+    const titleInput = manager.container.querySelector('#html-pdf-title-input');
+    if (titleInput) {
+      titleInput.oninput = (e) => {
+        manager.htmlPdfDocTitle = e.target.value.trim();
+      };
+    }
+
+    const themeBtns = manager.container.querySelectorAll('[data-html-theme]');
+    themeBtns.forEach(btn => {
+      btn.onclick = () => {
+        manager.htmlPdfTheme = btn.getAttribute('data-html-theme');
+        manager.render();
+      };
+    });
+
+    const pageSizeSelect = manager.container.querySelector('#html-pdf-pagesize-select');
+    if (pageSizeSelect) {
+      pageSizeSelect.onchange = (e) => {
+        manager.htmlPdfPageSize = e.target.value;
+      };
+    }
+
+    const orientationSelect = manager.container.querySelector('#html-pdf-orientation-select');
+    if (orientationSelect) {
+      orientationSelect.onchange = (e) => {
+        manager.htmlPdfOrientation = e.target.value;
+      };
+    }
+
+    const marginBtns = manager.container.querySelectorAll('[data-html-margin]');
+    marginBtns.forEach(btn => {
+      btn.onclick = () => {
+        manager.htmlPdfMargin = parseInt(btn.getAttribute('data-html-margin'), 10) || 40;
+        manager.render();
+      };
+    });
+
+    const checkHeader = manager.container.querySelector('#html-pdf-check-header');
+    if (checkHeader) {
+      checkHeader.onchange = (e) => {
+        manager.htmlPdfShowHeader = e.target.checked;
+      };
+    }
+
+    const checkFooter = manager.container.querySelector('#html-pdf-check-footer');
+    if (checkFooter) {
+      checkFooter.onchange = (e) => {
+        manager.htmlPdfShowFooter = e.target.checked;
+      };
+    }
+  }
+
+  // Embedded Images Extraction listeners
+  if (['extract-images', 'extract_images'].includes(manager.activeTool.id)) {
+    const minSizeSelect = manager.container.querySelector('#extract-minsize-select');
+    if (minSizeSelect) {
+      minSizeSelect.onchange = (e) => {
+        manager.extractMinSize = e.target.value;
+      };
+    }
+
+    const formatBtns = manager.container.querySelectorAll('[data-extract-format]');
+    formatBtns.forEach(btn => {
+      btn.onclick = () => {
+        manager.extractTargetFormat = btn.getAttribute('data-extract-format');
+        manager.render();
+      };
+    });
+
+    const dedupCheck = manager.container.querySelector('#extract-deduplicate-check');
+    if (dedupCheck) {
+      dedupCheck.onchange = (e) => {
+        manager.extractDeduplicate = e.target.checked;
+      };
+    }
   }
 }

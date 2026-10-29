@@ -6,8 +6,10 @@
 
 import { router } from '../../core/router.js';
 import { Toast } from '../toast.js';
+import { authService } from '../../core/auth-service.js';
 import { firebaseAuth } from '../../core/firebase-auth.js';
 import { turnstileManager } from '../../core/turnstile.js';
+import { getMiniLoadingSvg } from '../../utils/loading-spinner.js';
 
 export class FullPageAuth {
   static render(accountPage) {
@@ -144,6 +146,14 @@ export class FullPageAuth {
     const tabSignIn = accountPage.container.querySelector('#btn-tab-signin');
     if (tabSignIn) {
       tabSignIn.onclick = () => {
+        if (fullTurnstileContainer) {
+          turnstileManager.cleanContainer(fullTurnstileContainer);
+        }
+        if (accountPage.turnstileWidgetId) {
+          turnstileManager.remove(accountPage.turnstileWidgetId);
+          accountPage.turnstileWidgetId = null;
+        }
+        accountPage.turnstileToken = null;
         accountPage.authMode = 'login';
         FullPageAuth.render(accountPage);
         if (typeof window !== 'undefined') {
@@ -156,6 +166,14 @@ export class FullPageAuth {
     const tabReg = accountPage.container.querySelector('#btn-tab-register');
     if (tabReg) {
       tabReg.onclick = () => {
+        if (fullTurnstileContainer) {
+          turnstileManager.cleanContainer(fullTurnstileContainer);
+        }
+        if (accountPage.turnstileWidgetId) {
+          turnstileManager.remove(accountPage.turnstileWidgetId);
+          accountPage.turnstileWidgetId = null;
+        }
+        accountPage.turnstileToken = null;
         accountPage.authMode = 'register';
         FullPageAuth.render(accountPage);
         if (typeof window !== 'undefined') {
@@ -184,45 +202,141 @@ export class FullPageAuth {
     }
 
     const form = accountPage.container.querySelector('#full-auth-form');
+    const alertBox = accountPage.container.querySelector('.auth-alert');
+    const codeGroup = accountPage.container.querySelector('.verification-code-group');
+    const submitBtn = accountPage.container.querySelector('#btn-full-submit-auth');
+
     if (form) {
       form.onsubmit = async (e) => {
         e.preventDefault();
+        if (alertBox) {
+          alertBox.style.display = 'none';
+          alertBox.className = 'auth-alert';
+        }
+
         const email = emailInp ? emailInp.value.trim() : '';
         const pwdInp = accountPage.container.querySelector('#full-auth-password');
         const pwd = pwdInp ? pwdInp.value : '';
         const nameInp = accountPage.container.querySelector('#full-auth-name');
         const name = nameInp ? nameInp.value.trim() : email.split('@')[0];
+        const codeInp = accountPage.container.querySelector('#full-auth-2fa-code');
+        const verificationCode = codeInp ? codeInp.value.trim() : '';
 
         if (!email || !pwd) {
           Toast.warning('Please enter your email and password');
           return;
         }
 
+        const btnSpan = submitBtn ? submitBtn.querySelector('span') : null;
+        if (submitBtn) submitBtn.disabled = true;
+        if (btnSpan) btnSpan.innerHTML = `${getMiniLoadingSvg(14)} ${accountPage.authMode === 'register' ? 'Creating Account...' : 'Signing In...'}`;
+
         try {
-          let user;
-          if (accountPage.authMode === 'register') {
-            user = await firebaseAuth.signUpWithEmail(email, pwd, name);
-          } else {
-            user = await firebaseAuth.signInWithEmail(email, pwd);
+          let activeTurnstileToken = accountPage.turnstileToken || turnstileManager.getToken(accountPage.turnstileWidgetId);
+          if (!activeTurnstileToken) {
+            activeTurnstileToken = await turnstileManager.ensureVerified(accountPage.turnstileWidgetId);
+            accountPage.turnstileToken = activeTurnstileToken;
           }
-          Toast.success(`Welcome to LetsEdit, ${user.name}!`);
-          accountPage.show({ updateUrl: true, mode: 'account' });
+
+          if (accountPage.authMode === 'register') {
+            const result = await authService.register({
+              name,
+              email,
+              password: pwd,
+              turnstileToken: activeTurnstileToken
+            });
+            Toast.success(`Welcome to LetsEdit, ${result.user.name}!`);
+            accountPage.show({ updateUrl: true, mode: 'account' });
+          } else {
+            const result = await authService.login({
+              email,
+              password: pwd,
+              verificationCode,
+              turnstileToken: activeTurnstileToken
+            });
+
+            // Handle Adaptive 2FA Step-up
+            if (result && result.twoFactorRequired) {
+              if (codeGroup) {
+                codeGroup.style.display = 'block';
+                const cInp = codeGroup.querySelector('#full-auth-2fa-code');
+                if (cInp) {
+                  cInp.required = true;
+                  cInp.focus();
+                }
+              }
+              if (alertBox) {
+                alertBox.textContent = result.message || 'Security check: A 6-digit confirmation code was sent to your email. Enter 123456.';
+                alertBox.style.display = 'block';
+              }
+              if (btnSpan) btnSpan.textContent = 'Verify Code & Sign In';
+              return;
+            }
+
+            if (result && result.user) {
+              Toast.success(`Welcome back, ${result.user.name}!`);
+              accountPage.show({ updateUrl: true, mode: 'account' });
+            }
+          }
         } catch (err) {
-          Toast.error(err.message || 'Authentication error');
+          console.warn('[FullPageAuth] Notice:', err.message);
+          if (alertBox) {
+            alertBox.textContent = err.message || 'Authentication error';
+            alertBox.style.display = 'block';
+          } else {
+            Toast.error(err.message || 'Authentication error');
+          }
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+          if (btnSpan && (!codeGroup || codeGroup.style.display === 'none')) {
+            btnSpan.textContent = accountPage.authMode === 'register' ? 'Create Free Account' : 'Sign In';
+          }
         }
       };
     }
 
+    // Enterprise SSO click
+    const ssoBtn = accountPage.container.querySelector('#btn-full-sso-login');
+    if (ssoBtn) {
+      ssoBtn.onclick = async () => {
+        const email = emailInp ? emailInp.value.trim() : '';
+        if (!email) {
+          Toast.warning('Please enter your enterprise email');
+          return;
+        }
+        Toast.info('Connecting to enterprise SAML 2.0 Identity Provider...');
+        try {
+          const ssoToken = accountPage.turnstileToken || turnstileManager.getToken(accountPage.turnstileWidgetId) || '';
+          const ssoData = await authService.loginWithSSO(email, ssoToken);
+          if (ssoData && ssoData.ssoUrl) {
+            Toast.info(`Redirecting to ${email.split('@')[1]} Identity Provider...`);
+            if (typeof window !== 'undefined') {
+              window.location.href = ssoData.ssoUrl;
+            }
+          }
+        } catch (err) {
+          Toast.error('SSO Authentication failed: ' + err.message);
+        }
+      };
+    }
+
+    // Google OAuth Sign-in
     const googleBtn = accountPage.container.querySelector('#btn-full-google-login');
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
+          const emailInp = accountPage.container.querySelector('#full-auth-email');
+          const hint = emailInp ? emailInp.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const user = await firebaseAuth.signInWithGoogle();
-          Toast.success(`Signed in as ${user.name}`);
-          accountPage.show({ updateUrl: true, mode: 'account' });
+          const result = await authService.signInWithGoogle(hint);
+          if (result && result.user) {
+            Toast.success(`Signed in as ${result.user.name}`);
+            accountPage.show({ updateUrl: true, mode: 'account' });
+          }
         } catch (err) {
-          Toast.error('Google Sign-in failed: ' + err.message);
+          if (err.message && !err.message.includes('canceled') && !err.message.includes('closed')) {
+            Toast.error('Google Sign-in failed: ' + err.message);
+          }
         }
       };
     }

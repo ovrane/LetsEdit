@@ -1,0 +1,1228 @@
+/* ==========================================================================
+   Comprehensive Mobile & Tablet Responsive Engine
+   Breakpoints: 1024px (Tablets / Laptops), 768px (Tablets / Phablets), 480px (Smartphones), 360px (Ultra-Compact)
+   Ensures 100% clean, polished, thumb-friendly UX across all pages & cards
+   ========================================================================== */
+
+/* Universal Viewport & Smooth Touch Rules */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================================================
+   Desktop & Compact Laptops (<= 1360px)
+   Prevents studio navbar crowding on standard 1280px - 1360px displays
+   ========================================================================== */
+@media (max-width: 1360px) {
+  #btn-open-docs span,
+  #btn-open-all-tools span,
+  #btn-open-pdf span {
+    display: none !important;
+  }
+
+  .file-name-tag {
+    max-width: 140px !important;
+  }
+
+  #btn-fit-width,
+  #btn-fit-page {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Mid-Size Devices & Tablets (769px to 1024px)
+   iPad Portrait/Landscape, Surface Pro, Small Laptops
+   ========================================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Landing Header & Navigation */
+  .landing-nav-inner {
+    padding: 0 16px;
+  }
+
+  /* Mega Menu Grid: 3 Clean Columns on Tablets */
+  .smallpdf-mega-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 16px 14px !important;
+    padding: 20px 20px !important;
+  }
+
+  /* Hero Section: Proportional 2-Column Layout */
+  .landing-hero-section {
+    padding: 40px 20px 28px !important;
+  }
+
+  .landing-hero-grid {
+    gap: 32px !important;
+  }
+
+  .landing-hero-title {
+    font-size: 40px !important;
+    line-height: 1.15 !important;
+  }
+
+  .landing-hero-subtitle {
+    font-size: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .hero-illustration-wrapper {
+    max-width: 440px !important;
+    min-height: 330px !important;
+  }
+
+  /* 8-Column Directory Grid: 3 Columns on Tablet */
+  .tools-dir-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  /* Tool Cards Grid: Auto-fill comfortable 3-col width */
+  .landing-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  /* Studio Navbar Header on Tablets */
+  .app-navbar {
+    padding: 0 12px;
+  }
+
+  .back-home-btn span,
+  #btn-open-pdf,
+  .autosave-badge span,
+  #btn-open-all-tools span,
+  #user-profile-widget #btn-open-auth span,
+  #btn-open-docs,
+  #btn-fit-width,
+  #btn-fit-page,
+  .page-nav-group,
+  .navbar-center .navbar-divider {
+    display: none !important;
+  }
+
+  .file-title-pill {
+    max-width: 130px;
+  }
+
+  .file-name-tag {
+    max-width: 90px;
+  }
+
+  .navbar-brand {
+    gap: 6px;
+  }
+
+  .navbar-right {
+    gap: 6px;
+  }
+
+  /* Studio Ribbon Toolbar: Horizontal Scroll with smooth touch */
+  .app-toolbar {
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 6px 12px !important;
+  }
+
+  .app-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toolbar-group {
+    flex-shrink: 0;
+  }
+
+  /* Studio Tool Options Sidebar: Compact Rail */
+  .tool-options-sidebar {
+    width: 270px !important;
+  }
+
+  /* Docs Page Layout on Tablet */
+  .docs-main-body {
+    grid-template-columns: 240px 1fr !important;
+    gap: 24px !important;
+    padding: 32px 18px 64px !important;
+  }
+
+  .docs-chapter {
+    padding: 28px 24px !important;
+  }
+
+  /* Legal Page Layout on Tablet */
+  .legal-main-body {
+    grid-template-columns: 230px 1fr !important;
+    gap: 24px !important;
+    padding: 32px 18px 64px !important;
+  }
+
+  .legal-content-card {
+    padding: 32px 28px !important;
+  }
+
+  /* Account Settings Hub on Tablet */
+  .account-shell {
+    grid-template-columns: 220px 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* Workflow Workspace Layout on Tablet */
+  .workflow-workspace-layout {
+    grid-template-columns: 1fr 290px !important;
+    gap: 20px !important;
+  }
+
+  .workflow-file-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  }
+}
+
+/* Universal Touch & Viewport Polish */
+@media (max-width: 768px) {
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Universal Modal Responsive Shell */
+  .modal-backdrop {
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: calc(100vh - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: 16px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-header {
+    padding: 14px 18px;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 16px 18px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    padding: 12px 18px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* All Tools Hub Modal on Small Screens */
+  .tools-hub-dialog {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 94vh !important;
+    max-height: 94dvh !important;
+    border-radius: 16px !important;
+  }
+
+  .tools-hub-header {
+    padding: 12px 16px;
+  }
+
+  .tools-hub-subtitle {
+    display: none !important;
+  }
+
+  .tools-hub-controls {
+    padding: 10px 16px;
+  }
+
+  .modal-search-wrapper {
+    padding: 6px 12px;
+  }
+
+  .modal-search-input {
+    font-size: 13px;
+  }
+
+  .modal-shortcut-badge {
+    display: none !important;
+  }
+
+  .modal-filter-rail {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+    padding-bottom: 4px;
+    padding-right: 24px !important;
+    scroll-padding: 0 16px;
+    gap: 6px;
+  }
+
+  .modal-filter-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tool-filter-chip {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    padding: 5px 11px;
+  }
+
+  .tools-hub-body {
+    padding: 14px 16px;
+  }
+
+  .tools-hub-footer {
+    padding: 10px 16px;
+  }
+
+  .tools-hub-footer-hint {
+    display: none !important;
+  }
+
+  .tools-hub-close-cta {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Studio Top Navigation Bar on Tablets & Mobile */
+  .app-navbar {
+    height: 54px;
+    padding: 0 10px;
+  }
+
+  .navbar-brand {
+    gap: 6px;
+  }
+
+  .landing-desktop-nav,
+  .landing-nav-menu,
+  .back-home-btn span,
+  #btn-open-pdf span,
+  .autosave-badge span,
+  #btn-open-all-tools span,
+  #user-profile-widget #btn-open-auth span,
+  #btn-open-docs {
+    display: none !important;
+  }
+
+  .back-home-btn,
+  #btn-open-pdf,
+  #btn-open-all-tools {
+    padding: 6px 8px;
+  }
+
+  .lets-logo-text {
+    font-size: 17px;
+  }
+
+  .lets-logo-badge {
+    width: 28px;
+    height: 28px;
+  }
+
+  .file-name-tag {
+    max-width: 90px;
+    font-size: 11.5px;
+    padding: 3px 8px;
+  }
+
+  .navbar-center .navbar-divider,
+  #btn-fit-width,
+  #btn-fit-page {
+    display: none !important;
+  }
+
+  .navbar-center {
+    gap: 4px;
+  }
+
+  .zoom-text {
+    font-size: 11px;
+    min-width: 38px;
+  }
+
+  .page-badge-text {
+    font-size: 11.5px;
+  }
+
+  .navbar-right {
+    gap: 6px;
+  }
+
+  .autosave-badge {
+    padding: 4px 6px;
+  }
+
+  .btn-export-pdf {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .btn-export-pdf span {
+    display: inline;
+  }
+
+  /* Studio Ribbon Toolbar: Horizontal Touch Scroller */
+  .app-toolbar {
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 6px 10px;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .app-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toolbar-group {
+    flex-shrink: 0;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .tool-btn {
+    padding: 6px 9px;
+    font-size: 12px;
+    gap: 4px;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+
+  .canva-dropdown .dropdown-menu {
+    position: fixed;
+    top: 96px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: none;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Dynamic Properties Bar on Mobile */
+  .properties-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+
+  .properties-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .prop-item {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+
+  .prop-item label {
+    font-size: 11px;
+  }
+
+  .select-sm {
+    font-size: 11.5px;
+    padding: 3px 6px;
+    height: 28px;
+  }
+
+  /* Mobile Slide-Over Drawers for Sidebars */
+  .app-sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: 82vw;
+    max-width: 290px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body.sidebar-open .app-sidebar {
+    transform: translateX(0);
+    margin-left: 0 !important;
+  }
+
+  body:not(.sidebar-open) .app-sidebar {
+    transform: translateX(-100%);
+    margin-left: 0 !important;
+  }
+
+  .tool-options-sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 50;
+    width: 85vw;
+    max-width: 320px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body.tool-sidebar-open .tool-options-sidebar {
+    transform: translateX(0);
+    margin-right: 0 !important;
+  }
+
+  body:not(.tool-sidebar-open) .tool-options-sidebar {
+    transform: translateX(100%);
+    margin-right: 0 !important;
+  }
+
+  /* Document Viewport & Pages */
+  .document-viewport {
+    padding: 12px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pdf-page-wrap {
+    max-width: 100% !important;
+    margin: 0 auto 16px auto;
+  }
+
+  /* Editor Upload / Empty State Card on Small Screens */
+  .editor-upload-card {
+    width: calc(100% - 24px) !important;
+    max-width: 100% !important;
+    margin: 18px 12px !important;
+    padding: 28px 18px 24px !important;
+    border-radius: 18px !important;
+  }
+
+  .editor-upload-icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+  }
+
+  .editor-upload-title {
+    font-size: 19px;
+  }
+
+  .editor-upload-subtitle {
+    font-size: 12.5px;
+    margin-bottom: 18px;
+  }
+
+  .editor-upload-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .editor-upload-btn-primary,
+  .editor-upload-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 18px;
+    font-size: 13.5px;
+    border-radius: 10px;
+  }
+
+  .editor-upload-drop-hint {
+    font-size: 12px;
+  }
+
+  .editor-upload-sample-row {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .feature-pill {
+    font-size: 10.5px;
+    padding: 4px 10px;
+  }
+
+  /* Landing Page Header & Hero on Small Screens */
+  .landing-header {
+    top: 0;
+    margin: 0;
+    width: 100%;
+    height: 60px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .landing-nav-inner {
+    padding: 0 16px;
+  }
+
+  .landing-hero-section {
+    padding: 32px 16px 20px;
+  }
+
+  .landing-hero-title {
+    font-size: 26px !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.02em;
+  }
+
+  .landing-hero-subtitle {
+    font-size: 13.5px !important;
+    margin-bottom: 20px;
+  }
+
+  .hero-search-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 8px 14px;
+  }
+
+  .hero-search-input {
+    font-size: 13.5px;
+  }
+
+  .landing-filter-rail {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+    gap: 6px;
+    padding: 4px 24px 8px 4px !important;
+    scroll-padding: 0 16px;
+  }
+
+  .landing-filter-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .landing-filter-chip {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 3.5px 9px;
+    height: 27px;
+    gap: 4px;
+  }
+
+  /* 8-Column Directory Grid: 2 Columns on Tablet */
+  .tools-dir-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    padding: 0 8px;
+  }
+
+  .tools-dir-col {
+    padding: 14px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .tools-dir-col-title {
+    font-size: 13px;
+  }
+
+  .tools-dir-item {
+    padding: 7px 8px;
+    font-size: 12.5px;
+    border-radius: 8px;
+  }
+
+  /* Why Choose LetsEdit Grid */
+  .why-choose-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .why-card {
+    padding: 20px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .why-card-title {
+    font-size: 16px;
+  }
+
+  .why-card-desc {
+    font-size: 13px;
+  }
+
+  /* Apps Showcase Banner */
+  .apps-banner {
+    grid-template-columns: 1fr !important;
+    padding: 24px 18px !important;
+    gap: 20px !important;
+    border-radius: 18px !important;
+  }
+
+  .apps-title {
+    font-size: 24px !important;
+  }
+
+  .apps-desc {
+    font-size: 13.5px !important;
+    margin-bottom: 18px;
+  }
+
+  .apps-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px;
+  }
+
+  .app-download-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 18px !important;
+  }
+
+  .apps-preview-col {
+    order: -1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .apps-mockup-wrapper {
+    max-width: 240px;
+  }
+
+  /* FAQ Accordion Section */
+  .faq-accordion {
+    gap: 8px;
+  }
+
+  .faq-item {
+    border-radius: 12px;
+  }
+
+  .faq-question {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .faq-answer {
+    padding: 0 16px 14px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* Smallpdf Executive Footer on Tablets */
+  .footer-container {
+    flex-direction: column;
+    gap: 28px;
+    padding: 0 16px 24px;
+  }
+
+  .footer-brand {
+    max-width: 100%;
+  }
+
+  .footer-links {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px 16px !important;
+    width: 100% !important;
+  }
+
+  .footer-col h4 {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .footer-col a {
+    font-size: 12.5px;
+    padding: 3px 0;
+  }
+
+  .footer-bottom-inner {
+    padding: 14px 16px;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .footer-status-pill {
+    font-size: 11px;
+    text-align: center;
+  }
+
+  /* Tool Workflow Pages on Small Screens */
+  .workflow-header {
+    height: 56px;
+  }
+
+  .workflow-header-inner {
+    padding: 0 14px;
+  }
+
+  .workflow-hero-card {
+    padding: 0 8px;
+  }
+
+  .workflow-title {
+    font-size: 22px !important;
+  }
+
+  .workflow-subtitle {
+    font-size: 12.5px !important;
+    margin-bottom: 16px;
+  }
+
+  .workflow-dropzone {
+    padding: 20px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .workflow-primary-cta {
+    padding: 10px 20px !important;
+    font-size: 13.5px !important;
+  }
+
+  .workflow-workspace-main {
+    padding: 16px 12px;
+  }
+
+  .workflow-workspace-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .workflow-cards-area {
+    padding: 16px 12px !important;
+  }
+
+  .workflow-file-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .workflow-file-card {
+    padding: 10px;
+  }
+
+  .file-card-preview {
+    height: 100px;
+  }
+
+  .workflow-sidebar-card {
+    padding: 16px 14px !important;
+  }
+
+  /* Floating Badges & HUD on Mobile with iOS Safe Area */
+  .pwa-offline-badge {
+    bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+    right: 14px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .worker-hud-container {
+    bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+    right: 14px;
+    left: 14px;
+    width: auto;
+  }
+
+  .worker-hud-card {
+    width: 100%;
+  }
+
+  /* Studio Floating Apply Bar & Paging Bar with Safe Area */
+  .editor-floating-bottom-bar {
+    bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
+    width: calc(100vw - 32px);
+    max-width: 380px;
+  }
+
+  .btn-apply-changes {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+  }
+
+  .editor-paging-bar {
+    bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
+    max-width: calc(100vw - 20px) !important;
+    padding: 4px 10px !important;
+    gap: 6px !important;
+  }
+
+  body.has-pending-changes .editor-paging-bar {
+    bottom: max(76px, calc(76px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+
+  .paging-fit-btn,
+  .editor-paging-bar .paging-divider:last-of-type {
+    display: none !important;
+  }
+
+  /* Legal Hub: Seamless Mobile Horizontal Tab Bar */
+  .legal-main-body {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    padding: 20px 14px 48px !important;
+  }
+
+  .legal-sidebar {
+    position: sticky !important;
+    top: 56px !important;
+    z-index: 25 !important;
+    background: var(--bg-surface) !important;
+    padding: 4px 0 !important;
+  }
+
+  .legal-nav-group {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding: 6px 8px !important;
+    border-radius: 12px !important;
+  }
+
+  .legal-nav-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  .legal-sidebar-item {
+    flex-shrink: 0 !important;
+    width: auto !important;
+    font-size: 12.5px !important;
+    padding: 6px 12px !important;
+    white-space: nowrap !important;
+  }
+
+  .legal-content-card {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Legal Header on Mobile */
+  .legal-header-inner {
+    padding: 0 14px !important;
+  }
+
+  .legal-header-left .legal-nav-link {
+    display: none !important;
+  }
+
+  .legal-header-right {
+    gap: 8px !important;
+  }
+
+  #btn-legal-studio span {
+    display: none !important;
+  }
+
+  #btn-legal-studio {
+    padding: 6px 10px !important;
+  }
+
+  /* Docs Header on Mobile */
+  .docs-header-inner {
+    padding: 0 14px !important;
+  }
+
+  .docs-header-cta {
+    display: none !important;
+  }
+
+  .docs-search-input-wrap {
+    width: 140px !important;
+  }
+
+  /* Landing Hero Sheet Tilted Bounds */
+  .hero-backdrop-sheet.sheet-back {
+    transform: rotate(3deg) translate(6px, -4px) !important;
+    max-width: 90% !important;
+  }
+
+  /* Account Navigation as Mobile Horizontal Tab Rail */
+  .account-shell {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .account-menu {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding: 4px 0 !important;
+  }
+
+  .account-menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .account-menu-item {
+    flex-shrink: 0 !important;
+    font-size: 12.5px !important;
+    padding: 7px 12px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Smallpdf Mega Menu: 2-Columns on Portrait Tablet & Large Phone */
+  .smallpdf-mega-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px 10px !important;
+    padding: 16px 14px !important;
+  }
+}
+
+/* Extra Small Screens (Smartphones <= 480px) */
+@media (max-width: 480px) {
+  /* Tool Cards Grid: 1 Column Full Width on Phone */
+  .landing-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .landing-tool-card {
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .card-icon-badge {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .card-title {
+    font-size: 15px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .card-desc {
+    font-size: 12.5px !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Orbiting Floating Badges Scaled to Prevent Overflow */
+  .hero-float-badge {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+  }
+
+  .badge-word-w {
+    font-size: 15px !important;
+  }
+
+  .hero-float-badge svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .hero-illustration-wrapper {
+    min-height: 240px !important;
+    max-width: 100% !important;
+  }
+
+  /* 8-Column Directory Grid: 1 Column Full Width on Phone */
+  .tools-dir-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .tools-dir-col {
+    padding: 14px 14px !important;
+  }
+
+  .tools-dir-item {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  /* Footer: 1 Column Full Width on Phone */
+  .footer-links {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .footer-col {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 14px;
+  }
+
+  .footer-col:last-child {
+    border-bottom: none;
+  }
+
+  /* Top Studio Navbar on Phone */
+  .navbar-center,
+  #btn-toggle-tool-sidebar,
+  #btn-theme-toggle {
+    display: none !important;
+  }
+
+  .file-title-pill {
+    max-width: 80px;
+  }
+
+  /* Search replace panel on Phone */
+  #prop-replace-wrap {
+    flex-wrap: wrap;
+  }
+
+  #find-query-input,
+  #replace-query-input {
+    width: 100% !important;
+  }
+
+  /* Touch Target Sizing & Spacing */
+  .btn-social {
+    min-height: 44px !important;
+  }
+
+  .api-snippet-wrap {
+    padding-top: 42px !important;
+  }
+
+  .smallpdf-mega-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 14px 12px !important;
+  }
+}
+
+/* ==========================================================================
+   Ultra-Compact Smartphones (<= 360px)
+   iPhone SE (1st gen: 320px), Galaxy Z Flip Cover Screen (300-320px)
+   ========================================================================== */
+@media (max-width: 360px) {
+  /* Landing Header on 320px */
+  .landing-nav-inner {
+    padding: 0 8px !important;
+  }
+
+  .lets-logo-text {
+    font-size: 15px !important;
+  }
+
+  .lets-logo-badge {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .landing-header-right {
+    gap: 4px !important;
+  }
+
+  .landing-signin-pill-btn {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  #btn-landing-search {
+    display: none !important;
+  }
+
+  /* Studio Navbar on 320px */
+  .app-navbar {
+    padding: 0 6px !important;
+  }
+
+  .navbar-brand {
+    gap: 4px !important;
+  }
+
+  #btn-open-pdf,
+  .autosave-badge {
+    display: none !important;
+  }
+
+  .file-title-pill {
+    max-width: 62px !important;
+    padding: 2px 6px !important;
+  }
+
+  .file-name-tag {
+    max-width: 48px !important;
+    font-size: 10.5px !important;
+  }
+
+  .btn-export-pdf {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  /* Landing Hero on 320px */
+  .landing-hero-section {
+    padding: 24px 10px 18px !important;
+  }
+
+  .landing-hero-title {
+    font-size: 23px !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .hero-search-wrapper {
+    padding: 6px 10px !important;
+  }
+
+  .hero-search-input {
+    font-size: 12px !important;
+  }
+
+  .docs-search-input-wrap {
+    width: 105px !important;
+  }
+
+  .docs-search-input {
+    font-size: 11.5px !important;
+    padding: 6px 20px 6px 24px !important;
+  }
+
+  /* Filter chips on 320px */
+  .tool-filter-chip,
+  .landing-filter-chip {
+    font-size: 10.5px !important;
+    padding: 3px 7px !important;
+    height: 25px !important;
+  }
+
+  /* Modals on 320px */
+  .modal-dialog {
+    width: calc(100vw - 12px) !important;
+    max-width: calc(100vw - 12px) !important;
+    border-radius: 12px !important;
+  }
+
+  .modal-header {
+    padding: 10px 12px !important;
+  }
+
+  .modal-body {
+    padding: 12px !important;
+  }
+
+  .modal-footer {
+    padding: 8px 12px !important;
+  }
+}
+
