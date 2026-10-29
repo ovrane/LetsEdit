@@ -411,8 +411,11 @@ class AuthService {
         const fbUser = await firebaseAuth.signInWithEmail(normalizedEmail, password);
         return { success: true, user: fbUser };
       } catch (fbErr) {
-        // Firebase Auth gave a concrete error (e.g. wrong password, user not found)
-        throw fbErr;
+        if (fbErr.message?.includes('CONFIGURATION_NOT_FOUND') || fbErr.code === 'auth/configuration-not-found') {
+          console.warn('[AuthService] Firebase Auth not provisioned on project, falling through to ClientAccountVault');
+        } else {
+          throw fbErr;
+        }
       }
     }
 
@@ -534,7 +537,11 @@ class AuthService {
         const fbUser = await firebaseAuth.signUpWithEmail(normalizedEmail, password, displayName);
         return { success: true, user: fbUser };
       } catch (fbErr) {
-        throw fbErr;
+        if (fbErr.message?.includes('CONFIGURATION_NOT_FOUND') || fbErr.code === 'auth/configuration-not-found') {
+          console.warn('[AuthService] Firebase Auth not provisioned on project, falling through to ClientAccountVault');
+        } else {
+          throw fbErr;
+        }
       }
     }
 

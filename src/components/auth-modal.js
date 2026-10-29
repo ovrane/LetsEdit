@@ -404,6 +404,10 @@ export class AuthModal {
   }
 
   open(mode = 'login') {
+    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
+    if (existingContainer) {
+      turnstileManager.cleanContainer(existingContainer);
+    }
     if (this.turnstileWidgetId) {
       turnstileManager.remove(this.turnstileWidgetId);
       this.turnstileWidgetId = null;
@@ -421,6 +425,10 @@ export class AuthModal {
 
   close() {
     this.modal.style.display = 'none';
+    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
+    if (existingContainer) {
+      turnstileManager.cleanContainer(existingContainer);
+    }
     if (this.turnstileWidgetId) {
       turnstileManager.remove(this.turnstileWidgetId);
       this.turnstileWidgetId = null;

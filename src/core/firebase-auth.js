@@ -45,8 +45,18 @@ class FirebaseAuthService {
   }
 
   init() {
-    try {
-      if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
+    const isAuthExplicitlyEnabled = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_AUTH_ENABLED === 'true');
+
+    // In headless Node.js test environment or when not explicitly enabled, keep false
+    if (typeof window === 'undefined') {
+      this.isConfigured = false;
+      return;
+    }
+
+    // Only eagerly attach Firebase Auth SDK if explicitly configured and verified
+    // (prevents CONFIGURATION_NOT_FOUND 400 network failures on projects where Auth isn't enabled)
+    if (isAuthExplicitlyEnabled && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
+      try {
         this.app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
         this.auth = getAuth(this.app);
         this.isConfigured = true;
@@ -64,9 +74,12 @@ class FirebaseAuthService {
           }
         });
         return;
+      } catch (err) {
+        console.warn('Firebase live initialization notice:', err.message);
+        this.isConfigured = false;
       }
-    } catch (err) {
-      console.warn('Firebase live initialization notice:', err.message);
+    } else {
+      this.isConfigured = false;
     }
 
     // Read remembered session from localStorage

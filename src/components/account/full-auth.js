@@ -146,6 +146,9 @@ export class FullPageAuth {
     const tabSignIn = accountPage.container.querySelector('#btn-tab-signin');
     if (tabSignIn) {
       tabSignIn.onclick = () => {
+        if (fullTurnstileContainer) {
+          turnstileManager.cleanContainer(fullTurnstileContainer);
+        }
         if (accountPage.turnstileWidgetId) {
           turnstileManager.remove(accountPage.turnstileWidgetId);
           accountPage.turnstileWidgetId = null;
@@ -163,6 +166,9 @@ export class FullPageAuth {
     const tabReg = accountPage.container.querySelector('#btn-tab-register');
     if (tabReg) {
       tabReg.onclick = () => {
+        if (fullTurnstileContainer) {
+          turnstileManager.cleanContainer(fullTurnstileContainer);
+        }
         if (accountPage.turnstileWidgetId) {
           turnstileManager.remove(accountPage.turnstileWidgetId);
           accountPage.turnstileWidgetId = null;
