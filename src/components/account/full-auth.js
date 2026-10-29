@@ -226,12 +226,18 @@ export class FullPageAuth {
         if (btnSpan) btnSpan.innerHTML = `${getMiniLoadingSvg(14)} ${accountPage.authMode === 'register' ? 'Creating Account...' : 'Signing In...'}`;
 
         try {
+          let activeTurnstileToken = accountPage.turnstileToken || turnstileManager.getToken(accountPage.turnstileWidgetId);
+          if (!activeTurnstileToken) {
+            activeTurnstileToken = await turnstileManager.ensureVerified(accountPage.turnstileWidgetId);
+            accountPage.turnstileToken = activeTurnstileToken;
+          }
+
           if (accountPage.authMode === 'register') {
             const result = await authService.register({
               name,
               email,
               password: pwd,
-              turnstileToken: accountPage.turnstileToken
+              turnstileToken: activeTurnstileToken
             });
             Toast.success(`Welcome to LetsEdit, ${result.user.name}!`);
             accountPage.show({ updateUrl: true, mode: 'account' });
@@ -240,7 +246,7 @@ export class FullPageAuth {
               email,
               password: pwd,
               verificationCode,
-              turnstileToken: accountPage.turnstileToken
+              turnstileToken: activeTurnstileToken
             });
 
             // Handle Adaptive 2FA Step-up

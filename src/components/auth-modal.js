@@ -286,6 +286,12 @@ export class AuthModal {
         if (btnText) btnText.innerHTML = `${getMiniLoadingSvg(14)} ${this.mode === 'register' ? 'Creating Account...' : 'Signing In...'}`;
 
         try {
+          let activeTurnstileToken = this.turnstileToken || turnstileManager.getToken(this.turnstileWidgetId);
+          if (!activeTurnstileToken) {
+            activeTurnstileToken = await turnstileManager.ensureVerified(this.turnstileWidgetId);
+            this.turnstileToken = activeTurnstileToken;
+          }
+
           if (this.mode === 'register') {
             const nameInp = this.modal.querySelector('#auth-name');
             const confInp = this.modal.querySelector('#auth-confirm-password');
@@ -302,7 +308,7 @@ export class AuthModal {
               name: displayName,
               email,
               password,
-              turnstileToken: this.turnstileToken
+              turnstileToken: activeTurnstileToken
             });
             this.handleSuccessfulAuth(result.user);
           } else {
@@ -310,7 +316,7 @@ export class AuthModal {
               email,
               password,
               verificationCode,
-              turnstileToken: this.turnstileToken
+              turnstileToken: activeTurnstileToken
             });
 
             // Handle Adaptive 2FA Step-up
