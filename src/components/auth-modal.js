@@ -382,13 +382,17 @@ export class AuthModal {
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
+          const emailInput = this.modal.querySelector('#auth-email');
+          const hint = emailInput ? emailInput.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const result = await authService.signInWithGoogle();
+          const result = await authService.signInWithGoogle(hint);
           if (result && result.user) {
             this.handleSuccessfulAuth(result.user);
           }
         } catch (err) {
-          Toast.error('Google Sign-in failed: ' + err.message);
+          if (err.message && !err.message.includes('canceled') && !err.message.includes('closed')) {
+            Toast.error('Google Sign-in failed: ' + err.message);
+          }
         }
       };
     }
@@ -404,13 +408,13 @@ export class AuthModal {
   }
 
   open(mode = 'login') {
-    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
-    if (existingContainer) {
-      turnstileManager.cleanContainer(existingContainer);
-    }
     if (this.turnstileWidgetId) {
       turnstileManager.remove(this.turnstileWidgetId);
       this.turnstileWidgetId = null;
+    }
+    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
+    if (existingContainer) {
+      turnstileManager.cleanContainer(existingContainer);
     }
     this.turnstileToken = null;
     this.mode = mode;
@@ -425,13 +429,13 @@ export class AuthModal {
 
   close() {
     this.modal.style.display = 'none';
-    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
-    if (existingContainer) {
-      turnstileManager.cleanContainer(existingContainer);
-    }
     if (this.turnstileWidgetId) {
       turnstileManager.remove(this.turnstileWidgetId);
       this.turnstileWidgetId = null;
+    }
+    const existingContainer = this.modal?.querySelector('#modal-turnstile-container');
+    if (existingContainer) {
+      turnstileManager.cleanContainer(existingContainer);
     }
     this.turnstileToken = null;
   }

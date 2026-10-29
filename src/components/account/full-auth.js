@@ -325,14 +325,18 @@ export class FullPageAuth {
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
+          const emailInp = accountPage.container.querySelector('#full-auth-email');
+          const hint = emailInp ? emailInp.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const result = await authService.signInWithGoogle();
+          const result = await authService.signInWithGoogle(hint);
           if (result && result.user) {
             Toast.success(`Signed in as ${result.user.name}`);
             accountPage.show({ updateUrl: true, mode: 'account' });
           }
         } catch (err) {
-          Toast.error('Google Sign-in failed: ' + err.message);
+          if (err.message && !err.message.includes('canceled') && !err.message.includes('closed')) {
+            Toast.error('Google Sign-in failed: ' + err.message);
+          }
         }
       };
     }
