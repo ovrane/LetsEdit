@@ -45,17 +45,14 @@ class FirebaseAuthService {
   }
 
   init() {
-    const isAuthExplicitlyEnabled = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_AUTH_ENABLED === 'true');
-
-    // In headless Node.js test environment or when not explicitly enabled, keep false
+    // In headless Node.js test environment, keep false so tests use controlled mock users
     if (typeof window === 'undefined') {
       this.isConfigured = false;
       return;
     }
 
-    // Only eagerly attach Firebase Auth SDK if explicitly configured and verified
-    // (prevents CONFIGURATION_NOT_FOUND 400 network failures on projects where Auth isn't enabled)
-    if (isAuthExplicitlyEnabled && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
+    // Attach Firebase Auth SDK in browser runtime
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
       try {
         this.app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
         this.auth = getAuth(this.app);

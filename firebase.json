@@ -1,4 +1,13 @@
 {
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "LetsEdit",
+        "supportEmail": "mozammilali2018@gmail.com"
+      }
+    }
+  },
   "hosting": {
     "target": "letsedit-site",
     "public": "dist",

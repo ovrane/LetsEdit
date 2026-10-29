@@ -382,10 +382,8 @@ export class AuthModal {
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
-          const emailInput = this.modal.querySelector('#auth-email');
-          const hint = emailInput ? emailInput.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const result = await authService.signInWithGoogle(hint);
+          const result = await authService.signInWithGoogle();
           if (result && result.user) {
             this.handleSuccessfulAuth(result.user);
           }

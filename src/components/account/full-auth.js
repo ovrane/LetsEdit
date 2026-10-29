@@ -325,10 +325,8 @@ export class FullPageAuth {
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
-          const emailInp = accountPage.container.querySelector('#full-auth-email');
-          const hint = emailInp ? emailInp.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const result = await authService.signInWithGoogle(hint);
+          const result = await authService.signInWithGoogle();
           if (result && result.user) {
             Toast.success(`Signed in as ${result.user.name}`);
             accountPage.show({ updateUrl: true, mode: 'account' });
