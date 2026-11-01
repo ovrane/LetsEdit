@@ -372,15 +372,7 @@ export class LandingPage {
     // Header Quick Tool Search Modal (Spotlight style)
     this.setupHeaderQuickSearch();
 
-    // Theme Toggle on Landing Header
-    const landingThemeBtn = this.container.querySelector('#btn-landing-theme');
-    if (landingThemeBtn) {
-      landingThemeBtn.onclick = () => {
-        toggleTheme();
-      };
-    }
-
-    applyTheme(getPreferredTheme());
+    applyTheme();
 
     // User auth button & popover on landing header
     const landingAuthBtn = this.container.querySelector('#btn-landing-auth');

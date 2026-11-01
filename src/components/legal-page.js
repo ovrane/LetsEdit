@@ -102,15 +102,6 @@ export class LegalPage {
           </div>
 
           <div class="legal-header-right">
-            <button class="icon-btn" id="btn-legal-theme" title="Toggle Theme" aria-label="Toggle theme">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            </button>
             <a href="/edit_pdf" data-route="/edit_pdf" class="btn btn-primary btn-sm" id="btn-legal-studio" style="padding: 8px 16px; font-weight: 700;">
               <span>Open Studio</span>
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
@@ -439,8 +430,6 @@ export class LegalPage {
     const docsLink = this.container.querySelector('#legal-nav-docs');
     if (docsLink) docsLink.onclick = (e) => { e.preventDefault(); router.navigate('/docs'); };
 
-    const themeBtn = this.container.querySelector('#btn-legal-theme');
-    if (themeBtn) themeBtn.onclick = () => toggleTheme();
 
     const studioBtn = this.container.querySelector('#btn-legal-studio');
     if (studioBtn) studioBtn.onclick = (e) => { e.preventDefault(); router.navigate('/edit_pdf'); };

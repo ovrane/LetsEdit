@@ -409,17 +409,8 @@ class App {
     const saveBtn = document.getElementById('btn-save-pdf');
     if (saveBtn) saveBtn.onclick = triggerApplyWorkflow;
 
-    const floatingApplyBtn = document.getElementById('btn-floating-apply');
-    if (floatingApplyBtn) floatingApplyBtn.onclick = triggerApplyWorkflow;
-
-    // Initialize & Wire theme toggle
-    applyTheme(getPreferredTheme());
-    const themeBtn = document.getElementById('btn-theme-toggle');
-    if (themeBtn) {
-      themeBtn.onclick = () => {
-        toggleTheme();
-      };
-    }
+    // Initialize light mode
+    applyTheme();
 
     // All Tools Hub modal
     const allToolsBtn = document.getElementById('btn-open-all-tools');
