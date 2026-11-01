@@ -15,7 +15,6 @@ export class MobilePairModal {
     this.broadcastChannel = null;
     this.onCompleteCallback = null;
     this.activeAction = 'camera';
-    this.init();
   }
 
   init() {
@@ -121,6 +120,9 @@ export class MobilePairModal {
   }
 
   async open({ action = 'camera', title = null, subtitle = null, onComplete = null } = {}) {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.activeAction = action;
     this.onCompleteCallback = onComplete;

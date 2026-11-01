@@ -9,9 +9,6 @@ import { Toast } from './toast.js';
 export class MetadataModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -138,6 +135,9 @@ export class MetadataModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const state = store.getState();
     const meta = state.metadata || {};

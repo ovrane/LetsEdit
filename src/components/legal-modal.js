@@ -8,10 +8,6 @@ export class LegalModal {
   constructor() {
     this.modal = null;
     this.activeTab = 'privacy'; // 'privacy' | 'terms' | 'security'
-
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -27,6 +23,9 @@ export class LegalModal {
 
   open(tab = 'privacy') {
     this.activeTab = tab;
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     this.render();
     this.bindEvents();
     if (this.modal) {
