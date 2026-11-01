@@ -1,0 +1,35 @@
+# LetsEdit
+
+> Free, private, in-browser PDF editor and document tools suite powered by WebAssembly (WASM). All PDF processing runs 100% client-side with zero cloud file uploads.
+
+LetsEdit provides over 50 document tools for editing text, merging, splitting, compressing, converting, signing, and protecting PDF files directly inside modern web browsers.
+
+## Core Capabilities
+
+- [PDF Editor](https://letsedit.web.app/edit_pdf): Edit existing text, add annotations, insert shapes, draw, and fill forms in the browser.
+- [Merge PDF](https://letsedit.web.app/merge_pdf): Combine multiple PDF documents into a single organized file with drag-and-drop reordering.
+- [Split PDF](https://letsedit.web.app/split_pdf): Extract specific page ranges or split every page into separate PDF files.
+- [Compress PDF](https://letsedit.web.app/compress_pdf): Reduce PDF file size using intelligent vector stream and raster image optimization.
+- [Fill & Sign](https://letsedit.web.app/sign_pdf): Electronically sign documents with draw, type, upload, or camera capture, generating verifiable audit certificates.
+- [Organize PDF](https://letsedit.web.app/organize_pdf): Rotate, reorder, duplicate, and delete pages with interactive grid view.
+- [Watermark PDF](https://letsedit.web.app/watermark_pdf): Add text or image watermarks with custom rotation, opacity, and positioning.
+- [Page Numbers](https://letsedit.web.app/page_numbers_pdf): Insert customizable headers, footers, and page numbers.
+- [PDF to Word](https://letsedit.web.app/pdf_to_word): Convert PDF documents into editable Microsoft Word (.docx) files.
+- [Word to PDF](https://letsedit.web.app/word_to_pdf): Convert Microsoft Word (.docx) files into standard vector PDF documents.
+- [PDF to Image](https://letsedit.web.app/pdf_to_image): Convert PDF pages to high-resolution JPG or PNG images.
+- [Images to PDF](https://letsedit.web.app/images_to_pdf): Combine multiple images (JPG, PNG, WebP) into a clean PDF document.
+- [Crop PDF](https://letsedit.web.app/crop_pdf): Trim document margins and adjust visible canvas boundaries.
+- [Permanent Redaction](https://letsedit.web.app/redact_pdf): Purge sensitive text, glyphs, and metadata tokens irreversibly.
+
+## Architecture & Privacy
+
+- [Documentation & Architecture](https://letsedit.web.app/docs): Comprehensive engineering guide, Text Clustering engine specification, and API reference.
+- [Zero-Cloud Privacy](https://letsedit.web.app/security-whitepaper): Security whitepaper detailing client-side WASM processing, Web Crypto SHA-256 integrity, and offline operation.
+- [Privacy Policy](https://letsedit.web.app/privacy): Privacy policy confirming zero cloud document storage or telemetry transmission of file contents.
+- [Terms of Service](https://letsedit.web.app/terms): Terms of service for free web tools and optional developer API tokens.
+
+## Optional
+
+- [Agentic Catalog](https://letsedit.web.app/.well-known/ai-catalog.json): Machine-readable Agentic Resource Discovery (ARD) capability catalog.
+- [Full Documentation](https://letsedit.web.app/llms-full.txt): Complete detailed text documentation for LLM comprehension and tooling integration.
+- [Developer API](https://letsedit.web.app/account): Developer API keys and programmatic REST endpoints for server-side integration.

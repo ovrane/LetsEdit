@@ -12,9 +12,6 @@ export class AlternateMixModal {
   constructor() {
     this.modal = null;
     this.secondDocBytes = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -137,6 +134,9 @@ export class AlternateMixModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const state = store.getState();
     const docAName = this.modal.querySelector('#mix-doc-a-name');

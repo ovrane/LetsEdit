@@ -1,0 +1,45 @@
+# LetsEdit — Full Documentation & LLM Specification
+
+> LetsEdit is a private, zero-cloud online PDF editor and 50+ document tools suite running client-side WebAssembly (WASM). Documents never leave the user's browser.
+
+## 1. Executive Summary
+
+LetsEdit is engineered to offer all capabilities found in platforms such as Adobe Acrobat, Sejda PDF, and iLovePDF, but with an architectural focus on client-side security and zero cloud data leaks. Files selected by users are decoded in browser memory using WebAssembly compilations of PDF engines (PDF.js, pdf-lib, custom WASM algorithms) and rendered onto HTML5 Canvas element stacks.
+
+## 2. Tools & Workflows
+
+### PDF Studio Editor (/edit_pdf)
+- Direct inline text editing with matching font family, weight, and baseline detection.
+- Freehand vector drawing, highlighter, eraser, and vector shapes (rectangle, ellipse, line, arrow).
+- Stamp and image insertion with transparency.
+- Sticky notes, annotations, and comments.
+- AcroForms interactive field builder (text box, checkbox, radio button).
+- Permanent cryptographic redaction (destroys text glyph streams, coordinates, and forensic artifacts).
+
+### Organization & Splitting
+- /merge_pdf: Reorder, combine, and merge multiple documents.
+- /split_pdf: Extract custom page sets, odd/even pages, or split into single-page documents.
+- /organize_pdf: Visual multi-page grid for rotation (90°/180°/270°), reordering, duplication, and deletion.
+- /crop_pdf: Precise margin trimming and page dimension adjustment.
+- /alternate_mix_pdf: Interleave duplex scanner pages from two documents into proper sequence.
+
+### Optimization & Conversion
+- /compress_pdf: Lossless and lossy vector/raster compression with live visual preview.
+- /pdf_to_word: Extract structured typography, tables, and headings into editable Microsoft Word (.docx).
+- /word_to_pdf: Vector PDF generation from Word (.docx) files without layout deformation.
+- /pdf_to_image: Export pages to JPG or PNG with configurable DPI (72 to 300 DPI).
+- /images_to_pdf: Combine multiple JPG, PNG, and WebP images into a single formatted PDF.
+- /ocr_pdf: Optical Character Recognition extracting searchable text from scanned PDFs.
+
+### Security, Cryptography & Compliance
+- /sign_pdf: Legal electronic signatures complying with US ESIGN Act and EU eIDAS.
+- Automatic SHA-256 legal audit certificate generation with QR code transaction verification.
+- /protect_pdf: Standard AES-128 and AES-256 encryption with password protection and permissions.
+- /unlock_pdf: Decrypt password-protected documents in memory.
+
+## 3. Machine-Readable Interfaces
+
+- Catalog Manifest: https://letsedit.web.app/.well-known/ai-catalog.json
+- ARD Discovery: https://letsedit.web.app/.well-known/ard.json
+- Web App Manifest: https://letsedit.web.app/manifest.webmanifest
+- Sitemap: https://letsedit.web.app/sitemap.xml
