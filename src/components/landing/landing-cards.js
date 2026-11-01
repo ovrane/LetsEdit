@@ -4,7 +4,7 @@
  * docs & specifications rendering, and card click dispatching.
  */
 
-import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, SMALLPDF_DIRECTORIES, renderDirectoryItemHtml } from '../all-tools-modal.js';
+import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, SMALLPDF_DIRECTORIES, renderDirectoryItemHtml } from '../tools-catalog-data.js';
 import { getTwoToneIconSvg } from './landing-icons.js';
 
 export const DOCS_DIRECTORIES = [

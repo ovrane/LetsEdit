@@ -11,9 +11,6 @@ import { downloadBlob } from '../utils/helpers.js';
 export class SplitHalfModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -125,6 +122,9 @@ export class SplitHalfModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const pages = store.getState().pageCount || 1;
     this.modal.querySelector('#half-source-pages').textContent = pages.toString();

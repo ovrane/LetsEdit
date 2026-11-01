@@ -23,7 +23,6 @@ export class StudioExportModal {
     this.numPages = 1;
     this.fileSizeStr = '0 KB';
     this.isProcessing = false;
-    this.init();
   }
 
   init() {

@@ -9,7 +9,6 @@ import { Toast } from './toast.js';
 export class WatermarkModal {
   constructor() {
     this.modal = null;
-    this.init();
   }
 
   init() {
@@ -171,6 +170,10 @@ export class WatermarkModal {
   }
 
   open() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
+    if (!this.modal) return;
     const cur = store.getState().watermark;
     if (cur) {
       this.modal.querySelector('#wm-text').value = cur.text || '';

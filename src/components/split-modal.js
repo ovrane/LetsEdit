@@ -11,9 +11,6 @@ import { downloadBlob } from '../utils/helpers.js';
 export class SplitModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -161,6 +158,9 @@ export class SplitModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const state = store.getState();
     const totalPages = state.pageCount || 1;

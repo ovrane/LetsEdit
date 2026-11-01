@@ -8,7 +8,7 @@
  * - text-clustering.js, eraser.js, resize-gizmo.js, bubble-toolbar.js
  */
 
-import { pdfEngine } from './pdf-engine.js';
+const getPdfEngine = async () => (await import('./pdf-engine.js')).pdfEngine;
 import { store } from './state-store.js';
 import { uid } from '../utils/helpers.js';
 import { CanvasEmptyState } from './canvas/empty-state.js';
@@ -17,7 +17,7 @@ import { AnnotationRenderer } from './canvas/annotation-renderer.js';
 import { CanvasEventsHandler } from './canvas/canvas-events.js';
 import { TextClustering } from './canvas/text-clustering.js';
 import { FloatingBubbleBar } from './canvas/bubble-toolbar.js';
-import { loadAllEditorFonts, getCssFontFamily } from './font-registry.js';
+import { getCssFontFamily } from './font-registry.js';
 import { Toast } from '../components/toast.js';
 
 export class CanvasManager {
@@ -33,9 +33,6 @@ export class CanvasManager {
     this.renderedPages = new Set();
     this.pageObserver = null;
     this.currentPageNumber = 1;
-
-    // Load all 150+ Google Fonts into document head for pixel-perfect editing fidelity
-    loadAllEditorFonts();
 
     this.bindGlobalEvents();
   }
@@ -211,7 +208,8 @@ export class CanvasManager {
           try {
             btn.disabled = true;
             Toast.show(`Duplicating page ${pageNum}...`, 'info');
-            await pdfEngine.duplicatePage(pageNum - 1);
+            const engine = await getPdfEngine();
+            await engine.duplicatePage(pageNum - 1);
             store.duplicatePage(pageNum);
             Toast.show(`Page ${pageNum} duplicated!`, 'success');
           } catch (err) {
@@ -224,7 +222,8 @@ export class CanvasManager {
           try {
             btn.disabled = true;
             Toast.show(`Inserting blank page after page ${pageNum}...`, 'info');
-            await pdfEngine.insertBlankPage(pageNum - 1);
+            const engine = await getPdfEngine();
+            await engine.insertBlankPage(pageNum - 1);
             store.addBlankPage(pageNum - 1);
             Toast.show(`Blank page inserted after page ${pageNum}!`, 'success');
           } catch (err) {
@@ -265,11 +264,12 @@ export class CanvasManager {
     this.renderedPages.add(pageNum);
 
     const state = store.getState();
-    const page = await pdfEngine.getPage(pageNum);
+    const engine = await getPdfEngine();
+    const page = await engine.getPage(pageNum);
     const rotation = state.pageRotations[pageNum] || 0;
 
     // Render PDF base canvas
-    const viewport = await pdfEngine.renderPageToCanvas(page, refs.canvas, state.scale, rotation);
+    const viewport = await engine.renderPageToCanvas(page, refs.canvas, state.scale, rotation);
 
     // Size overlays to match viewport
     const width = viewport.width;
@@ -298,7 +298,8 @@ export class CanvasManager {
 
   async renderTextLayer(page, textLayerEl, scale, rotation, pageNum) {
     textLayerEl.innerHTML = '';
-    const { items, viewport } = await pdfEngine.extractTextItems(page, scale, rotation);
+    const engine = await getPdfEngine();
+    const { items, viewport } = await engine.extractTextItems(page, scale, rotation);
     const clusters = TextClustering.clusterTextItems(items, viewport, scale);
 
     const currentAnnotations = store.getAnnotations(pageNum) || [];

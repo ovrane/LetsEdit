@@ -11,9 +11,6 @@ import { downloadBlob } from '../utils/helpers.js';
 export class PdfToImageModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -127,6 +124,9 @@ export class PdfToImageModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.modal.style.display = 'flex';
   }

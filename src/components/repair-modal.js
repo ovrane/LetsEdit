@@ -16,7 +16,6 @@ export class RepairModal {
     this.fileName = 'corrupted_document.pdf';
     this.repairedResult = null;
     this.isRepairing = false;
-    this.init();
   }
 
   init() {
@@ -131,6 +130,9 @@ export class RepairModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.modal.style.display = 'flex';
 

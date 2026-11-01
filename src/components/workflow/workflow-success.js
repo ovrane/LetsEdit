@@ -7,7 +7,6 @@
 
 import { CHAIN_TOOLS, WORKFLOW_TOOLS_CONFIG } from './tools-config.js';
 import { openMobileQrModal, openCloudStorageModal } from './workflow-modals.js';
-import { compareModal } from '../compare-modal.js';
 import { Toast } from '../toast.js';
 import { downloadBlob, formatFileSize } from '../../utils/helpers.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
@@ -670,8 +669,9 @@ export function bindSuccessEvents(manager) {
 
   const openDiffBtn = manager.container.querySelector('#btn-open-interactive-diff');
   if (openDiffBtn) {
-    openDiffBtn.onclick = () => {
+    openDiffBtn.onclick = async () => {
       if (manager.compareDocA && manager.compareDocB) {
+        const { compareModal } = await import('../compare-modal.js');
         compareModal.showWithBytes(
           manager.compareDocA.bytes,
           manager.compareDocB.bytes,
