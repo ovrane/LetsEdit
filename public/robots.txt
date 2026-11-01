@@ -42,3 +42,7 @@ Allow: /
 
 # Host & Sitemap References
 Sitemap: https://letsedit.web.app/sitemap.xml
+
+# Agentic Resource Discovery & LLM Guidelines
+# llms.txt: https://letsedit.web.app/llms.txt
+# ard.json: https://letsedit.web.app/.well-known/ard.json
