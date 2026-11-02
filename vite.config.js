@@ -28,10 +28,36 @@ export default defineConfig({
           }
         });
       }
+    },
+    {
+      // Fix: <link rel="preload" as="style"> tags emitted by Vite's CSS plugin
+      // don't get crossorigin= from crossOriginLoading (which only covers scripts).
+      // Without it browsers discard the preload because the credentials mode doesn't
+      // match the actual stylesheet fetch, showing the "preload not used" warning.
+      // enforce:'post' ensures we run AFTER Vite's own CSS preload injection.
+      name: 'css-preload-crossorigin',
+      enforce: 'post',
+      transformIndexHtml: {
+        order: 'post',
+        handler(html) {
+          return html.replace(
+            /<link rel="preload" as="style"([^>]*?)>/g,
+            (match, attrs) => {
+              if (/crossorigin/.test(attrs)) return match;
+              return `<link rel="preload" as="style" crossorigin="anonymous"${attrs}>`;
+            }
+          );
+        }
+      }
     }
   ],
   build: {
     chunkSizeWarningLimit: 1000,
+    // Emit crossorigin="anonymous" on all <link rel="modulepreload"> tags Vite
+    // generates so the preload credentials-mode matches the actual fetch request.
+    // Without this, browsers log a "preload not used" warning for the CSS chunk.
+    crossOriginLoading: 'anonymous',
+    modulePreload: { polyfill: true },
     rollupOptions: {
       output: {
         manualChunks(id) {

@@ -16,7 +16,7 @@ import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 import { pwaManager } from './core/pwa-manager.js';
-import { populateFontSelect } from './core/font-registry.js';
+import { populateFontSelect, loadAllEditorFonts } from './core/font-registry.js';
 
 class App {
   constructor() {
