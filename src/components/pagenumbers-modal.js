@@ -10,7 +10,6 @@ export class PageNumbersModal {
   constructor() {
     this.modal = null;
     this.selectedPosition = 'bottom-center';
-    this.init();
   }
 
   init() {
@@ -167,6 +166,10 @@ export class PageNumbersModal {
   }
 
   open() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
+    if (!this.modal) return;
     const cur = store.getState().pageNumbers;
     if (cur) {
       this.modal.querySelector('#pn-format').value = cur.format || 'Page {n} of {total}';

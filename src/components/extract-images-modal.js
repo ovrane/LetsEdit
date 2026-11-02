@@ -15,7 +15,6 @@ export class ExtractImagesModal {
     this.modal = null;
     this.extractedImages = [];
     this.isExtracting = false;
-    this.init();
   }
 
   init() {
@@ -131,6 +130,10 @@ export class ExtractImagesModal {
   }
 
   async open(customBytes = null, docTitle = null) {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
+    if (!this.modal) return;
     this.modal.style.display = 'flex';
     const state = store.getState();
     const bytes = customBytes || pdfEngine.rawBytes || state.pdfBytes;

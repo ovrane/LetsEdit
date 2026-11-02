@@ -1,0 +1,49 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "LetsEdit",
+    "identifier": "did:web:letsedit.web.app",
+    "documentationUrl": "https://letsedit.web.app/docs",
+    "logoUrl": "https://letsedit.web.app/icon.svg"
+  },
+  "entries": [
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:letsedit.web.app:tools:pdf-suite",
+      "displayName": "LetsEdit PDF Suite",
+      "description": "Client-side private WebAssembly PDF processing suite offering editing, merging, splitting, compression, conversion, electronic signing, and permanent redaction without cloud uploads.",
+      "type": "application/json",
+      "url": "https://letsedit.web.app/docs",
+      "tags": [
+        "pdf",
+        "pdf-editor",
+        "wasm",
+        "client-side",
+        "converter",
+        "e-sign",
+        "privacy"
+      ],
+      "capabilities": [
+        "edit_pdf_text",
+        "merge_pdf_documents",
+        "split_pdf_pages",
+        "compress_pdf_file",
+        "convert_pdf_to_word",
+        "convert_word_to_pdf",
+        "convert_pdf_to_images",
+        "convert_images_to_pdf",
+        "electronic_signatures",
+        "permanent_redaction",
+        "watermark_and_page_numbering"
+      ],
+      "representativeQueries": [
+        "How can I edit text in a PDF online for free without uploading my files to a cloud server?",
+        "Merge multiple PDF documents into one single file privately",
+        "Compress PDF file size directly in the browser",
+        "Sign a PDF document with legally binding electronic signatures and audit trail"
+      ],
+      "version": "1.0.0",
+      "updatedAt": "2026-11-01T00:00:00Z"
+    }
+  ]
+}

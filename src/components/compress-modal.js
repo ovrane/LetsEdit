@@ -12,9 +12,6 @@ export class CompressModal {
   constructor() {
     this.modal = null;
     this.lastResult = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -181,6 +178,9 @@ export class CompressModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const state = store.getState();
     const size = state.pdfBytes ? (state.pdfBytes.byteLength || state.pdfBytes.length) : 0;

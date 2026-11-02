@@ -3,48 +3,20 @@
  */
 
 import { store } from './core/state-store.js';
-import { pdfEngine } from './core/pdf-engine.js';
+const getPdfEngine = async () => (await import('./core/pdf-engine.js')).pdfEngine;
 import { CanvasManager } from './core/canvas-manager.js';
 import { Sidebar } from './components/sidebar.js';
-import { SignatureTool } from './tools/signature-tool.js';
-import { ImageTool } from './tools/image-tool.js';
 import { FormTool } from './tools/form-tool.js';
 import { searchReplace } from './tools/search-replace.js';
-import { AuthModal, authModal } from './components/auth-modal.js';
-import { WatermarkModal } from './components/watermark-modal.js';
-import { PageNumbersModal } from './components/pagenumbers-modal.js';
-import { SecurityModal } from './components/security-modal.js';
-import { cropModal } from './components/crop-modal.js';
-import { metadataModal } from './components/metadata-modal.js';
-import { batesModal } from './components/bates-modal.js';
-import { splitModal } from './components/split-modal.js';
-import { nUpModal } from './components/nup-modal.js';
-import { alternateMixModal } from './components/alternate-mix-modal.js';
-import { splitHalfModal } from './components/split-half-modal.js';
-import { pdfToImageModal } from './components/pdf-to-image-modal.js';
-import { resizeModal } from './components/resize-modal.js';
-import { compressModal } from './components/compress-modal.js';
-import { flipModal } from './components/flip-modal.js';
-import { grayscaleModal } from './components/grayscale-modal.js';
-import { extractImagesModal } from './components/extract-images-modal.js';
-import { ocrModal } from './components/ocr-modal.js';
-import { allToolsModal } from './components/all-tools-modal.js';
+import { authModal } from './components/auth-modal.js';
 import { landingPage } from './components/landing-page.js';
 import { toolOptionsPanel } from './components/tool-options-panel.js';
-import { toolWorkflow } from './components/tool-workflow.js';
-import { accountPage } from './components/account-page.js';
-import { mobilePairPage } from './components/mobile-pair-page.js';
-import { recipientSignPage } from './components/recipient-sign-page.js';
 import { router } from './core/router.js';
 import { applyTheme, toggleTheme, getPreferredTheme } from './utils/theme.js';
 import { Toast } from './components/toast.js';
 import { downloadBlob, readFileAsArrayBuffer } from './utils/helpers.js';
 import { pwaManager } from './core/pwa-manager.js';
-import { legalModal } from './components/legal-modal.js';
-import { legalPage } from './components/legal-page.js';
-import { docsPage } from './components/docs-page.js';
 import { populateFontSelect, loadAllEditorFonts } from './core/font-registry.js';
-import { studioExportModal } from './components/studio-export-modal.js';
 
 class App {
   constructor() {
@@ -66,12 +38,12 @@ class App {
     // Initialize core components
     this.canvasManager = new CanvasManager(viewport);
     this.sidebar = new Sidebar(sidebarEl);
-    this.signatureTool = new SignatureTool();
-    this.imageTool = new ImageTool();
+    this.signatureTool = null;
+    this.imageTool = null;
     this.authModal = authModal;
-    this.watermarkModal = new WatermarkModal();
-    this.pageNumbersModal = new PageNumbersModal();
-    this.securityModal = new SecurityModal();
+    this.watermarkModal = null;
+    this.pageNumbersModal = null;
+    this.securityModal = null;
 
     if (toolSidebarEl) {
       toolOptionsPanel.mount(toolSidebarEl);
@@ -127,8 +99,8 @@ class App {
         if (viewClass) {
           document.body.classList.add(viewClass);
         }
-        legalPage.hide();
-        docsPage.hide();
+        if (window.__legalPage) window.__legalPage.hide();
+        if (window.__docsPage) window.__docsPage.hide();
         if (mobileContainer) mobileContainer.style.display = 'none';
         if (recContainer) recContainer.style.display = 'none';
         if (toolWfContainer) toolWfContainer.style.display = 'none';
@@ -144,19 +116,25 @@ class App {
         landingPage.switchToStudio({ updateUrl: false });
       } else if (route.isAccount) {
         setView('show-account');
-        accountPage.show({ updateUrl: false });
+        import('./components/account-page.js').then(m => m.accountPage.show({ updateUrl: false }));
       } else if (route.isLogin) {
         setView('show-account');
-        accountPage.showLogin({ updateUrl: false });
+        import('./components/account-page.js').then(m => m.accountPage.showLogin({ updateUrl: false }));
       } else if (route.isRegister) {
         setView('show-account');
-        accountPage.showRegister({ updateUrl: false });
+        import('./components/account-page.js').then(m => m.accountPage.showRegister({ updateUrl: false }));
       } else if (route.isLegal) {
         setView('show-legal');
-        legalPage.show({ tab: route.legalTab || 'privacy', updateUrl: false });
+        import('./components/legal-page.js').then(m => {
+          window.__legalPage = m.legalPage;
+          m.legalPage.show({ tab: route.legalTab || 'privacy', updateUrl: false });
+        });
       } else if (route.isDocs) {
         setView('show-docs');
-        docsPage.show({ updateUrl: false });
+        import('./components/docs-page.js').then(m => {
+          window.__docsPage = m.docsPage;
+          m.docsPage.show({ updateUrl: false });
+        });
       } else if (route.toolId === 'mobile-pair') {
         setView('show-mobile-pair');
         let mc = document.getElementById('mobile-pair-container');
@@ -166,7 +144,7 @@ class App {
           document.body.appendChild(mc);
         }
         mc.style.display = 'flex';
-        mobilePairPage.mount(mc);
+        import('./components/mobile-pair-page.js').then(m => m.mobilePairPage.mount(mc));
       } else if (route.isRecipientSigning || route.toolId === 'sign-document') {
         setView('show-recipient-sign');
         let rc = document.getElementById('recipient-sign-container');
@@ -176,10 +154,12 @@ class App {
           document.body.appendChild(rc);
         }
         rc.style.display = 'flex';
-        recipientSignPage.mount(rc);
+        import('./components/recipient-sign-page.js').then(m => m.recipientSignPage.mount(rc));
       } else if (route.toolId) {
         setView('show-tool-workflow');
-        toolWorkflow.openTool(route.toolId, { updateUrl: false });
+        import('./components/tool-workflow.js').then(m => {
+          m.toolWorkflow.openTool(route.toolId, { updateUrl: false });
+        });
       }
     });
 
@@ -247,8 +227,9 @@ class App {
                 banner.remove();
                 Toast.info('Restoring session annotations...');
                 if (!store.getState().pdfBytes) {
-                  const sampleBytes = await pdfEngine.createSamplePdf();
-                  const info = await pdfEngine.loadPdf(sampleBytes);
+                  const engine = await getPdfEngine();
+                  const sampleBytes = await engine.createSamplePdf();
+                  const info = await engine.loadPdf(sampleBytes);
                   store.setDocument(sampleBytes, data.filename || 'Recovered_Document.pdf', info.numPages);
                 }
                 for (const [pageNumStr, annList] of Object.entries(data.annotations)) {
@@ -307,8 +288,9 @@ class App {
       if (fsResult && fsResult.file) {
         try {
           Toast.info('Loading PDF document...');
+          const engine = await getPdfEngine();
           const arrayBuffer = await readFileAsArrayBuffer(fsResult.file);
-          const info = await pdfEngine.loadPdf(arrayBuffer);
+          const info = await engine.loadPdf(arrayBuffer);
           store.setDocument(arrayBuffer, fsResult.file.name, info.numPages);
           document.getElementById('current-filename').textContent = fsResult.file.name;
           Toast.success(`Loaded ${fsResult.file.name} (${info.numPages} pages)`);
@@ -325,8 +307,9 @@ class App {
       if (file && file.type === 'application/pdf') {
         try {
           Toast.info('Loading PDF document...');
+          const engine = await getPdfEngine();
           const arrayBuffer = await readFileAsArrayBuffer(file);
-          const info = await pdfEngine.loadPdf(arrayBuffer);
+          const info = await engine.loadPdf(arrayBuffer);
           store.setDocument(arrayBuffer, file.name, info.numPages);
           document.getElementById('current-filename').textContent = file.name;
           Toast.success(`Loaded ${file.name} (${info.numPages} pages)`);
@@ -418,28 +401,25 @@ class App {
     }
 
     // Apply Changes -> Process -> Export Workflow (Sejda & Smallpdf architecture)
-    const triggerApplyWorkflow = () => {
+    const triggerApplyWorkflow = async () => {
+      const { studioExportModal } = await import('./components/studio-export-modal.js');
       studioExportModal.startWorkflow(store.getState());
     };
 
     const saveBtn = document.getElementById('btn-save-pdf');
     if (saveBtn) saveBtn.onclick = triggerApplyWorkflow;
 
-    const floatingApplyBtn = document.getElementById('btn-floating-apply');
-    if (floatingApplyBtn) floatingApplyBtn.onclick = triggerApplyWorkflow;
-
-    // Initialize & Wire theme toggle
-    applyTheme(getPreferredTheme());
-    const themeBtn = document.getElementById('btn-theme-toggle');
-    if (themeBtn) {
-      themeBtn.onclick = () => {
-        toggleTheme();
-      };
-    }
+    // Initialize light mode
+    applyTheme();
 
     // All Tools Hub modal
     const allToolsBtn = document.getElementById('btn-open-all-tools');
-    if (allToolsBtn) allToolsBtn.onclick = () => allToolsModal.show();
+    if (allToolsBtn) {
+      allToolsBtn.onclick = async () => {
+        const { allToolsModal } = await import('./components/all-tools-modal.js');
+        allToolsModal.show();
+      };
+    }
 
     // Docs & Guide navigation from Studio
     const openDocsBtn = document.getElementById('btn-open-docs');
@@ -475,61 +455,85 @@ class App {
 
     // Standalone action buttons on toolbar
     const wmBtn = document.getElementById('btn-open-watermark');
-    if (wmBtn) wmBtn.onclick = () => this.watermarkModal.open();
+    if (wmBtn) {
+      wmBtn.onclick = async () => {
+        if (!this.watermarkModal) {
+          const { WatermarkModal } = await import('./components/watermark-modal.js');
+          this.watermarkModal = new WatermarkModal();
+        }
+        this.watermarkModal.open();
+      };
+    }
 
     const pnBtn = document.getElementById('btn-open-pagenumbers');
-    if (pnBtn) pnBtn.onclick = () => this.pageNumbersModal.open();
+    if (pnBtn) {
+      pnBtn.onclick = async () => {
+        if (!this.pageNumbersModal) {
+          const { PageNumbersModal } = await import('./components/pagenumbers-modal.js');
+          this.pageNumbersModal = new PageNumbersModal();
+        }
+        this.pageNumbersModal.open();
+      };
+    }
 
     const secBtn = document.getElementById('btn-open-security');
-    if (secBtn) secBtn.onclick = () => this.securityModal.open();
+    if (secBtn) {
+      secBtn.onclick = async () => {
+        if (!this.securityModal) {
+          const { SecurityModal } = await import('./components/security-modal.js');
+          this.securityModal = new SecurityModal();
+        }
+        this.securityModal.open();
+      };
+    }
 
     const cropBtn = document.getElementById('btn-open-crop');
-    if (cropBtn) cropBtn.onclick = () => cropModal.show();
+    if (cropBtn) cropBtn.onclick = () => import('./components/crop-modal.js').then(m => m.cropModal.show());
 
     const metaBtn = document.getElementById('btn-open-metadata');
-    if (metaBtn) metaBtn.onclick = () => metadataModal.show();
+    if (metaBtn) metaBtn.onclick = () => import('./components/metadata-modal.js').then(m => m.metadataModal.show());
 
     const batesBtn = document.getElementById('btn-open-bates');
-    if (batesBtn) batesBtn.onclick = () => batesModal.show();
+    if (batesBtn) batesBtn.onclick = () => import('./components/bates-modal.js').then(m => m.batesModal.show());
 
     const splitBtn = document.getElementById('btn-open-split');
-    if (splitBtn) splitBtn.onclick = () => splitModal.show();
+    if (splitBtn) splitBtn.onclick = () => import('./components/split-modal.js').then(m => m.splitModal.show());
 
     const nupBtn = document.getElementById('btn-open-nup');
-    if (nupBtn) nupBtn.onclick = () => nUpModal.show();
+    if (nupBtn) nupBtn.onclick = () => import('./components/nup-modal.js').then(m => m.nUpModal.show());
 
     const mixBtn = document.getElementById('btn-open-mix');
-    if (mixBtn) mixBtn.onclick = () => alternateMixModal.show();
+    if (mixBtn) mixBtn.onclick = () => import('./components/alternate-mix-modal.js').then(m => m.alternateMixModal.show());
 
     const splitHalfBtn = document.getElementById('btn-open-split-half');
-    if (splitHalfBtn) splitHalfBtn.onclick = () => splitHalfModal.show();
+    if (splitHalfBtn) splitHalfBtn.onclick = () => import('./components/split-half-modal.js').then(m => m.splitHalfModal.show());
 
     const toImageBtn = document.getElementById('btn-open-to-image');
-    if (toImageBtn) toImageBtn.onclick = () => pdfToImageModal.show();
+    if (toImageBtn) toImageBtn.onclick = () => import('./components/pdf-to-image-modal.js').then(m => m.pdfToImageModal.show());
 
     const extractImagesBtn = document.getElementById('btn-open-extract-images');
-    if (extractImagesBtn) extractImagesBtn.onclick = () => extractImagesModal.open();
+    if (extractImagesBtn) extractImagesBtn.onclick = () => import('./components/extract-images-modal.js').then(m => m.extractImagesModal.open());
 
     const resizeBtn = document.getElementById('btn-open-resize');
-    if (resizeBtn) resizeBtn.onclick = () => resizeModal.show();
+    if (resizeBtn) resizeBtn.onclick = () => import('./components/resize-modal.js').then(m => m.resizeModal.show());
 
     const flipBtn = document.getElementById('btn-open-flip');
-    if (flipBtn) flipBtn.onclick = () => flipModal.show();
+    if (flipBtn) flipBtn.onclick = () => import('./components/flip-modal.js').then(m => m.flipModal.show());
 
     const compressBtn = document.getElementById('btn-open-compress');
-    if (compressBtn) compressBtn.onclick = () => compressModal.show();
+    if (compressBtn) compressBtn.onclick = () => import('./components/compress-modal.js').then(m => m.compressModal.show());
 
     const grayscaleBtn = document.getElementById('btn-open-grayscale');
-    if (grayscaleBtn) grayscaleBtn.onclick = () => grayscaleModal.show();
+    if (grayscaleBtn) grayscaleBtn.onclick = () => import('./components/grayscale-modal.js').then(m => m.grayscaleModal.show());
 
     const ocrBtn = document.getElementById('btn-open-ocr');
-    if (ocrBtn) ocrBtn.onclick = () => ocrModal.show();
+    if (ocrBtn) ocrBtn.onclick = () => import('./components/ocr-modal.js').then(m => m.ocrModal.show());
 
     const sanitizeBtn = document.getElementById('btn-open-sanitize');
-    if (sanitizeBtn) sanitizeBtn.onclick = () => toolWorkflow.openTool('sanitize');
+    if (sanitizeBtn) sanitizeBtn.onclick = () => import('./components/tool-workflow.js').then(m => m.toolWorkflow.openTool('sanitize'));
 
     const flattenBtn = document.getElementById('btn-open-flatten');
-    if (flattenBtn) flattenBtn.onclick = () => toolWorkflow.openTool('flatten');
+    if (flattenBtn) flattenBtn.onclick = () => import('./components/tool-workflow.js').then(m => m.toolWorkflow.openTool('flatten'));
 
     // Convert dropdown quick actions
     const quickImgToPdf = document.getElementById('btn-quick-images-to-pdf');
@@ -543,9 +547,10 @@ class App {
           const files = Array.from(e.target.files);
           if (files.length > 0) {
             Toast.info(`Converting ${files.length} images to PDF...`);
+            const engine = await getPdfEngine();
             const buffers = await Promise.all(files.map(f => f.arrayBuffer()));
-            const newPdf = await pdfEngine.imagesToPdf(buffers);
-            const info = await pdfEngine.loadPdf(newPdf);
+            const newPdf = await engine.imagesToPdf(buffers);
+            const info = await engine.loadPdf(newPdf);
             store.setDocument(newPdf, 'Images_Combined.pdf', info.numPages);
             Toast.success(`Created PDF from ${files.length} images!`);
           }
@@ -560,7 +565,8 @@ class App {
         const state = store.getState();
         if (!state.pdfBytes) return Toast.error('No document loaded');
         Toast.info('Extracting searchable text...');
-        const text = await pdfEngine.extractDocumentText(state.pdfBytes);
+        const engine = await getPdfEngine();
+        const text = await engine.extractDocumentText(state.pdfBytes);
         const blob = new Blob([text], { type: 'text/plain' });
         const name = (state.documentName || 'Document').replace(/\.pdf$/i, '') + '_text.txt';
         downloadBlob(blob, name);
@@ -606,12 +612,26 @@ class App {
         if (tool === 'stamp') tool = 'image';
 
         if (tool === 'sign') {
-          this.signatureTool.open();
+          if (!this.signatureTool) {
+            import('./tools/signature-tool.js').then(({ SignatureTool }) => {
+              this.signatureTool = new SignatureTool();
+              this.signatureTool.open();
+            });
+          } else {
+            this.signatureTool.open();
+          }
           return;
         }
 
         if (tool === 'image') {
-          this.imageTool.open();
+          if (!this.imageTool) {
+            import('./tools/image-tool.js').then(({ ImageTool }) => {
+              this.imageTool = new ImageTool();
+              this.imageTool.open();
+            });
+          } else {
+            this.imageTool.open();
+          }
         }
 
         toolBtns.forEach(b => b.classList.remove('active'));
@@ -917,7 +937,7 @@ class App {
       // Slash (/) to open All Tools Hub (Canva style)
       if (e.key === '/' && !e.target.matches('input, textarea')) {
         e.preventDefault();
-        allToolsModal.show();
+        import('./components/all-tools-modal.js').then(m => m.allToolsModal.show());
       }
     });
   }
@@ -927,4 +947,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = new App();
   window.letseditStudio = app;
   app.init();
+
+  // Prefetch core PDF engine during browser idle
+  if (typeof window !== 'undefined') {
+    const idlePrefetch = window.requestIdleCallback || ((cb) => setTimeout(cb, 2000));
+    idlePrefetch(() => {
+      import('./core/pdf-engine.js');
+    });
+  }
 });

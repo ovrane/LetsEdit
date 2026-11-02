@@ -24,8 +24,15 @@ export function prerenderRoutes() {
     return;
   }
 
-  const baseHtml = fs.readFileSync(baseHtmlPath, 'utf-8');
+  let baseHtml = fs.readFileSync(baseHtmlPath, 'utf-8');
   let count = 0;
+
+  // Preload main stylesheet to eliminate render-blocking delay
+  const cssMatch = baseHtml.match(/<link rel="stylesheet"[^>]*href="(\/assets\/index-[^"]+\.css)"/i);
+  if (cssMatch && !baseHtml.includes(`rel="preload" as="style" href="${cssMatch[1]}"`)) {
+    const cssPreload = `  <link rel="preload" as="style" href="${cssMatch[1]}">\n`;
+    baseHtml = baseHtml.replace(cssMatch[0], cssPreload + cssMatch[0]);
+  }
 
   // 1. Prerender Homepage (dist/index.html) with full semantic landing HTML & h1
   const landingHtml = getLandingTemplateHtml();

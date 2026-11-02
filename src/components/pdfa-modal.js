@@ -19,7 +19,6 @@ export class PdfaModal {
     this.selectedProfile = 'pdfa-1b';
     this.embeddedFile = null;
     this.activeTab = 'convert'; // 'convert' | 'validate'
-    this.init();
   }
 
   init() {
@@ -254,6 +253,9 @@ export class PdfaModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.modal.style.display = 'flex';
 

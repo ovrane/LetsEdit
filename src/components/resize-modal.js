@@ -10,9 +10,6 @@ import { Toast } from './toast.js';
 export class ResizeModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -181,6 +178,9 @@ export class ResizeModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (this.modal) this.modal.style.display = 'flex';
   }
 

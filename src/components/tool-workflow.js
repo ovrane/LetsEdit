@@ -124,9 +124,6 @@ export class ToolWorkflowManager {
     this.excelOrientation = 'auto';
     this.pptTitle = '';
 
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   getBatesPositionCss() {
@@ -154,6 +151,9 @@ export class ToolWorkflowManager {
   }
 
   openTool(toolKey, { updateUrl = true } = {}) {
+    if (!this.container && typeof document !== 'undefined') {
+      this.init();
+    }
     const config = WORKFLOW_TOOLS_CONFIG[toolKey] || WORKFLOW_TOOLS_CONFIG.merge;
     this.activeTool = config;
     this.uploadedFiles = [];

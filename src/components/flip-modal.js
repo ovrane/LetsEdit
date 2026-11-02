@@ -12,9 +12,6 @@ export class FlipModal {
   constructor() {
     this.modal = null;
     this.lastResult = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -224,6 +221,9 @@ export class FlipModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.modal.querySelector('#btn-flip-download').style.display = 'none';
     const applyBtn = this.modal.querySelector('#btn-flip-apply');

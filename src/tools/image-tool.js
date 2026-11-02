@@ -13,7 +13,6 @@ export class ImageTool {
     this.modal = null;
     this.activeTab = 'stamps';
     this.uploadedDataUrl = null;
-    this.initModal();
   }
 
   initModal() {
@@ -367,7 +366,10 @@ export class ImageTool {
   }
 
   open() {
-    this.modal.style.display = 'flex';
+    if (!this.modal && typeof document !== 'undefined') {
+      this.initModal();
+    }
+    if (this.modal) this.modal.style.display = 'flex';
   }
 
   placeImageOnActivePage(dataUrl, initialW = 0.3, initialH = 0.15, opacity = 1.0) {

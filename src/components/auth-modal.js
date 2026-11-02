@@ -28,11 +28,31 @@ export class AuthModal {
     this.turnstileWidgetId = null;
 
     if (typeof document !== 'undefined') {
-      this.init();
+      // Close any active user popover when clicking elsewhere
+      document.addEventListener('click', (e) => {
+        if (this.activePopover && !this.activePopover.contains(e.target) && !e.target.closest('.user-account-btn') && !e.target.closest('#btn-open-auth')) {
+          this.closeAccountMenu();
+        }
+      });
+
+      // Global listener for user change via state store or Firebase
+      store.subscribe((event, data) => {
+        if (event === 'user-changed') {
+          this.updateAllUserWidgets(data.user);
+        }
+      });
+
+      // Synchronize with Firebase Auth service
+      firebaseAuth.onAuthStateChanged((user) => {
+        if (user) {
+          store.setUser(user);
+        }
+      });
     }
   }
 
   init() {
+    if (this.modal) return;
     this.modal = document.createElement('div');
     this.modal.className = 'modal-backdrop auth-modal-backdrop';
     this.modal.id = 'auth-modal';
@@ -40,26 +60,6 @@ export class AuthModal {
 
     this.renderModal();
     document.body.appendChild(this.modal);
-    this.bindEvents();
-
-    // Close any active user popover when clicking elsewhere
-    document.addEventListener('click', (e) => {
-      if (this.activePopover && !this.activePopover.contains(e.target) && !e.target.closest('.user-account-btn') && !e.target.closest('#btn-open-auth')) {
-        this.closeAccountMenu();
-      }
-    });
-
-    // Global listener for user change via state store or Firebase
-    store.subscribe((event, data) => {
-      if (event === 'user-changed') {
-        this.updateAllUserWidgets(data.user);
-      }
-    });
-
-    // Synchronize with Firebase Auth service
-    firebaseAuth.onAuthStateChanged((user) => {
-      this.updateAllUserWidgets(user);
-    });
   }
 
   renderModal() {
@@ -382,10 +382,8 @@ export class AuthModal {
     if (googleBtn) {
       googleBtn.onclick = async () => {
         try {
-          const emailInput = this.modal.querySelector('#auth-email');
-          const hint = emailInput ? emailInput.value.trim() : '';
           Toast.info('Connecting to Google Account...');
-          const result = await authService.signInWithGoogle(hint);
+          const result = await authService.signInWithGoogle();
           if (result && result.user) {
             this.handleSuccessfulAuth(result.user);
           }
@@ -408,6 +406,10 @@ export class AuthModal {
   }
 
   open(mode = 'login') {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
+    if (!this.modal) return;
     if (this.turnstileWidgetId) {
       turnstileManager.remove(this.turnstileWidgetId);
       this.turnstileWidgetId = null;

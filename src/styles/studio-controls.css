@@ -287,21 +287,8 @@ body.show-tool-workflow .editor-paging-bar {
    Studio Editor 'Apply Changes' Floating Bar & Export Workflow
    ========================================================================== */
 
-/* Sejda-style Persistent Floating Bar */
+/* Floating bottom bar removed per user request */
 .editor-floating-bottom-bar {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 95;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-}
-
-body:not(.show-studio) .editor-floating-bottom-bar {
   display: none !important;
 }
 

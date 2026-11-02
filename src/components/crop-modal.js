@@ -9,9 +9,6 @@ import { Toast } from './toast.js';
 export class CropModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -173,6 +170,9 @@ export class CropModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const state = store.getState();
     const cs = state.cropSettings || { top: 0, right: 0, bottom: 0, left: 0, applyToAll: true };

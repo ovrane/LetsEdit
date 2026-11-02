@@ -30,11 +30,16 @@
   <meta name="theme-color" content="#30050d">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="author" type="text/plain" href="/llms.txt">
+  <link rel="alternate" type="application/json" href="/.well-known/ard.json" title="Agentic Resource Discovery (ARD)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  </noscript>
+  <link rel="preload" as="style" href="/src/style.css">
   <link rel="stylesheet" href="/src/style.css">
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <script type="application/ld+json">
@@ -242,20 +247,6 @@
         <span>Saved</span>
       </div>
 
-      <button class="icon-btn" id="btn-theme-toggle" title="Toggle Theme (Dark / Light)">
-        <svg class="theme-icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-          viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-      </button>
 
       <button class="btn btn-sm btn-outline" id="btn-open-all-tools" title="Open 43+ PDF Tools Directory (/)">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -817,17 +808,6 @@
 
     <!-- Right Tool Options Sidebar -->
     <aside class="tool-options-sidebar" id="tool-options-sidebar"></aside>
-
-    <!-- Floating Action Bar for Studio Editor (Sejda-style persistent 'Apply changes') -->
-    <div class="editor-floating-bottom-bar" id="editor-floating-apply">
-      <button class="btn btn-primary btn-apply-changes" id="btn-floating-apply" title="Apply changes and export PDF">
-        <span>Apply changes</span>
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
-      </button>
-    </div>
   </main>
 
   <script type="module" src="/src/main.js"></script>

@@ -14,7 +14,6 @@ export class OcrModal {
     this.modal = null;
     this.ocrResult = null;
     this.isProcessing = false;
-    this.init();
   }
 
   init() {
@@ -172,6 +171,10 @@ export class OcrModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
+    if (!this.modal) return;
     const state = store.getState();
     if (!state.pdfBytes && !pdfEngine.rawBytes) {
       Toast.warning('Please open a PDF document first');

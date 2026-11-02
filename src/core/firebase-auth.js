@@ -9,18 +9,6 @@
  *   guaranteeing 100% flawless user flow with zero network blockage.
  */
 
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  sendPasswordResetEmail,
-  updateProfile,
-  onAuthStateChanged
-} from 'firebase/auth';
 import { store } from './state-store.js';
 
 // Default configuration with environment variables and lets-edit-inc live Firebase project
@@ -40,49 +28,10 @@ class FirebaseAuthService {
     this.isConfigured = false;
     this.authListeners = new Set();
     this.currentUser = null;
+    this.fbModules = null;
+    this._initPromise = null;
 
-    this.init();
-  }
-
-  init() {
-    const isAuthExplicitlyEnabled = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FIREBASE_AUTH_ENABLED === 'true');
-
-    // In headless Node.js test environment or when not explicitly enabled, keep false
-    if (typeof window === 'undefined') {
-      this.isConfigured = false;
-      return;
-    }
-
-    // Only eagerly attach Firebase Auth SDK if explicitly configured and verified
-    // (prevents CONFIGURATION_NOT_FOUND 400 network failures on projects where Auth isn't enabled)
-    if (isAuthExplicitlyEnabled && firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
-      try {
-        this.app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-        this.auth = getAuth(this.app);
-        this.isConfigured = true;
-
-        onAuthStateChanged(this.auth, (fbUser) => {
-          if (fbUser) {
-            const mapped = this._mapFirebaseUser(fbUser);
-            this.currentUser = mapped;
-            store.setUser(mapped);
-            this._notifyListeners(mapped);
-          } else {
-            this.currentUser = null;
-            store.setUser(null);
-            this._notifyListeners(null);
-          }
-        });
-        return;
-      } catch (err) {
-        console.warn('Firebase live initialization notice:', err.message);
-        this.isConfigured = false;
-      }
-    } else {
-      this.isConfigured = false;
-    }
-
-    // Read remembered session from localStorage
+    // Read remembered session from localStorage immediately (0ms sync)
     if (typeof localStorage !== 'undefined') {
       try {
         const saved = localStorage.getItem('letsedit_firebase_session');
@@ -95,6 +44,70 @@ class FirebaseAuthService {
         console.warn('Failed restoring saved auth session:', e);
       }
     }
+
+    // Only eagerly attach Firebase Auth SDK if user has active session or is on an auth route
+    const isAuthRoute = typeof window !== 'undefined' && 
+      (window.location.pathname.startsWith('/account') || 
+       window.location.pathname.startsWith('/login') || 
+       window.location.pathname.startsWith('/register'));
+
+    if (this.currentUser || isAuthRoute) {
+      this.init();
+    } else if (typeof window !== 'undefined') {
+      // Defer background iframe initialization until idle so landing page is not blocked
+      const scheduleIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 4000));
+      scheduleIdle(() => {
+        this.init();
+      });
+    }
+  }
+
+  async ensureInitialized() {
+    if (this.isConfigured && this.auth && this.fbModules) return;
+    return this.init();
+  }
+
+  init() {
+    if (this._initPromise) return this._initPromise;
+    this._initPromise = (async () => {
+      // In headless Node.js test environment, keep false so tests use controlled mock users
+      if (typeof window === 'undefined') {
+        this.isConfigured = false;
+        return;
+      }
+
+      // Attach Firebase Auth SDK in browser runtime
+      if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 5) {
+        try {
+          const { initializeApp, getApps, getApp } = await import('firebase/app');
+          const fbAuth = await import('firebase/auth');
+          this.fbModules = { initializeApp, getApps, getApp, ...fbAuth };
+
+          this.app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+          this.auth = fbAuth.getAuth(this.app);
+          this.isConfigured = true;
+
+          fbAuth.onAuthStateChanged(this.auth, (fbUser) => {
+            if (fbUser) {
+              const mapped = this._mapFirebaseUser(fbUser);
+              this.currentUser = mapped;
+              store.setUser(mapped);
+              this._notifyListeners(mapped);
+            } else {
+              this.currentUser = null;
+              store.setUser(null);
+              this._notifyListeners(null);
+            }
+          });
+        } catch (err) {
+          console.warn('Firebase live initialization notice:', err.message);
+          this.isConfigured = false;
+        }
+      } else {
+        this.isConfigured = false;
+      }
+    })();
+    return this._initPromise;
   }
 
   _mapFirebaseUser(fbUser, extra = {}) {
@@ -142,9 +155,10 @@ class FirebaseAuthService {
    * Sign In with Email and Password
    */
   async signInWithEmail(email, password) {
-    if (this.isConfigured && this.auth) {
+    await this.ensureInitialized();
+    if (this.isConfigured && this.auth && this.fbModules) {
       try {
-        const cred = await signInWithEmailAndPassword(this.auth, email, password);
+        const cred = await this.fbModules.signInWithEmailAndPassword(this.auth, email, password);
         const mapped = this._mapFirebaseUser(cred.user);
         this._persistSession(mapped);
         return mapped;
@@ -184,11 +198,12 @@ class FirebaseAuthService {
    * Create New User Account with Email and Password
    */
   async signUpWithEmail(email, password, displayName = '') {
-    if (this.isConfigured && this.auth) {
+    await this.ensureInitialized();
+    if (this.isConfigured && this.auth && this.fbModules) {
       try {
-        const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+        const cred = await this.fbModules.createUserWithEmailAndPassword(this.auth, email, password);
         if (displayName) {
-          await updateProfile(cred.user, { displayName });
+          await this.fbModules.updateProfile(cred.user, { displayName });
         }
         const mapped = this._mapFirebaseUser(cred.user, { name: displayName });
         this._persistSession(mapped);
@@ -229,13 +244,14 @@ class FirebaseAuthService {
    * Google OAuth Sign In via Firebase
    */
   async signInWithGoogle() {
-    if (this.isConfigured && this.auth) {
+    await this.ensureInitialized();
+    if (this.isConfigured && this.auth && this.fbModules) {
       try {
-        const provider = new GoogleAuthProvider();
+        const provider = new this.fbModules.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
         provider.addScope('profile');
         provider.addScope('email');
-        const cred = await signInWithPopup(this.auth, provider);
+        const cred = await this.fbModules.signInWithPopup(this.auth, provider);
         const mapped = this._mapFirebaseUser(cred.user);
         this._persistSession(mapped);
         return mapped;
@@ -280,9 +296,10 @@ class FirebaseAuthService {
    * Password Reset Email Dispatch
    */
   async sendPasswordReset(email) {
-    if (this.isConfigured && this.auth) {
+    await this.ensureInitialized();
+    if (this.isConfigured && this.auth && this.fbModules) {
       try {
-        await sendPasswordResetEmail(this.auth, email);
+        await this.fbModules.sendPasswordResetEmail(this.auth, email);
         return true;
       } catch (err) {
         if (typeof window !== 'undefined') {
@@ -298,9 +315,9 @@ class FirebaseAuthService {
    * Sign Out Current User
    */
   async signOut() {
-    if (this.isConfigured && this.auth) {
+    if (this.isConfigured && this.auth && this.fbModules) {
       try {
-        await signOut(this.auth);
+        await this.fbModules.signOut(this.auth);
       } catch (e) {
         console.warn('Firebase signout error:', e);
       }

@@ -27,7 +27,6 @@ export class CompareModal {
     this.totalPages = 1;
     this.wipePercent = 50;
     this.opacityPercent = 50;
-    this.init();
   }
 
   init() {
@@ -423,6 +422,9 @@ export class CompareModal {
   }
 
   async show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.modal.style.display = 'flex';
 

@@ -9,9 +9,6 @@ import { Toast } from './toast.js';
 export class BatesModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -171,6 +168,9 @@ export class BatesModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     const state = store.getState();
     const bn = state.batesNumbering || {

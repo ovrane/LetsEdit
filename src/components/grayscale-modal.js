@@ -12,9 +12,6 @@ export class GrayscaleModal {
   constructor() {
     this.modal = null;
     this.lastResult = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -142,6 +139,9 @@ export class GrayscaleModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.modal.querySelector('#grayscale-result-box').style.display = 'none';
     this.modal.querySelector('#btn-grayscale-download').style.display = 'none';

@@ -3,7 +3,7 @@
  * Displays a clean, Adobe Acrobat / Landing style upload dropzone when no document is open.
  */
 
-import { pdfEngine } from '../pdf-engine.js';
+const getPdfEngine = async () => (await import('../pdf-engine.js')).pdfEngine;
 import { store } from '../state-store.js';
 import { readFileAsArrayBuffer } from '../../utils/helpers.js';
 import { Toast } from '../../components/toast.js';
@@ -75,8 +75,9 @@ export class CanvasEmptyState {
         if (file && file.type === 'application/pdf') {
           try {
             Toast.info('Loading PDF document...');
+            const engine = await getPdfEngine();
             const ab = await readFileAsArrayBuffer(file);
-            const info = await pdfEngine.loadPdf(ab);
+            const info = await engine.loadPdf(ab);
             store.setDocument(ab, file.name, info.numPages);
             const filenameEl = document.getElementById('current-filename');
             if (filenameEl) filenameEl.textContent = file.name;
@@ -93,8 +94,9 @@ export class CanvasEmptyState {
       blankBtn.onclick = async () => {
         try {
           Toast.info('Creating clean blank page...');
-          const blankBytes = await pdfEngine.createBlankPdf();
-          const info = await pdfEngine.loadPdf(blankBytes);
+          const engine = await getPdfEngine();
+          const blankBytes = await engine.createBlankPdf();
+          const info = await engine.loadPdf(blankBytes);
           store.setDocument(blankBytes, 'Blank_Document.pdf', info.numPages);
           const filenameEl = document.getElementById('current-filename');
           if (filenameEl) filenameEl.textContent = 'Blank_Document.pdf';
@@ -120,8 +122,9 @@ export class CanvasEmptyState {
       if (file && file.type === 'application/pdf') {
         try {
           Toast.info('Loading PDF document...');
+          const engine = await getPdfEngine();
           const ab = await readFileAsArrayBuffer(file);
-          const info = await pdfEngine.loadPdf(ab);
+          const info = await engine.loadPdf(ab);
           store.setDocument(ab, file.name, info.numPages);
           const filenameEl = document.getElementById('current-filename');
           if (filenameEl) filenameEl.textContent = file.name;

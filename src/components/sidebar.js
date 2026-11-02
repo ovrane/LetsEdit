@@ -3,11 +3,10 @@
  * Blank Page Insertion, and External PDF Merging
  */
 
-import { pdfEngine } from '../core/pdf-engine.js';
+const getPdfEngine = async () => (await import('../core/pdf-engine.js')).pdfEngine;
 import { store } from '../core/state-store.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
-import { toolWorkflow } from './tool-workflow.js';
 import { router } from '../core/router.js';
 
 export class Sidebar {
@@ -47,7 +46,8 @@ export class Sidebar {
     this.container.querySelector('#sidebar-add-page-btn').onclick = async () => {
       try {
         Toast.info('Appending blank page...');
-        const newCount = await pdfEngine.appendBlankPage();
+        const engine = await getPdfEngine();
+        const newCount = await engine.appendBlankPage();
         store.addBlankPage();
         Toast.success(`Added page ${newCount}!`);
       } catch (err) {
@@ -67,8 +67,9 @@ export class Sidebar {
         try {
           Toast.info(`Merging ${file.name}...`);
           const bytes = await readFileAsArrayBuffer(file);
-          const totalPages = await pdfEngine.mergeExternalPdf(bytes);
-          store.setDocument(pdfEngine.rawBytes, store.getState().filename, totalPages);
+          const engine = await getPdfEngine();
+          const totalPages = await engine.mergeExternalPdf(bytes);
+          store.setDocument(engine.rawBytes, store.getState().filename, totalPages);
           Toast.success(`Merged ${file.name}! Total pages: ${totalPages}`);
         } catch (err) {
           console.error(err);
@@ -216,7 +217,8 @@ export class Sidebar {
 
   async renderThumbCanvas(pageNum, canvas, rotation) {
     try {
-      const page = await pdfEngine.getPage(pageNum);
+      const engine = await getPdfEngine();
+      const page = await engine.getPage(pageNum);
       const totalRotation = (page.rotate + rotation) % 360;
       const viewport = page.getViewport({ scale: 0.25, rotation: totalRotation });
 

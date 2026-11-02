@@ -113,8 +113,7 @@ export class PagingBarHandler {
         const state = store.getState();
         if (!state.pdfBytes || state.pageCount === 0) return;
 
-        const viewportRect = manager.container.getBoundingClientRect();
-        const viewportCenterY = viewportRect.top + viewportRect.height / 2;
+        const containerScrollCenter = manager.container.scrollTop + (manager.container.clientHeight / 2);
 
         let closestPage = null;
         let minDistance = Infinity;
@@ -126,9 +125,8 @@ export class PagingBarHandler {
         for (const pageNum of activePages) {
           const el = document.getElementById(`page-wrap-${pageNum}`);
           if (el) {
-            const rect = el.getBoundingClientRect();
-            const pageCenterY = rect.top + rect.height / 2;
-            const distance = Math.abs(viewportCenterY - pageCenterY);
+            const pageCenterY = el.offsetTop + (el.offsetHeight / 2);
+            const distance = Math.abs(containerScrollCenter - pageCenterY);
             if (distance < minDistance) {
               minDistance = distance;
               closestPage = pageNum;

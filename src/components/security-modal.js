@@ -9,7 +9,6 @@ import { Toast } from './toast.js';
 export class SecurityModal {
   constructor() {
     this.modal = null;
-    this.init();
   }
 
   init() {
@@ -147,6 +146,10 @@ export class SecurityModal {
   }
 
   open() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
+    if (!this.modal) return;
     const cur = store.getState().exportPassword;
     if (cur && cur.userPassword) {
       this.modal.querySelector('#sec-user-pwd').value = cur.userPassword;

@@ -11,9 +11,6 @@ import { downloadBlob } from '../utils/helpers.js';
 export class NUpModal {
   constructor() {
     this.modal = null;
-    if (typeof document !== 'undefined') {
-      this.init();
-    }
   }
 
   init() {
@@ -137,6 +134,9 @@ export class NUpModal {
   }
 
   show() {
+    if (!this.modal && typeof document !== 'undefined') {
+      this.init();
+    }
     if (!this.modal) return;
     this.updateSummary(2);
     this.modal.style.display = 'flex';

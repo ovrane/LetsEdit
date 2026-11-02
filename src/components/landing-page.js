@@ -8,8 +8,11 @@
  */
 
 import { store } from '../core/state-store.js';
-import { pdfEngine } from '../core/pdf-engine.js';
-import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES, allToolsModal } from './all-tools-modal.js';
+const getPdfEngine = async () => {
+  const { pdfEngine } = await import('../core/pdf-engine.js');
+  return pdfEngine;
+};
+import { TOOLS_CATALOG, LETSEDIT_TOOL_CATEGORIES } from './tools-catalog-data.js';
 import { Toast } from './toast.js';
 import { readFileAsArrayBuffer } from '../utils/helpers.js';
 import { applyTheme, getPreferredTheme, toggleTheme } from '../utils/theme.js';
@@ -20,7 +23,7 @@ import { getLandingTemplateHtml } from './landing/landing-html.js';
 import { LandingCardsRenderer } from './landing/landing-cards.js';
 import { getTwoToneIconSvg } from './landing/landing-icons.js';
 import { pwaManager } from '../core/pwa-manager.js';
-import { legalModal } from './legal-modal.js';
+
 
 export class LandingPage {
   constructor() {
@@ -114,7 +117,8 @@ export class LandingPage {
 
     // 6. Fallback to in-studio modal if opened from within editor context
     this.switchToStudio();
-    setTimeout(() => {
+    setTimeout(async () => {
+      const { allToolsModal } = await import('./all-tools-modal.js');
       allToolsModal.dispatchToolAction(action);
     }, 150);
   }
@@ -137,7 +141,8 @@ export class LandingPage {
       try {
         Toast.info('Loading PDF into Studio...');
         const ab = await readFileAsArrayBuffer(file);
-        const info = await pdfEngine.loadPdf(ab);
+        const engine = await getPdfEngine();
+        const info = await engine.loadPdf(ab);
         store.setDocument(ab, file.name, info.numPages);
         const filenameEl = document.getElementById('current-filename');
         if (filenameEl) filenameEl.textContent = file.name;
@@ -162,8 +167,9 @@ export class LandingPage {
       heroBlankBtn.onclick = async () => {
         try {
           Toast.info('Creating clean blank page...');
-          const blankBytes = await pdfEngine.createBlankPdf();
-          const info = await pdfEngine.loadPdf(blankBytes);
+          const engine = await getPdfEngine();
+          const blankBytes = await engine.createBlankPdf();
+          const info = await engine.loadPdf(blankBytes);
           store.setDocument(blankBytes, 'Blank_Document.pdf', info.numPages);
           const filenameEl = document.getElementById('current-filename');
           if (filenameEl) filenameEl.textContent = 'Blank_Document.pdf';
@@ -180,8 +186,9 @@ export class LandingPage {
       heroSampleBtn.onclick = async () => {
         try {
           Toast.info('Loading sample agreement...');
-          const sampleBytes = await pdfEngine.createSamplePdf();
-          const info = await pdfEngine.loadPdf(sampleBytes);
+          const engine = await getPdfEngine();
+          const sampleBytes = await engine.createSamplePdf();
+          const info = await engine.loadPdf(sampleBytes);
           store.setDocument(sampleBytes, 'Sample_Agreement.pdf', info.numPages);
           const filenameEl = document.getElementById('current-filename');
           if (filenameEl) filenameEl.textContent = 'Sample_Agreement.pdf';
@@ -198,8 +205,9 @@ export class LandingPage {
       heroSampleMultiBtn.onclick = async () => {
         try {
           Toast.info('Loading 4-page sample report...');
-          const sampleBytes = await pdfEngine.createSampleWatermarkPdf();
-          const info = await pdfEngine.loadPdf(sampleBytes);
+          const engine = await getPdfEngine();
+          const sampleBytes = await engine.createSampleWatermarkPdf();
+          const info = await engine.loadPdf(sampleBytes);
           store.setDocument(sampleBytes, 'Sample_4Page_Report.pdf', info.numPages);
           const filenameEl = document.getElementById('current-filename');
           if (filenameEl) filenameEl.textContent = 'Sample_4Page_Report.pdf';
@@ -211,6 +219,13 @@ export class LandingPage {
         }
       };
     }
+
+    // Prefetch PDF engine on user intent (pointer hover or file dragenter)
+    const prefetchEngine = () => {
+      import('../core/pdf-engine.js');
+    };
+    if (heroDropzone) heroDropzone.addEventListener('dragenter', prefetchEngine, { once: true });
+    if (heroUploadBtn) heroUploadBtn.addEventListener('pointerenter', prefetchEngine, { once: true });
 
     const heroOpenEditorBtn = this.container.querySelector('#btn-landing-open-editor');
     if (heroOpenEditorBtn) {
@@ -357,15 +372,7 @@ export class LandingPage {
     // Header Quick Tool Search Modal (Spotlight style)
     this.setupHeaderQuickSearch();
 
-    // Theme Toggle on Landing Header
-    const landingThemeBtn = this.container.querySelector('#btn-landing-theme');
-    if (landingThemeBtn) {
-      landingThemeBtn.onclick = () => {
-        toggleTheme();
-      };
-    }
-
-    applyTheme(getPreferredTheme());
+    applyTheme();
 
     // User auth button & popover on landing header
     const landingAuthBtn = this.container.querySelector('#btn-landing-auth');
@@ -513,7 +520,11 @@ export class LandingPage {
         else if (tab === 'terms') router.navigate('/terms');
         else if (tab === 'security') router.navigate('/security-whitepaper');
         else if (tab === 'cookies') router.navigate('/cookies');
-        else legalModal.open(tab);
+        else {
+          import('./legal-modal.js').then(({ legalModal }) => {
+            legalModal.open(tab);
+          });
+        }
       };
     });
 
@@ -588,7 +599,8 @@ export class LandingPage {
     try {
       Toast.info('Loading PDF into Studio...');
       const arrayBuffer = await readFileAsArrayBuffer(file);
-      const info = await pdfEngine.loadPdf(arrayBuffer);
+      const engine = await getPdfEngine();
+      const info = await engine.loadPdf(arrayBuffer);
       store.setDocument(arrayBuffer, file.name, info.numPages);
       const filenameEl = document.getElementById('current-filename');
       if (filenameEl) filenameEl.textContent = file.name;

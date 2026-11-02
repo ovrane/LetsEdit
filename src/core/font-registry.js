@@ -347,25 +347,31 @@ export function buildGoogleFontsUrl(fontIds) {
 const _loadedFontUrls = new Set();
 
 /**
- * Loads all non-system fonts from the catalog into the document <head>.
- * Called once on editor initialization.
+ * Loads a single font on-demand when requested by the editor or user.
+ */
+export function loadEditorFont(fontId) {
+  if (typeof document === 'undefined' || !fontId) return;
+  const rec = FONT_MAP[fontId];
+  if (!rec || rec.category === 'system') return;
+  const url = buildGoogleFontsUrl([fontId]);
+  if (url && !_loadedFontUrls.has(url)) {
+    _loadedFontUrls.add(url);
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = url;
+    link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  }
+}
+
+/**
+ * Loads common editor fonts on-demand without blocking initial page render.
  */
 export function loadAllEditorFonts() {
   if (typeof document === 'undefined') return;
-  const allIds = FONT_CATALOG.filter(f => f.category !== 'system').map(f => f.id);
-  // Split into batches of 20 to stay within URL length limits
-  const BATCH = 20;
-  for (let i = 0; i < allIds.length; i += BATCH) {
-    const batchUrl = buildGoogleFontsUrl(allIds.slice(i, i + BATCH));
-    if (batchUrl && !_loadedFontUrls.has(batchUrl)) {
-      _loadedFontUrls.add(batchUrl);
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = batchUrl;
-      link.crossOrigin = 'anonymous';
-      document.head.appendChild(link);
-    }
-  }
+  // Load only top common editor fonts on idle, not 150+ fonts upfront
+  const common = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Merriweather'];
+  common.forEach(f => loadEditorFont(f));
 }
 
 // ─── 4. TTF Fetching for pdf-lib (vector export) ─────────────────────────────
@@ -433,7 +439,23 @@ export async function fetchFontBytes(fontId) {
 
 // ─── 5. Standard PDF Font Fallback Map ──────────────────────────────────────
 
-import { StandardFonts } from 'pdf-lib';
+// Self-contained StandardFonts constant map matching pdf-lib specification without pulling in entire library
+const StandardFonts = {
+  Courier: 'Courier',
+  CourierBold: 'Courier-Bold',
+  CourierOblique: 'Courier-Oblique',
+  CourierBoldOblique: 'Courier-BoldOblique',
+  Helvetica: 'Helvetica',
+  HelveticaBold: 'Helvetica-Bold',
+  HelveticaOblique: 'Helvetica-Oblique',
+  HelveticaBoldOblique: 'Helvetica-BoldOblique',
+  TimesRoman: 'Times-Roman',
+  TimesRomanBold: 'Times-Bold',
+  TimesRomanItalic: 'Times-Italic',
+  TimesRomanBoldItalic: 'Times-BoldItalic',
+  Symbol: 'Symbol',
+  ZapfDingbats: 'ZapfDingbats'
+};
 
 /**
  * Maps a canonical font ID to the closest pdf-lib StandardFont enum for fallback.

@@ -16,7 +16,6 @@ export class SignatureTool {
     this.inkColor = '#0f172a';
     this.cameraInkColor = '#1a365d';
     this.cameraStream = null;
-    this.initModal();
   }
 
   initModal() {
@@ -494,7 +493,10 @@ export class SignatureTool {
   }
 
   open() {
-    this.modal.style.display = 'flex';
+    if (!this.modal && typeof document !== 'undefined') {
+      this.initModal();
+    }
+    if (this.modal) this.modal.style.display = 'flex';
   }
 
   placeSignatureOnActivePage(dataUrl) {

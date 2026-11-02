@@ -8,7 +8,6 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { Toast } from '../toast.js';
 import { PageOperations } from '../../core/engine/page-ops.js';
 import { pdfEngine } from '../../core/pdf-engine.js';
-import { compareModal } from '../compare-modal.js';
 import { mobilePairModal } from '../mobile-pair-modal.js';
 import { cloudPickerModal } from '../cloud-picker-modal.js';
 import { bindWorkspaceOptionsEvents } from './workspace-options-events.js';
@@ -366,8 +365,9 @@ export function bindWorkspaceEvents(manager) {
   // Quick compare visual diff launcher
   const quickCompareBtn = manager.container.querySelector('#btn-options-quick-compare-preview');
   if (quickCompareBtn) {
-    quickCompareBtn.onclick = () => {
+    quickCompareBtn.onclick = async () => {
       if (manager.uploadedFiles.length >= 2) {
+        const { compareModal } = await import('../compare-modal.js');
         compareModal.showWithBytes(
           manager.uploadedFiles[0].bytes,
           manager.uploadedFiles[1].bytes,

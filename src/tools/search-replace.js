@@ -4,7 +4,6 @@
  * viewport auto-scrolling, active match highlighting, and single or batch replacement.
  */
 
-import { pdfEngine } from '../core/pdf-engine.js';
 import { store } from '../core/state-store.js';
 import { uid } from '../utils/helpers.js';
 import { Toast } from '../components/toast.js';
@@ -44,6 +43,7 @@ export class SearchReplaceTool {
       ? state.pageOrder
       : Array.from({ length: state.pageCount }, (_, i) => i + 1);
 
+    const { pdfEngine } = await import('../core/pdf-engine.js');
     for (const p of pageOrder) {
       if (state.deletedPages.has(p)) continue;
       const page = await pdfEngine.getPage(p);
